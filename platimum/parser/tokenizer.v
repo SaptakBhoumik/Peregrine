@@ -108,15 +108,23 @@ pub fn tokenize(str string) []string {
 		}
 		mut a:=i+1
 		if a < code.len{
-			if code[a].str() == white_space || code[a].str() in collection_of_keywords  || lexeme in collection_of_keywords{
+			if code[a].ascii_str() == white_space || code[a].ascii_str() in collection_of_keywords  || lexeme in collection_of_keywords{
 				if lexeme != ''{
 					lexeme  =lexeme.replace('\n', '<newline>')
-					println(lexeme)
 					result << lexeme
 					lexeme = ''
-				}
-			}
-		}
-	}
+		}}}}
 	return result
 }
+code:=r"
+for i,char in enumerate(string):
+if char != white_space:
+        lexeme += char 
+    if (i+1 < len(string)): 
+        if string[i+1] == white_space or string[i+1] in KEYWORDS or lexeme in KEYWORDS: 
+            if lexeme != '':
+                print(lexeme.replace('\n', '<newline>'))
+                lexeme = ''
+"
+d:=tokenize(code)
+println(d)
