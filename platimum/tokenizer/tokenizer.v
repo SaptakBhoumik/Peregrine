@@ -97,12 +97,12 @@ pub fn tokenize(str string) []string {
 	collection_of_keywords << exception_keywords
 	collection_of_keywords << variable_keybords 
 	collection_of_keywords << functional_keywords
-	mut code:=str
+	mut code:="$str "
 	white_space := ' '
 	//defining an empty array
 	mut result := []string{}
 	mut lexeme := ''
-	for i,mut char in code.split(" "){	
+	for i,mut char in code.split(""){	
 		lexeme += "$char"
 		mut a:=i+1
 		if a < code.len{
