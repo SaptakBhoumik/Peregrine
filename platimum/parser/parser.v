@@ -1,2 +1,5 @@
 import tokenizer
-println(tokenizer.tokenize("h a "))
+a:='g a
+g g
+g g'
+println(tokenizer.tokenize(a))
