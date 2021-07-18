@@ -1,4 +1,8 @@
 pub fn tokenize(str string) []string {
+	other_symbols[
+				'<newline>',//used to show \n
+				'<tab>'//used to show tab
+				]
 	symbols := [
 			'{',
 			'}',
@@ -77,8 +81,6 @@ pub fn tokenize(str string) []string {
 							"var"
 							]
 	functional_keywords := [
-							'<newline>',//used to show \n
-							'<tab>',//used to show tab
 							'PRINT',
 							'INPUT',
 							'SYSTEM'//run command prompt commands
@@ -86,6 +88,7 @@ pub fn tokenize(str string) []string {
 	//defining an empty array
 	mut collection_of_keywords := []string{}
 	//appending the keywords
+	collection_of_keywords << other_symbols
 	collection_of_keywords << symbols
 	collection_of_keywords << logical_keywords
 	collection_of_keywords << operator_keywords
