@@ -1,3 +1,32 @@
+
+pub fn enumerate(code string) []string {
+	return code.split("")
+} 
+
+pub fn tokenize(str string) []string {
+	mut code:=str.replace('    ','<tab>')
+	white_space := ' '
+	//defining an empty array
+	mut result := []string{}
+	mut lexeme := ''
+	for i,char in enumerate(code){
+		if char != white_space{
+			lexeme += char
+		}
+	if i+1 < code.len(){
+		if code[i+1] == white_space || code[i+1] in collection_of_keywords  || lexeme in collection_of_keywords{
+			if lexeme != ''{
+				lexeme  =lexeme.replace('\n', '<newline>')
+				println(lexeme)
+				result << lexeme
+				lexeme = ''
+			}
+		}
+	}
+	}
+	return result
+}
+
 symbols := [
 			'{',
 			'}',
@@ -76,12 +105,14 @@ variable_keybords := [
 						"var"
 						]
 functional_keywords := [
+						'<newline>',//used to show \n
+						'<tab>',//used to show tab
 						'PRINT',
 						'INPUT',
 						'SYSTEM'//run command prompt commands
 						]
 //defining an empty array
-mut collection_of_keywords := []string{}
+pub mut collection_of_keywords := []string{}
 //appending the keywords
 collection_of_keywords << symbols
 collection_of_keywords << logical_keywords
@@ -94,4 +125,12 @@ collection_of_keywords << import_keywords
 collection_of_keywords << exception_keywords
 collection_of_keywords << variable_keybords 
 collection_of_keywords << functional_keywords
-println(collection_of_keywords)
+
+code:=r"for i,char in enumerate(string):
+    if char != white_space:
+        lexeme += char # adding a char each time
+    if (i+1 < len(string)): # prevents error
+        if string[i+1] == white_space or string[i+1] in KEYWORDS or lexeme in KEYWORDS: # if next char == ' '
+            if lexeme != '':
+                print(lexeme.replace('\n', '<newline>'))
+                lexeme = ''"
