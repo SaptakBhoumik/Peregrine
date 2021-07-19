@@ -108,7 +108,7 @@ pub fn tokenize(str string) []string {
 		if a < code.len{
 			if code[a].ascii_str() == white_space || code[a].ascii_str() in collection_of_keywords  || lexeme in collection_of_keywords{
 				if lexeme != ''{
-					lexeme  =lexeme.replace('\n', '<newline>')
+					lexeme  =lexeme.replace('\n', r'\n')
 					result << lexeme
 					lexeme = ''
 		}}}}
