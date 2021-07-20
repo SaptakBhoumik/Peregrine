@@ -1,7 +1,13 @@
 module tokenizer
 
 pub fn tokenize(str string) []string {
+	other_keywords := [
+					'True',
+					'False',
+					'None'
+					]
 	symbols := [
+			' ',
 			'{',
 			'}',
 			'(',
@@ -86,6 +92,7 @@ pub fn tokenize(str string) []string {
 	//defining an empty array
 	mut collection_of_keywords := []string{}
 	//appending the keywords
+	collection_of_keywords << other_keywords
 	collection_of_keywords << symbols
 	collection_of_keywords << logical_keywords
 	collection_of_keywords << operator_keywords
