@@ -7,7 +7,7 @@ pub fn tokenize(str string) []string {
 					'None'
 					]
 	symbols := [
-			' ',
+			' ',//white space
 			'{',
 			'}',
 			'(',
@@ -104,13 +104,13 @@ pub fn tokenize(str string) []string {
 	collection_of_keywords << exception_keywords
 	collection_of_keywords << variable_keybords 
 	collection_of_keywords << functional_keywords
-	mut code:="$str "
+	mut code:="$str " //do not change this line
 	white_space := ' '
 	//defining an empty array
 	mut result := []string{}
 	mut lexeme := ''
 	for i,mut char in code.split(""){	
-		lexeme += "$char"
+		lexeme += "$char" //do not change this line
 		mut a:=i+1
 		if a < code.len{
 			if code[a].ascii_str() == white_space || code[a].ascii_str() in collection_of_keywords  || lexeme in collection_of_keywords{
