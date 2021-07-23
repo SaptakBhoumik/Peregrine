@@ -1,5 +1,22 @@
 module tokenizer
 
+fn remove_comment(str string) string{
+	code := "$str \n"//dont change this line
+	mut modified_code:=""
+	mut lines := code.split_into_lines()
+	for mut line in lines{
+		mut modified_line:=line.replace(" ","")
+		modified_line=modified_line.replace("	","")
+		if modified_line.len > 0 {
+		mut first_char:=modified_line[0].ascii_str()
+		println(modified_line)
+		println(first_char)
+		if first_char!="#"{
+			modified_code += "$line \n"
+	}}}
+	return modified_code
+}
+
 pub fn tokenize(str string) []string {
 	other_keywords := [
 					'True',
