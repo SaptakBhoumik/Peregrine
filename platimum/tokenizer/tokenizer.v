@@ -9,8 +9,6 @@ fn remove_comment(str string) string{
 		modified_line=modified_line.replace("	","")
 		if modified_line.len > 0 {
 		mut first_char:=modified_line[0].ascii_str()
-		println(modified_line)
-		println(first_char)
 		if first_char!="#"{
 			modified_code += "$line \n"
 	}}}
