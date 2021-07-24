@@ -8,10 +8,18 @@ for i,char in enumerate(string):
 	# prevents error
     if i+1 < len(string):
         if string[i+1] == white_space or string[i+1] in KEYWORDS or lexeme in KEYWORDS: 
+                    #sds
             if lexeme != '':
                 a.append(lexeme.replace('\n', '<newline>'))
                 print(lexeme.replace('\n', '<newline>'))
                 lexeme = ''
 print(a)
 "
-println(tokenizer.tokenize(a))
+k:=tokenizer.tokenize(a)
+println(k)
+if "#" in k{
+    print("fail")
+}
+else {
+    print("pass")
+}
