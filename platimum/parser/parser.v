@@ -7,7 +7,7 @@ for i,char in enumerate(string):
     #print(lexeme)
 	# prevents error
     if i+1 < len(string):
-        if string[i+1] == white_space or string[i+1] in KEYWORDS or lexeme in KEYWORDS: # if next char == ' '
+        if string[i+1] == white_space or string[i+1] in KEYWORDS or lexeme in KEYWORDS: 
             if lexeme != '':
                 a.append(lexeme.replace('\n', '<newline>'))
                 print(lexeme.replace('\n', '<newline>'))

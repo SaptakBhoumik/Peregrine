@@ -119,7 +119,7 @@ pub fn tokenize(str string) []string {
 	collection_of_keywords << exception_keywords
 	collection_of_keywords << variable_keybords 
 	collection_of_keywords << functional_keywords
-	mut code:="$str " //do not change this line
+	mut code:=remove_comment("$str " )//do not change this line
 	white_space := ' '
 	//defining an empty array
 	mut result := []string{}
