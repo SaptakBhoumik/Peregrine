@@ -16,10 +16,5 @@ for i,char in enumerate(string):
 print(a)
 "
 k:=tokenizer.tokenize(a)
-println(k)
-if "#" in k{
-    print("fail")
-}
-else {
-    print("pass")
-}
+j:=tokenizer.remove_white_space(k)
+println(j)
