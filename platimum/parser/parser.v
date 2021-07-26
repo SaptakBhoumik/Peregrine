@@ -16,5 +16,4 @@ for i,char in enumerate(string):
 print(a)
 "
 k:=tokenizer.tokenize(a)
-j:=tokenizer.remove_white_space(k)
-println(j)
+println(k)
