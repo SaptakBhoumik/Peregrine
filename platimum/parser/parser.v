@@ -1,19 +1,25 @@
 import tokenizer
-a:="
-for i,char in enumerate(string):
-    if char != white_space:
-		# adding a char each time
-        lexeme += char 
-    #print(lexeme)
-	# prevents error
-    if i+1 < len(string):
-        if string[i+1] == white_space or string[i+1] in KEYWORDS or lexeme in KEYWORDS: 
-                    #sds
-            if lexeme != '':
-                a.append(lexeme.replace('\n', '<newline>'))
-                print(lexeme.replace('\n', '<newline>'))
-                lexeme = ''
-print(a)
-"
+mut a:='a=True
+cons b= False
+a=None
+def main():
+    PRINT "hi"
+    PRINT 2+9
+    PRINT 2-9
+    PRINT 2*9
+    PRINT 2/9
+    PRINT 2^9
+    PRINT 2//9
+    PRINT 2%9
+def print(str)
+    PRINT str
+k=3
+if k==3 or k>3 or k<3 or k!=3 or k>=4 or k<=3:
+    PRINT "fd"
+elif k==0 and k==1:
+    print("s")
+else:
+    print("j")
+'
 k:=tokenizer.tokenize(a)
-println(k)
+println(tokenizer.process_tokens(k))
