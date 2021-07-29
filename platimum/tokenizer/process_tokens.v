@@ -1,7 +1,8 @@
 module tokenizer
 
 fn symbol_present_in_arrey(item string) int{
-	symbols:=[
+	symbols:=[		
+					'!',
 					'=',//equals
 					'+',//addition
 					'-',//subtraction
@@ -10,9 +11,9 @@ fn symbol_present_in_arrey(item string) int{
 					'^',//exponent
 					'(',
 					'.',
+					',',
 					')',
 					':',
-					'!',
 					'%',//remainder
 					'>',//greater than
 					'<',//less than
@@ -68,11 +69,11 @@ pub fn process_tokens(list []string) []string{
 	mut is_list_open:=false//checks if it is a list
 	mut is_dictionary_open:=false//checks if is is a dictionary
 	multi_char_symbols:=[
+					'!='//not equals to
 					'//',//quotient
 					'==',
 					'=>',//greater than equals to
 					'=<',//less than equals to
-					'!='//not equals to
 					]
 	mut lis := list.clone()
 	//defining an empty array

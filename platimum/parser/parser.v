@@ -17,11 +17,13 @@ def main():
 def print(str)
     PRINT str
 k=3
-if k==3 or k>3 or k<3 or k!=3 or k>=4 or k<=3:
+if k==3 or k>3 or k<3 or k=>4 or k=<3:
     PRINT "fd hi"
 elif k==0 and k==1:
     print("s")
 else:
-    print(9.0)'
+    print(9.0)
+a,b=6,7
+k!=3'
 k:=tokenizer.tokenize(a)
 println(tokenizer.process_tokens(k))

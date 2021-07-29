@@ -23,6 +23,7 @@ pub fn tokenize(str string) []string {
 					]
 	symbols := [
 			' ',//white space
+			'!',
 			'{',
 			'}',
 			'(',
