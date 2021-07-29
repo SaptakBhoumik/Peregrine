@@ -1,6 +1,6 @@
 module tokenizer
 
-fn present_in_arrey(item string) int{
+fn symbol_present_in_arrey(item string) int{
 	symbols:=[
 					'=',//equals
 					'+',//addition
@@ -9,7 +9,9 @@ fn present_in_arrey(item string) int{
 					'/',//division
 					'^',//exponent
 					'(',
+					'.',
 					')',
+					':',
 					'!',
 					'%',//remainder
 					'>',//greater than
@@ -20,6 +22,32 @@ fn present_in_arrey(item string) int{
 					'=<',//less than equals to
 					'!='//not equals to
 					]
+	mut present:=0//false
+	for symbol in symbols{
+		if item==symbol{
+			present=1//true
+			break
+		}
+		else{
+			continue
+		}
+	}
+	return present
+}
+
+fn number_present_in_arrey(item string) int{
+	symbols:=[
+				'0',
+				'1',
+				'2',
+				'3',
+				'4',
+				'5',
+				'6',
+				'7',
+				'8',
+				'9'
+				]
 	mut present:=0//false
 	for symbol in symbols{
 		if item==symbol{
@@ -51,6 +79,7 @@ pub fn process_tokens(list []string) []string{
 	mut results := []string{}
 	for i,mut item in lis{
 		mut count:=results.len
+		
 		if i>0{		
 			if count>0{
 				mut prev_item:= results[count-1]
@@ -61,7 +90,17 @@ pub fn process_tokens(list []string) []string{
 					 results[count-1]+=*item
 					}
 				}
-				else if prev_item !=" " && item!=" " && present_in_arrey(item)==0 && present_in_arrey(prev_item)==0 && is_double_quote_open==false && is_single_quote_open==false && is_list_open==false && is_dictionary_open==false && item!=r"\n" && prev_item !=r"\n"{
+				else if prev_item !=" " && item!=" " && symbol_present_in_arrey(item)==0 && symbol_present_in_arrey(prev_item)==0 && is_double_quote_open==false && is_single_quote_open==false && is_list_open==false && is_dictionary_open==false && item!=r"\n" && prev_item !=r"\n"{
+					unsafe{
+					 results[count-1]+=*item
+					}				
+				}
+				else if item=="." && number_present_in_arrey(prev_item)==1 && is_double_quote_open==false && is_single_quote_open==false && is_list_open==false && is_dictionary_open==false{
+					unsafe{
+					 results[count-1]+=*item
+					}				
+				}
+				else if prev_item=="." && number_present_in_arrey(item)==1 && is_double_quote_open==false && is_single_quote_open==false && is_list_open==false && is_dictionary_open==false{
 					unsafe{
 					 results[count-1]+=*item
 					}				

@@ -1,5 +1,8 @@
 import tokenizer
-mut a:='a=True
+mut a:='
+import os
+os.system("hi")
+a=True
 cons b= False
 a=None
 def main():
@@ -7,7 +10,7 @@ def main():
     PRINT 2+9
     PRINT 2-9
     PRINT 2*9
-    PRINT 2/9
+    PRINT 2.8/9
     PRINT 2^9
     PRINT 2//9
     PRINT 2%9
@@ -19,7 +22,6 @@ if k==3 or k>3 or k<3 or k!=3 or k>=4 or k<=3:
 elif k==0 and k==1:
     print("s")
 else:
-    print("j")
-'
+    print(9.0)'
 k:=tokenizer.tokenize(a)
 println(tokenizer.process_tokens(k))
