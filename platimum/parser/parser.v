@@ -17,7 +17,7 @@ def main():
 def print(str)
     PRINT str
 k=3
-if k==3 or k>3 or k<3 or k=>4 or k=<3:
+if k==3 or k>3 or k<3 or k>=4 or k<=3:
     PRINT "fd hi"
 elif k==0 and k==1:
     print("s")

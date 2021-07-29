@@ -49,8 +49,8 @@ pub fn tokenize(str string) []string {
 					'%',//remainder
 					'>',//greater than
 					'<',//less than
-					'=>',//greater than equals to
-					'=<',//less than equals to
+					'>=',//greater than equals to
+					'<=',//less than equals to
 					'!='//not equals to
 					]
 

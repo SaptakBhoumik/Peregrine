@@ -19,8 +19,8 @@ fn symbol_present_in_arrey(item string) int{
 					'<',//less than
 					'//',//quotient
 					'==',
-					'=>',//greater than equals to
-					'=<',//less than equals to
+					'>=',//greater than equals to
+					'<=',//less than equals to
 					'!='//not equals to
 					]
 	mut present:=0//false
@@ -72,8 +72,8 @@ pub fn process_tokens(list []string) []string{
 					'!='//not equals to
 					'//',//quotient
 					'==',
-					'=>',//greater than equals to
-					'=<',//less than equals to
+					'>=',//greater than equals to
+					'<=',//less than equals to
 					]
 	mut lis := list.clone()
 	//defining an empty array
