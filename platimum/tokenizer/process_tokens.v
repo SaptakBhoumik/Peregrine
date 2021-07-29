@@ -105,6 +105,38 @@ pub fn process_tokens(list []string) []string{
 					 results[count-1]+=*item
 					}				
 				}
+				//single quote
+				else if item=="'" && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==false && is_dictionary_open==false{
+					is_single_quote_open=true
+					results << item
+				}
+				else if item!="'" && is_double_quote_open==false && is_single_quote_open==true  && is_list_open==false && is_dictionary_open==false{
+					unsafe{
+					 results[count-1]+=*item
+					}
+				}
+				else if item=="'" && is_double_quote_open==false && is_single_quote_open==true  && is_list_open==false && is_dictionary_open==false{
+					is_single_quote_open=false
+					unsafe{
+					 results[count-1]+=*item
+					}
+				}
+				//double quote
+				else if item=='"' && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==false && is_dictionary_open==false{
+					is_double_quote_open=true
+					results << item
+				}
+				else if item!='"' && is_double_quote_open==true && is_single_quote_open==false  && is_list_open==false && is_dictionary_open==false{
+					unsafe{
+					 results[count-1]+=*item
+					}
+				}
+				else if item=='"' && is_double_quote_open==true && is_single_quote_open==false   && is_list_open==false && is_dictionary_open==false{
+					is_double_quote_open=false
+					unsafe{
+					 results[count-1]+=*item
+					}
+				}
 				else{
 					results << item
 				}
