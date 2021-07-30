@@ -1,7 +1,11 @@
 import tokenizer
-mut a:='
+mut a:='ab=c
 import os
+{a:"s",b:"b",y:7}
 [5,"4",9]
+{a:"s",b:"b",y:7}
+[5,"4","]"]
+[5,"4",9,"["]
 os.system("hi")
 a=True
 cons b= False
@@ -27,6 +31,6 @@ else:
 a,b=6,7
 k!=3
 [5,"4",9]
-hi'
+{a:"s",b:"b",y:7}'
 k:=tokenizer.tokenize(a)
 println(tokenizer.process_tokens(k))
