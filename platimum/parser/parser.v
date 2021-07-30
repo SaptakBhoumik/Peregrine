@@ -1,6 +1,7 @@
 import tokenizer
 mut a:='
 import os
+[5,"4",9]
 os.system("hi")
 a=True
 cons b= False
@@ -24,6 +25,8 @@ elif k==0 and k==1:
 else:
     print(9.0)
 a,b=6,7
-k!=3'
+k!=3
+[5,"4",9]
+hi'
 k:=tokenizer.tokenize(a)
 println(tokenizer.process_tokens(k))
