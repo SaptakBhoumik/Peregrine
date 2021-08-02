@@ -1,6 +1,7 @@
 module tokenizer
 
 fn symbol_present_in_arrey(item string) int{
+	//it finds if the item is any one of the symbol
 	symbols:=[		
 					'!',
 					'=',//equals
@@ -37,6 +38,7 @@ fn symbol_present_in_arrey(item string) int{
 }
 
 fn number_present_in_arrey(item string) int{
+//it finds if the item is a number
 	symbols:=[
 				'0',
 				'1',
@@ -63,7 +65,7 @@ fn number_present_in_arrey(item string) int{
 }
 
 pub fn process_tokens(list []string) []string{
-
+//it organizes the partially tokenized text
 	mut is_double_quote_open:=false//checks if double quote " is open
 	mut is_single_quote_open:=false//checks if single quote ' is open
 	mut is_double_quote_open_list:=false

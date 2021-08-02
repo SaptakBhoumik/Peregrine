@@ -1,6 +1,7 @@
 module tokenizer
 
 fn remove_comment(str string) string{
+//it removes the comment
 	code := "$str \n"//dont change this line
 	mut modified_code:=""
 	mut lines := code.split_into_lines()
@@ -16,6 +17,7 @@ fn remove_comment(str string) string{
 }
 
 pub fn tokenize(str string) []string {
+//it partially tokenizes the code
 	other_keywords := [
 					'True',
 					'False',
