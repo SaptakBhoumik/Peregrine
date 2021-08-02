@@ -5,8 +5,8 @@ fn remove_comment(str string) string{
 	mut modified_code:=""
 	mut lines := code.split_into_lines()
 	for mut line in lines{
-		mut modified_line:=line.replace(" ","")
-		modified_line=modified_line.replace("	","")
+		mut modified_line:=line.replace(" ","")//do not change this line
+		modified_line=modified_line.replace("	","")//do not change this line
 		if modified_line.len > 0 {
 		mut first_char:=modified_line[0].ascii_str()
 		if first_char!="#"{

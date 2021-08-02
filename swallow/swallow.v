@@ -1,7 +1,7 @@
 import os
 import tokenizer
 fn main() {
-    filename := "/home/saptak/Desktop/platinum/python_implication/example.pt"
+    filename := "/home/saptak/Desktop/swallow/python_implication/example.sw"
     content := os.read_file(filename) or {
         panic("failed to read $filename")
     }
