@@ -1,5 +1,5 @@
 module tokenizer
-
+// Original author: Saptak Bhoumik
 fn remove_comment(str string) string{
 //it removes the comment
 	code := "$str \n"//dont change this line

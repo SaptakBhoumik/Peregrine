@@ -1,5 +1,6 @@
 import os
 import tokenizer
+// Original author: Saptak Bhoumik
 fn main() {
     filename := "/home/saptak/Desktop/swallow/python_implication/example.sw"
     content := os.read_file(filename) or {
