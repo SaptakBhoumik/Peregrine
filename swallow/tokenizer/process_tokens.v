@@ -4,6 +4,7 @@ fn symbol_present_in_arrey(item string) int{
 	//it finds if the item is any one of the symbol
 	symbols:=[		
 					'!',
+					'#',
 					'=',//equals
 					'+',//addition
 					'-',//subtraction
@@ -253,5 +254,23 @@ pub fn process_tokens(list []string) []string{
 			results << item
 			}
 	}
-	return results
+	mut is_comment_open:=false
+	mut final_result:=[]string{}
+	//removing comment
+	for mut item in results{
+		if item=="#" && is_comment_open==false{
+			is_comment_open=true
+		}
+		else if item!=r"\n" && is_comment_open==true{
+			continue
+		}
+		else if item==r"\n" && is_comment_open==true{
+			is_comment_open=false
+			final_result << item
+		}
+		else{
+			final_result << item
+		}
+	}
+	return final_result 
 }

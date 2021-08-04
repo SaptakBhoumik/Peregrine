@@ -1,21 +1,5 @@
 module tokenizer
 // Original author: Saptak Bhoumik
-fn remove_comment(str string) string{
-//it removes the comment
-	code := "$str \n"//dont change this line
-	mut modified_code:=""
-	mut lines := code.split_into_lines()
-	for mut line in lines{
-		mut modified_line:=line.replace(" ","")//do not change this line
-		modified_line=modified_line.replace("	","")//do not change this line
-		if modified_line.len > 0 {
-		mut first_char:=modified_line[0].ascii_str()
-		if first_char!="#"{
-			modified_code += "$line \n"
-	}}}
-	return modified_code
-}
-
 pub fn tokenize(str string) []string {
 //it partially tokenizes the code
 	other_keywords := [
@@ -122,7 +106,7 @@ pub fn tokenize(str string) []string {
 	collection_of_keywords << exception_keywords
 	collection_of_keywords << variable_keybords 
 	collection_of_keywords << functional_keywords
-	mut code:=remove_comment("$str " )//do not change this line
+	mut code:="$str "//do not change this line
 	white_space := ' '
 	//defining an empty array
 	mut result := []string{}
