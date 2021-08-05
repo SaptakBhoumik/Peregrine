@@ -1,37 +1,54 @@
-import tokenizer
 // Original author: Saptak Bhoumik
-mut a:='ab=c
-import os
-{a:"s",b:"b",y:7}
-[5,"4",9]
-{a:"s",b:"b",y:7}
-[5,"4","]"]
-[5,"4",9,"["]
-os.system("hi")
-a=True
-cons b= False
-a=None
-def main():
-    PRINT "hi"
-    PRINT 2+9
-    PRINT 2-9
-    PRINT 2*9
-    PRINT 2.8/9
-    PRINT 2^9
-    PRINT 2//9
-    PRINT 2%9
-def print(str)
-    PRINT str
-k=3
-if k==3 or k>3 or k<3 or k>=4 or k<=3:
-    PRINT "fd hi"
-elif k==0 and k==1:
-    print("s")
-else:
-    print(9.0)
-a,b=6,7
-k!=3
-[5,"4",9]
-{a:"s",b:"b",y:7}'
-k:=tokenizer.tokenize(a)
-println(tokenizer.process_tokens(k))
+fn is_number(list []string)string {
+	mut type_of_str:="undefined"
+	numbers:=[
+			'0',
+			'1',
+			'2',
+			'3',
+			'4',
+			'5',
+			'6',
+			'7',
+			'8',
+			'9'
+			]
+	if list[0] in numbers{
+		if "." in list{
+			type_of_str = "float"
+		}
+		else{
+			type_of_str = "int"
+		}
+	}
+	else{
+		type_of_str = "undefined"
+	}
+	return type_of_str
+}
+fn know_type(item string) string{
+    mut type_of_str:="undefined"
+	split_text:=item.split("")
+	count:=split_text.len
+	if count>0{
+		if split_text[count-1]=="'" && split_text[0]=="'"{
+			type_of_str="string"
+		}
+		else if split_text[count-1]=='"' && split_text[0]=='"'{
+			type_of_str="string"
+		}
+		else if  split_text[0]=='{' && split_text[count-1]=='}'{
+			type_of_str="dictionary"
+		}
+		else if  split_text[0]=='[' && split_text[count-1]==']'{
+			type_of_str="list"
+		}
+		else{
+			type_of_str=is_number(split_text)
+		}
+	}
+	else{
+		type_of_str="undefined"
+	}
+	return type_of_str
+}

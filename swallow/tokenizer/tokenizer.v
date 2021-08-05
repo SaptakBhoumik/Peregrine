@@ -82,6 +82,8 @@ pub fn tokenize(str string) []string {
 							"global",
 							"int",
 							"str",
+							"list",
+							"dictionary",
 							"float",
 							"cons",
 							"var"
