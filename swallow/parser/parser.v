@@ -1,4 +1,28 @@
+module parser
 // Original author: Saptak Bhoumik
+
+struct Know_type {
+	mut:
+	is_var bool
+	name string
+	check string
+}
+
+struct Body {
+	mut:
+	keyword string
+}
+
+struct Ast {
+	mut:
+	path string
+	variable_name []string
+	variable_type []Know_type
+	constant_name []string
+	constant_type []Know_type
+	body []Body
+}
+
 fn is_number(list []string)string {
 	mut type_of_str:="undefined"
 	numbers:=[
@@ -31,7 +55,10 @@ fn know_type(item string) string{
 	split_text:=item.split("")
 	count:=split_text.len
 	if count>0{
-		if split_text[count-1]=="'" && split_text[0]=="'"{
+		if item=="True" || item=="False"{
+			type_of_str="bool"
+		}
+		else if split_text[count-1]=="'" && split_text[0]=="'"{
 			type_of_str="string"
 		}
 		else if split_text[count-1]=='"' && split_text[0]=='"'{
@@ -51,4 +78,9 @@ fn know_type(item string) string{
 		type_of_str="undefined"
 	}
 	return type_of_str
+}
+
+pub fn parser(code []string)string {
+	mut json:=""
+	return json
 }

@@ -69,7 +69,9 @@ pub fn tokenize(str string) []string {
 						'yield'
 						]
 	import_keywords :=[
-						'import'
+						'import',
+						'himport',
+						'cimport'
 						]
 	exception_keywords := [
 							"try", 
@@ -81,6 +83,7 @@ pub fn tokenize(str string) []string {
 	variable_keybords := [
 							"global",
 							"int",
+							"bool",
 							"str",
 							"list",
 							"dictionary",
