@@ -3,6 +3,7 @@ module tokenizer
 pub fn tokenize(str string) []string {
 //it partially tokenizes the code
 	other_keywords := [
+					'Ccode',
 					'True',
 					'False',
 					'None'
