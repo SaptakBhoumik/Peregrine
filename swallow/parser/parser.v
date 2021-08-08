@@ -5,17 +5,29 @@ struct Know_type {
 	mut:
 	is_var bool
 	name string
-	check string
+	check_type string
 }
+
+struct Function_return_type {
+	mut:
+	name string
+	check_type string
+}
+
 
 struct Body {
 	mut:
+	column int
+	ast_type string
 	keyword string
+	length string
 }
 
 struct Ast {
 	mut:
 	path string
+	function_name []string
+	function_return []Function_return_type
 	variable_name []string
 	variable_type []Know_type
 	constant_name []string
