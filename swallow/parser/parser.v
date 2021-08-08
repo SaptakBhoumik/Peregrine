@@ -25,6 +25,9 @@ struct Body {
 
 struct Ast {
 	mut:
+	header_file []string
+	c_file []string
+	folder string
 	path string
 	function_name []string
 	function_return []Function_return_type
