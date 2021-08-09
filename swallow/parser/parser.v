@@ -14,6 +14,23 @@ struct Function_return_type {
 	check_type string
 }
 
+struct Right{
+	mut:
+	ast_type string
+	keyword string
+	length string
+	left []Left
+	right []&Right
+}
+
+struct Left{
+	mut:
+	ast_type string
+	keyword string
+	length string
+	left []&Left
+	right []Right
+}
 
 struct Body {
 	mut:
@@ -21,6 +38,8 @@ struct Body {
 	ast_type string
 	keyword string
 	length string
+	left []Left
+	right []Right
 }
 
 struct Ast {
