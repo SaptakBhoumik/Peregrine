@@ -15,16 +15,16 @@ pub fn tokenize(str string) []string {
 			'}',
 			'(',
 			')',
-			'[', 
-			']', 
+			'[',
+			']',
 			'.', 
-			'"', 
+			'"',
 			"'",
 			'\n', 
-			':', 
+			':',
 			',',
 			'#'//comment
-			] 
+			]
 	logical_keywords :=[
 					'=',//equals
 					'+',//addition
@@ -42,10 +42,10 @@ pub fn tokenize(str string) []string {
 					]
 
 	operator_keywords := [
-				'and', 
+				'and',
 				'or', 
 				'not', 
-				'in', 
+				'in',
 				'is'
 				]
 	conditional_keywords :=[
@@ -75,14 +75,13 @@ pub fn tokenize(str string) []string {
 						'cimport'
 						]
 	exception_keywords := [
-							"try", 
+							"try",
 							"except", 
 							"raise", 
 							"finally"
 							]
 
 	variable_keybords := [
-							"global",
 							"int",
 							"bool",
 							"str",
@@ -110,14 +109,14 @@ pub fn tokenize(str string) []string {
 	collection_of_keywords << return_keywords
 	collection_of_keywords << import_keywords
 	collection_of_keywords << exception_keywords
-	collection_of_keywords << variable_keybords 
+	collection_of_keywords << variable_keybords
 	collection_of_keywords << functional_keywords
-	mut code:="$str "//do not change this line
+	mut code:="\n$str  "//do not change this line
 	white_space := ' '
 	//defining an empty array
 	mut result := []string{}
 	mut lexeme := ''
-	for i,mut char in code.split(""){	
+	for i,mut char in code.split(""){
 		lexeme += "$char" //do not change this line
 		mut a:=i+1
 		if a < code.len{

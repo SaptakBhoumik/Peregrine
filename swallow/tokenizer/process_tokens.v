@@ -2,7 +2,7 @@ module tokenizer
 // Original author: Saptak Bhoumik
 fn symbol_present_in_arrey(item string) int{
 	//it finds if the item is any one of the symbol
-	symbols:=[		
+	symbols:=[
 					'!',
 					'Ccode',
 					'#',

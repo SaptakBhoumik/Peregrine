@@ -2,48 +2,49 @@ module parser
 // Original author: Saptak Bhoumik
 
 struct Know_type {
-	mut:
+	pub mut:
 	is_var bool
+	is_static bool
 	name string
 	check_type string
 }
 
 struct Function_return_type {
-	mut:
+	pub mut:
 	name string
 	check_type string
 }
 
 struct Right{
-	mut:
+	pub mut:
 	ast_type string
 	keyword string
-	length string
-	left []Left
+	length int
+	left []&Left
 	right []&Right
 }
 
 struct Left{
-	mut:
+	pub mut:
 	ast_type string
 	keyword string
-	length string
+	length int
 	left []&Left
-	right []Right
+	right []&Right
 }
 
 struct Body {
-	mut:
-	column int
+	pub mut:
 	ast_type string
 	keyword string
-	length string
-	left []Left
-	right []Right
+	length int
+	left []&Left
+	right []&Right
 }
 
 struct Ast {
-	mut:
+	pub mut:
+	import_file []string
 	header_file []string
 	c_file []string
 	folder string
@@ -114,7 +115,26 @@ fn know_type(item string) string{
 	return type_of_str
 }
 
-pub fn parser(code []string)string {
-	mut json:=""
+pub fn parser(code []string) Ast{
+	mut is_ccode:=false
+	mut code_block:=Body{}
+	mut json:=Ast{}
+	for index,item in code{
+		if item=="Ccode" && is_ccode==false{
+			is_ccode=true
+		}
+		else if item!="Ccode" && is_ccode==true{
+			code_block=Body{ast_type:"Ccode"
+							keyword : item
+							length :item.len}
+		}
+		else if  item=="Ccode" && is_ccode==true{
+			is_ccode=false
+		}
+		if code_block!=Body{}{
+		json.body<<code_block
+		code_block=Body{}
+		}
+	}
 	return json
 }
