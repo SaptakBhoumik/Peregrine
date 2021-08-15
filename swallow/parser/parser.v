@@ -15,31 +15,14 @@ struct Function_return_type {
 	check_type string
 }
 
-struct Right{
-	pub mut:
-	ast_type string
-	keyword string
-	length int
-	left []&Left
-	right []&Right
-}
-
-struct Left{
-	pub mut:
-	ast_type string
-	keyword string
-	length int
-	left []&Left
-	right []&Right
-}
 
 struct Body {
 	pub mut:
 	ast_type string
 	keyword string
 	length int
-	left []&Left
-	right []&Right
+	left []Body
+	right []Body
 }
 
 struct Ast {
@@ -116,25 +99,39 @@ fn know_type(item string) string{
 }
 
 pub fn parser(code []string) Ast{
+	mut previus_item:=""
+	mut is_func_def:= false
+	mut is_argument:= false
 	mut is_ccode:=false
 	mut code_block:=Body{}
 	mut json:=Ast{}
 	for index,item in code{
-		if item=="Ccode" && is_ccode==false{
+		if item=="Ccode" && is_ccode==false && index!=0{
 			is_ccode=true
 		}
-		else if item!="Ccode" && is_ccode==true{
-			code_block=Body{ast_type:"Ccode"
-							keyword : item
-							length :item.len}
+		else if is_ccode==true{
+			code_block,is_ccode=ccode(item, is_ccode)
 		}
-		else if  item=="Ccode" && is_ccode==true{
-			is_ccode=false
+		else if item=="def"{
+			previus_item=item
+			is_func_def=true
 		}
-		if code_block!=Body{}{
+		else if is_func_def==true{
+			code_block,previus_item,is_argument=function(item,is_func_def,previus_item,json,is_argument)
+		}
+		if code_block!=Body{} && is_func_def==true && code_block.ast_type =="function_define" {
 		json.body<<code_block
 		code_block=Body{}
 		}
+		else if code_block!=Body{} && is_argument==true && is_func_def==true{
+		json.body[json.body.len-1].right<<code_block
+		code_block=Body{}
+		}
+		else if code_block!=Body{}  && is_argument==false && is_func_def==true{
+		json.body[json.body.len-1].left<<code_block
+		code_block=Body{}
+		}
+
 	}
 	return json
 }

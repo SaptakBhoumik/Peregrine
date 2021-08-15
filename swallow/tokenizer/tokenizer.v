@@ -67,7 +67,6 @@ pub fn tokenize(str string) []string {
 							]
 	return_keywords := [
 						'return',
-						'yield'
 						]
 	import_keywords :=[
 						'import',
@@ -88,8 +87,7 @@ pub fn tokenize(str string) []string {
 							"list",
 							"dictionary",
 							"float",
-							"cons",
-							"var"
+							"const"
 							]
 	functional_keywords := [
 							'PRINT',
