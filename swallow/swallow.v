@@ -8,6 +8,7 @@ fn main() {
         panic("failed to read $filename")
     }
     mut a:=content
+    println(tokenizer.process_tokens(tokenizer.tokenize(a)))
     k:=parser.parser(tokenizer.process_tokens(tokenizer.tokenize(a)))
     println(k)
     // println(content)

@@ -4,7 +4,6 @@ fn symbol_present_in_arrey(item string) int{
 	//it finds if the item is any one of the symbol
 	symbols:=[
 					'!',
-					'Ccode',
 					'#',
 					'=',//equals
 					'+',//addition

@@ -21,6 +21,7 @@ struct Body {
 	ast_type string
 	keyword string
 	length int
+	tab f64
 	left []Body
 	right []Body
 }
@@ -41,83 +42,38 @@ struct Ast {
 	body []Body
 }
 
-fn is_number(list []string)string {
-	mut type_of_str:="undefined"
-	numbers:=[
-			'0',
-			'1',
-			'2',
-			'3',
-			'4',
-			'5',
-			'6',
-			'7',
-			'8',
-			'9'
-			]
-	if list[0] in numbers{
-		if "." in list{
-			type_of_str = "float"
-		}
-		else{
-			type_of_str = "int"
-		}
-	}
-	else{
-		type_of_str = "undefined"
-	}
-	return type_of_str
-}
-fn know_type(item string) string{
-    mut type_of_str:="undefined"
-	split_text:=item.split("")
-	count:=split_text.len
-	if count>0{
-		if item=="True" || item=="False"{
-			type_of_str="bool"
-		}
-		else if split_text[count-1]=="'" && split_text[0]=="'"{
-			type_of_str="string"
-		}
-		else if split_text[count-1]=='"' && split_text[0]=='"'{
-			type_of_str="string"
-		}
-		else if  split_text[0]=='{' && split_text[count-1]=='}'{
-			type_of_str="dictionary"
-		}
-		else if  split_text[0]=='[' && split_text[count-1]==']'{
-			type_of_str="list"
-		}
-		else{
-			type_of_str=is_number(split_text)
-		}
-	}
-	else{
-		type_of_str="undefined"
-	}
-	return type_of_str
-}
-
 pub fn parser(code []string) Ast{
 	mut previus_item:=""
+	mut is_tab:=true
+	mut tab:=0.0
 	mut is_func_def:= false
 	mut is_argument:= false
 	mut is_ccode:=false
 	mut code_block:=Body{}
 	mut json:=Ast{}
 	for index,item in code{
+		if item==" " && is_tab==true{
+			tab+=0.25
+		}
+		else if item!=" " && is_tab==true{
+			is_tab=false
+		}
+		else if item==r"\n"{
+			tab=0
+			is_tab=true
+		}
 		if item=="Ccode" && is_ccode==false && index!=0{
 			is_ccode=true
 		}
 		else if is_ccode==true{
-			code_block,is_ccode=ccode(item, is_ccode)
+			code_block,is_ccode=ccode(item, is_ccode,tab)
 		}
 		else if item=="def"{
 			previus_item=item
 			is_func_def=true
 		}
 		else if is_func_def==true{
-			code_block,previus_item,is_argument=function(item,is_func_def,previus_item,json,is_argument)
+			code_block,previus_item,is_argument=function(item,is_func_def,previus_item,json,is_argument,tab)
 		}
 		if code_block!=Body{} && is_func_def==true && code_block.ast_type =="function_define" {
 		json.body<<code_block

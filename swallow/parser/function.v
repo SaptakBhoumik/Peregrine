@@ -1,6 +1,6 @@
 module parser
 // Original author: Saptak Bhoumik
-pub fn function(item string,is_func_def bool,previus_item string, json Ast,argument bool)(Body , string,bool){
+pub fn function(item string,is_func_def bool,previus_item string, json Ast,argument bool,tab_len f64)(Body , string,bool){
 	mut is_argument:=argument
 	mut previous_item:=previus_item
 	mut code_block:=Body{}
@@ -24,7 +24,8 @@ pub fn function(item string,is_func_def bool,previus_item string, json Ast,argum
 	else if item!=" " && is_argument==true && item!=r"\n" && item!="(" && item!=")" && item!="," && item!=":" && is_func_def==true && json.body[json.body.len-1].left.len==0 && previous_item=="("{
 			code_block=Body{ast_type:"required_argument"
 							keyword : item
-							length :item.len}
+							length :item.len
+							tab : tab_len}
 		}
 	}
 	return code_block ,  previous_item ,is_argument
