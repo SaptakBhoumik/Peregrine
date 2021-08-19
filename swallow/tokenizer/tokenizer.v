@@ -61,8 +61,6 @@ pub fn tokenize(str string) []string {
 							]
 	structure_keywords :=[
 							'def',
-							'as',
-							'with'
 							]
 	return_keywords := [
 						'return',

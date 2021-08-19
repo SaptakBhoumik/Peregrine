@@ -291,5 +291,27 @@ pub fn process_tokens(list []string) []string{
 			final_result << item
 		}
 	}
-	return final_result 
+	mut is_tab:=true
+	mut ultimate_result:=[]string{}
+	for mut item in final_result{
+		if item==" " && is_tab==true{
+			is_tab=true
+		}
+		else if item!=" " && is_tab==true{
+			is_tab=false
+		}
+		else if item==r"\n"{
+			is_tab=true
+		}
+		if item==" " && is_tab==false{
+			continue
+		}
+		else if item==" " && is_tab==true{
+			ultimate_result<<item
+		}
+		else{
+			ultimate_result<<item
+		}
+	}
+	return ultimate_result
 }

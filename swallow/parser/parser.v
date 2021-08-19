@@ -50,6 +50,7 @@ pub fn parser(code []string) Ast{
 	mut is_argument:= false
 	mut is_ccode:=false
 	mut code_block:=Body{}
+	mut previous_code_block:=Body{}
 	mut json:=Ast{}
 	for index,item in code{
 		if item==" " && is_tab==true{
@@ -68,6 +69,24 @@ pub fn parser(code []string) Ast{
 		else if is_ccode==true{
 			code_block,is_ccode=ccode(item, is_ccode,tab)
 		}
+		else if item=="pass"{
+			code_block=Body{ast_type:"pass"
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
+		else if item=="break"{
+			code_block=Body{ast_type:"break"
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
+		else if item=="continue"{
+			code_block=Body{ast_type:"continue"
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
 		else if item=="def"{
 			previus_item=item
 			is_func_def=true
@@ -77,16 +96,22 @@ pub fn parser(code []string) Ast{
 		}
 		if code_block!=Body{} && is_func_def==true && code_block.ast_type =="function_define" {
 		json.body<<code_block
-		code_block=Body{}
 		}
 		else if code_block!=Body{} && is_argument==true && is_func_def==true{
 		json.body[json.body.len-1].right<<code_block
-		code_block=Body{}
 		}
 		else if code_block!=Body{}  && is_argument==false && is_func_def==true{
-		json.body[json.body.len-1].left<<code_block
-		code_block=Body{}
+		if code_block.tab<1{
+			panic("$code_block.keyword \n ^ IndentationError: expected an indented block")
 		}
+		else{
+		if code_block.tab==1{
+		json.body[json.body.len-1].left<<code_block
+		}
+		}
+		previous_code_block=code_block
+		code_block=Body{}
+	}
 
 	}
 	return json
