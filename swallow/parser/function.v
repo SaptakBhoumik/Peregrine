@@ -13,16 +13,17 @@ pub fn function(item string,is_func_def bool,previus_item string, json Ast,argum
 
 	else if json.body.len>0{
 		if item=="(" && is_func_def==true && json.body[json.body.len-1].left.len==0 && is_argument==false{
-			previous_item="("
+			previous_item=item
 			is_argument= true
 			}
 		else if item==")" && is_func_def==true && json.body[json.body.len-1].left.len==0 && is_argument==true{
-			previous_item=")"
+			previous_item=item
 			is_argument=false
 
 		}
 	else if item!=" " && is_argument==true && item!=r"\n" && item!="(" && item!=")" && item!="," && item!=":" && is_func_def==true && json.body[json.body.len-1].left.len==0 && previous_item=="("{
-			code_block=Body{ast_type:"required_argument"
+		previous_item=item
+		code_block=Body{ast_type:"required_argument"
 							keyword : item
 							length :item.len
 							tab : tab_len}
