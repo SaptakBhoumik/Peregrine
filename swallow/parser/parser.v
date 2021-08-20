@@ -43,7 +43,7 @@ struct Ast {
 }
 
 pub fn parser(code []string) Ast{
-	mut operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=']
+	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=']
 	mut replace_previous:=false
 	mut is_operator:=false
 	mut is_constant:=false
@@ -82,9 +82,11 @@ pub fn parser(code []string) Ast{
 		else if item in operater{
 			is_operator=true
 			code_block,is_operator,replace_previous=parse_operator(is_operator,previus_item,item,tab, is_constant,mut previous_code_block)
+			previus_item=item
 		}
 		else if is_operator==true{
 			code_block,is_operator,replace_previous=parse_operator(is_operator,previus_item,item,tab, is_constant,mut previous_code_block)
+			previus_item=item
 		}
 		//checks if c code
 		else if item=="Ccode" && is_ccode==false && index!=0{
@@ -125,12 +127,7 @@ pub fn parser(code []string) Ast{
 		json.body<<code_block
 		}
 		else if code_block!=Body{} && is_argument==true && is_func_def==true{
-			if replace_previous==false{
-				json.body[json.body.len-1].right<<code_block
-			}
-			else{
-				json.body[json.body.len-1].right[json.body[json.body.len-1].right.len-1]=code_block
-			}
+				json.body.last().right<<code_block
 		}
 		else if code_block!=Body{}  && is_argument==false{
 		if code_block.tab<1{

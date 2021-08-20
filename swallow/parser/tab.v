@@ -4,10 +4,10 @@ pub fn tab_handler(mut json Ast,mut code_block Body,right bool,replace_previous 
 	if right==false{
 		if code_block.tab==1{
 			if replace_previous==false{
-			json.body[json.body.len-1].left<<code_block
+			json.body.last().left<<code_block
 			}
 			else{
-			json.body[json.body.len-1].left[json.body[json.body.len-1].left.len-1]=code_block
+			json.body.last().left[json.body.last().left.len-1]=code_block
 			}
 		}
 		else{
