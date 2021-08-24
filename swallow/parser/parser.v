@@ -121,6 +121,13 @@ pub fn parser(code []string) Ast{
 						}
 			is_loop=true
 		}
+		//checks if raw string
+		else if item=="r"{
+			code_block=Body{ast_type:item
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
 		else if next_item in operater{
 			is_operator=true
 			code_block,is_operator=parse_operator(is_operator,item,tab)
@@ -198,6 +205,9 @@ pub fn parser(code []string) Ast{
 			else{
 				code_block.direction="right"
 			}
+		}
+		if code_block.ast_type=="string" && previous_code_block.ast_type=="r"{
+			code_block.ast_type="raw_string"
 		}
 		//appends to json
 		if  code_block.keyword!=""{

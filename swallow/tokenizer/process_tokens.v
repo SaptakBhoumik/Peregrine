@@ -13,6 +13,7 @@ fn symbol_present_in_arrey(item string) int{
 					'^',//exponent
 					'(',
 					'.',
+					'r',
 					',',
 					')',
 					':',
@@ -94,7 +95,12 @@ pub fn process_tokens(list []string) []string{
 				mut prev_item:= results[count-1]
 				mut consequtive_item:="$prev_item$item"
 				//i know this part is a bit messy
-				if consequtive_item in multi_char_symbols && is_double_quote_open==false && is_single_quote_open==false && is_list_open==false && is_dictionary_open==false && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
+				if prev_item=="r" && is_double_quote_open==false && is_single_quote_open==false && is_list_open==false && is_dictionary_open==false && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false && item!="'" && item!='"'{
+					unsafe{
+					 results[count-1]+=*item
+					}
+				}
+				else if consequtive_item in multi_char_symbols && is_double_quote_open==false && is_single_quote_open==false && is_list_open==false && is_dictionary_open==false && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
 					unsafe{
 					 results[count-1]+=*item
 					}
