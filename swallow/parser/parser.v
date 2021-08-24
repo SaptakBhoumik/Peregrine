@@ -48,6 +48,8 @@ pub fn parser(code []string) Ast{
 	loop:=["if","while","elif","else","for"]
 	logic:=["and","or","not","in","is"]
 	error_handler:=["try","except","finally"]
+	basic_keyword:=["PRINT","SYSTEM","INPUT"]
+	mut is_basic:=false
 	mut is_operator:=false
 	mut is_argument:=false
 	mut next_item:="string"
@@ -92,6 +94,20 @@ pub fn parser(code []string) Ast{
 						length :item.len
 						tab : tab
 						}
+		}
+		else if is_basic==true{
+			code_block,is_operator=parse_operator(is_operator,item,tab )
+			if code_block.ast_type=='undefined' && next_item!="("{
+				code_block.ast_type="variable"
+			}
+		}
+		else if item in basic_keyword{
+			code_block=Body{ast_type:item
+						keyword : item
+						length :item.len
+						tab : tab
+						}
+			is_basic=true
 		}
 		else if item in loop{
 			code_block=loop_parse(item,tab)
@@ -195,6 +211,13 @@ pub fn parser(code []string) Ast{
 			right=is_loop
 		}
 		else if is_loop==true && item!=":"{
+			right=true
+		}
+		if is_basic==true && item==r"\n"{
+			is_basic=false
+			right=is_loop
+		}
+		else if is_basic==true && item!="\n"{
 			right=true
 		}
 		code_block=Body{}

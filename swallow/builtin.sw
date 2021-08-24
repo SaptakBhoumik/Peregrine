@@ -1,6 +1,7 @@
 #Builtin swallow function
 def print(query):
-    PRINT "$query\n"
+    text=f"{query}\n"
+    PRINT query
 def input(query):
     PRINT query
     out=INPUT

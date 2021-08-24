@@ -1,4 +1,4 @@
 def mafgin(r):
-    const a=5
-    const a=b
-    b=4
+    PRINT any
+    SYSTEM a
+    INPUT a+1
