@@ -22,8 +22,9 @@ struct Body {
 	keyword string
 	length int
 	tab f64
-	left []Body
-	right []Body
+	relative_to int
+	direction string
+	id int
 }
 
 struct Ast {
@@ -44,8 +45,8 @@ struct Ast {
 
 pub fn parser(code []string) Ast{
 	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=']
-	mut replace_previous:=false
 	mut is_operator:=false
+	mut is_argument:=false
 	mut is_constant:=false
 	mut next_item:="string"
 	mut right:=false
@@ -53,7 +54,6 @@ pub fn parser(code []string) Ast{
 	mut is_tab:=true
 	mut tab:=0.0
 	mut is_func_def:= false
-	mut is_argument:= false
 	mut is_ccode:=false
 	mut code_block:=Body{}
 	mut previous_code_block:=Body{}
@@ -77,16 +77,34 @@ pub fn parser(code []string) Ast{
 		//parsing starts here
 		//checks if operator
 		if next_item in operater{
-			previus_item=item
-		}
-		else if item in operater{
 			is_operator=true
-			code_block,is_operator,replace_previous=parse_operator(is_operator,previus_item,item,tab, is_constant,mut previous_code_block)
-			previus_item=item
+			code_block,is_operator=parse_operator(is_operator,item,tab, is_constant,mut previous_code_block)
+			// if code_block.ast_type=="undefined" && next_item=="("{
+			// 	continue
+			// }
+			if code_block.ast_type=='undefined' && next_item!="("{
+				code_block.ast_type="variable"
+			}
 		}
-		else if is_operator==true{
-			code_block,is_operator,replace_previous=parse_operator(is_operator,previus_item,item,tab, is_constant,mut previous_code_block)
-			previus_item=item
+		else if is_operator==true && is_argument==false{
+			code_block,is_operator=parse_operator(is_operator,item,tab, is_constant,mut previous_code_block)
+			if code_block.ast_type=='undefined' && next_item!="("{
+				code_block.ast_type="variable"
+			}
+		}
+		else if is_operator==true && is_argument==true && item!=")"{
+			code_block,is_operator=parse_operator(is_operator,item,tab, is_constant,mut previous_code_block)
+			if code_block.ast_type=='undefined' && next_item!="("{
+				code_block.ast_type="variable"
+			}
+		}
+		//checks if new line
+		else if item==r"\n"{
+			code_block=Body{ast_type:"new_line"
+					keyword : item
+					length :item.len
+					tab : tab
+					}
 		}
 		//checks if c code
 		else if item=="Ccode" && is_ccode==false && index!=0{
@@ -120,26 +138,27 @@ pub fn parser(code []string) Ast{
 			is_func_def=true
 		}
 		else if is_func_def==true{
-			code_block,previus_item,is_argument=function(item,is_func_def,previus_item,json,is_argument,tab)
+			code_block,previus_item,right=function(item,is_func_def,previus_item,json,right,tab)
+			is_argument=right
+		}
+		code_block.id=index
+		//modify the code block
+		if code_block.keyword!="" && code_block.keyword!=r"\n"{
+			if right==false{
+				code_block.direction="left"
+			}
+			else{
+				code_block.direction="right"
+			}
 		}
 		//appends to json
-		if code_block!=Body{} && is_func_def==true && code_block.ast_type =="function_define" {
-		json.body<<code_block
+		if  code_block.keyword!=""{
+			json=tab_handler(mut json,mut code_block,mut previous_code_block, right)
 		}
-		else if code_block!=Body{} && is_argument==true && is_func_def==true{
-				json.body.last().right<<code_block
+		if code_block.keyword!=r"\n" && code_block.keyword!=""{
+			previous_code_block=code_block
 		}
-		else if code_block!=Body{}  && is_argument==false{
-		if code_block.tab<1{
-			panic("$code_block.keyword \n    	 ^ IndentationError: expected an indented block")
-		}
-		else{
-		json=tab_handler(mut json,mut code_block,right,replace_previous)
-		}
-		previous_code_block=code_block
 		code_block=Body{}
-	}
-
 	}
 	return json
 }

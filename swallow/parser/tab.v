@@ -1,18 +1,30 @@
 module parser
 // Original author: Saptak Bhoumik
-pub fn tab_handler(mut json Ast,mut code_block Body,right bool,replace_previous bool) Ast{
+pub fn tab_handler(mut json Ast,mut code_block Body,mut previus_code_block Body,right bool) Ast{
 	if right==false{
-		if code_block.tab==1{
-			if replace_previous==false{
-			json.body.last().left<<code_block
+		if code_block.keyword!=r"\n"{
+			if code_block.tab==previus_code_block.tab{
+				code_block.relative_to=previus_code_block.relative_to
 			}
-			else{
-			json.body.last().left[json.body.last().left.len-1]=code_block
+			else if code_block.tab<previus_code_block.tab{
+				code_block.relative_to=code_block.id
+			}
+			else if code_block.tab>previus_code_block.tab{
+				code_block.relative_to=previus_code_block.id
 			}
 		}
-		else{
-			panic("$code_block.keyword \n    	 ^ IndentationError: Unable to handle $code_block.tab indents")
+		json.body<<code_block
+	}
+	else{
+		if code_block.keyword!=r"\n"{
+			if previus_code_block.direction=="right"{
+				code_block.relative_to=previus_code_block.relative_to
+			}
+			else if previus_code_block.direction!="right"{
+				code_block.relative_to=previus_code_block.id
+			}
 		}
+		json.body<<code_block
 	}
 	return json
 }
