@@ -45,11 +45,14 @@ struct Ast {
 
 pub fn parser(code []string) Ast{
 	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=']
+	loop:=["if","while","elif","else","for"]
+	logic:=["and","or","not","in","is"]
 	mut is_operator:=false
 	mut is_argument:=false
 	mut is_constant:=false
 	mut next_item:="string"
 	mut right:=false
+	mut is_loop:=false
 	mut previus_item:=""
 	mut is_tab:=true
 	mut tab:=0.0
@@ -76,7 +79,19 @@ pub fn parser(code []string) Ast{
 		}
 		//parsing starts here
 		//checks if operator
-		if next_item in operater{
+		if item in loop{
+			code_block=loop_parse(item,tab)
+			is_loop=true
+		}
+		else if item in logic{
+			code_block=Body{ast_type:item
+						keyword : item
+						length :item.len
+						tab : tab
+						}
+			is_loop=true
+		}
+		else if next_item in operater{
 			is_operator=true
 			code_block,is_operator=parse_operator(is_operator,item,tab, is_constant,mut previous_code_block)
 			// if code_block.ast_type=="undefined" && next_item=="("{
@@ -157,6 +172,13 @@ pub fn parser(code []string) Ast{
 		}
 		if code_block.keyword!=r"\n" && code_block.keyword!=""{
 			previous_code_block=code_block
+		}
+		if is_loop==true && item==":"{
+			is_loop=false
+			right=is_loop
+		}
+		else if is_loop==true && item!=":"{
+			right=true
 		}
 		code_block=Body{}
 	}

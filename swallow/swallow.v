@@ -3,7 +3,7 @@ import tokenizer
 import parser
 // Original author: Saptak Bhoumik
 fn main() {
-    filename := "/home/saptak/Desktop/swallow/python_implication/example.sw"
+    filename := "./example.sw"
     content := os.read_file(filename) or {
         panic("failed to read $filename")
     }

@@ -1,10 +1,4 @@
-/python_implication
 /test
-/c
-/swallow/parser/token.l
-/swallow/parser/*.*.c
-/swallow/parser/*.*.h
-/swallow/parser/calc
 .vscode
 /push.bat
 /push.sh
