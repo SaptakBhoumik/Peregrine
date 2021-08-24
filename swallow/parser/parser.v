@@ -146,14 +146,6 @@ pub fn parser(code []string) Ast{
 				code_block.ast_type="variable"
 			}
 		}
-		//checks if new line
-		else if item==r"\n"{
-			code_block=Body{ast_type:"new_line"
-					keyword : item
-					length :item.len
-					tab : tab
-					}
-		}
 		//checks if c code
 		else if item=="Ccode" && is_ccode==false && index!=0{
 			is_ccode=true
@@ -188,6 +180,14 @@ pub fn parser(code []string) Ast{
 		else if is_func_def==true{
 			code_block,previus_item,right=function(item,is_func_def,previus_item,json,right,tab)
 			is_argument=right
+		}
+		//checks if new line
+		else if item==r"\n"{
+			code_block=Body{ast_type:"new_line"
+					keyword : item
+					length :item.len
+					tab : tab
+					}
 		}
 		code_block.id=index
 		//modify the code block

@@ -1,4 +1,2 @@
-def mafgin(r):
-    PRINT any
-    SYSTEM a
-    INPUT a+1
+def main(a):
+    a=3+3
