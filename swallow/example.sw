@@ -1,3 +1,7 @@
 def mafgin(r):
-    if a==b and a==6:
-        a=f
+    try:
+        a=1
+    except:
+        b=creat
+    finally:
+        b=c

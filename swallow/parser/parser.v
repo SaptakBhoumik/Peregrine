@@ -47,6 +47,7 @@ pub fn parser(code []string) Ast{
 	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=']
 	loop:=["if","while","elif","else","for"]
 	logic:=["and","or","not","in","is"]
+	error_handler:=["try","except","finally"]
 	mut is_operator:=false
 	mut is_argument:=false
 	mut is_constant:=false
@@ -79,7 +80,14 @@ pub fn parser(code []string) Ast{
 		}
 		//parsing starts here
 		//checks if operator
-		if item in loop{
+		if item in error_handler{
+			code_block=Body{ast_type:item
+						keyword : item
+						length :item.len
+						tab : tab
+						}
+		}
+		else if item in loop{
 			code_block=loop_parse(item,tab)
 			is_loop=true
 		}
