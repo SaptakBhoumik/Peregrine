@@ -1,7 +1,4 @@
 def mafgin(r):
-    try:
-        a=1
-    except:
-        b=creat
-    finally:
-        b=c
+    const a=5
+    const a=b
+    b=4

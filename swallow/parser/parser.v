@@ -50,7 +50,6 @@ pub fn parser(code []string) Ast{
 	error_handler:=["try","except","finally"]
 	mut is_operator:=false
 	mut is_argument:=false
-	mut is_constant:=false
 	mut next_item:="string"
 	mut right:=false
 	mut is_loop:=false
@@ -80,7 +79,14 @@ pub fn parser(code []string) Ast{
 		}
 		//parsing starts here
 		//checks if operator
-		if item in error_handler{
+		if item=="const"{
+			code_block=Body{ast_type:item
+						keyword : item
+						length :item.len
+						tab : tab
+						}
+		}
+		else if item in error_handler{
 			code_block=Body{ast_type:item
 						keyword : item
 						length :item.len
@@ -101,22 +107,25 @@ pub fn parser(code []string) Ast{
 		}
 		else if next_item in operater{
 			is_operator=true
-			code_block,is_operator=parse_operator(is_operator,item,tab, is_constant,mut previous_code_block)
+			code_block,is_operator=parse_operator(is_operator,item,tab)
 			// if code_block.ast_type=="undefined" && next_item=="("{
 			// 	continue
 			// }
-			if code_block.ast_type=='undefined' && next_item!="("{
+			if code_block.ast_type=='undefined' && next_item!="(" && previous_code_block.ast_type=='const'{
+				code_block.ast_type="constant"
+			}
+			else if code_block.ast_type=='undefined' && next_item!="(" && previous_code_block.ast_type!='const'{
 				code_block.ast_type="variable"
 			}
 		}
 		else if is_operator==true && is_argument==false{
-			code_block,is_operator=parse_operator(is_operator,item,tab, is_constant,mut previous_code_block)
+			code_block,is_operator=parse_operator(is_operator,item,tab )
 			if code_block.ast_type=='undefined' && next_item!="("{
 				code_block.ast_type="variable"
 			}
 		}
 		else if is_operator==true && is_argument==true && item!=")"{
-			code_block,is_operator=parse_operator(is_operator,item,tab, is_constant,mut previous_code_block)
+			code_block,is_operator=parse_operator(is_operator,item,tab)
 			if code_block.ast_type=='undefined' && next_item!="("{
 				code_block.ast_type="variable"
 			}
