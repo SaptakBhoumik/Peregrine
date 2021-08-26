@@ -1,3 +1,4 @@
 def main(a):
-    ra=r"3"
-    ra="3"
+    return a+b
+def hi():
+    a=b

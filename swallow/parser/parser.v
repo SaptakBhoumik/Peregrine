@@ -50,6 +50,7 @@ pub fn parser(code []string) Ast{
 	error_handler:=["try","except","finally"]
 	basic_keyword:=["PRINT","SYSTEM","INPUT"]
 	mut is_basic:=false
+	mut is_return:=false
 	mut is_operator:=false
 	mut is_argument:=false
 	mut next_item:="string"
@@ -128,6 +129,7 @@ pub fn parser(code []string) Ast{
 							length :item.len
 							tab : tab}
 		}
+		//checks if operator
 		else if next_item in operater{
 			is_operator=true
 			code_block,is_operator=parse_operator(is_operator,item,tab)
@@ -184,6 +186,23 @@ pub fn parser(code []string) Ast{
 			previus_item=item
 			is_func_def=true
 		}
+		//checks if return statement
+		else if item=="return"{
+			is_return=true
+			code_block=Body{ast_type:"return"
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
+		else if item!=r"\n" && is_return==true{
+			code_block=Body{ast_type:know_type(item)
+							keyword : item
+							length :item.len
+							tab : tab}
+			if code_block.ast_type=='undefined' && next_item!="("{
+				code_block.ast_type="variable"
+			}
+		}
 		else if is_func_def==true{
 			code_block,previus_item,right=function(item,is_func_def,previus_item,json,right,tab)
 			is_argument=right
@@ -225,9 +244,16 @@ pub fn parser(code []string) Ast{
 		}
 		if is_basic==true && item==r"\n"{
 			is_basic=false
-			right=is_loop
+			right=is_basic
 		}
-		else if is_basic==true && item!="\n"{
+		else if is_basic==true && item!=r"\n"{
+			right=true
+		}
+		if is_return==true && item==r"\n"{
+			is_return=false
+			right=is_return
+		}
+		else if is_return==true && item!=r"\n"{
 			right=true
 		}
 		code_block=Body{}
