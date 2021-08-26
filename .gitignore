@@ -2,11 +2,3 @@
 .vscode
 /push.bat
 /push.sh
-# Binaries for programs and plugins
-main
-swallow
-*.exe
-*.exe~
-*.so
-*.dylib
-*.dll
