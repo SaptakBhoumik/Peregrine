@@ -45,7 +45,7 @@ struct Ast {
 
 pub fn parser(code []string) Ast{
 	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=']
-	loop:=["if","while","elif","else","for"]
+	loop:=["if","while","elif","else","for","in","is"]
 	logic:=["and","or","not","in","is"]
 	error_handler:=["try","except","finally"]
 	basic_keyword:=["PRINT","SYSTEM","INPUT"]
@@ -180,6 +180,20 @@ pub fn parser(code []string) Ast{
 							keyword : item
 							length :item.len
 							tab : tab}
+		}
+		else if is_loop==true && item!=","{
+			if item==":"{
+				code_block=Body{}
+			}
+			else{
+				code_block=Body{ast_type:know_type(item)
+							keyword : item
+							length :item.len
+							tab : tab}
+				if code_block.ast_type=='undefined' && next_item!="("{
+					code_block.ast_type="variable"
+				}
+			}
 		}
 		//checks if function
 		else if item=="def"{

@@ -1,2 +1,3 @@
 def main():
-    a,b=c
+    for a,b in b:
+        a=y
