@@ -129,6 +129,13 @@ pub fn parser(code []string) Ast{
 							length :item.len
 							tab : tab}
 		}
+		//checks if c code
+		else if item=="Ccode" && is_ccode==false && index!=0{
+			is_ccode=true
+		}
+		else if is_ccode==true{
+			code_block,is_ccode=ccode(item, is_ccode,tab)
+		}
 		//checks if operator
 		else if next_item in operater{
 			is_operator=true
@@ -155,13 +162,7 @@ pub fn parser(code []string) Ast{
 				code_block.ast_type="variable"
 			}
 		}
-		//checks if c code
-		else if item=="Ccode" && is_ccode==false && index!=0{
-			is_ccode=true
-		}
-		else if is_ccode==true{
-			code_block,is_ccode=ccode(item, is_ccode,tab)
-		}
+
 		//some basic keyword
 		else if item=="pass"{
 			code_block=Body{ast_type:"pass"
