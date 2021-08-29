@@ -20,7 +20,9 @@ pub fn formatter(src string) string {
 			token="\n"
 		}
 		previous_item=token
-		token=" $token"
+		if token!=" "{
+			token=" $token"
+		}
 		unsafe{
 			source+=*token
 		}
