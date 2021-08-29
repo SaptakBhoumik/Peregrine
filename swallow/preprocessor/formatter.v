@@ -4,25 +4,27 @@ module preprocessor
 
 import tokenizer
 
-pub fn preprocess(src string) string[] {
-	src = tokenize(src)
+pub fn formatter(src string) string {
+	mut tokens:=tokenizer.process_tokens(tokenizer.tokenize(src))
+	// src = tokenize(src)
+	mut source:=""
+	mut previous_item:=""
+	mut module_name:="MODULE"
 
-	mut counter := 0
-	
-	for token in src {
-		match token {
-			"def" {
-				counter++
-				mut name: string = src[counter]
-				if name == "main" {
-					break
-				}
-				modulename := "MODULENAME"
-				name = f"${modulename}${name}"
-			}
+
+	for mut token in tokens {
+		if previous_item=="def" && token!="main"{
+			token="$module_name$token"
 		}
-		counter++
+		else if token==r"\n"{
+			token="\n"
+		}
+		previous_item=token
+		token=" $token"
+		unsafe{
+			source+=*token
+		}
 	}
 
-	return src
+	return source
 }
