@@ -68,6 +68,8 @@ fn number_present_in_arrey(item string) int{
 
 pub fn process_tokens(list []string) []string{
 //it organizes the partially tokenized text
+	mut second_bracket_count:=0
+	mut third_bracket_count:=0
 	mut is_double_quote_open:=false//checks if double quote " is open
 	mut is_single_quote_open:=false//checks if single quote ' is open
 	mut is_ccode:=false
@@ -171,15 +173,6 @@ pub fn process_tokens(list []string) []string{
 					results << item
 				}
 				//list
-				else if item=='[' && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==false && is_dictionary_open==false && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
-					is_list_open=true
-					results << item
-				}
-				else if item!=']' && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==true && is_dictionary_open==false  && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
-					unsafe{
-					 results[count-1]+=*item
-					}
-				}
 				else if item=='"' && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==true && is_dictionary_open==false  && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
 					is_double_quote_open_list=true
 					unsafe{
@@ -207,29 +200,27 @@ pub fn process_tokens(list []string) []string{
 					unsafe{
 					 results[count-1]+=*item
 					}
-				} 
+				}
 				else if item=="'" && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==true && is_dictionary_open==false  && is_double_quote_open_list==false && is_single_quote_open_list==true && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
 					is_single_quote_open_list=false
 					unsafe{
 					 results[count-1]+=*item
 					}
 				}
+				else if item=='[' && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==false && is_dictionary_open==false && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
+					results << item
+				}
+				else if item!=']' && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==true && is_dictionary_open==false  && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
+					unsafe{
+					 results[count-1]+=*item
+					}
+				}
 				else if item==']' && is_double_quote_open==false && is_single_quote_open==false   && is_list_open==true && is_dictionary_open==false  && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
-					is_list_open=false
 					unsafe{
 					 results[count-1]+=*item
 					}
 				} 
 				//dictionary
-				else if item=='{' && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==false && is_dictionary_open==false && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
-					is_dictionary_open=true
-					results << item
-				}
-				else if item!='}' && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==false && is_dictionary_open==true  && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
-					unsafe{
-					 results[count-1]+=*item
-					}
-				}
 				else if item=='"' && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==false && is_dictionary_open==true  && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
 					is_double_quote_open_dictionary=true
 					unsafe{
@@ -257,19 +248,27 @@ pub fn process_tokens(list []string) []string{
 					unsafe{
 					 results[count-1]+=*item
 					}
-				} 
+				}
 				else if item=="'" && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==false && is_dictionary_open==true  && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==true && is_ccode==false{
 					is_single_quote_open_dictionary=false
 					unsafe{
 					 results[count-1]+=*item
 					}
 				}
-				else if item=='}' && is_double_quote_open==false && is_single_quote_open==false   && is_list_open==false && is_dictionary_open==true  && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
-					is_dictionary_open=false
+				else if item=='{' && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==false && is_dictionary_open==false && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
+					results << item
+				}
+				else if item!='}' && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==false && is_dictionary_open==true  && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
 					unsafe{
 					 results[count-1]+=*item
 					}
-				} 
+				}
+				else if item=='}' && is_double_quote_open==false && is_single_quote_open==false   && is_list_open==false && is_dictionary_open==true  && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
+
+					unsafe{
+					 results[count-1]+=*item
+					}
+				}
 				else{
 					results << item
 				}
@@ -278,6 +277,32 @@ pub fn process_tokens(list []string) []string{
 		else{
 			results << item
 			}
+		//dictionary
+		if item=='{' && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==false && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
+			second_bracket_count=second_bracket_count+1
+			}
+		else if item=='}' && is_double_quote_open==false && is_single_quote_open==false  && is_list_open==false && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
+			second_bracket_count=second_bracket_count-1
+			}
+		if second_bracket_count==0{
+			is_dictionary_open=false
+			}
+		else{
+			is_dictionary_open=true
+		}
+		//list
+		if item=='[' && is_double_quote_open==false && is_single_quote_open==false  && is_dictionary_open==false && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
+			third_bracket_count=third_bracket_count+1
+			}
+		else if item==']' && is_double_quote_open==false && is_single_quote_open==false  && is_dictionary_open==false && is_double_quote_open_list==false && is_single_quote_open_list==false && is_double_quote_open_dictionary==false && is_single_quote_open_dictionary==false && is_ccode==false{
+			third_bracket_count=third_bracket_count-1
+			}
+		if third_bracket_count==0{
+			is_list_open=false
+			}
+		else{
+			is_list_open=true
+		}
 	}
 	mut is_comment_open:=false
 	mut final_result:=[]string{}
