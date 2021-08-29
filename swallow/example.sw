@@ -1,2 +1,2 @@
-def main():
+def hmain():
     a=1

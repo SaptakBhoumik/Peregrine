@@ -1,4 +1,4 @@
-// Original author: Ethan Olchik
+// author: Ethan Olchik
 
 module preprocessor
 
