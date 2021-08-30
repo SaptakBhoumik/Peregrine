@@ -1,2 +1,3 @@
 def hmain():
-    a=1
+    const fa=r"1"
+    const rb=f"1"
