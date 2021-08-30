@@ -39,11 +39,7 @@ pub fn formatter(src string) string {
 		}
 		else if find_token(token,function_list)==true{
 			if previous_item!="." && next_item=="("{
-				temp=module_name
-				unsafe{
-					temp+=*token
-				}
-				token=temp
+				token="$module_name$token"
 			}
 		}
 		previous_item=token
