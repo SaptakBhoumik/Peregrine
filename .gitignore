@@ -2,3 +2,5 @@
 .vscode
 /push.bat
 /push.sh
+.idea
+**/a.out
