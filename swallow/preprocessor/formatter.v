@@ -17,7 +17,6 @@ fn find_token(token string , function_list []string) bool{
 
 pub fn formatter(src string) string {
 	mut next_item:=""
-	mut temp:=""
 	mut tokens:=tokenizer.process_tokens(tokenizer.tokenize(src))
 	mut function_list:=[]string{}
 	mut source:=""

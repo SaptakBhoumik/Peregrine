@@ -83,7 +83,7 @@ pub fn parser(code []string) Ast{
 		//parsing starts here
 		//checks if operator
 		if item=="const"{
-			code_block=Body{ast_type:item
+			code_block=Body{ast_type:"constant"
 						keyword : item
 						length :item.len
 						tab : tab
@@ -122,9 +122,15 @@ pub fn parser(code []string) Ast{
 						}
 			is_loop=true
 		}
-		//checks if raw string
+		//checks if raw string or formatted string
 		else if item=="r"{
-			code_block=Body{ast_type:item
+			code_block=Body{ast_type:"raw_string"
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
+		else if item=="f"{
+			code_block=Body{ast_type:"formatted_string"
 							keyword : item
 							length :item.len
 							tab : tab}
@@ -143,10 +149,10 @@ pub fn parser(code []string) Ast{
 			// if code_block.ast_type=="undefined" && next_item=="("{
 			// 	continue
 			// }
-			if code_block.ast_type=='undefined' && next_item!="(" && previous_code_block.ast_type=='const'{
-				code_block.ast_type="constant"
+			if code_block.ast_type=='undefined' && next_item!="(" && previous_code_block.keyword=='const'{
+				code_block.ast_type=previous_code_block.ast_type
 			}
-			else if code_block.ast_type=='undefined' && next_item!="(" && previous_code_block.ast_type!='const'{
+			else if code_block.ast_type=='undefined' && next_item!="(" && previous_code_block.keyword!='const'{
 				code_block.ast_type="variable"
 			}
 		}
@@ -253,8 +259,11 @@ pub fn parser(code []string) Ast{
 				code_block.direction="right"
 			}
 		}
-		if code_block.ast_type=="string" && previous_code_block.ast_type=="r"{
-			code_block.ast_type="raw_string"
+		if code_block.ast_type=="string" && previous_code_block.keyword=="r"{
+			code_block.ast_type=previous_code_block.ast_type
+		}
+		else if code_block.ast_type=="string" && previous_code_block.keyword=="f"{
+			code_block.ast_type=previous_code_block.ast_type
 		}
 		//appends to json
 		if  code_block.keyword!=""{

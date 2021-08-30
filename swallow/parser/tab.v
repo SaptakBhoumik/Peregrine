@@ -1,7 +1,7 @@
 module parser
 // Original author: Saptak Bhoumik
 pub fn tab_handler(mut json Ast,mut code_block Body,mut previus_code_block Body,right bool) Ast{
-	if code_block.keyword!="r"{
+	if code_block.keyword!="r" && code_block.keyword!="f" && code_block.keyword!='const'{
 		if right==false{
 			if code_block.keyword!=r"\n"{
 				if code_block.tab==previus_code_block.tab{

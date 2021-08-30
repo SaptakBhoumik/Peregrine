@@ -42,7 +42,7 @@ pub fn tokenize(str string) []string {
 
 	operator_keywords := [
 				'and',
-				'or', 
+				'or',
 				'not', 
 				'in',
 				'is'
