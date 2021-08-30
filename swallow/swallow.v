@@ -13,6 +13,7 @@ fn main() {
     k:=parser.parser(tokenizer.process_tokens(tokenizer.tokenize(a)))
     println(k)
     println(preprocessor.formatter(content))
+    println(tokenizer.process_tokens(tokenizer.tokenize(preprocessor.formatter(content))))
     // println(content)
     // println(os.args)//gives the location do i can add the built i file location
 }

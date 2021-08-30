@@ -6,7 +6,6 @@ import tokenizer
 
 pub fn formatter(src string) string {
 	mut tokens:=tokenizer.process_tokens(tokenizer.tokenize(src))
-	// src = tokenize(src)
 	mut source:=""
 	mut previous_item:=""
 	mut module_name:="MODULE"
@@ -20,8 +19,8 @@ pub fn formatter(src string) string {
 			token="\n"
 		}
 		previous_item=token
-		if token!=" "{
-			token=" $token"
+		if token!=" " && token!="\n"{
+			token="$token "
 		}
 		unsafe{
 			source+=*token
