@@ -58,8 +58,7 @@ char *_format(const char *fmt, ...) {
                 memcpy(result + space, fmt, 1);
                 space = 1;
             } else {
-                size_t l = strlen(result);
-                result = (char*)realloc(result, l + 1);
+                result = (char*)realloc(result, space + 1);
                 memcpy(result + space, fmt, 1);
                 space += 1;
             }
