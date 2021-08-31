@@ -31,11 +31,11 @@ pub fn tab_handler(mut json Ast,mut code_block Body,mut previus_code_block Body,
 		}
 		else{
 			if code_block.keyword!=r"\n"{
-				if previus_code_block.direction=="right"{
+				if json.body.last().direction=="right"{
 					code_block.relative_to=previus_code_block.relative_to
 				}
-				else if previus_code_block.direction!="right"{
-					code_block.relative_to=previus_code_block.id
+				else if json.body.last().direction!="right"{
+					code_block.relative_to=json.body.last().id
 				}
 			}
 			json.body<<code_block

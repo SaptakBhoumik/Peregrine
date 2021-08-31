@@ -1,3 +1,3 @@
-def hmain(int a):
-    const fa=r"1"
+def hmain(a):
+    const int fa=r"1"
     const rb=f"1"

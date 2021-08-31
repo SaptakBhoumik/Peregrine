@@ -263,13 +263,23 @@ pub fn parser(code []string) Ast{
 			}
 		}
 		if previous_code_block.keyword in swallow_type{
-			code_block.ast_type=previous_code_block.ast_type
+			if code_block.ast_type=="required_argument"{
+				code_block.ast_type="$previous_code_block.ast_type$underscore$code_block.ast_type"
+			}
+			else{
+				code_block.ast_type=previous_code_block.ast_type
+			}
 		}
 		else if code_block.keyword in swallow_type{
 			code_block.ast_type=code_block.ast_type
 		}
 		else if previous_code_block.keyword == "const"{
-			code_block.ast_type=previous_code_block.ast_type
+			if code_block.ast_type=="required_argument"{
+				code_block.ast_type="$previous_code_block.ast_type$underscore$code_block.ast_type"
+			}
+			else{
+				code_block.ast_type=previous_code_block.ast_type
+			}
 		}
 		if code_block.ast_type=="string" && previous_code_block.keyword=="r"{
 			code_block.ast_type=previous_code_block.ast_type
