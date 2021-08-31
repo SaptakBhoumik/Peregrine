@@ -84,12 +84,8 @@ pub fn tokenize(str string) []string {
 							"list",
 							"dictionary",
 							"float",
+							"void",
 							"const"
-							]
-	functional_keywords := [
-							'PRINT',
-							'INPUT',
-							'SYSTEM'//run command prompt commands
 							]
 	//defining an empty array
 	mut collection_of_keywords := []string{}
@@ -105,7 +101,6 @@ pub fn tokenize(str string) []string {
 	collection_of_keywords << import_keywords
 	collection_of_keywords << exception_keywords
 	collection_of_keywords << variable_keybords
-	collection_of_keywords << functional_keywords
 	mut code:="\n$str  "//do not change this line
 	white_space := ' '
 	//defining an empty array

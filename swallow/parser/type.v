@@ -36,6 +36,9 @@ pub fn know_type(item string) string{
 		if item=="True" || item=="False"{
 			type_of_str="bool"
 		}
+		else if item==")" || item=="("{
+			type_of_str="bracket"
+		}
 		else if split_text[count-1]=="'" && split_text[0]=="'"{
 			type_of_str="string"
 		}
