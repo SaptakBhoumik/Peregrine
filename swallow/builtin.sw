@@ -1,9 +1,5 @@
 #Builtin swallow function
-def print(query):
-    text=f"{query}\n"
-    PRINT text
-def input(query):
-    PRINT query
-    out=INPUT
-    PRINT "\n"
-    return out
+#Author: Saptak Bhoumik
+#Builtin.h is imported by default
+def print(str query):
+    Ccode printf("%s",query);  Ccode
