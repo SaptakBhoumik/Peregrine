@@ -2,4 +2,4 @@
 #Author: Saptak Bhoumik
 #Builtin.h is imported by default
 def print(str query):
-    Ccode printf("%s",query);Ccode
+    Ccode printf("%s",query);  Ccode
