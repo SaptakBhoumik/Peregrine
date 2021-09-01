@@ -1,0 +1,8 @@
+./swallow/parser/* @SaptakBhoumik
+./swallow/tokenizer/* @SaptakBhoumik
+./swallow/swallow.v @SaptakBhoumik
+./swallow/builtin.sw @SaptakBhoumik
+./swallow/tokenizer/import_parser.v @SaptakBhoumik
+./swallow/tokenizer/formatter.v @classerase
+./swallow/builtin.h @mdgaziur
+./swallow/tests/builtin/* @mdgaziur
