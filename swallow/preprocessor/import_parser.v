@@ -29,8 +29,9 @@ pub fn import_parser(code string) Import_ast{
 			else if item == "cimport"{
 				is_c_file=true
 			}
+
 			//for swallow files
-			else if is_swallow_file==true{
+			if is_swallow_file==true{
 				if item==r"\n"{
 					is_swallow_file=false
 				}
