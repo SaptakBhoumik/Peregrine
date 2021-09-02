@@ -5,6 +5,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
+#include <stdio.h>
 
 /*
  * Builtin formatter function
@@ -30,7 +32,7 @@ char *_format(const char *fmt, ...) {
     size_t fmt_size = strlen(fmt);
 
     if(fmt_size > 0) {
-        result = malloc(sizeof(char));
+        result = (char*)malloc(sizeof(char));
 
         // add one character if it's not possibly format string
         if (*fmt != '{' || !(*(fmt+1) && *(fmt+1) == '}')) {
@@ -39,7 +41,7 @@ char *_format(const char *fmt, ...) {
             fmt++;
         }
     } else {
-        return "";
+        return (char*)"";
     }
 
     while(*fmt) {
@@ -49,7 +51,7 @@ char *_format(const char *fmt, ...) {
                 char *arg = va_arg(args, char*);
                 size_t a_size = strlen(arg);
 
-                result = realloc(result, size + a_size);
+                result = (char*)realloc(result, size + a_size);
                 memcpy(result + size, arg, a_size);
                 size += a_size;
                 fmt++; // ignore '}'
@@ -57,7 +59,7 @@ char *_format(const char *fmt, ...) {
         }
         else {
             // increase size and push char
-            result = realloc(result, size + 1);
+            result = (char*)realloc(result, size + 1);
             memcpy(result + size, fmt, 1);
             size += 1;
         }
@@ -67,10 +69,96 @@ char *_format(const char *fmt, ...) {
 
     // null terminate if it's not null
     if(result) {
-        result = realloc(result, size + 1);
+        result = (char*)realloc(result, size + 1);
         result[size] = '\0';
     }
 
     return result;
+}
+
+/* _colorprint() implementation */
+
+/*
+ * int16_t
+ *
+ * Put foreground color in first half
+ * and background color in second half
+ */
+
+// Foreground(text) colors
+#define SH_FG_BLACK             (30 << 8)
+#define SH_FG_RED               (31 << 8)
+#define SH_FG_GREEN             (32 << 8)
+#define SH_FG_YELLOW            (33 << 8)
+#define SH_FG_BLUE              (34 << 8)
+#define SH_FG_MAGENTA           (35 << 8)
+#define SH_FG_CYAN              (36 << 8)
+#define SH_FG_WHITE             (37 << 8)
+#define SH_FG_BRIGHT_BLACK      (30 << 8)
+#define SH_FG_BRIGHT_RED        (31 << 8)
+#define SH_FG_BRIGHT_GREEN      (32 << 8)
+#define SH_FG_BRIGHT_YELLOW     (33 << 8)
+#define SH_FG_BRIGHT_BLUE       (34 << 8)
+#define SH_FG_BRIGHT_MAGENTA    (35 << 8)
+#define SH_FG_BRIGHT_CYAN       (36 << 8)
+#define SH_FG_BRIGHT_WHITE      (37 << 8)
+
+// Background(text) colors
+#define SH_BG_BLACK             40
+#define SH_BG_RED               41
+#define SH_BG_GREEN             42
+#define SH_BG_YELLOW            43
+#define SH_BG_BLUE              44
+#define SH_BG_MAGENTA           45
+#define SH_BG_CYAN              46
+#define SH_BG_WHITE             47
+#define SH_BG_BRIGHT_BLACK      100
+#define SH_BG_BRIGHT_RED        101
+#define SH_BG_BRIGHT_GREEN      102
+#define SH_BG_BRIGHT_YELLOW     103
+#define SH_BG_BRIGHT_BLUE       104
+#define SH_BG_BRIGHT_MAGENTA    105
+#define SH_BG_BRIGHT_CYAN       106
+#define SH_BG_BRIGHT_WHITE      107
+
+/*
+ * Builtin Color Print Function
+ * Author: MD Gaziur Rahman Noor
+ *
+ * Formats given string specifically so that it is colored as
+ * specified when printed to stdout
+ *
+ * Example:
+ * _colorprint("Hello World!", SH_FG_BLACK | SH_BG_WHITE);
+ */
+void _colorprint(const char *str, int16_t flags, bool reset = true) {
+    int8_t background = flags & 0x00FF;
+    int8_t foreground = (flags & 0xFF00) >> 8;
+
+    if(background == 0) {
+        // don't include  background
+        printf("\e[1;%dm%s", foreground, str);
+    }
+    else {
+        printf("\e[1;%dm\e[1;%dm%s", foreground, background, str);
+    }
+
+    if(reset)
+        printf("\e[1;0m");
+}
+
+/*
+ * Wrapper around _colorprint function which adds newline at the end
+ * Author: MD Gaziur Rahman Noor
+ *
+ * Works same as _colorprint() but adds newline at the end
+ *
+ * Example:
+ * _colorprintln("Hello World!", SH_FG_BLACK | SH_BG_WHITE);
+ */
+void _colorprintln(const char *str, int16_t flags) {
+    char *formatted_string = _format("{}\e[1;0m\n", str);
+    _colorprint(formatted_string, flags, false);
+    free(formatted_string);
 }
 #endif //SWALLOW_BUILTIN_H
