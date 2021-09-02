@@ -14,6 +14,7 @@ fn symbol_present_in_arrey(item string) int{
 					'(',
 					'.',
 					'r',
+					'f',
 					',',
 					')',
 					':',

@@ -44,12 +44,13 @@ struct Ast {
 }
 
 pub fn parser(code []string) Ast{
+	swallow_type:=["int","bool","str","list","dictionary","float","void"]
 	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=']
 	loop:=["if","while","elif","else","for","in","is"]
 	logic:=["and","or","not","in","is"]
 	error_handler:=["try","except","finally"]
-	basic_keyword:=["PRINT","SYSTEM","INPUT"]
-	mut is_basic:=false
+	variable:="_variable"
+	underscore:="_"
 	mut is_return:=false
 	mut is_operator:=false
 	mut is_argument:=false
@@ -81,9 +82,24 @@ pub fn parser(code []string) Ast{
 			is_tab=true
 		}
 		//parsing starts here
-		//checks if operator
-		if item=="const"{
-			code_block=Body{ast_type:item
+		if item in swallow_type{
+			if previous_code_block.keyword=="const"{
+				code_block=Body{ast_type:"$item$underscore$previous_code_block.ast_type"
+							keyword : item
+							length :item.len
+							tab : tab
+							}
+			}
+			else{
+				code_block=Body{ast_type:"$item$variable"
+							keyword : item
+							length :item.len
+							tab : tab
+							}
+			}
+		}
+		else if item=="const"{
+			code_block=Body{ast_type:"constant"
 						keyword : item
 						length :item.len
 						tab : tab
@@ -96,20 +112,7 @@ pub fn parser(code []string) Ast{
 						tab : tab
 						}
 		}
-		else if is_basic==true{
-			code_block,is_operator=parse_operator(is_operator,item,tab )
-			if code_block.ast_type=='undefined' && next_item!="("{
-				code_block.ast_type="variable"
-			}
-		}
-		else if item in basic_keyword{
-			code_block=Body{ast_type:item
-						keyword : item
-						length :item.len
-						tab : tab
-						}
-			is_basic=true
-		}
+
 		else if item in loop{
 			code_block=loop_parse(item,tab)
 			is_loop=true
@@ -122,9 +125,15 @@ pub fn parser(code []string) Ast{
 						}
 			is_loop=true
 		}
-		//checks if raw string
+		//checks if raw string or formatted string
 		else if item=="r"{
-			code_block=Body{ast_type:item
+			code_block=Body{ast_type:"raw_string"
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
+		else if item=="f"{
+			code_block=Body{ast_type:"formatted_string"
 							keyword : item
 							length :item.len
 							tab : tab}
@@ -139,25 +148,25 @@ pub fn parser(code []string) Ast{
 		//checks if operator
 		else if next_item in operater{
 			is_operator=true
-			code_block,is_operator=parse_operator(is_operator,item,tab)
+			code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
 			// if code_block.ast_type=="undefined" && next_item=="("{
 			// 	continue
 			// }
-			if code_block.ast_type=='undefined' && next_item!="(" && previous_code_block.ast_type=='const'{
-				code_block.ast_type="constant"
+			if code_block.ast_type=='undefined' && next_item!="(" && previous_code_block.keyword=='const'{
+				code_block.ast_type=previous_code_block.ast_type
 			}
-			else if code_block.ast_type=='undefined' && next_item!="(" && previous_code_block.ast_type!='const'{
+			else if code_block.ast_type=='undefined' && next_item!="(" && previous_code_block.keyword!='const'{
 				code_block.ast_type="variable"
 			}
 		}
 		else if is_operator==true && is_argument==false{
-			code_block,is_operator=parse_operator(is_operator,item,tab )
+			code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
 			if code_block.ast_type=='undefined' && next_item!="("{
 				code_block.ast_type="variable"
 			}
 		}
 		else if is_operator==true && is_argument==true && item!=")"{
-			code_block,is_operator=parse_operator(is_operator,item,tab)
+			code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
 			if code_block.ast_type=='undefined' && next_item!="("{
 				code_block.ast_type="variable"
 			}
@@ -253,8 +262,30 @@ pub fn parser(code []string) Ast{
 				code_block.direction="right"
 			}
 		}
-		if code_block.ast_type=="string" && previous_code_block.ast_type=="r"{
-			code_block.ast_type="raw_string"
+		if previous_code_block.keyword in swallow_type{
+			if code_block.ast_type=="required_argument"{
+				code_block.ast_type="$previous_code_block.ast_type$underscore$code_block.ast_type"
+			}
+			else{
+				code_block.ast_type=previous_code_block.ast_type
+			}
+		}
+		else if code_block.keyword in swallow_type{
+			code_block.ast_type=code_block.ast_type
+		}
+		else if previous_code_block.keyword == "const"{
+			if code_block.ast_type=="required_argument"{
+				code_block.ast_type="$previous_code_block.ast_type$underscore$code_block.ast_type"
+			}
+			else{
+				code_block.ast_type=previous_code_block.ast_type
+			}
+		}
+		if code_block.ast_type=="string" && previous_code_block.keyword=="r"{
+			code_block.ast_type=previous_code_block.ast_type
+		}
+		else if code_block.ast_type=="string" && previous_code_block.keyword=="f"{
+			code_block.ast_type=previous_code_block.ast_type
 		}
 		//appends to json
 		if  code_block.keyword!=""{
@@ -268,13 +299,6 @@ pub fn parser(code []string) Ast{
 			right=is_loop
 		}
 		else if is_loop==true && item!=":"{
-			right=true
-		}
-		if is_basic==true && item==r"\n"{
-			is_basic=false
-			right=is_basic
-		}
-		else if is_basic==true && item!=r"\n"{
 			right=true
 		}
 		if is_return==true && item==r"\n"{

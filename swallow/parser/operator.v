@@ -1,6 +1,6 @@
 module parser
 // Original author: Saptak Bhoumik
-pub fn parse_operator(operator bool,item string,tab f64) (Body,bool){
+pub fn parse_operator(operator bool,item string,tab f64,is_argument bool) (Body,bool){
 	binary_operator:=['+','-','*','/','^','//','%']
 	compare:=['==', '!=', '<=', '>=', '>','<']
 	mut is_operator:=operator
@@ -34,12 +34,21 @@ pub fn parse_operator(operator bool,item string,tab f64) (Body,bool){
 					}
 		is_operator=false
 	}
-	else if item!=")" && item!=":"{
-		code_block=Body{ast_type:know_type(item)
-					keyword : item
-					length :item.len
-					tab : tab
-					}
+	else if item!=":"{
+		if item != ")"{
+			code_block=Body{ast_type:know_type(item)
+						keyword : item
+						length :item.len
+						tab : tab
+						}
+		}
+		else if item==")" && is_argument==false{
+			code_block=Body{ast_type:know_type(item)
+						keyword : item
+						length :item.len
+						tab : tab
+						}
+		}
 	}
 	return code_block,is_operator
 }
