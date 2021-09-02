@@ -24,50 +24,53 @@ char *_format(const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
 
-    if (!fmt || strlen(fmt) == 0) {
+    // make sure it's not empty or null
+    char *result = NULL;
+    size_t size = 0;
+    size_t fmt_size = strlen(fmt);
+
+    if(fmt_size > 0) {
+        result = malloc(sizeof(char));
+
+        // add one character if it's not possibly format string
+        if (*fmt != '{' || !(*(fmt+1) && *(fmt+1) == '}')) {
+            result[0] = *fmt;
+            size += 1;
+            fmt++;
+        }
+    } else {
         return "";
     }
 
-    char *result = NULL;
-    size_t space = 0;
+    while(*fmt) {
+        // check if it's format string
+        if (*fmt == '{') {
+            if (*(fmt+1) && *(fmt+1) == '}') {
+                char *arg = va_arg(args, char*);
+                size_t a_size = strlen(arg);
 
-    while(*fmt != '\0') {
-        if (*fmt == '{' && *(fmt + 1) == '}') {
-            char *arg = va_arg(args, char*);
-
-            // allocate if doesn't exist
-            if (!result) {
-                result = (char*)malloc(sizeof(char) * strlen(arg));
-                space = strlen(arg);
-                // memcpy
-                memcpy(result, arg, strlen(arg));
-            }
-            else {
-                // reallocate
-                result = (char*)realloc(result, space + strlen(arg));
-
-                // memcpy
-                memcpy(result + space, arg, strlen(arg));
-                space += strlen(arg);
-            }
-            fmt++;
-        } else {
-            // allocate if isn't allocated already
-            if(!result) {
-                result = (char*)malloc(sizeof(char));
-                memcpy(result + space, fmt, 1);
-                space = 1;
-            } else {
-                result = (char*)realloc(result, space + 1);
-                memcpy(result + space, fmt, 1);
-                space += 1;
+                result = realloc(result, size + a_size);
+                memcpy(result + size, arg, a_size);
+                size += a_size;
+                fmt++; // ignore '}'
             }
         }
+        else {
+            // increase size and push char
+            result = realloc(result, size + 1);
+            memcpy(result + size, fmt, 1);
+            size += 1;
+        }
+
         fmt++;
     }
-    result[space] = '\0';
+
+    // null terminate if it's not null
+    if(result) {
+        result = realloc(result, size + 1);
+        result[size] = '\0';
+    }
 
     return result;
 }
-
 #endif //SWALLOW_BUILTIN_H
