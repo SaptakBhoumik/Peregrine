@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 /*
  * Builtin formatter function
@@ -129,9 +130,9 @@ char *_format(const char *fmt, ...) {
  * specified when printed to stdout
  *
  * Example:
- * _colorprint("Hello World!", SH_FG_BLACK | SH_BG_WHITE);
+ * _colorprint("Hello World!", SH_FG_BLACK | SH_BG_WHITE, true);
  */
-void _colorprint(const char *str, int16_t flags, bool reset = true) {
+void _colorprint(const char *str, int16_t flags, bool reset) {
     int8_t background = flags & 0x00FF;
     int8_t foreground = (flags & 0xFF00) >> 8;
 
@@ -157,7 +158,7 @@ void _colorprint(const char *str, int16_t flags, bool reset = true) {
  * _colorprintln("Hello World!", SH_FG_BLACK | SH_BG_WHITE);
  */
 void _colorprintln(const char *str, int16_t flags) {
-    char *formatted_string = _format("{}\e[1;0m\n", str);
+    char *formatted_string = _format("{}\e[1;0m\n", str, false);
     _colorprint(formatted_string, flags, false);
     free(formatted_string);
 }
