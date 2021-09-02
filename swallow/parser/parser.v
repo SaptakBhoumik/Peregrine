@@ -51,6 +51,7 @@ pub fn parser(code []string) Ast{
 	error_handler:=["try","except","finally"]
 	variable:="_variable"
 	underscore:="_"
+	mut is_function_call:=false
 	mut is_return:=false
 	mut is_operator:=false
 	mut is_argument:=false
@@ -205,6 +206,31 @@ pub fn parser(code []string) Ast{
 				}
 			}
 		}
+		//checks if function call
+
+		else if know_type(item)=='undefined' && previus_item!="def" && next_item=="("{
+			code_block=Body{ast_type:"function_call"
+							keyword : item
+							length :item.len
+							tab : tab}
+			is_function_call=true
+		}
+		else if is_function_call==true{
+			code_block=Body{ast_type:know_type(item)
+							keyword : item
+							length :item.len
+							tab : tab}
+
+			if code_block.ast_type=='undefined'{
+				if item==","{
+					code_block.ast_type="comma"
+				}
+				else{
+					code_block.ast_type="variable"
+				}
+			}
+		}
+
 		//checks if function
 		else if item=="def"{
 			previus_item=item
@@ -290,6 +316,13 @@ pub fn parser(code []string) Ast{
 		//appends to json
 		if  code_block.keyword!=""{
 			json=tab_handler(mut json,mut code_block,mut previous_code_block, right)
+		}
+		if is_function_call==true && item==r"\n"{
+			right=false
+			is_function_call=false
+		}
+		else if is_function_call==true && item!=r"\n"{
+			right=true
 		}
 		if code_block.keyword!=r"\n" && code_block.keyword!=""{
 			previous_code_block=code_block
