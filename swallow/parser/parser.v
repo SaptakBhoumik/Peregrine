@@ -44,6 +44,7 @@ struct Ast {
 }
 
 pub fn parser(code []string) Ast{
+	methord:=["insert","remove","replace","append","pop","sort","count","reverse"]
 	swallow_type:=["int","bool","str","list","dictionary","float","void"]
 	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=']
 	loop:=["if","while","elif","else","for","in","is"]
@@ -207,7 +208,28 @@ pub fn parser(code []string) Ast{
 			}
 		}
 		//checks if function call
-
+		else if next_item=="."{
+			code_block=Body{ast_type:know_type(item)
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
+		else if item=="." && next_item in methord{
+			if json.body[json.body.len-1].ast_type=="undefined"{
+				json.body[json.body.len-1].ast_type="variable"
+			}
+			code_block=Body{ast_type:"dot"
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
+		else if previous_code_block.keyword=="." && item in methord && next_item=="("{
+			code_block=Body{ast_type:"methord"
+							keyword : item
+							length :item.len
+							tab : tab}
+			is_function_call=true
+		}
 		else if know_type(item)=='undefined' && previus_item!="def" && next_item=="("{
 			code_block=Body{ast_type:"function_call"
 							keyword : item

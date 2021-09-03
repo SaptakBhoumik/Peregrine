@@ -1,2 +1,2 @@
 def ain(a,b):
-    print(hi(1),a)
+    a().append(a,b)

@@ -9,17 +9,17 @@ import os
 
 
 pub fn process_imports(src string) Ast {
-	tokens = tokenizer.process_tokens(tokenizer.tokenize(src))
-	next_item = ""
+	tokens := tokenizer.process_tokens(tokenizer.tokenize(src))
+	next_item := ""
 	previous_item = ""
-	rtks = ""
+	rtks := ""
 	ast := Ast {}
 	for index, mut item in tokens {
 		if index < count - 1 && index != 0 {
 			next_item=tokens[index+1]
 		}
 		
-		mut path = ""
+		mut path := ""
 		for item != r"\n" {
 			path += item
 		}
