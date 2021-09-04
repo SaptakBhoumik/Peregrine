@@ -1,6 +1,6 @@
 # Swallow
 
-Swallow is a compiled, dynamically typed programming language currently under devolopment. Docs comming soon
+Swallow is a compiled programming language currently under devolopment. Docs comming soon
 
 # Why am I creating this language?
 
@@ -16,7 +16,6 @@ I am creating it as a fast alternative to python and as an easy alternative to c
 
 - Fast
 - Occupies less memory
-- Dynamically typed
 - Compiled
 
 # How does it work?
