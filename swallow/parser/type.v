@@ -39,6 +39,9 @@ pub fn know_type(item string) string{
 		else if item==")" || item=="("{
 			type_of_str="bracket"
 		}
+		else if item==","{
+			type_of_str="comma"
+		}
 		else if split_text[count-1]=="'" && split_text[0]=="'"{
 			type_of_str="string"
 		}

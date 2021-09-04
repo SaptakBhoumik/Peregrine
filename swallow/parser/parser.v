@@ -151,9 +151,6 @@ pub fn parser(code []string) Ast{
 		else if next_item in operater{
 			is_operator=true
 			code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
-			// if code_block.ast_type=="undefined" && next_item=="("{
-			// 	continue
-			// }
 			if code_block.ast_type=='undefined' && next_item!="(" && previous_code_block.keyword=='const'{
 				code_block.ast_type=previous_code_block.ast_type
 			}
@@ -161,16 +158,50 @@ pub fn parser(code []string) Ast{
 				code_block.ast_type="variable"
 			}
 		}
-		else if is_operator==true && is_argument==false{
+		else if item in operater{
+			is_operator=true
 			code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
-			if code_block.ast_type=='undefined' && next_item!="("{
-				code_block.ast_type="variable"
+		}
+		else if is_operator==true && next_item!="(" && know_type(item)!="undefined"{
+			if is_argument==false{
+				code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
+				if code_block.ast_type=='undefined' && next_item!="("{
+					code_block.ast_type="variable"
+				}
+			}
+			else if is_argument==true && item!=")"{
+				code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
+				if code_block.ast_type=='undefined' && next_item!="("{
+					code_block.ast_type="variable"
+				}
 			}
 		}
-		else if is_operator==true && is_argument==true && item!=")"{
-			code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
-			if code_block.ast_type=='undefined' && next_item!="("{
-				code_block.ast_type="variable"
+		else if is_operator==true && next_item=="(" && know_type(item)!="undefined"{
+			if is_argument==false{
+				code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
+				if code_block.ast_type=='undefined' && next_item!="("{
+					code_block.ast_type="variable"
+				}
+			}
+			else if is_argument==true && item!=")"{
+				code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
+				if code_block.ast_type=='undefined' && next_item!="("{
+					code_block.ast_type="variable"
+				}
+			}
+		}
+		else if is_operator==true && next_item!="(" && know_type(item)=="undefined"{
+			if is_argument==false{
+				code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
+				if code_block.ast_type=='undefined' && next_item!="("{
+					code_block.ast_type="variable"
+				}
+			}
+			else if is_argument==true && item!=")"{
+				code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
+				if code_block.ast_type=='undefined' && next_item!="("{
+					code_block.ast_type="variable"
+				}
 			}
 		}
 
@@ -230,6 +261,9 @@ pub fn parser(code []string) Ast{
 							tab : tab}
 			is_function_call=true
 		}
+		// else if item=="."{
+
+		// }
 		else if know_type(item)=='undefined' && previus_item!="def" && next_item=="("{
 			code_block=Body{ast_type:"function_call"
 							keyword : item
