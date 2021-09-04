@@ -9,6 +9,9 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+#define True true
+#define False false
+
 /*
  * Builtin formatter function
  * Author: MD Gaziur Rahman Noor
@@ -158,8 +161,8 @@ void _colorprint(const char *str, int16_t flags, bool reset) {
  * _colorprintln("Hello World!", SH_FG_BLACK | SH_BG_WHITE);
  */
 void _colorprintln(const char *str, int16_t flags) {
-    char *formatted_string = _format("{}\e[1;0m\n", str, false);
-    _colorprint(formatted_string, flags, false);
+    char *formatted_string = _format("{}\e[1;0m\n", str, False);
+    _colorprint(formatted_string, flags, False);
     free(formatted_string);
 }
 #endif //SWALLOW_BUILTIN_H
