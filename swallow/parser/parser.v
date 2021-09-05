@@ -52,6 +52,7 @@ pub fn parser(code []string) Ast{
 	error_handler:=["try","except","finally"]
 	variable:="_variable"
 	underscore:="_"
+	mut first_bracket_count:=0
 	mut is_function_call:=false
 	mut is_return:=false
 	mut is_operator:=false
@@ -335,6 +336,30 @@ pub fn parser(code []string) Ast{
 					}
 		}
 		code_block.id=index
+
+
+		if previous_code_block.ast_type=="function_call" && item=="("{
+			first_bracket_count++
+		}
+		else if is_function_call==true && item=="("{
+			first_bracket_count++
+		}
+		else if is_function_call==true && item==")"{
+			first_bracket_count--
+		}
+		if first_bracket_count==0{
+			if item==")" && is_function_call==true{
+				is_function_call=false
+			}
+			else{
+				right=false
+				is_function_call=false
+			}
+		}
+		else if first_bracket_count>0{
+			right=true
+			is_function_call=true
+		}
 		//modify the code block
 		if code_block.keyword!="" && code_block.keyword!=r"\n"{
 			if right==false{
@@ -373,13 +398,7 @@ pub fn parser(code []string) Ast{
 		if  code_block.keyword!=""{
 			json=tab_handler(mut json,mut code_block,mut previous_code_block, right)
 		}
-		if is_function_call==true && item==r"\n"{
-			right=false
-			is_function_call=false
-		}
-		else if is_function_call==true && item!=r"\n"{
-			right=true
-		}
+
 		if code_block.keyword!=r"\n" && code_block.keyword!=""{
 			previous_code_block=code_block
 		}
