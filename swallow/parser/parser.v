@@ -47,7 +47,7 @@ pub fn parser(code []string) Ast{
 	methord:=["insert","remove","replace","append","pop","sort","count","reverse"]
 	swallow_type:=["int","bool","str","list","dictionary","float","void"]
 	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=']
-	loop:=["if","while","elif","else","for","in","is"]
+	loop:=["if","while","elif","else","for"]
 	logic:=["and","or","not","in","is"]
 	error_handler:=["try","except","finally"]
 	variable:="_variable"
@@ -69,6 +69,9 @@ pub fn parser(code []string) Ast{
 	mut previous_code_block:=Body{}
 	mut json:=Ast{}
 	for index,item in code{
+		if item==r"\n"{
+			last_left_code_block=Body{}
+		}
 		//finds next item
 		if index<code.len-1 && index!=0{
 			next_item=code[index+1]
@@ -225,7 +228,21 @@ pub fn parser(code []string) Ast{
 							length :item.len
 							tab : tab}
 		}
-		else if is_loop==true && item!=","{
+		else if is_loop==true && know_type(item)!="undefined" && next_item!="("{
+			if item==":"{
+				code_block=Body{}
+			}
+			else{
+				code_block=Body{ast_type:know_type(item)
+							keyword : item
+							length :item.len
+							tab : tab}
+				if code_block.ast_type=='undefined' && next_item!="("{
+					code_block.ast_type="variable"
+				}
+			}
+		}
+		else if is_loop==true && know_type(item)=="undefined" && next_item!="("{
 			if item==":"{
 				code_block=Body{}
 			}
@@ -360,6 +377,23 @@ pub fn parser(code []string) Ast{
 			right=true
 			is_function_call=true
 		}
+		if is_loop==true && item==":"{
+			is_loop=false
+			right=is_loop
+		}
+		else if is_loop==true && item!=":" && item in loop{
+			right=false
+		}
+		else if is_loop==true && item!=":" {
+			right=true
+		}
+		if is_return==true && item==r"\n"{
+			is_return=false
+			right=is_return
+		}
+		else if is_return==true && item!=r"\n" && item!=r"return"{
+			right=true
+		}
 		//modify the code block
 		if code_block.keyword!="" && code_block.keyword!=r"\n"{
 			if right==false{
@@ -398,23 +432,8 @@ pub fn parser(code []string) Ast{
 		if  code_block.keyword!=""{
 			json=tab_handler(mut json,mut code_block,mut previous_code_block, right)
 		}
-
 		if code_block.keyword!=r"\n" && code_block.keyword!=""{
 			previous_code_block=code_block
-		}
-		if is_loop==true && item==":"{
-			is_loop=false
-			right=is_loop
-		}
-		else if is_loop==true && item!=":"{
-			right=true
-		}
-		if is_return==true && item==r"\n"{
-			is_return=false
-			right=is_return
-		}
-		else if is_return==true && item!=r"\n"{
-			right=true
 		}
 		code_block=Body{}
 	}
