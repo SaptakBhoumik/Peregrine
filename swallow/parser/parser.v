@@ -69,9 +69,6 @@ pub fn parser(code []string) Ast{
 	mut previous_code_block:=Body{}
 	mut json:=Ast{}
 	for index,item in code{
-		if item==r"\n"{
-			last_left_code_block=Body{}
-		}
 		//finds next item
 		if index<code.len-1 && index!=0{
 			next_item=code[index+1]
