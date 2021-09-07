@@ -10,17 +10,11 @@ I am creating it as a fast alternative to python and as an easy alternative to c
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
-# Core ideas and principles
+# Goals
 
 - Ease to use
 - Fast
 - Highly modular
-
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
-
-# Key features
-
-- Fast
 - Occupies less memory
 - Compiled
 
