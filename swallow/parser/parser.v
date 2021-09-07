@@ -52,6 +52,7 @@ pub fn parser(code []string) Ast{
 	error_handler:=["try","except","finally"]
 	variable:="_variable"
 	underscore:="_"
+	mut replace_previous:=false
 	mut first_bracket_count:=0
 	mut is_function_call:=false
 	mut is_return:=false
@@ -276,8 +277,24 @@ pub fn parser(code []string) Ast{
 							tab : tab}
 			is_function_call=true
 		}
-		// else if item=="."{
-
+		// else if item=="." && know_type(previous_code_block.keyword)=="undefined" && (item in methord)==false{
+		// 	code_block=Body{ast_type:"function_call"
+		// 					keyword : "$previous_code_block.keyword$underscore"
+		// 					length :previous_code_block.keyword.len
+		// 					tab : tab}
+		// 	replace_previous=true
+		// 	previus_item="."
+		// }
+		// else if previus_item=="." && know_type(item)=="undefined"{
+		// 	previus_item=""
+		// 	code_block=Body{ast_type:"function_call"
+		// 					keyword : "$previous_code_block.keyword$item"
+		// 					length :previous_code_block.keyword.len
+		// 					tab : tab}
+		// 	replace_previous=true
+		// 	if next_item=="("{
+		// 		is_function_call=true
+		// 	}
 		// }
 		else if know_type(item)=='undefined' && previus_item!="def" && next_item=="("{
 			code_block=Body{ast_type:"function_call"
@@ -293,12 +310,7 @@ pub fn parser(code []string) Ast{
 							tab : tab}
 
 			if code_block.ast_type=='undefined'{
-				if item==","{
-					code_block.ast_type="comma"
-				}
-				else{
-					code_block.ast_type="variable"
-				}
+				code_block.ast_type="variable"
 			}
 		}
 
@@ -352,8 +364,10 @@ pub fn parser(code []string) Ast{
 		code_block.id=index
 
 
-		if previous_code_block.ast_type=="function_call" && item=="("{
-			first_bracket_count++
+		if item=="(" && is_function_call==false{
+			if previous_code_block.ast_type=="function_call" || previous_code_block.ast_type=="methord"{
+				first_bracket_count++
+			}
 		}
 		else if is_function_call==true && item=="("{
 			first_bracket_count++
@@ -427,7 +441,12 @@ pub fn parser(code []string) Ast{
 		}
 		//appends to json
 		if  code_block.keyword!=""{
-			json=tab_handler(mut json,mut code_block,mut previous_code_block, right)
+			if replace_previous==false{
+				json=tab_handler(mut json,mut code_block,mut previous_code_block, right)
+			}
+			else{
+				json.body[json.body.len-1]=code_block
+			}
 		}
 		if code_block.keyword!=r"\n" && code_block.keyword!=""{
 			previous_code_block=code_block
