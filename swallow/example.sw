@@ -1,2 +1,2 @@
 def ain():
-    const a="f"
+    a=a.append(y)

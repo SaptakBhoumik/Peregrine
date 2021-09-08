@@ -63,6 +63,9 @@ pub fn know_type(item string) string{
 		else if  split_text[0]=='[' && split_text[count-1]==']'{
 			type_of_str="list"
 		}
+		else if item=="."{
+			type_of_str="dot"
+		}
 		else{
 			type_of_str=is_number(split_text)
 		}

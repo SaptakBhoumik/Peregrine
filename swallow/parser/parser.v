@@ -52,7 +52,6 @@ pub fn parser(code []string) Ast{
 	error_handler:=["try","except","finally"]
 	variable:="_variable"
 	underscore:="_"
-	mut replace_previous:=false
 	mut first_bracket_count:=0
 	mut is_function_call:=false
 	mut is_return:=false
@@ -277,31 +276,24 @@ pub fn parser(code []string) Ast{
 							tab : tab}
 			is_function_call=true
 		}
-		// else if item=="." && know_type(previous_code_block.keyword)=="undefined" && (item in methord)==false{
-		// 	code_block=Body{ast_type:"function_call"
-		// 					keyword : "$previous_code_block.keyword$underscore"
-		// 					length :previous_code_block.keyword.len
-		// 					tab : tab}
-		// 	replace_previous=true
-		// 	previus_item="."
-		// }
-		// else if previus_item=="." && know_type(item)=="undefined"{
-		// 	previus_item=""
-		// 	code_block=Body{ast_type:"function_call"
-		// 					keyword : "$previous_code_block.keyword$item"
-		// 					length :previous_code_block.keyword.len
-		// 					tab : tab}
-		// 	replace_previous=true
-		// 	if next_item=="("{
-		// 		is_function_call=true
-		// 	}
-		// }
 		else if know_type(item)=='undefined' && previus_item!="def" && next_item=="("{
 			code_block=Body{ast_type:"function_call"
 							keyword : item
 							length :item.len
 							tab : tab}
 			is_function_call=true
+		}
+		else if previous_code_block.ast_type=="function_call" && item=="(" && is_function_call==false{
+			code_block=Body{ast_type:"bracket"
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
+		else if previous_code_block.ast_type=="methord" && item=="(" && is_function_call==false{
+			code_block=Body{ast_type:"bracket"
+							keyword : item
+							length :item.len
+							tab : tab}
 		}
 		else if is_function_call==true{
 			code_block=Body{ast_type:know_type(item)
@@ -364,7 +356,7 @@ pub fn parser(code []string) Ast{
 		code_block.id=index
 
 
-		if item=="(" && is_function_call==false{
+		if item=="("{
 			if previous_code_block.ast_type=="function_call" || previous_code_block.ast_type=="methord"{
 				first_bracket_count++
 			}
@@ -441,15 +433,15 @@ pub fn parser(code []string) Ast{
 		}
 		//appends to json
 		if  code_block.keyword!=""{
-			if replace_previous==false{
-				json=tab_handler(mut json,mut code_block,mut previous_code_block, right)
-			}
-			else{
-				json.body[json.body.len-1]=code_block
-			}
+			json=tab_handler(mut json,mut code_block,mut previous_code_block, right)
 		}
-		if code_block.keyword!=r"\n" && code_block.keyword!=""{
-			previous_code_block=code_block
+		if json.body.len!=0{
+			if json.body.last().keyword!=r"\n"{
+				previous_code_block=json.body.last()
+				if json.body.last().keyword=="const" || json.body.last().keyword in swallow_type{
+					json.body.pop()
+				}
+			}
 		}
 		code_block=Body{}
 	}
