@@ -44,14 +44,15 @@ struct Ast {
 }
 
 pub fn parser(code []string) Ast{
-	methord:=["insert","remove","replace","append","pop","sort","count","reverse"]
 	swallow_type:=["int","bool","str","list","dictionary","float","void"]
+	decorator:=["@methord"]//more will be added soon
 	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=']
 	loop:=["if","while","elif","else","for"]
 	logic:=["and","or","not","in","is"]
 	error_handler:=["try","except","finally"]
 	variable:="_variable"
 	underscore:="_"
+	mut methord:=[]string{}
 	mut first_bracket_count:=0
 	mut is_function_call:=false
 	mut is_return:=false
@@ -86,7 +87,14 @@ pub fn parser(code []string) Ast{
 			is_tab=true
 		}
 		//parsing starts here
-		if item in swallow_type{
+		if item in decorator{
+			code_block=Body{ast_type:"decorator"
+							keyword : item
+							length :item.len
+							tab : tab
+							}
+		}
+		else if item in swallow_type{
 			if previous_code_block.keyword=="const"{
 				code_block=Body{ast_type:"$item$underscore$previous_code_block.ast_type"
 							keyword : item
@@ -399,6 +407,9 @@ pub fn parser(code []string) Ast{
 			right=true
 		}
 		//modify the code block
+		if previous_code_block.ast_type=="decorator" && item=="def"{
+			methord<<next_item
+		}
 		if code_block.keyword!="" && code_block.keyword!=r"\n"{
 			if right==false{
 				code_block.direction="left"
@@ -442,7 +453,7 @@ pub fn parser(code []string) Ast{
 					last_left_code_block=json.body.last()
 				}
 				previous_code_block=json.body.last()
-				if json.body.last().keyword=="const" || json.body.last().keyword in swallow_type{
+				if json.body.last().keyword=="const" || json.body.last().keyword in swallow_type || json.body.last().ast_type=="decorator"{
 					json.body.pop()
 				}
 			}
