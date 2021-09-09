@@ -67,6 +67,7 @@ pub fn parser(code []string) Ast{
 	mut is_ccode:=false
 	mut code_block:=Body{}
 	mut previous_code_block:=Body{}
+	mut last_left_code_block:=Body{}
 	mut json:=Ast{}
 	for index,item in code{
 		//finds next item
@@ -433,10 +434,13 @@ pub fn parser(code []string) Ast{
 		}
 		//appends to json
 		if  code_block.keyword!=""{
-			json=tab_handler(mut json,mut code_block,mut previous_code_block, right)
+			json=tab_handler(mut json,mut code_block,mut previous_code_block, right,last_left_code_block)
 		}
 		if json.body.len!=0{
 			if json.body.last().keyword!=r"\n"{
+				if json.body.last().direction=="left"{
+					last_left_code_block=json.body.last()
+				}
 				previous_code_block=json.body.last()
 				if json.body.last().keyword=="const" || json.body.last().keyword in swallow_type{
 					json.body.pop()

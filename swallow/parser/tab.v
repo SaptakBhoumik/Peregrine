@@ -1,11 +1,16 @@
 module parser
 // Original author: Saptak Bhoumik
-pub fn tab_handler(mut json Ast,mut code_block Body,mut previus_code_block Body,right bool) Ast{
+pub fn tab_handler(mut json Ast,mut code_block Body,mut previus_code_block Body,right bool,last_left_code_block Body) Ast{
 	if code_block.keyword!="r" && code_block.keyword!="f"{
 		if right==false{
 			if code_block.keyword!=r"\n"{
 				if code_block.tab==previus_code_block.tab{
-					code_block.relative_to=previus_code_block.relative_to
+					if previus_code_block.direction=="right" && last_left_code_block.direction=="left" && last_left_code_block.tab==code_block.tab{
+						code_block.relative_to=last_left_code_block.relative_to
+					}
+					else{
+						code_block.relative_to=previus_code_block.relative_to
+					}
 				}
 				else if code_block.tab<previus_code_block.tab{
 					code_block.relative_to=code_block.id
