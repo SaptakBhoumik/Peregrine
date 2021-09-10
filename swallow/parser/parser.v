@@ -36,7 +36,6 @@ pub fn parser(code []string) (Ast,string){
 	variable:="_variable"
 	underscore:="_"
 	mut error := ""
-	mut method:=[]string{}
 	mut first_bracket_count:=0
 	mut is_function_call:=false
 	mut is_return:=false
@@ -253,7 +252,7 @@ pub fn parser(code []string) (Ast,string){
 							length :item.len
 							tab : tab}
 		}
-		else if item=="." && next_item in method{
+		else if item=="." && next_item in json.method_define{
 			if json.body[json.body.len-1].ast_type=="undefined"{
 				json.body[json.body.len-1].ast_type="variable"
 			}
@@ -262,7 +261,7 @@ pub fn parser(code []string) (Ast,string){
 							length :item.len
 							tab : tab}
 		}
-		else if previous_code_block.keyword=="." && item in method && next_item=="("{
+		else if previous_code_block.keyword=="." && item in json.method_define && next_item=="("{
 			code_block=Body{ast_type:"method"
 							keyword : item
 							length :item.len
@@ -395,7 +394,7 @@ pub fn parser(code []string) (Ast,string){
 		}
 		//modify the code block
 		if previous_code_block.ast_type=="decorator" && item=="def"{
-			method<<next_item
+			json.method_define<<next_item
 		}
 		if code_block.keyword!="" && code_block.keyword!=r"\n"{
 			if right==false{

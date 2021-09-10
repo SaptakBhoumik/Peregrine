@@ -20,6 +20,6 @@
 - [ ] continue- Continus the execution of a loop
 - [ ] dot,comma,bracket- As the name suggests
 - [ ] function_call- Calls a function
-- [ ] methord - Like append and all those stuff
+- [ ] method - Like append and all those stuff
 - [ ] function_define- Used to define a function
 - [ ] newline - as the name suggests `\n`
