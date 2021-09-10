@@ -1,21 +1,6 @@
 module parser
 // Original author: Saptak Bhoumik
 
-struct Know_type {
-	pub mut:
-	is_var bool
-	is_static bool
-	name string
-	check_type string
-}
-
-struct Function_return_type {
-	pub mut:
-	name string
-	check_type string
-}
-
-
 struct Body {
 	pub mut:
 	ast_type string
@@ -34,16 +19,14 @@ struct Ast {
 	c_file []string
 	folder string
 	path string
-	function_name []string
-	function_return []Function_return_type
-	variable_name []string
-	variable_type []Know_type
-	constant_name []string
-	constant_type []Know_type
+	function_define []string
+	function_call []string
+	methord_define []string
+	methord_call []string
 	body []Body
 }
 
-pub fn parser(code []string) Ast{
+pub fn parser(code []string) (Ast,string){
 	swallow_type:=["int","bool","str","list","dictionary","float","void"]
 	decorator:=["@methord"]//more will be added soon
 	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=']
@@ -52,6 +35,7 @@ pub fn parser(code []string) Ast{
 	error_handler:=["try","except","finally"]
 	variable:="_variable"
 	underscore:="_"
+	mut error := ""
 	mut methord:=[]string{}
 	mut first_bracket_count:=0
 	mut is_function_call:=false
@@ -362,6 +346,9 @@ pub fn parser(code []string) Ast{
 					tab : tab
 					}
 		}
+		else{
+			error="$item\n^Undefined charecter"
+		}
 		code_block.id=index
 
 
@@ -445,7 +432,12 @@ pub fn parser(code []string) Ast{
 		}
 		//appends to json
 		if  code_block.keyword!=""{
-			json=tab_handler(mut json,mut code_block,mut previous_code_block, right,last_left_code_block)
+			json,error=tab_handler(mut json,mut code_block,mut previous_code_block, right,last_left_code_block)
+		}
+		json,error=error_check(mut json,code_block)
+		if error!=""{
+			json=Ast{}
+			break
 		}
 		if json.body.len!=0{
 			if json.body.last().keyword!=r"\n"{
@@ -460,5 +452,5 @@ pub fn parser(code []string) Ast{
 		}
 		code_block=Body{}
 	}
-	return json
+	return json,error
 }
