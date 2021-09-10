@@ -1,4 +1,5 @@
+@method
 def ain():
     return 0
-def ain():
-    a()
+def main():
+    a.ain()

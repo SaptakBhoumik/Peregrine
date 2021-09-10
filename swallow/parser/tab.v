@@ -13,10 +13,10 @@ pub fn tab_handler(mut json Ast,mut code_block Body,mut previus_code_block Body,
 						code_block.relative_to=previus_code_block.relative_to
 					}
 				}
-				else if code_block.tab==previus_code_block.tab+1{
+				else if code_block.tab==previus_code_block.tab-1{
 					code_block.relative_to=code_block.id
 				}
-				else if code_block.tab==previus_code_block.tab-1{
+				else if code_block.tab==previus_code_block.tab+1{
 					if previus_code_block.direction=="right"{
 						code_block.relative_to=previus_code_block.relative_to
 					}
@@ -25,7 +25,7 @@ pub fn tab_handler(mut json Ast,mut code_block Body,mut previus_code_block Body,
 					}
 				}
 				else{
-					error="$code_block.keyword\n^ Undefined intend"
+					error="$code_block.keyword\n^ Undefined intent"
 				}
 			}
 			json.body<<code_block

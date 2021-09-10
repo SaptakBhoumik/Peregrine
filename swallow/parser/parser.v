@@ -21,14 +21,14 @@ struct Ast {
 	path string
 	function_define []string
 	function_call []string
-	methord_define []string
-	methord_call []string
+	method_define []string
+	method_call []string
 	body []Body
 }
 
 pub fn parser(code []string) (Ast,string){
 	swallow_type:=["int","bool","str","list","dictionary","float","void"]
-	decorator:=["@methord"]//more will be added soon
+	decorator:=["@method"]//more will be added soon
 	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=']
 	loop:=["if","while","elif","else","for"]
 	logic:=["and","or","not","in","is"]
@@ -36,7 +36,7 @@ pub fn parser(code []string) (Ast,string){
 	variable:="_variable"
 	underscore:="_"
 	mut error := ""
-	mut methord:=[]string{}
+	mut method:=[]string{}
 	mut first_bracket_count:=0
 	mut is_function_call:=false
 	mut is_return:=false
@@ -253,7 +253,7 @@ pub fn parser(code []string) (Ast,string){
 							length :item.len
 							tab : tab}
 		}
-		else if item=="." && next_item in methord{
+		else if item=="." && next_item in method{
 			if json.body[json.body.len-1].ast_type=="undefined"{
 				json.body[json.body.len-1].ast_type="variable"
 			}
@@ -262,8 +262,8 @@ pub fn parser(code []string) (Ast,string){
 							length :item.len
 							tab : tab}
 		}
-		else if previous_code_block.keyword=="." && item in methord && next_item=="("{
-			code_block=Body{ast_type:"methord"
+		else if previous_code_block.keyword=="." && item in method && next_item=="("{
+			code_block=Body{ast_type:"method"
 							keyword : item
 							length :item.len
 							tab : tab}
@@ -282,7 +282,7 @@ pub fn parser(code []string) (Ast,string){
 							length :item.len
 							tab : tab}
 		}
-		else if previous_code_block.ast_type=="methord" && item=="(" && is_function_call==false{
+		else if previous_code_block.ast_type=="method" && item=="(" && is_function_call==false{
 			code_block=Body{ast_type:"bracket"
 							keyword : item
 							length :item.len
@@ -353,7 +353,7 @@ pub fn parser(code []string) (Ast,string){
 
 
 		if item=="("{
-			if previous_code_block.ast_type=="function_call" || previous_code_block.ast_type=="methord"{
+			if previous_code_block.ast_type=="function_call" || previous_code_block.ast_type=="method"{
 				first_bracket_count++
 			}
 		}
@@ -395,7 +395,7 @@ pub fn parser(code []string) (Ast,string){
 		}
 		//modify the code block
 		if previous_code_block.ast_type=="decorator" && item=="def"{
-			methord<<next_item
+			method<<next_item
 		}
 		if code_block.keyword!="" && code_block.keyword!=r"\n"{
 			if right==false{
