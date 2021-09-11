@@ -333,14 +333,27 @@ pub fn parser(code []string) (Ast,string){
 							tab : tab}
 		}
 		else if is_func_def==true{
-			if is_argument==true && item!="(" && item!=")" && item!=""{
+			if is_argument==true && item!="(" && item!=")" && item!="" && item!=","{
 				previus_item=item
 				code_block=Body{ast_type:"required_argument"
 							keyword : item
 							length :item.len
-							tab : tab}
+							tab : tab
+							direction : "right"
+							id : index}
+				if json.body.last().direction=="left"{
+					code_block.relative_to=json.body.last().id
+				}
+				else{
+					code_block.relative_to=json.body.last().relative_to
+				}
+				if previous_code_block.keyword in swallow_type || previous_code_block.keyword=="const"{
+					code_block.ast_type="$previous_code_block.ast_type$underscore$code_block.ast_type"
+				}
+				json.body<<code_block
+				code_block=Body{}
 			}
-			else{
+			else if item!=","{
 				code_block,previus_item,right=function(item,is_func_def,previus_item,json,right,tab)
 				is_argument=right
 			}
@@ -414,12 +427,7 @@ pub fn parser(code []string) (Ast,string){
 			}
 		}
 		if previous_code_block.keyword in swallow_type{
-			if code_block.ast_type=="required_argument"{
-				code_block.ast_type="$previous_code_block.ast_type$underscore$code_block.ast_type"
-			}
-			else{
-				code_block.ast_type=previous_code_block.ast_type
-			}
+			code_block.ast_type=previous_code_block.ast_type
 		}
 		else if code_block.keyword in swallow_type{
 			code_block.ast_type=code_block.ast_type

@@ -35,8 +35,7 @@ pub fn tab_handler(mut json Ast,mut code_block Body,mut previus_code_block Body,
 				if json.body.last().direction=="right"{
 					code_block.relative_to=previus_code_block.relative_to
 				}
-				else{
-					// println("${json.body.last().id}")
+				else if json.body.last().direction!="right"{
 					code_block.relative_to=json.body.last().id
 				}
 			}
