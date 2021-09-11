@@ -346,7 +346,7 @@ pub fn parser(code []string) (Ast,string){
 					}
 		}
 		else{
-			error="$item\n^Undefined charecter"
+			error="$item\n^Undefined character"
 		}
 		code_block.id=index
 
@@ -451,5 +451,6 @@ pub fn parser(code []string) (Ast,string){
 		}
 		code_block=Body{}
 	}
+	json.path = "main.sw"
 	return json,error
 }

@@ -1,5 +1,2 @@
-@method
-def ain():
-    return 0
-def main():
-    a.ain()
+x = 5
+1+1

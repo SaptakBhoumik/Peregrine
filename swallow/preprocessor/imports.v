@@ -36,7 +36,7 @@ pub fn process_imports(src string) Ast {
 
 		tks = tokenizer.process_tokens(tokenizer.tokenize(buf))
 
-		ast = parser.paresr(tks)
+		ast = parser.parser(tks)
 	}
 
 	return ast
