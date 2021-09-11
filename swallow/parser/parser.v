@@ -333,8 +333,17 @@ pub fn parser(code []string) (Ast,string){
 							tab : tab}
 		}
 		else if is_func_def==true{
-			code_block,previus_item,right=function(item,is_func_def,previus_item,json,right,tab)
-			is_argument=right
+			if is_argument==true && item!="(" && item!=")" && item!=""{
+				previus_item=item
+				code_block=Body{ast_type:"required_argument"
+							keyword : item
+							length :item.len
+							tab : tab}
+			}
+			else{
+				code_block,previus_item,right=function(item,is_func_def,previus_item,json,right,tab)
+				is_argument=right
+			}
 		}
 
 		//checks if new line
@@ -451,6 +460,5 @@ pub fn parser(code []string) (Ast,string){
 		}
 		code_block=Body{}
 	}
-	json.path = "main.sw"
 	return json,error
 }

@@ -19,5 +19,6 @@ fn error_check(mut json Ast,code_block Body) (Ast,string){
 			json.function_define<<code_block.keyword
 		}
 	}
+	
 	return json,error
 }

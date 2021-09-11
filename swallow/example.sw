@@ -1,2 +1,2 @@
-x = 5
-1+1
+def main(int a):
+    main()
