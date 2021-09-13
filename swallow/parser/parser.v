@@ -10,6 +10,7 @@ pub struct Body {
 	relative_to int
 	direction string
 	id int
+	line int
 }
 
 struct Function{
@@ -45,6 +46,7 @@ pub fn parser(code []string) (Ast,string){
 	underscore:="_"
 	mut reserved_keywords:=[]string{}
 	mut error := ""
+	mut line:=0
 	mut return_type:=false
 	mut first_bracket_count:=0
 	mut is_function_call:=false
@@ -71,9 +73,6 @@ pub fn parser(code []string) (Ast,string){
 	reserved_keywords<<error_handler
 	reserved_keywords<<["Ccode","break","continue","return"]
 	for index,item in code{
-		if item=="(" && previus_item==")"{
-			return_type=true
-		}
 		//finds next item
 		if index<code.len-1 && index!=0{
 			next_item=code[index+1]
@@ -87,16 +86,46 @@ pub fn parser(code []string) (Ast,string){
 		}
 		else if item==r"\n"{
 			tab=0
+			line++
 			is_tab=true
 		}
 		//parsing starts here
-		if return_type==true && is_function_call==false && item!="(" && (previous_code_block.ast_type=="function_define" || previous_code_block.ast_type in required_arg)==true && is_argument==false && is_operator==false && is_loop==false && is_ccode==false{
+		if item=="(" && previus_item==")" && (previous_code_block.ast_type in required_arg || previous_code_block.ast_type=="function_define"){
+			return_type=true
+		}
+		
+		else if return_type==true && item == ")"{
+			return_type=false
+		}
+		else if return_type==true && is_function_call==false && item!="(" && (previous_code_block.ast_type=="function_define" || previous_code_block.ast_type in required_arg) && is_argument==false && is_operator==false && is_loop==false && is_ccode==false{
 			if item in swallow_type{
 				json.function_return_type[json.function_return_type.len-1].return_type<<item
 			}
-			else if item==")"{
-				return_type=false
+		}
+		
+		else if is_argument==true && item!="(" && item!=")" && item!="," && (item in reserved_keywords)==false{
+				previus_item=item
+				code_block=Body{ast_type:"required_argument"
+							keyword : item
+							length :item.len
+							tab : tab
+							direction : "right"
+							id : index}
+				if json.body.last().direction=="left"{
+					code_block.relative_to=json.body.last().id
+				}
+				else{
+					code_block.relative_to=json.body.last().relative_to
+				}
+				if previous_code_block.keyword in swallow_type || previous_code_block.keyword=="const"{
+					code_block.ast_type="$previous_code_block.ast_type$underscore$code_block.ast_type"
+				}
+				json.body<<code_block
+				code_block=Body{}
 			}
+		else if is_argument==true && item==")"{
+			is_argument=false
+			previus_item=item
 		}
 		//checks if function call
 		else if next_item=="."{
@@ -327,29 +356,11 @@ pub fn parser(code []string) (Ast,string){
 							length :item.len
 							tab : tab}
 		}
-
+		
 		else if is_func_def==true  && item!=" " && is_function_call==false{
-			if is_argument==true && item!="(" && item!=")" && item!=","{
-				previus_item=item
-				code_block=Body{ast_type:"required_argument"
-							keyword : item
-							length :item.len
-							tab : tab
-							direction : "right"
-							id : index}
-				if json.body.last().direction=="left"{
-					code_block.relative_to=json.body.last().id
-				}
-				else{
-					code_block.relative_to=json.body.last().relative_to
-				}
-				if previous_code_block.keyword in swallow_type || previous_code_block.keyword=="const"{
-					code_block.ast_type="$previous_code_block.ast_type$underscore$code_block.ast_type"
-				}
-				json.body<<code_block
-				code_block=Body{}
-			}
-			else if item!=","{
+			println(item)
+			
+			if item!=","{
 				code_block,previus_item,right=function(item,is_func_def,previus_item,json,right,tab)
 				is_argument=right
 			}
@@ -411,6 +422,7 @@ pub fn parser(code []string) (Ast,string){
 			right=true
 		}
 		//modify the code block
+		code_block.line=line
 		if previous_code_block.ast_type=="decorator" && item=="def"{
 			json.method_define<<next_item
 		}

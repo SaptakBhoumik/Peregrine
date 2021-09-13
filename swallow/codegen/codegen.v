@@ -32,9 +32,6 @@ pub fn codegen(ast parser.Ast) []string{
 				code<<"char * ${item.keyword}"
 			}
 		}
-		else if item.keyword==r"\n" && previous_code_block.keyword!=r"\n" && previous_code_block.keyword!=r""{
-			code<<";\n"
-		}
 		previous_code_block=item
 	} 
 	println(ast)
