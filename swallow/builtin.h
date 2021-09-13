@@ -1,7 +1,7 @@
 // Original author: MD Gaziur Rahman Noor
 
-#ifndef SWALLOW_BUILTIN_H
-#define SWALLOW_BUILTIN_H
+// #ifndef SWALLOW_BUILTIN_H
+// #define SWALLOW_BUILTIN_H
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
@@ -83,10 +83,9 @@ char *_format(const char *fmt, ...) {
 /* _colorprint() implementation */
 
 /*
- * int16_t
+ * int64_t
  *
  * Put foreground color in first half
- * and background color in second half
  */
 
 // Foreground(text) colors
@@ -107,23 +106,6 @@ char *_format(const char *fmt, ...) {
 #define SH_FG_BRIGHT_CYAN       (36 << 8)
 #define SH_FG_BRIGHT_WHITE      (37 << 8)
 
-// Background(text) colors
-#define SH_BG_BLACK             40
-#define SH_BG_RED               41
-#define SH_BG_GREEN             42
-#define SH_BG_YELLOW            43
-#define SH_BG_BLUE              44
-#define SH_BG_MAGENTA           45
-#define SH_BG_CYAN              46
-#define SH_BG_WHITE             47
-#define SH_BG_BRIGHT_BLACK      100
-#define SH_BG_BRIGHT_RED        101
-#define SH_BG_BRIGHT_GREEN      102
-#define SH_BG_BRIGHT_YELLOW     103
-#define SH_BG_BRIGHT_BLUE       104
-#define SH_BG_BRIGHT_MAGENTA    105
-#define SH_BG_BRIGHT_CYAN       106
-#define SH_BG_BRIGHT_WHITE      107
 
 /*
  * Builtin Color Print Function
@@ -133,36 +115,12 @@ char *_format(const char *fmt, ...) {
  * specified when printed to stdout
  *
  * Example:
- * _colorprint("Hello World!", SH_FG_BLACK | SH_BG_WHITE, true);
+ * _colorprint("Hello World!", SH_FG_BLACK , true);
  */
-void _colorprint(const char *str, int16_t flags, bool reset) {
-    int8_t background = flags & 0x00FF;
+void _colorprint(const char *str, int64_t flags, bool reset) {
     int8_t foreground = (flags & 0xFF00) >> 8;
-
-    if(background == 0) {
-        // don't include  background
-        printf("\e[1;%dm%s", foreground, str);
-    }
-    else {
-        printf("\e[1;%dm\e[1;%dm%s", foreground, background, str);
-    }
-
+    printf("\e[1;%dm%s", foreground, str);
     if(reset)
         printf("\e[1;0m");
 }
-
-/*
- * Wrapper around _colorprint function which adds newline at the end
- * Author: MD Gaziur Rahman Noor
- *
- * Works same as _colorprint() but adds newline at the end
- *
- * Example:
- * _colorprintln("Hello World!", SH_FG_BLACK | SH_BG_WHITE);
- */
-void _colorprintln(const char *str, int16_t flags) {
-    char *formatted_string = _format("{}\e[1;0m\n", str, False);
-    _colorprint(formatted_string, flags, False);
-    free(formatted_string);
-}
-#endif //SWALLOW_BUILTIN_H
+// #endif //SWALLOW_BUILTIN_H

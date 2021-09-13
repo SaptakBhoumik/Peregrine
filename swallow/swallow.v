@@ -5,7 +5,8 @@ import codegen
 // import preprocessor
 // Original author: Saptak Bhoumik
 fn main() {
-    filename := "./example.sw"
+    arg:=os.args.clone()
+    filename := arg[2]
     content := os.read_file(filename) ?
     mut path:=os.executable()
     path=path.replace(r"\","/")
@@ -19,8 +20,18 @@ fn main() {
     builtin_h:= os.read_file("${folder}builtin.h")?
     mut total:="${builtin_sw}\n${content}"
     ast,error:=parser.parser(tokenizer.process_tokens(tokenizer.tokenize(total)))
+    mut final_code:=""
     if error==""{
-       println(codegen.codegen(ast))
+       codes:=codegen.codegen(ast)
+       for code in codes{
+           final_code="$final_code$code"
+       }
+    final_code="//Generated using the swallow compiler \n $builtin_h \n $final_code"
+    mut x:=os.create("temp.c")?
+    x.writeln(final_code)?
+    x.close()
+    os.system("gcc ./temp.c -o ${arg.last()}")
+    os.system("rm ./temp.c")
     }
     else{
         print("\033[0;31m")

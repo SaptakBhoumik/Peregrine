@@ -103,7 +103,7 @@ pub fn parser(code []string) (Ast,string){
 			}
 		}
 		
-		else if is_argument==true && item!="(" && item!=")" && item!="," && (item in reserved_keywords)==false{
+		else if is_argument==true && item!="("  && item!=r"\n" && item!=")" && item!="," && item!=" " && (item in reserved_keywords)==false && next_item!="(" && is_function_call==false{
 				previus_item=item
 				code_block=Body{ast_type:"required_argument"
 							keyword : item
@@ -123,7 +123,7 @@ pub fn parser(code []string) (Ast,string){
 				json.body<<code_block
 				code_block=Body{}
 			}
-		else if is_argument==true && item==")"{
+		else if is_argument==true && item==")" && is_function_call==false{
 			is_argument=false
 			previus_item=item
 		}
@@ -358,7 +358,6 @@ pub fn parser(code []string) (Ast,string){
 		}
 		
 		else if is_func_def==true  && item!=" " && is_function_call==false{
-			println(item)
 			
 			if item!=","{
 				code_block,previus_item,right=function(item,is_func_def,previus_item,json,right,tab)

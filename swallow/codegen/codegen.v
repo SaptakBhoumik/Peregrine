@@ -6,9 +6,19 @@ import parser
 
 pub fn codegen(ast parser.Ast) []string{
 	required_arg:=["str_variable_required_argument","int_variable_required_argument","bool_variable_required_argument","list_variable_required_argument","dictionary_variable_required_argument","float_variable_required_argument","void_variable_required_argument"]
+	ast_type:=["function_call","function_define"]
+	mut is_function_call:=false
+	mut keyword:=""
+	mut first_bracket_count:=0
 	mut code:=[]string{}
 	mut previous_code_block:=parser.Body{}
-	for item in ast.body{
+	mut next_item:=parser.Body{}
+	for index,item in ast.body{
+		keyword=item.keyword
+		// println(is_function_call)
+		if index<ast.body.len-1 && index!=0{
+			next_item=ast.body[index+1]
+		}
 		if previous_code_block.ast_type=="function_define" && item.direction!="right"{
 			code<<"(){\n"
 		}
@@ -31,9 +41,55 @@ pub fn codegen(ast parser.Ast) []string{
 			if item.ast_type=="str_variable_required_argument"{
 				code<<"char * ${item.keyword}"
 			}
+			else if item.ast_type=="void_variable_required_argument"{
+				code<<"void * ${item.keyword}"
+			}
+			else if item.ast_type=="int_variable_required_argument"{
+				code<<"int64_t ${item.keyword}"
+			}
+			else if item.ast_type=="bool_variable_required_argument"{
+				code<<"bool ${item.keyword}"
+			}
 		}
-		previous_code_block=item
+		else if item.ast_type =="function_call" && is_function_call==false{
+			code<<item.keyword
+		}
+		else if previous_code_block.ast_type =="function_call" && is_function_call==false{
+			code[code.len-1]+=keyword
+		}
+		else if is_function_call==true{
+			code[code.len-1]+=keyword
+		}
+		if item.keyword=="(" && is_function_call==true{
+			first_bracket_count++
+		}
+		else if item.keyword=="(" && is_function_call==false && previous_code_block.ast_type=="function_call"{
+			first_bracket_count++
+		}
+		else if item.keyword==")" && is_function_call==true{
+			first_bracket_count--
+		}
+		if first_bracket_count==0{
+			if is_function_call==true{
+				if next_item.line!=item.line || next_item==item || next_item.keyword==r"\n"{
+					code<<";\n"
+				}
+			}
+			is_function_call=false
+		}
+		else{
+			is_function_call=true
+		} 
+		if previous_code_block.tab<item.tab && keyword!=r"\n" && is_function_call==false && (previous_code_block.ast_type in ast_type) == false{
+			code<<"\n}\n"
+		}
+		else if item==next_item && item!=parser.Body{}{
+			code<<"\n}\n"
+		}
+		
+		if keyword!=r"\n"{
+			previous_code_block=item
+		}
 	} 
-	println(ast)
 	return code
 }
