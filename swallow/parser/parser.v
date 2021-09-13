@@ -1,7 +1,7 @@
 module parser
 // Original author: Saptak Bhoumik
 
-struct Body {
+pub struct Body {
 	pub mut:
 	ast_type string
 	keyword string
@@ -12,15 +12,22 @@ struct Body {
 	id int
 }
 
-struct Ast {
+struct Function{
+	pub mut:
+	name string
+	return_type []string
+}
+
+pub struct Ast {
 	pub mut:
 	import_file []string
 	header_file []string
 	c_file []string
 	folder string
 	path string
+	function_return_type []Function
 	function_define []string
-	function_call []string
+	function_call []string=["main"]
 	method_define []string
 	method_call []string
 	body []Body
@@ -28,6 +35,7 @@ struct Ast {
 
 pub fn parser(code []string) (Ast,string){
 	swallow_type:=["int","bool","str","list","dictionary","float","void"]
+	required_arg:=["str_variable_required_argument","int_variable_required_argument","bool_variable_required_argument","list_variable_required_argument","dictionary_variable_required_argument","float_variable_required_argument","void_variable_required_argument"]
 	decorator:=["@method"]//more will be added soon
 	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=']
 	loop:=["if","while","elif","else","for"]
@@ -35,7 +43,9 @@ pub fn parser(code []string) (Ast,string){
 	error_handler:=["try","except","finally"]
 	variable:="_variable"
 	underscore:="_"
+	mut reserved_keywords:=[]string{}
 	mut error := ""
+	mut return_type:=false
 	mut first_bracket_count:=0
 	mut is_function_call:=false
 	mut is_return:=false
@@ -53,7 +63,17 @@ pub fn parser(code []string) (Ast,string){
 	mut previous_code_block:=Body{}
 	mut last_left_code_block:=Body{}
 	mut json:=Ast{}
+	reserved_keywords<<loop
+	reserved_keywords<<swallow_type
+	reserved_keywords<<decorator
+	reserved_keywords<<operater
+	reserved_keywords<<logic
+	reserved_keywords<<error_handler
+	reserved_keywords<<["Ccode","break","continue","return"]
 	for index,item in code{
+		if item=="(" && previus_item==")"{
+			return_type=true
+		}
 		//finds next item
 		if index<code.len-1 && index!=0{
 			next_item=code[index+1]
@@ -70,7 +90,57 @@ pub fn parser(code []string) (Ast,string){
 			is_tab=true
 		}
 		//parsing starts here
-		if item in decorator{
+		if return_type==true && is_function_call==false && item!="(" && (previous_code_block.ast_type=="function_define" || previous_code_block.ast_type in required_arg)==true && is_argument==false && is_operator==false && is_loop==false && is_ccode==false{
+			if item in swallow_type{
+				json.function_return_type[json.function_return_type.len-1].return_type<<item
+			}
+			else if item==")"{
+				return_type=false
+			}
+		}
+		//checks if function call
+		else if next_item=="."{
+			code_block=Body{ast_type:know_type(item)
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
+		else if item=="." && next_item in json.method_define{
+			if json.body[json.body.len-1].ast_type=="undefined"{
+				json.body[json.body.len-1].ast_type="variable"
+			}
+			code_block=Body{ast_type:"dot"
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
+		else if previous_code_block.keyword=="." && item in json.method_define && next_item=="("{
+			code_block=Body{ast_type:"method"
+							keyword : item
+							length :item.len
+							tab : tab}
+			is_function_call=true
+		}
+		else if know_type(item)=='undefined' && previus_item!="def" && next_item=="(" && (item in reserved_keywords)==false{
+			code_block=Body{ast_type:"function_call"
+							keyword : item
+							length :item.len
+							tab : tab}
+			is_function_call=true
+		}
+		else if previous_code_block.ast_type=="function_call" && item=="(" && is_function_call==false{
+			code_block=Body{ast_type:"bracket"
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
+		else if previous_code_block.ast_type=="method" && item=="(" && is_function_call==false{
+			code_block=Body{ast_type:"bracket"
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
+		else if item in decorator{
 			code_block=Body{ast_type:"decorator"
 							keyword : item
 							length :item.len
@@ -155,35 +225,7 @@ pub fn parser(code []string) (Ast,string){
 			is_operator=true
 			code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
 		}
-		else if is_operator==true && next_item!="(" && know_type(item)!="undefined"{
-			if is_argument==false{
-				code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
-				if code_block.ast_type=='undefined' && next_item!="("{
-					code_block.ast_type="variable"
-				}
-			}
-			else if is_argument==true && item!=")"{
-				code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
-				if code_block.ast_type=='undefined' && next_item!="("{
-					code_block.ast_type="variable"
-				}
-			}
-		}
-		else if is_operator==true && next_item=="(" && know_type(item)!="undefined"{
-			if is_argument==false{
-				code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
-				if code_block.ast_type=='undefined' && next_item!="("{
-					code_block.ast_type="variable"
-				}
-			}
-			else if is_argument==true && item!=")"{
-				code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
-				if code_block.ast_type=='undefined' && next_item!="("{
-					code_block.ast_type="variable"
-				}
-			}
-		}
-		else if is_operator==true && next_item!="(" && know_type(item)=="undefined"{
+		else if is_operator==true && previous_code_block.ast_type!="function_call"{
 			if is_argument==false{
 				code_block,is_operator=parse_operator(is_operator,item,tab,is_argument)
 				if code_block.ast_type=='undefined' && next_item!="("{
@@ -245,48 +287,7 @@ pub fn parser(code []string) (Ast,string){
 				}
 			}
 		}
-		//checks if function call
-		else if next_item=="."{
-			code_block=Body{ast_type:know_type(item)
-							keyword : item
-							length :item.len
-							tab : tab}
-		}
-		else if item=="." && next_item in json.method_define{
-			if json.body[json.body.len-1].ast_type=="undefined"{
-				json.body[json.body.len-1].ast_type="variable"
-			}
-			code_block=Body{ast_type:"dot"
-							keyword : item
-							length :item.len
-							tab : tab}
-		}
-		else if previous_code_block.keyword=="." && item in json.method_define && next_item=="("{
-			code_block=Body{ast_type:"method"
-							keyword : item
-							length :item.len
-							tab : tab}
-			is_function_call=true
-		}
-		else if know_type(item)=='undefined' && previus_item!="def" && next_item=="("{
-			code_block=Body{ast_type:"function_call"
-							keyword : item
-							length :item.len
-							tab : tab}
-			is_function_call=true
-		}
-		else if previous_code_block.ast_type=="function_call" && item=="(" && is_function_call==false{
-			code_block=Body{ast_type:"bracket"
-							keyword : item
-							length :item.len
-							tab : tab}
-		}
-		else if previous_code_block.ast_type=="method" && item=="(" && is_function_call==false{
-			code_block=Body{ast_type:"bracket"
-							keyword : item
-							length :item.len
-							tab : tab}
-		}
+		
 		else if is_function_call==true{
 			code_block=Body{ast_type:know_type(item)
 							keyword : item
@@ -326,14 +327,9 @@ pub fn parser(code []string) (Ast,string){
 							length :item.len
 							tab : tab}
 		}
-		else if item=="," && is_argument==false{
-			code_block=Body{ast_type:"comma"
-							keyword : item
-							length :item.len
-							tab : tab}
-		}
-		else if is_func_def==true{
-			if is_argument==true && item!="(" && item!=")" && item!="" && item!=","{
+
+		else if is_func_def==true  && item!=" " && is_function_call==false{
+			if is_argument==true && item!="(" && item!=")" && item!=","{
 				previus_item=item
 				code_block=Body{ast_type:"required_argument"
 							keyword : item

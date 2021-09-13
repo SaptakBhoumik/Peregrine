@@ -12,7 +12,7 @@ pub fn function(item string,is_func_def bool,previus_item string, json Ast,right
 						previous_item=item
 	}
 
-	else if item=="("{
+	else if item=="(" && json.body.last().ast_type=="function_define"{
 		is_argument= true
 		previous_item=item
 	} 
