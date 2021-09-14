@@ -90,7 +90,10 @@ pub fn parser(code []string) (Ast,string){
 			is_tab=true
 		}
 		//parsing starts here
-		if item=="(" && previus_item==")" && (previous_code_block.ast_type in required_arg || previous_code_block.ast_type=="function_define"){
+		if previous_code_block.keyword in swallow_type && item==":"{
+					//do nothing
+		}
+		else if item=="(" && previus_item==")" && (previous_code_block.ast_type in required_arg || previous_code_block.ast_type=="function_define"){
 			return_type=true
 		}
 		
@@ -467,10 +470,15 @@ pub fn parser(code []string) (Ast,string){
 				if json.body.last().direction=="left"{
 					last_left_code_block=json.body.last()
 				}
-				previous_code_block=json.body.last()
-				if json.body.last().keyword=="const" || json.body.last().keyword in swallow_type || json.body.last().ast_type=="decorator"{
-					json.body.pop()
+				if previous_code_block.keyword in swallow_type && item==":"{
+					//do nothing
 				}
+				else{
+					previous_code_block=json.body.last()
+					if json.body.last().keyword=="const" || json.body.last().keyword in swallow_type || json.body.last().ast_type=="decorator" || json.body.last().keyword=="def"{
+						json.body.pop()
+					}
+				}	
 			}
 		}
 		code_block=Body{}

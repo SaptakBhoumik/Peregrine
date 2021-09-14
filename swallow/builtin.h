@@ -89,22 +89,6 @@ char *_format(const char *fmt, ...) {
  */
 
 // Foreground(text) colors
-#define SH_FG_BLACK             (30 << 8)
-#define SH_FG_RED               (31 << 8)
-#define SH_FG_GREEN             (32 << 8)
-#define SH_FG_YELLOW            (33 << 8)
-#define SH_FG_BLUE              (34 << 8)
-#define SH_FG_MAGENTA           (35 << 8)
-#define SH_FG_CYAN              (36 << 8)
-#define SH_FG_WHITE             (37 << 8)
-#define SH_FG_BRIGHT_BLACK      (30 << 8)
-#define SH_FG_BRIGHT_RED        (31 << 8)
-#define SH_FG_BRIGHT_GREEN      (32 << 8)
-#define SH_FG_BRIGHT_YELLOW     (33 << 8)
-#define SH_FG_BRIGHT_BLUE       (34 << 8)
-#define SH_FG_BRIGHT_MAGENTA    (35 << 8)
-#define SH_FG_BRIGHT_CYAN       (36 << 8)
-#define SH_FG_BRIGHT_WHITE      (37 << 8)
 
 
 /*
@@ -117,7 +101,32 @@ char *_format(const char *fmt, ...) {
  * Example:
  * _colorprint("Hello World!", SH_FG_BLACK , true);
  */
-void _colorprint(const char *str, int64_t flags, bool reset) {
+void _colorprint(const char *str, char *color, bool reset) {
+    int64_t flags;
+    if (strcmp(color, "BLACK")==0){
+        flags=(30 << 8);
+    }
+    else if (strcmp(color, "RED")==0){
+        flags=(31 << 8);
+    }
+    else if (strcmp(color, "GREEN")==0){
+        flags=(32 << 8);
+    }
+    else if (strcmp(color, "YELLOW")==0){
+        flags=(33 << 8);
+    }
+    else if (strcmp(color, "BLUE")==0){
+        flags=(34 << 8);
+    }
+    else if (strcmp(color, "MAGENTA")==0){
+        flags=(35 << 8);
+    }
+    else if (strcmp(color, "CYAN")==0){
+        flags=(36 << 8);
+    }
+    else if (strcmp(color, "WHITE")==0){
+        flags=(37 << 8);
+    }
     int8_t foreground = (flags & 0xFF00) >> 8;
     printf("\e[1;%dm%s", foreground, str);
     if(reset)

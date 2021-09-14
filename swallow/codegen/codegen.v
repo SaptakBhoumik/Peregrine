@@ -124,7 +124,10 @@ pub fn codegen(ast parser.Ast) []string{
 		else{
 			is_function_call=true
 		} 
-		if previous_code_block.tab<item.tab && keyword!=r"\n" && is_function_call==false && (previous_code_block.ast_type in ast_type) == false{
+		if previous_code_block.tab==item.tab+1 && keyword!=r"\n" && is_function_call==false && previous_code_block.ast_type!="function_define" && (item.ast_type in ast_type) == false{
+			code<<"\n}\n"
+		}
+		else if next_item.tab==item.tab-1 && next_item.keyword!=r"\n" && keyword!=r"\n" && is_function_call==false && previous_code_block.ast_type!="function_define" && (item.ast_type in ast_type) == false{
 			code<<"\n}\n"
 		}
 		else if item==next_item && item!=parser.Body{}{
