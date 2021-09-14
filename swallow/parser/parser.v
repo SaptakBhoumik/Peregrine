@@ -27,7 +27,7 @@ pub struct Ast {
 	folder string
 	path string
 	function_return_type []Function
-	function_define []string
+	function_define []string=["__asm__","printf"]
 	function_call []string=["main"]
 	method_define []string
 	method_call []string

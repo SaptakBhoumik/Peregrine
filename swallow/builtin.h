@@ -123,4 +123,27 @@ void _colorprint(const char *str, int64_t flags, bool reset) {
     if(reset)
         printf("\e[1;0m");
 }
+double mypow(double base, double power)
+{
+    double result = 1;
+    if (power >= 0)
+    {
+
+        while (power--)
+        {
+            result = result * base;
+        }
+
+        return result;
+    }
+    else if (power < 0)
+    {
+        while (power++)
+        {
+            result = result * base;
+        }
+        return 1 / result;
+    }
+}
+
 // #endif //SWALLOW_BUILTIN_H

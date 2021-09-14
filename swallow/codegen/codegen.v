@@ -6,8 +6,10 @@ import parser
 
 pub fn codegen(ast parser.Ast) []string{
 	required_arg:=["str_variable_required_argument","int_variable_required_argument","bool_variable_required_argument","list_variable_required_argument","dictionary_variable_required_argument","float_variable_required_argument","void_variable_required_argument"]
+	variable_ast:=["str_variable","int_variable","bool_variable","list_variable","dictionary_variable","float_variable","void_variable"]
 	ast_type:=["function_call","function_define"]
 	mut is_function_call:=false
+	mut is_operator:=false
 	mut keyword:=""
 	mut first_bracket_count:=0
 	mut code:=[]string{}
@@ -31,8 +33,37 @@ pub fn codegen(ast parser.Ast) []string{
 		else if previous_code_block.ast_type in required_arg && item.direction!="right"{
 			code<<"){\n"
 		}
+		//codegen starts here
 		if item.ast_type=="Ccode"{
 			code<<item.keyword
+		}
+		else if next_item.keyword=="^"{
+			code<<"mypow($item.keyword"
+			is_operator==true
+		}
+		else if item.keyword=="^"{
+			code<<","
+		}
+		else if previous_code_block.keyword=="^"{
+			code<<"$item.keyword)"
+		}
+		else if item.ast_type in variable_ast{
+			code<<variable(item.ast_type,keyword)
+		}
+		else if is_operator==true && item.keyword!=r"\n"{
+			code[code.len-1]+=keyword
+		}
+		else if is_operator==true && item.keyword==r"\n"{
+			code<<";\n"
+			is_operator=false
+		}
+		else if (next_item.ast_type=="binary_operator" || next_item.ast_type=="assign") && is_operator==false{
+			is_operator=true
+			code<<keyword
+		}
+		else if (item.ast_type=="binary_operator" || item.ast_type=="assign") && is_operator==false{
+			is_operator=true
+			code[code.len-1]+=keyword
 		}
 		else if item.ast_type=="function_define"{
 			code<<func_return(item.keyword,ast)

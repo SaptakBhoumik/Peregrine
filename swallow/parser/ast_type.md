@@ -9,9 +9,9 @@
 - [ ] and,or,not,in,is - As the name suggests.
 - [ ] raw_string- like this `r"hi\n"` will print `hi\n`
 - [ ] formated_string- `f"{a} and {b}"` will print `a_value and b_value`
-- [ ] Ccode- If you call c functions
-- [ ] asign- Refers to the equals sign(=)
-- [ ] binary_operator - Refers to the following `['+','-','*','/','^','//','%']`
+- [X] Ccode- If you call c functions
+- [X] asign- Refers to the equals sign(=)
+- [X] binary_operator - Refers to the following `['+','-','*','/','^','//','%']`
 - [ ] compare - Refers to the following `['==', '!=', '<=', '>=', '>','<']`
 - [ ] bool,string,void,pointer,dictionary,list- Various types of valus a variable can hold
 - [ ] pass-Do nothing
@@ -19,7 +19,7 @@
 - [ ] break- Stop the execution of a loop
 - [ ] continue- Continus the execution of a loop
 - [ ] dot,comma,bracket- As the name suggests
-- [ ] function_call- Calls a function
+- [X] function_call- Calls a function
 - [ ] method - Like append and all those stuff
-- [ ] function_define- Used to define a function
-- [ ] newline - as the name suggests `\n`
+- [X] function_define- Used to define a function
+- [X] newline - as the name suggests `\n`

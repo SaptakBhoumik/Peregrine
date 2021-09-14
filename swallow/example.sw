@@ -1,6 +1,5 @@
 def main():
-    print("First swallow program\n")
-    print("First swallow program\n")
-    colorprint("First swallow program\n", SH_FG_GREEN)
-    colorprint("It can also print in other color but i am too lazy to show\n", SH_FG_BLUE)
-
+    float arg_one=58.8
+    float arg_two=10
+    float power=arg_one^arg_two
+    printf( "%g ^ %g = %g\n", arg_one, arg_two, power)

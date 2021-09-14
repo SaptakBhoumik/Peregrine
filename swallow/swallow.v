@@ -35,7 +35,7 @@ fn main() {
     }
     else{
         print("\033[0;31m")
-        print("$error\n")//Display Hello in red
+        print("$error\n")//Display error in red
         print("\033[0m")
     }
     // println(preprocessor.formatter(content))
