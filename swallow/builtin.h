@@ -146,4 +146,9 @@ double mypow(double base, double power)
     }
 }
 
+int64_t round_number(double num)
+{
+    return num < 0 ? num - 0.5 : num + 0.5;
+}
+
 // #endif //SWALLOW_BUILTIN_H

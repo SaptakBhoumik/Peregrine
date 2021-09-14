@@ -37,6 +37,19 @@ pub fn codegen(ast parser.Ast) []string{
 		if item.ast_type=="Ccode"{
 			code<<item.keyword
 		}
+
+		else if next_item.keyword=="//"{
+			code<<"round_number($item.keyword"
+			is_operator==true
+		}
+		else if item.keyword=="//"{
+			code<<"/"
+		}
+		else if previous_code_block.keyword=="//"{
+			code<<"$item.keyword)"
+		}
+
+
 		else if next_item.keyword=="^"{
 			code<<"mypow($item.keyword"
 			is_operator==true
