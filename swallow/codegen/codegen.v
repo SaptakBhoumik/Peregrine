@@ -9,6 +9,7 @@ pub fn codegen(ast parser.Ast) []string{
 	variable_ast:=["str_variable","int_variable","bool_variable","list_variable","dictionary_variable","float_variable","void_variable"]
 	mut ast_type:=["function_call","function_define","binary_operator","assign"]
 	mut is_function_call:=false
+	mut is_return:=false
 	mut is_operator:=false
 	mut is_func_def:=false
 	mut keyword:=""
@@ -39,15 +40,39 @@ pub fn codegen(ast parser.Ast) []string{
 			code<<"\n}\n"
 		}
 		//codegen starts here
-		if item.keyword==r"\n" && next_item.keyword==r"\n" && next_item!=item{
-			//do nothing
+		if item.line!=next_item.line && is_return==true{
+			code<<"$keyword ;\n"
+			is_return=false
+		}
+		else if is_return==true && item.keyword==r"\n"{
+			code<<";\n"
+			is_return=false
+		}
+		else if item.ast_type=="function_define"{
+			code<<func_return(item.keyword,ast)
+			is_func_def=true
+		}
+		else if (is_function_call==true && (next_item.line!=item.line || next_item==item || next_item.keyword==r"\n") && item.keyword==")")||( is_operator==true && item.keyword==r"\n"){
+			if keyword==")"{
+				code<<");\n"
+			}
+			else if previous_code_block.keyword==")" && item.keyword==r"\n"{
+				//do nothing
+			}
+			else{
+				code<<";\n"
+			}
 		}
 		else if item.ast_type=="Ccode"{
 			code<<"$item.keyword \n"
 		}
+		else if item.keyword=="return"{
+			code<<"$item.keyword "
+			is_return=true
+		}
 
 		else if next_item.keyword=="//"{
-			code<<"round_number($item.keyword"
+			code<<"myFloor($item.keyword"
 			is_operator==true
 		}
 		else if item.keyword=="//"{
@@ -75,10 +100,6 @@ pub fn codegen(ast parser.Ast) []string{
 		else if is_operator==true && item.keyword!=r"\n"{
 			code[code.len-1]+=keyword
 		}
-		else if is_operator==true && item.keyword==r"\n"{
-			code<<";\n"
-			is_operator=false
-		}
 		else if (next_item.ast_type=="binary_operator" || next_item.ast_type=="assign") && is_operator==false{
 			is_operator=true
 			code<<keyword
@@ -87,10 +108,7 @@ pub fn codegen(ast parser.Ast) []string{
 			is_operator=true
 			code[code.len-1]+=keyword
 		}
-		else if item.ast_type=="function_define"{
-			code<<func_return(item.keyword,ast)
-			is_func_def=true
-		}
+		
 		else if item.ast_type in required_arg{
 			if item.ast_type=="str_variable_required_argument"{
 				code<<"char * ${item.keyword}"
@@ -115,6 +133,10 @@ pub fn codegen(ast parser.Ast) []string{
 		else if is_function_call==true{
 			code[code.len-1]+=keyword
 		}
+		else if is_return==true && item.keyword!=r"\n"{
+			code[code.len-1]+="$keyword "
+		}
+		
 		if item.keyword=="(" && is_function_call==true{
 			first_bracket_count++
 		}
@@ -125,11 +147,7 @@ pub fn codegen(ast parser.Ast) []string{
 			first_bracket_count--
 		}
 		if first_bracket_count==0{
-			if is_function_call==true{
-				if next_item.line!=item.line || next_item==item || next_item.keyword==r"\n"{
-					code<<";\n"
-				}
-			}
+			
 			is_function_call=false
 		}
 		else{

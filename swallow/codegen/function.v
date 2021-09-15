@@ -14,5 +14,8 @@ fn func_return(name string, ast parser.Ast) string{
 	if type_of_return==[]string{} || type_of_return==["void"]{
 		return_item="void * $name"
 	}
+	else if type_of_return==["str"]{
+		return_item="char * $name"
+	}
 	return return_item
 }

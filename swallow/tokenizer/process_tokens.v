@@ -70,13 +70,13 @@ fn number_present_in_arrey(item string) int{
 				'9'
 				]
 	mut present:=0//false
-	for symbol in symbols{
-		if item==symbol{
+	for symbol in item.split(""){
+		if symbol in symbols{
 			present=1//true
-			break
 		}
 		else{
-			continue
+			present=0
+			break
 		}
 	}
 	return present

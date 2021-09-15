@@ -12,6 +12,41 @@
 #define True true
 #define False false
 
+char *inputString(FILE* fp, size_t size){
+//The size is extended by the input with the value of the provisional
+    char *str;
+    int ch;
+    size_t len = 0;
+    str = realloc(NULL, sizeof(*str)*size);//size is start size
+    if(!str)return str;
+    while(EOF!=(ch=fgetc(fp)) && ch != '\n'){
+        str[len++]=ch;
+        if(len==size){
+            str = realloc(str, sizeof(*str)*(size+=16));
+            if(!str)return str;
+        }
+    }
+    str[len++]='\0';
+
+    return realloc(str, sizeof(*str)*len);
+}
+double myFloor(double x) /* Change this to your liking: long double might
+                                             be float in your situation.  */
+{
+    long double xcopy=x<0?x*-1:x;
+    unsigned int zeros=0;
+    long double n=1;
+    for(n=1;xcopy>n*10;n*=10,++zeros);
+    for(xcopy-=n;zeros!=-1;xcopy-=n)
+        if(xcopy<0)
+        {
+            xcopy+=n;
+            n/=10;
+            --zeros;
+        }
+    xcopy+=n;
+    return x<0?(xcopy==0?x:x-(1-xcopy)):(x-xcopy);
+}
 /*
  * Builtin formatter function
  * Author: MD Gaziur Rahman Noor
@@ -153,11 +188,6 @@ double mypow(double base, double power)
         }
         return 1 / result;
     }
-}
-
-int64_t round_number(double num)
-{
-    return num < 0 ? num - 0.5 : num + 0.5;
 }
 
 // #endif //SWALLOW_BUILTIN_H

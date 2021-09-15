@@ -96,6 +96,12 @@ pub fn parser(code []string) (Ast,string){
 		if previous_code_block.keyword in swallow_type && item==":"{
 					//do nothing
 		}
+		else if item==")" && is_function_call==true{
+			code_block=Body{ast_type:"bracket"
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
 		else if item=="(" && previus_item==")" && (previous_code_block.ast_type in required_arg || previous_code_block.ast_type=="function_define"){
 			return_type=true
 		}
