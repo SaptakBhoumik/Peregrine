@@ -3,6 +3,8 @@ def something() (str):
 def main():
     print("Enter a string ")
     str a=input()
+    colorprint("BLUE","BLUE")
+    colorprint("BLUE","RED")
     printf("%f", 58.8//10)
     printf( "\nYou entered %s\n", a)
     printf( "\n Returned text %s\n", something())

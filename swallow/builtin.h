@@ -7,10 +7,10 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <stdbool.h>
-
-#define True true
-#define False false
+// #include <stdbool.h>
+#define bool int
+#define True 1
+#define False 0
 
 char *inputString(FILE* fp, size_t size){
 //The size is extended by the input with the value of the provisional
