@@ -1,5 +1,20 @@
 module tokenizer
 // Original author: Saptak Bhoumik
+fn remove_extra_return(token []string) []string{
+	mut results:=[]string{}
+	for item in token{
+		if results.len==0{
+			results<<item
+		}
+		else if item==r"\n" && results.last()==r"\n"{
+			//do nothing
+		}
+		else{
+			results<<item
+		}
+	}
+	return results
+}
 fn symbol_present_in_arrey(item string) int{
 	//it finds if the item is any one of the symbol
 	symbols:=[
@@ -325,18 +340,23 @@ pub fn process_tokens(list []string) []string{
 	}
 	mut is_tab:=true
 	mut ultimate_result:=[]string{}
-	for mut item in final_result{
+	mut nxt:=""
+	for index,mut item in final_result{
+		if index!=final_result.len-1{
+			nxt=final_result[index+1]
+		}
+		
 		if item==" " && is_tab==true{
 			is_tab=true
 		}
 		else if item!=" " && is_tab==true{
 			is_tab=false
 		}
-		else if item==r"\n"{
+		else if item==r"\n" && nxt!=r"\n" && index!=final_result.len-1{
 			is_tab=true
 		}
 		if item==" " && is_tab==false{
-			continue
+			//do nothing
 		}
 		else if item==" " && is_tab==true{
 			ultimate_result<<item
@@ -345,5 +365,5 @@ pub fn process_tokens(list []string) []string{
 			ultimate_result<<item
 		}
 	}
-	return ultimate_result
+	return remove_extra_return(ultimate_result)
 }

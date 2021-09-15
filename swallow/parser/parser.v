@@ -89,6 +89,9 @@ pub fn parser(code []string) (Ast,string){
 			line++
 			is_tab=true
 		}
+		if item==r"\n" && next_item==r"\n" && index!=code.len-1{
+			is_tab==false
+		}
 		//parsing starts here
 		if previous_code_block.keyword in swallow_type && item==":"{
 					//do nothing
@@ -105,8 +108,11 @@ pub fn parser(code []string) (Ast,string){
 				json.function_return_type[json.function_return_type.len-1].return_type<<item
 			}
 		}
-		
-		else if is_argument==true && item!="("  && item!=r"\n" && item!=")" && item!="," && item!=" " && (item in reserved_keywords)==false && next_item!="(" && is_function_call==false{
+		else if is_argument==true && item==")" && is_function_call==false && is_operator==false && is_loop==false && is_ccode==false{
+			is_argument=false
+			previus_item=item
+		}
+		else if is_argument==true && item!="("  && item!=r"\n" && item!=")" && item!="," && item!=" " && (item in reserved_keywords)==false && next_item!="(" && is_function_call==false  && (next_item in reserved_keywords)==false  && is_operator==false && is_loop==false && is_ccode==false{
 				previus_item=item
 				code_block=Body{ast_type:"required_argument"
 							keyword : item
@@ -126,10 +132,7 @@ pub fn parser(code []string) (Ast,string){
 				json.body<<code_block
 				code_block=Body{}
 			}
-		else if is_argument==true && item==")" && is_function_call==false{
-			is_argument=false
-			previus_item=item
-		}
+		
 		//checks if function call
 		else if next_item=="."{
 			code_block=Body{ast_type:know_type(item)
@@ -424,6 +427,9 @@ pub fn parser(code []string) (Ast,string){
 			right=true
 		}
 		//modify the code block
+		if code_block.tab==0 && code_block.ast_type!="function_define"{
+			code_block.tab=tab
+		}
 		code_block.line=line
 		if previous_code_block.ast_type=="decorator" && item=="def"{
 			json.method_define<<next_item
