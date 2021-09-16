@@ -6,5 +6,5 @@ def main():
     colorprint("BLUE","BLUE")
     colorprint("BLUE","RED")
     printf("%f", 58.8//10)
-    printf( "\nYou entered %s\n", a)
+    print("\n{a} {a} {a} {a}")
     printf( "\n Returned text %s\n", something())
