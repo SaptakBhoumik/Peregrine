@@ -19,7 +19,6 @@ pub fn codegen(ast parser.Ast) []string{
 	mut next_item:=parser.Body{}
 	ast_type<<required_arg
 	ast_type<<variable_ast
-	println(ast)
 	for index,item in ast.body{
 		keyword=item.keyword
 		if index<ast.body.len-1 && index!=0{
@@ -72,9 +71,7 @@ pub fn codegen(ast parser.Ast) []string{
 			is_return=true
 		}
 		else if item.ast_type == 'string' {
-			println("yes")
 			if item.keyword.contains("{") {
-				println("yes1")
 				code << fstring(item)
 			} else {
 				code << "$item.keyword"
