@@ -48,7 +48,7 @@ pub fn know_type(item string) string{
 		else if split_text[count-1]=="'" && split_text[0]=="'"{
 			type_of_str="string"
 		}
-		else if item=="None"{
+		else if item=="NULL"{
 			type_of_str="void"
 		}
 		else if split_text[0]=="&"{
