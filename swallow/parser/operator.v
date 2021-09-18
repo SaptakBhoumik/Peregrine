@@ -1,7 +1,7 @@
 module parser
 // Original author: Saptak Bhoumik
 pub fn parse_operator(operator bool,item string,tab f64,is_argument bool) (Body,bool){
-	binary_operator:=['+','-','*','/','^','//','%']
+	binary_operator:=['+','-','*','/','^','//','%','++',"--"]
 	compare:=['==', '!=', '<=', '>=', '>','<']
 	mut is_operator:=operator
 	mut code_block:=Body{}

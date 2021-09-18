@@ -6,7 +6,7 @@ def print(str query):
 def colorprint(str string, str flags):
     Ccode _colorprint(string,flags,True); Ccode
 @free
-def input() (str):
+def input() ->str:
     str variable="some string"
     Ccode variable = inputString(stdin, 10); Ccode
-    return variable   
+    return variable 

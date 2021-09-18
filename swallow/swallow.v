@@ -20,6 +20,7 @@ fn main() {
     builtin_h:= os.read_file("${folder}builtin.h")?
     mut total:="${builtin_sw}\n${content}"
     ast,error:=parser.parser(tokenizer.process_tokens(tokenizer.tokenize(total)))
+    // println(tokenizer.process_tokens(tokenizer.tokenize(total)))
     mut final_code:=""
     if error==""{
     // print(ast)

@@ -46,7 +46,7 @@ pub fn parser(code []string) (Ast,string){
 	swallow_type:=["int","bool","str","list","dictionary","float","void"]
 	required_arg:=["str_variable_required_argument","int_variable_required_argument","bool_variable_required_argument","list_variable_required_argument","dictionary_variable_required_argument","float_variable_required_argument","void_variable_required_argument"]
 	decorator:=["@method","@free"]//more will be added soon
-	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=']
+	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=','++',"--"]
 	loop:=["if","while","elif","else","for"]
 	logic:=["and","or","not","in","is"]
 	error_handler:=["try","except","finally"]
@@ -112,11 +112,11 @@ pub fn parser(code []string) (Ast,string){
 							length :item.len
 							tab : tab}
 		}
-		else if item=="(" && previus_item==")" && (previous_code_block.ast_type in required_arg || previous_code_block.ast_type=="function_define"){
+		else if item=="->" && previus_item==")" && (previous_code_block.ast_type in required_arg || previous_code_block.ast_type=="function_define"){
 			return_type=true
 		}
 		
-		else if return_type==true && item == ")"{
+		else if return_type==true && item == ":"{
 			return_type=false
 		}
 		else if return_type==true && is_function_call==false && item!="(" && (previous_code_block.ast_type=="function_define" || previous_code_block.ast_type in required_arg) && is_argument==false && is_operator==false && is_loop==false && is_ccode==false{

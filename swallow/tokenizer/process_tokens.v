@@ -2,6 +2,8 @@ module tokenizer
 // Original author: Saptak Bhoumik
 fn remove_extra_return(token []string) []string{
 	mut results:=[]string{}
+	operater:=["++","--","->"]
+	mut consequtive_item:=""
 	for item in token{
 		if results.len==0{
 			results<<item
@@ -10,7 +12,13 @@ fn remove_extra_return(token []string) []string{
 			//do nothing
 		}
 		else{
-			results<<item
+			consequtive_item="${results.last()}$item"
+			if consequtive_item in operater{
+				results[results.len-1]=consequtive_item
+			}
+			else{
+				results<<item
+			}
 		}
 	}
 	return results
