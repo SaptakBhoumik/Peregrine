@@ -12,11 +12,18 @@ pub struct Body {
 	id int
 	line int
 }
-
+struct Var{
+	 pub mut:
+	 variable string
+	 var_type string
+ }
 struct Function{
 	pub mut:
 	name string
+	variable []string
+	variable_type []Var
 	return_type []string
+	free []string
 }
 
 pub struct Ast {
@@ -31,19 +38,21 @@ pub struct Ast {
 	function_call []string=["main"]
 	method_define []string
 	method_call []string
+	free []string
 	body []Body
 }
 
 pub fn parser(code []string) (Ast,string){
 	swallow_type:=["int","bool","str","list","dictionary","float","void"]
 	required_arg:=["str_variable_required_argument","int_variable_required_argument","bool_variable_required_argument","list_variable_required_argument","dictionary_variable_required_argument","float_variable_required_argument","void_variable_required_argument"]
-	decorator:=["@method"]//more will be added soon
+	decorator:=["@method","@free"]//more will be added soon
 	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=']
 	loop:=["if","while","elif","else","for"]
 	logic:=["and","or","not","in","is"]
 	error_handler:=["try","except","finally"]
 	variable:="_variable"
 	underscore:="_"
+	mut var:=Var{}
 	mut reserved_keywords:=[]string{}
 	mut error := ""
 	mut line:=0
@@ -92,6 +101,7 @@ pub fn parser(code []string) (Ast,string){
 		if item==r"\n" && next_item==r"\n" && index!=code.len-1{
 			is_tab==false
 		}
+		
 		//parsing starts here
 		if previous_code_block.keyword in swallow_type && item==":"{
 					//do nothing
@@ -182,11 +192,18 @@ pub fn parser(code []string) (Ast,string){
 							tab : tab}
 		}
 		else if item in decorator{
-			code_block=Body{ast_type:"decorator"
-							keyword : item
-							length :item.len
-							tab : tab
-							}
+			if code.len==index+3{
+				error="Unexpected end of file"
+				break
+			}
+			else{
+				if item=="@method"{
+					json.method_define<<code[index+3]
+				}
+				else if item=="@free"{
+					json.free<<code[index+3]
+				}
+			}
 		}
 		else if item in swallow_type{
 			if previous_code_block.keyword=="const"{
@@ -368,7 +385,12 @@ pub fn parser(code []string) (Ast,string){
 							length :item.len
 							tab : tab}
 		}
-		
+		else if item=="," && is_argument==false{
+			code_block=Body{ast_type:"comma"
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
 		else if is_func_def==true  && item!=" " && is_function_call==false{
 			
 			if item!=","{
@@ -389,7 +411,7 @@ pub fn parser(code []string) (Ast,string){
 			error="$item\n^Undefined character"
 		}
 		code_block.id=index
-
+		code_block.line=line
 
 		if item=="("{
 			if previous_code_block.ast_type=="function_call" || previous_code_block.ast_type=="method"{
@@ -433,13 +455,11 @@ pub fn parser(code []string) (Ast,string){
 			right=true
 		}
 		//modify the code block
+		
 		if code_block.tab==0 && code_block.ast_type!="function_define"{
 			code_block.tab=tab
 		}
-		code_block.line=line
-		if previous_code_block.ast_type=="decorator" && item=="def"{
-			json.method_define<<next_item
-		}
+		
 		if code_block.keyword!="" && code_block.keyword!=r"\n"{
 			if right==false{
 				code_block.direction="left"
@@ -450,13 +470,121 @@ pub fn parser(code []string) (Ast,string){
 		}
 		if previous_code_block.keyword in swallow_type{
 			code_block.ast_type=previous_code_block.ast_type
+			if item in json.function_return_type[json.function_return_type.len-1].variable{
+				error="$item \n ^ Redefinition of an existing variable"
+				break
+			}
+			else{
+				if json.body.len==0{
+					error="$item \n No function found"
+				}
+				else{
+					json.function_return_type[json.function_return_type.len-1].variable<<item
+					var.variable=item
+					var.var_type=previous_code_block.keyword
+					json.function_return_type[json.function_return_type.len-1].variable_type<<var
+				}
+			}
 		}
 		else if code_block.keyword in swallow_type{
-			code_block.ast_type=code_block.ast_type
+			//do nothing
+		}
+		else if (code_block.ast_type=="variable"||code_block.ast_type=="constant") && item!="const" && previous_code_block.keyword!="," && next_item=="=" && (item in json.function_return_type[json.function_return_type.len-1].variable)==false{
+			if code.len<=index+2{
+				error="Unexpected end of file"
+				break
+			}
+			else{
+				json.function_return_type[json.function_return_type.len-1].variable<<item
+				if know_type(code[index+2])!="undefined"{
+					var.variable=item
+					if know_type(code[index+2])=="float" || know_type(code[index+2])=="dictionary" || know_type(code[index+2])=="list" || know_type(code[index+2])=="bool"{
+						var.var_type=know_type(code[index+2])
+					}
+					else if know_type(code[index+2])=="void" || know_type(code[index+2])=="pointer"{
+						var.var_type="void"
+					} 
+					else if know_type(code[index+2])=="int" || code[index+2]=="("{
+						var.var_type="float"
+					}
+					else if know_type(code[index+2])=="string"{
+						var.var_type="str"
+					}
+				}
+				else if code.len<=index+3{
+					if code[index+2] in json.function_return_type.last().variable{
+						var.variable=item
+						for variable_type_item in json.function_return_type.last().variable_type{
+							if variable_type_item.variable==code[index+2]{
+								var.var_type=variable_type_item.var_type
+								break
+							}
+						}
+					}
+					else{
+						error="${code[index+2]}\n^Undefined variable"
+						break
+					}
+				}
+				else if code[index+3]!="("{
+					if code[index+2] in json.function_return_type.last().variable{
+						var.variable=item
+						for variable_type_item in json.function_return_type.last().variable_type{
+							if variable_type_item.variable==code[index+2]{
+								var.var_type=variable_type_item.var_type
+								
+								break
+							}
+						}
+					}
+					else{
+						error="${code[index+2]}\n^Undefined variable"
+						break
+					}
+				}
+				else if code[index+3]=="("{
+					if code[index+2] in json.function_define{
+						var.variable=item
+						for function_type_item in json.function_return_type{
+							if function_type_item.name==code[index+2]{
+								if code[index+2]=="("{
+									var.var_type="float"
+								}
+								else if function_type_item.return_type==[]string{}{
+									var.var_type="void"
+								}
+								else if function_type_item.return_type.len==1{
+									if json.function_return_type.last().return_type==[]string{} && code[index+2] in json.free{
+										json.function_return_type[json.function_return_type.len-1].free<<item
+									}
+									var.var_type=function_type_item.return_type[0]
+								}
+								
+								break
+							}
+						}
+					}
+					else{
+						error="${code[index+2]}\n^Undefined function"
+						break
+					}
+				}
+				else{
+					error="Unable to determine type of $item"	
+				}
+				json.function_return_type[json.function_return_type.len-1].variable_type<<var
+			}
+			
+			if previous_code_block.keyword=="const"{
+				code_block.ast_type="$var.var_type$underscore$previous_code_block.ast_type"
+			}
+			else{
+				code_block.ast_type="$var.var_type$variable"
+			}
 		}
 		else if previous_code_block.keyword == "const"{
 			if code_block.ast_type=="required_argument"{
-				code_block.ast_type="$previous_code_block.ast_type$underscore$code_block.ast_type"
+				code_block.ast_type="$previous_code_block.ast_type$underscore$var.var_type"
 			}
 			else{
 				code_block.ast_type=previous_code_block.ast_type
@@ -467,6 +595,9 @@ pub fn parser(code []string) (Ast,string){
 		}
 		else if code_block.ast_type=="string" && previous_code_block.keyword=="f"{
 			code_block.ast_type=previous_code_block.ast_type
+			if json.function_return_type[json.function_return_type.len-1].return_type==[]string{}{
+							json.function_return_type[json.function_return_type.len-1].free<<item
+						}
 		}
 		//appends to json
 		if  code_block.keyword!=""{
@@ -486,13 +617,21 @@ pub fn parser(code []string) (Ast,string){
 					//do nothing
 				}
 				else{
-					previous_code_block=json.body.last()
-					if json.body.last().keyword=="const" || json.body.last().keyword in swallow_type || json.body.last().ast_type=="decorator" || json.body.last().keyword=="def"{
+					if code_block.keyword=="f" || code_block.keyword=="r"{
+						code_block.relative_to=previous_code_block.relative_to
+						code_block.direction=previous_code_block.direction
+						previous_code_block=code_block
+					}
+					else{
+						previous_code_block=json.body.last()
+					}
+					if json.body.last().keyword=="const" || json.body.last().keyword in swallow_type  || json.body.last().keyword=="def"{
 						json.body.pop()
 					}
 				}	
 			}
 		}
+		var=Var{}
 		code_block=Body{}
 	}
 	return json,error

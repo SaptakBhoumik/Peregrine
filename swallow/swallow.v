@@ -22,6 +22,8 @@ fn main() {
     ast,error:=parser.parser(tokenizer.process_tokens(tokenizer.tokenize(total)))
     mut final_code:=""
     if error==""{
+    // print(ast)
+    // println(ast.function_return_type)
        codes:=codegen.codegen(ast)
        for code in codes{
            final_code="$final_code$code"
@@ -31,7 +33,7 @@ fn main() {
     x.writeln(final_code)?
     x.close()
     os.system("gcc ./temp.c -o ${arg.last()}")
-    os.system("rm ./temp.c")
+    // os.system("rm ./temp.c")
     }
     else{
         print("\033[0;31m")

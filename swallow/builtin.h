@@ -30,8 +30,7 @@ char *inputString(FILE* fp, size_t size){
 
     return realloc(str, sizeof(*str)*len);
 }
-double myFloor(double x) /* Change this to your liking: long double might
-                                             be float in your situation.  */
+int64_t myFloor(double x) 
 {
     long double xcopy=x<0?x*-1:x;
     unsigned int zeros=0;

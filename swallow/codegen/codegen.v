@@ -13,6 +13,8 @@ pub fn codegen(ast parser.Ast) []string{
 	mut is_operator:=false
 	mut is_func_def:=false
 	mut keyword:=""
+	mut c_function:="string"
+	mut free:=[]string{}
 	mut first_bracket_count:=0
 	mut code:=[]string{}
 	mut previous_code_block:=parser.Body{}
@@ -40,7 +42,14 @@ pub fn codegen(ast parser.Ast) []string{
 			code<<"\n}\n"
 		}
 		//codegen starts here
-		if item.line!=next_item.line && is_return==true{
+		if item.keyword=="pass"{
+			//do nothing
+		}
+		else if item.line!=next_item.line && is_return==true{
+			code<<"$keyword ;\n"
+			is_return=false
+		}
+		else if is_return==true && item==next_item{
 			code<<"$keyword ;\n"
 			is_return=false
 		}
@@ -48,13 +57,21 @@ pub fn codegen(ast parser.Ast) []string{
 			code<<";\n"
 			is_return=false
 		}
+		else if item.tab!=next_item.tab && is_return==true{
+			code<<"$keyword ;\n"
+			is_return=false
+		}
 		else if item.ast_type=="function_define"{
-			code<<func_return(item.keyword,ast)
+			c_function,free=func_return(item.keyword,ast)
+			code<<c_function
 			is_func_def=true
 		}
-		else if (is_function_call==true && (next_item.line!=item.line || next_item==item || next_item.keyword==r"\n") && item.keyword==")")||( is_operator==true && item.keyword==r"\n"){
+		else if (is_function_call==true && (next_item.line!=item.line || next_item==item || next_item.keyword==r"\n") && item.keyword==")")||( is_operator==true && item.keyword==r"\n")||( is_operator==true && item==next_item){
 			if keyword==")"{
 				code<<");\n"
+			}
+			else if is_operator==true && item==next_item{
+				code<<"$keyword;\n"
 			}
 			else if previous_code_block.keyword==")" && item.keyword==r"\n"{
 				//do nothing
@@ -62,6 +79,8 @@ pub fn codegen(ast parser.Ast) []string{
 			else{
 				code<<";\n"
 			}
+			is_operator=false
+
 		}
 		else if item.ast_type=="Ccode"{
 			code<<"$item.keyword \n"
@@ -162,7 +181,17 @@ pub fn codegen(ast parser.Ast) []string{
 		if is_func_def==true && item.tab!=0{
 			is_func_def=false
 		}
-		if is_operator==false && is_function_call==false && previous_code_block.line!=item.line && is_func_def==false  && item.keyword!="(" && (item.ast_type in ast_type)==false{
+		if (next_item.ast_type=="function_define" || item==next_item) && free.len!=0{
+			for free_var in free{
+				code<<"\nfree($free_var);\n$free_var=NULL;\n"
+			} 
+			code<<"\n}\n"
+			free=[]string{}
+		}
+		else if item==next_item || keyword=="pass"{
+			code<<"\n}\n"
+		}
+		else if is_operator==false && is_function_call==false && previous_code_block.line!=item.line && is_func_def==false  && item.keyword!="(" && (item.ast_type in ast_type)==false{
 			if previous_code_block.tab>item.tab && keyword!=r"\n" {
 				code<<"\n}\n"
 			}	
