@@ -21,7 +21,7 @@ pub fn codegen(ast parser.Ast) []string{
 	mut next_item:=parser.Body{}
 	ast_type<<required_arg
 	ast_type<<variable_ast
-	for index,item in ast.body{
+	for index,mut item in ast.body{
 		keyword=item.keyword
 		if index<ast.body.len-1 && index!=0{
 			next_item=ast.body[index+1]
@@ -40,17 +40,14 @@ pub fn codegen(ast parser.Ast) []string{
 		}
 		if previous_code_block.ast_type=="Ccode" && item.line!=previous_code_block.line && previous_code_block.tab>item.tab && item.keyword!=r"\n" &&  next_item.keyword!=r"\n" &&  is_operator==false && is_function_call==false {
 			code<<"\n}\n"
+		}
+		if item.ast_type=="formatted_string"{
+			keyword=fstring(item)
+			item.keyword=keyword
 		}	
 		//codegen starts here
 		if item.keyword=="pass"{
 			//do nothing
-		}
-		else if item.ast_type=="formatted_string"{
-			keyword=fstring(item)
-			code<<keyword
-			if next_item==item || next_item.line!=item.line{
-				code<<";"
-			}
 		}
 		else if item.line!=next_item.line && is_return==true{
 			code<<"$keyword ;\n"
@@ -95,13 +92,6 @@ pub fn codegen(ast parser.Ast) []string{
 		else if item.keyword=="return"{
 			code<<"$item.keyword "
 			is_return=true
-		}
-		else if item.ast_type == 'string' {
-			if item.keyword.contains("{") {
-				code << fstring(item)
-			} else {
-				code << "$item.keyword"
-			}
 		}
 		else if next_item.keyword=="//"{
 			code<<"myFloor($item.keyword"
@@ -211,7 +201,7 @@ pub fn codegen(ast parser.Ast) []string{
 			code<<"\n}\n"
 			}
 		if keyword!=r"\n"{
-			previous_code_block=item
+			previous_code_block=ast.body[index]
 		}
 	} 
 	return code
