@@ -496,7 +496,7 @@ pub fn parser(code []string) (Ast,string){
 			}
 			else{
 				json.function_return_type[json.function_return_type.len-1].variable<<item
-				if know_type(code[index+2])!="undefined"{
+				if know_type(code[index+2])!="undefined" || code[index+2]=="f" || code[index+2]=="r"{
 					var.variable=item
 					if know_type(code[index+2])=="float" || know_type(code[index+2])=="dictionary" || know_type(code[index+2])=="list" || know_type(code[index+2])=="bool"{
 						var.var_type=know_type(code[index+2])
@@ -507,9 +507,9 @@ pub fn parser(code []string) (Ast,string){
 					else if know_type(code[index+2])=="int" || code[index+2]=="("{
 						var.var_type="float"
 					}
-					else if know_type(code[index+2])=="string"{
+					else if know_type(code[index+2])=="string" || code[index+2]=="f" || code[index+2]=="r" {
 						var.var_type="str"
-					}
+					}		
 				}
 				else if code.len<=index+3{
 					if code[index+2] in json.function_return_type.last().variable{
@@ -595,8 +595,10 @@ pub fn parser(code []string) (Ast,string){
 		}
 		else if code_block.ast_type=="string" && previous_code_block.keyword=="f"{
 			code_block.ast_type=previous_code_block.ast_type
-			if json.function_return_type[json.function_return_type.len-1].return_type==[]string{}{
-							json.function_return_type[json.function_return_type.len-1].free<<item
+		}
+		if json.function_return_type.len!=0{
+			if json.function_return_type[json.function_return_type.len-1].return_type==[]string{} && previous_code_block.keyword=="=" && item=="f"{
+							json.function_return_type[json.function_return_type.len-1].free<<code[index-2]
 						}
 		}
 		//appends to json

@@ -40,10 +40,17 @@ pub fn codegen(ast parser.Ast) []string{
 		}
 		if previous_code_block.ast_type=="Ccode" && item.line!=previous_code_block.line && previous_code_block.tab>item.tab && item.keyword!=r"\n" &&  next_item.keyword!=r"\n" &&  is_operator==false && is_function_call==false {
 			code<<"\n}\n"
-		}
+		}	
 		//codegen starts here
 		if item.keyword=="pass"{
 			//do nothing
+		}
+		else if item.ast_type=="formatted_string"{
+			keyword=fstring(item)
+			code<<keyword
+			if next_item==item || next_item.line!=item.line{
+				code<<";"
+			}
 		}
 		else if item.line!=next_item.line && is_return==true{
 			code<<"$keyword ;\n"
