@@ -12,4 +12,4 @@ def input() ->str:
     return variable
 def panic(str string):
     colorprint(string,"RED")
-    Ccode exit(0); Ccode
+    exit(0)
