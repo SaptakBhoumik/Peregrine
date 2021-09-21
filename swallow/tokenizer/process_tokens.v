@@ -9,7 +9,7 @@ fn remove_extra_return(token []string) []string{
 			results<<item
 		}
 		else if item==r"\n" && results.last()==r"\n"{
-			//do nothing
+			//do nothing.
 		}
 		else{
 			consequtive_item="${results.last()}$item"
