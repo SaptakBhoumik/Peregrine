@@ -2,11 +2,60 @@ import os
 import tokenizer
 import parser
 import codegen
+
 // import preprocessor
+
+// Original Author(print_help && CLI): Ethan Olchik
+fn print_help() {
+    println("Swallow Compiler (C) The Swallow Organisation, MPL-2.0")
+    println("Usage: swallow [command] [options] [file]\n")
+    println("Swallow Commands:")
+    println("\tcompile         - compiles a given file")
+    println("\thelp            - shows this command")
+    println("\nSwallow Options:")
+    println("\t-emit-ast       - dumps ast in console and exits.")
+    println("\t-emit-c         - generates C code and exits (skips C compilation phase).")
+}
+
 // Original author: Saptak Bhoumik
+
 fn main() {
     arg:=os.args.clone()
-    filename := arg[2]
+    mut filename := ""
+    mut emitc := false
+    mut emitast := false
+    mut help := false
+    for idx, x in arg {
+        if x == "compile" {
+            filename = arg[idx+1]
+        }
+        else if x == "-emit-c" {
+            emitc = true
+        }
+        else if x == "-emit-ast" {
+            emitast = true
+        }
+        else if x == "-emit-token" {
+            return
+        }
+        else if x == "-o" {
+            continue
+        }
+        else if x == "help" {
+            help=true
+        }
+        else {
+            if x.contains(".sw") {
+                filename = x
+            }
+        }
+    }
+
+    if help {
+        print_help()
+        return
+    }
+
     content := os.read_file(filename) ?
     mut path:=os.executable()
     path=path.replace(r"\","/")
@@ -19,7 +68,18 @@ fn main() {
     builtin_sw:= os.read_file("${folder}builtin.sw")?
     builtin_h:= os.read_file("${folder}builtin.h")?
     mut total:="${builtin_sw}\n${content}"
-    ast,error:=parser.parser(tokenizer.process_tokens(tokenizer.tokenize(total)))
+    tokens := tokenizer.process_tokens(tokenizer.tokenize(total))
+
+    ast,error:=parser.parser(tokens)
+    if emitast && !emitc {
+        print(ast)
+        return
+    } else if emitast && !emitc {
+        println(tokens)
+        println(ast)
+        return
+    }
+
     // println(tokenizer.process_tokens(tokenizer.tokenize(total)))
     mut final_code:=""
     if error==""{
@@ -33,8 +93,19 @@ fn main() {
     mut x:=os.create("temp.c")?
     x.writeln(final_code)?
     x.close()
+    if emitc && !emitast {
+        return
+    }
+    else if emitast && emitc {
+        println(ast)
+        return
+    }
+
     os.system("gcc ./temp.c -o ${arg.last()}")
-    // os.system("rm ./temp.c")
+    
+    if !emitc {
+        os.system("rm ./temp.c")
+    }
     }
     else{
         print("\033[0;31m")
