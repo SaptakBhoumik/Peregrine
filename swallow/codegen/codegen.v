@@ -44,7 +44,18 @@ pub fn codegen(ast parser.Ast) []string{
 		if item.ast_type=="formatted_string"{
 			keyword=fstring(item)
 			item.keyword=keyword
-		}	
+		}
+		else if item.ast_type=="raw_string"	{
+			if item.keyword.split('')[0]=='"'{
+				keyword=item.keyword.split('"')[1]
+				keyword='R"($keyword)"'
+			}
+			else{
+				keyword=item.keyword.split("'")[1]
+				keyword='R"($keyword)"'
+			}
+			item.keyword=keyword
+		}
 		//codegen starts here
 		if item.keyword=="pass"{
 			//do nothing
