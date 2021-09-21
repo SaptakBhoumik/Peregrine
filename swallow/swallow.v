@@ -8,13 +8,16 @@ import codegen
 // Original Author(print_help && CLI): Ethan Olchik
 fn print_help() {
     println("Swallow Compiler (C) The Swallow Organisation, MPL-2.0")
-    println("Usage: swallow [command] [options] [file]\n")
+    println("Usage: swallow [command] [options] [file] -o [output file]\n")
     println("Swallow Commands:")
-    println("\tcompile         - compiles a given file")
-    println("\thelp            - shows this command")
+    println("\tcompile          - compiles a given file")
+    println("\thelp             - shows this command")
     println("\nSwallow Options:")
-    println("\t-emit-ast       - dumps ast in console and exits.")
-    println("\t-emit-c         - generates C code and exits (skips C compilation phase).")
+    println("\t-emit-ast        - dumps ast in console and exits.")
+    println("\t-emit-c          - generates C code and exits (skips C compilation phase).")
+    println("\t-o <output file> - select the file to output binary code to.")
+    println("\nExample:")
+    println("\tswallow compile example.sw -o example")
 }
 
 // Original author: Saptak Bhoumik
@@ -25,6 +28,7 @@ fn main() {
     mut emitc := false
     mut emitast := false
     mut help := false
+    mut o := false
     for idx, x in arg {
         if x == "compile" {
             filename = arg[idx+1]
@@ -39,6 +43,7 @@ fn main() {
             return
         }
         else if x == "-o" {
+            o = true
             continue
         }
         else if x == "help" {
@@ -49,6 +54,11 @@ fn main() {
                 filename = x
             }
         }
+    }
+
+    if !o {
+        print_help()
+        return
     }
 
     if help {
