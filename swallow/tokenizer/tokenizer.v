@@ -25,6 +25,9 @@ pub fn tokenize(str string) []string {
 			'#'//comment
 			]
 	logical_keywords :=[
+					"&",
+					"|",
+					"~",
 					'=',//equals
 					'+',//addition
 					'-',//subtraction

@@ -135,8 +135,9 @@ char *_format(const char *fmt, ...) {
  * Example:
  * _colorprint("Hello World!", SH_FG_BLACK , true);
  */
-void _colorprint(const char *str, char *color, bool reset) {
-    int64_t flags;
+void _colorprint(const char *str, char *color,char* bg, bool reset) {
+    int16_t bg_flags;
+    int16_t flags;
     if (strcmp(color, "BLACK")==0){
         flags=(30 << 8);
     }
@@ -161,8 +162,64 @@ void _colorprint(const char *str, char *color, bool reset) {
     else if (strcmp(color, "WHITE")==0){
         flags=(37 << 8);
     }
+    if (bg!=NULL){
+        if (strcmp(bg, "BLACK")==0){
+            bg_flags=40;
+        }
+        else if (strcmp(bg, "RED")==0){
+            bg_flags=41;
+        }
+        else if (strcmp(bg, "GREEN")==0){
+            bg_flags=42;
+        }
+        else if (strcmp(color, "YELLOW")==0){
+            bg_flags=43;
+        }
+        else if (strcmp(bg, "BLUE")==0){
+            bg_flags=44;
+        }
+        else if (strcmp(bg, "MAGENTA")==0){
+            bg_flags=45;
+        }
+        else if (strcmp(bg, "CYAN")==0){
+            bg_flags=46;
+        }
+        else if (strcmp(bg, "WHITE")==0){
+            bg_flags=47;
+        }
+        else if (strcmp(bg, "BRIGHT_BLACK")==0){
+            bg_flags=100;
+        }
+        else if (strcmp(bg, "BRIGHT_RED")==0){
+            bg_flags=101;
+        }
+        else if (strcmp(bg, "BRIGHT_GREEN")==0){
+            bg_flags=102;
+        }
+        else if (strcmp(color, "BRIGHT_YELLOW")==0){
+            bg_flags=103;
+        }
+        else if (strcmp(bg, "BRIGHT_BLUE")==0){
+            bg_flags=104;
+        }
+        else if (strcmp(bg, "BRIGHT_MAGENTA")==0){
+            bg_flags=105;
+        }
+        else if (strcmp(bg, "BRIGHT_CYAN")==0){
+            bg_flags=106;
+        }
+        else if (strcmp(bg, "BRIGHT_WHITE")==0){
+            bg_flags=107;
+        }
+    }
     int8_t foreground = (flags & 0xFF00) >> 8;
-    printf("\e[1;%dm%s", foreground, str);
+    int8_t background = bg_flags & 0x00FF;
+    if (background==0){
+        printf("\e[1;%dm%s", foreground, str);
+    }
+    else{
+        printf("\e[1;%dm\e[1;%dm%s", foreground, background, str);
+    }
     if(reset)
         printf("\e[1;0m");
 }

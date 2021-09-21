@@ -34,7 +34,7 @@ pub struct Ast {
 	folder string
 	path string
 	function_return_type []Function
-	function_define []string=["__asm__","printf"]
+	function_define []string=["__asm__","printf","exit"]
 	function_call []string=["main"]
 	method_define []string
 	method_call []string
@@ -46,8 +46,8 @@ pub fn parser(code []string) (Ast,string){
 	swallow_type:=["int","bool","str","list","dictionary","float","void"]
 	required_arg:=["str_variable_required_argument","int_variable_required_argument","bool_variable_required_argument","list_variable_required_argument","dictionary_variable_required_argument","float_variable_required_argument","void_variable_required_argument"]
 	decorator:=["@method","@free"]//more will be added soon
-	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=','++',"--"]
-	loop:=["if","while","elif","else","for"]
+	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=','++',"--","&","|","~","<<",">>","+=","-=","*=","/=","%=","<<=",">>=","&=","|="]
+	loop:=["if","while","elif","else","for","match","case"]
 	logic:=["and","or","not","in","is"]
 	error_handler:=["try","except","finally"]
 	variable:="_variable"
@@ -246,7 +246,6 @@ pub fn parser(code []string) (Ast,string){
 						length :item.len
 						tab : tab
 						}
-			is_loop=true
 		}
 		//checks if raw string or formatted string
 		else if item=="r"{

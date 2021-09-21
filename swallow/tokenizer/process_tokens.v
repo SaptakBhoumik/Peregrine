@@ -2,14 +2,14 @@ module tokenizer
 // Original author: Saptak Bhoumik
 fn remove_extra_return(token []string) []string{
 	mut results:=[]string{}
-	operater:=["++","--","->"]
+	operater:=["++","--","->","<<",">>","+=","-=","*=","/=","%=","<<=",">>=","&=","|="]
 	mut consequtive_item:=""
 	for item in token{
 		if results.len==0{
 			results<<item
 		}
 		else if item==r"\n" && results.last()==r"\n"{
-			//do nothing
+			//do nothing.
 		}
 		else{
 			consequtive_item="${results.last()}$item"
