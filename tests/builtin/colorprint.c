@@ -2,7 +2,7 @@
 #include "../../swallow/builtin.h"
 
 int main() {
-    _colorprint("This ", SH_FG_GREEN, True);
-    _colorprint("is ", SH_FG_BLUE, True);
+    _colorprint("This ", "GREEN", True);
+    _colorprint("is ", "BLUE", True);
     return 0;
 }
