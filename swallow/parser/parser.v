@@ -46,8 +46,8 @@ pub fn parser(code []string) (Ast,string){
 	swallow_type:=["int","bool","str","list","dictionary","float","void"]
 	required_arg:=["str_variable_required_argument","int_variable_required_argument","bool_variable_required_argument","list_variable_required_argument","dictionary_variable_required_argument","float_variable_required_argument","void_variable_required_argument"]
 	decorator:=["@method","@free"]//more will be added soon
-	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=','++',"--"]
-	loop:=["if","while","elif","else","for"]
+	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=','++',"--","&","|","~","<<",">>","+=","-=","*=","/=","%=","<<=",">>=","&=","|="]
+	loop:=["if","while","elif","else","for","match","case"]
 	logic:=["and","or","not","in","is"]
 	error_handler:=["try","except","finally"]
 	variable:="_variable"
