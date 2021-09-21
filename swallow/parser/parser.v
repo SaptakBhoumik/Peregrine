@@ -246,7 +246,6 @@ pub fn parser(code []string) (Ast,string){
 						length :item.len
 						tab : tab
 						}
-			is_loop=true
 		}
 		//checks if raw string or formatted string
 		else if item=="r"{
