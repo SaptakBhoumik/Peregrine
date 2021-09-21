@@ -35,7 +35,7 @@ For now it is written in v(visit vlang.io for more info) but in the future it wi
 
 # Progress
 
-Currently we are working on the parser(we will finish it within the next week).
+Currently we are working on the codegen and some swallow programs are working :) 
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
