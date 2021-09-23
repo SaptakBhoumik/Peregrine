@@ -114,7 +114,7 @@ fn main() {
     os.system("gcc ./temp.c -o ${arg.last()}")
     
     if !emitc {
-        os.system("rm ./temp.c")
+        // os.system("rm ./temp.c")
     }
     }
     else{

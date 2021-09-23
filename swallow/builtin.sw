@@ -5,6 +5,7 @@ def print(str query):
     Ccode printf("%s",query);  Ccode
 def colorprint(str string, str flags,str bg):
     Ccode _colorprint(string,flags,bg,True); Ccode
+
 @free
 def input() ->str:
     str variable="some string"

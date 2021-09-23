@@ -14,16 +14,16 @@ fn func_return(name string, ast parser.Ast) (string,[]string){
 		}
 	}
 	if type_of_return==[]string{} || type_of_return==["void"]{
-		return_item="void * $name"
+		return_item="void * $name ("
 	}
 	else if type_of_return==["str"]{
-		return_item="char * $name"
+		return_item="char * $name ("
 	}
 	else if type_of_return==["int"]{
-		return_item="int64_t $name"
+		return_item="int64_t $name ("
 	}
 	else if type_of_return==["float"]{
-		return_item="double $name"
+		return_item="double $name ("
 	}
 	return return_item,free
 }
