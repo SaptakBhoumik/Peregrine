@@ -12,12 +12,12 @@ pub struct Body {
 	id int
 	line int
 }
-struct Var{
+pub struct Var{
 	 pub mut:
 	 variable string
 	 var_type string
  }
-struct Function{
+pub struct Function{
 	pub mut:
 	name string
 	variable []string
@@ -626,7 +626,7 @@ pub fn parser(code []string) (Ast,string){
 					else{
 						previous_code_block=json.body.last()
 					}
-					if json.body.last().keyword=="const" || json.body.last().keyword in swallow_type  || json.body.last().keyword=="def"{
+					if json.body.last().keyword=="const" || json.body.last().keyword in swallow_type  || json.body.last().keyword=="def" {
 						json.body.pop()
 					}
 				}	
@@ -634,6 +634,9 @@ pub fn parser(code []string) (Ast,string){
 		}
 		var=Var{}
 		code_block=Body{}
+	}
+	if json.body.last().keyword==r"\n"{
+		json.body.pop()
 	}
 	return json,error
 }

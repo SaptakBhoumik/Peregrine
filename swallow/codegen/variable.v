@@ -1,7 +1,7 @@
 // Original author: Saptak Bhoumik
 
 module codegen
-
+import parser
 fn variable(ast_type string,keyword string)(string){
 	mut final:=""
 	if ast_type=="int_variable"{
@@ -17,4 +17,14 @@ fn variable(ast_type string,keyword string)(string){
 		final="double $keyword"
 	}
 	return final
+}
+fn var_type(var []parser.Var,keyword string)(string){
+	mut result:=""
+	for item in var{
+		if keyword==item.variable{
+			result=item.var_type
+			break
+		}
+	}
+	return result
 }

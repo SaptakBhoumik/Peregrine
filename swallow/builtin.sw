@@ -9,8 +9,8 @@ def colorprint(str string, str flags,str bg):
 @free
 def input() ->str:
     str variable="some string"
-    Ccode variable = inputString(stdin, 10); Ccode
+    Ccode variable = inputString(); Ccode
     return variable
 def panic(str string):
     colorprint(string,"RED",NULL)
-    exit(0)
+    exit(1)

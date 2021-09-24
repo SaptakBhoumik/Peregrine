@@ -12,23 +12,33 @@
 #define True 1
 #define False 0
 
-char *inputString(FILE* fp, size_t size){
-//The size is extended by the input with the value of the provisional
-    char *str;
-    int ch;
-    size_t len = 0;
-    str = realloc(NULL, sizeof(*str)*size);//size is start size
-    if(!str)return str;
-    while(EOF!=(ch=fgetc(fp)) && ch != '\n'){
-        str[len++]=ch;
-        if(len==size){
-            str = realloc(str, sizeof(*str)*(size+=16));
-            if(!str)return str;
-        }
-    }
-    str[len++]='\0';
+char *inputString(){
+        int bufsize = 100;
+        int position = 0;
+        char *buffer = (char*)malloc(sizeof(char) * bufsize);
+        int c;
 
-    return realloc(str, sizeof(*str)*len);
+        while (True) {
+
+                c = getchar();
+
+                if (c == EOF || c == '\n') {
+                        buffer[position] = '\0';
+                        return buffer;
+                } else {
+                        buffer[position] = c;
+
+                }
+
+                position++;
+
+                if (position >= bufsize) {
+                bufsize += 100;
+                buffer = (char*)realloc(buffer, bufsize);
+                }
+        }
+
+        return buffer; 
 }
 int64_t myFloor(double x) 
 {

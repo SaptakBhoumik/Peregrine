@@ -8,8 +8,11 @@ pub fn codegen(ast parser.Ast) []string{
 	required_arg:=["str_variable_required_argument","int_variable_required_argument","bool_variable_required_argument","list_variable_required_argument","dictionary_variable_required_argument","float_variable_required_argument","void_variable_required_argument"]
 	variable_ast:=["str_variable","int_variable","bool_variable","list_variable","dictionary_variable","float_variable","void_variable"]
 	loop:=["if","while","elif","else","for","match","case","default"]
+	if_else_loop:=["if","while","elif","else","for"]
 	mut ast_type:=["function_call","function_define","binary_operator","assign"]
 	mut is_function_call:=false
+	mut is_string_compare:=false
+	mut function:=parser.Function{}
 	mut tab_dif:=0
 	mut is_case:=false
 	mut is_match:=false
@@ -28,14 +31,16 @@ pub fn codegen(ast parser.Ast) []string{
 	ast_type<<variable_ast
 	for index,mut item in ast.body{
 		keyword=item.keyword
-		if item.ast_type in required_arg || item.keyword==r"\n" {
-			//do nothing
+		// if item.ast_type in required_arg {
+		// 	//do nothing
+		// }
+		if item.ast_type=="new_line" {
+			item.keyword=""
 		}
 		if index<ast.body.len-1 && index!=0{
 			next_item=ast.body[index+1]
 		}
 		if item.keyword=="case" && is_case==false{
-			is_loop=false
 			is_case=true
 			if is_match==true{
 				code<<"){\n"
@@ -43,7 +48,6 @@ pub fn codegen(ast parser.Ast) []string{
 			}
 		}
 		else if item.keyword=="match"  && is_match==false{
-			is_loop=false
 			is_match=true
 			if is_case==true{
 				code<<"):{\n"
@@ -65,8 +69,12 @@ pub fn codegen(ast parser.Ast) []string{
 		else if previous_code_block.ast_type=="function_define" && item.direction!="right"{
 			code<<"){\n"
 		}
-		else if is_loop==true && item.direction=="left"{
+		else if is_loop==true && (item.direction=="left" || item.keyword=="pass"){
 			if previous_code_block.keyword!="else" {
+				if is_string_compare==true{
+					code<<")==0"
+					is_string_compare=false
+				}
 				code<<"){\n"
 			}
 			else{
@@ -96,9 +104,32 @@ pub fn codegen(ast parser.Ast) []string{
 			}
 			item.keyword=keyword
 		}
+		if previous_code_block.keyword in if_else_loop || previous_code_block.keyword=="or" || 	previous_code_block.keyword=="and"{
+			if item.ast_type=="string"{
+				code<<" strcmp(" 
+				is_string_compare=true
+			}
+			else if item.ast_type=="variable" && item.keyword in function.variable && var_type(function.variable_type,keyword)=="str"{
+				code<<" strcmp(" 
+				is_string_compare=true
+			}
+			else if item.ast_type=="function_call" && func_return_if_else(keyword,ast)==["str"]{
+				code<<" strcmp(" 
+				is_string_compare=true
+			}
+		}
+		if item.keyword=="or" || item.keyword=="and"{
+			if is_string_compare==true{
+				code<<")==0 "
+				is_string_compare=false
+			}
+		}
 		//codegen starts here
 		if item.keyword=="pass"{
 			//do nothing
+		}
+		else if item.keyword=="==" && is_string_compare==true{
+			code<<","
 		}
 		else if item.ast_type=="compare"{
 			code<<"$item.keyword"
@@ -135,7 +166,7 @@ pub fn codegen(ast parser.Ast) []string{
 			code<<"$keyword ;\n"
 			is_return=false
 		}
-		else if is_return==true && item.keyword==r"\n"{
+		else if is_return==true && item.ast_type=="new_line"{
 			code<<";\n"
 			is_return=false
 		}
@@ -144,18 +175,18 @@ pub fn codegen(ast parser.Ast) []string{
 			is_return=false
 		}
 		else if item.ast_type=="function_define"{
-			c_function,free=func_return(item.keyword,ast)
+			c_function,free,function=func_return(item.keyword,ast)
 			code<<c_function
 			is_func_def=true
 		}
-		else if (is_function_call==true && (next_item.line!=item.line || next_item==item || next_item.keyword==r"\n") && item.keyword==")")||( is_operator==true && item.keyword==r"\n")||( is_operator==true && item==next_item){
+		else if ((is_function_call==true && (next_item.line!=item.line || next_item==item || next_item.ast_type=="new_line") && item.keyword==")")||( is_operator==true && item.ast_type=="new_line")||( is_operator==true && item==next_item)) && is_loop==false{
 			if keyword==")"{
 				code<<");\n"
 			}
 			else if is_operator==true && item==next_item{
 				code<<"$keyword;\n"
 			}
-			else if previous_code_block.keyword==")" && item.keyword==r"\n"{
+			else if previous_code_block.keyword==")" && item.ast_type=="new_line"{
 				//do nothing
 			}
 			else{
@@ -197,7 +228,7 @@ pub fn codegen(ast parser.Ast) []string{
 			code<<variable(item.ast_type,keyword)
 			is_operator==true
 		}
-		else if is_operator==true && item.keyword!=r"\n"{
+		else if is_operator==true && item.ast_type!="new_line"{
 			code[code.len-1]+=keyword
 		}
 		else if (next_item.ast_type=="binary_operator" || next_item.ast_type=="assign") && is_operator==false{
@@ -233,7 +264,7 @@ pub fn codegen(ast parser.Ast) []string{
 		else if is_function_call==true{
 			code[code.len-1]+=keyword
 		}
-		else if is_return==true && item.keyword!=r"\n"{
+		else if is_return==true && item.ast_type!="new_line"{
 			code[code.len-1]+="$keyword "
 		}
 		else if is_loop==true && item.direction=="right"{
@@ -257,24 +288,39 @@ pub fn codegen(ast parser.Ast) []string{
 		if is_func_def==true && item.tab!=0{
 			is_func_def=false
 		}
-		
+		// if (next_item.ast_type=="function_define" || item==next_item) && free.len!=0{
+		// 	for free_var in free{
+		// 		code<<"\nfree($free_var);\n$free_var=NULL;\n"
+		// 	} 
+		// 	free=[]string{}
+		// }
 		
 		if next_item.tab<item.tab || item==next_item{
-			if next_item.direction=="left" && item!=next_item{
-				tab_dif=int(item.tab-next_item.tab)
-				for _ in 0..tab_dif{
-					code<<"\n}\n"
-				}
-			}
-			else if next_item==item{
+				println(item)
+println(next_item)
+			if next_item==item{
 				tab_dif=int(item.tab)
 				for _ in 0..tab_dif{
 					code<<"\n}\n"
 				}
 			}
+
+			else if item.ast_type=="new_line" && ast.body.len>index+2 && item!=next_item{
+				tab_dif=int(next_item.tab-ast.body[index+2].tab)
+				for _ in 0..tab_dif{
+					code<<"\n}\n"
+				}
+			}
+			else if next_item.direction=="left" && item!=next_item{
+				tab_dif=int(item.tab-next_item.tab)
+				for _ in 0..tab_dif{
+					code<<"\n}\n"
+				}
+			}
+			
 		}
 		
-		if keyword!=r"\n"{
+		if item.ast_type!="new_line"{
 			previous_code_block=ast.body[index]
 		}
 	} 
