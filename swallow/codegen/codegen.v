@@ -40,6 +40,12 @@ pub fn codegen(ast parser.Ast) []string{
 		if index<ast.body.len-1 && index!=0{
 			next_item=ast.body[index+1]
 		}
+		if previous_code_block.ast_type=="function_define" && item.direction!="right"{
+			code<<"){\n"
+		}
+		else if previous_code_block.ast_type in required_arg && item.direction!="right"{
+			code<<"){\n"
+		}
 		if item.keyword=="case" && is_case==false{
 			is_case=true
 			if is_match==true{
@@ -66,9 +72,7 @@ pub fn codegen(ast parser.Ast) []string{
 			is_loop=false
 			code<<":{\n"
 			}
-		else if previous_code_block.ast_type=="function_define" && item.direction!="right"{
-			code<<"){\n"
-		}
+		
 		else if is_loop==true && (item.direction=="left" || item.keyword=="pass"){
 			if previous_code_block.keyword!="else" {
 				if is_string_compare==true{
@@ -85,9 +89,7 @@ pub fn codegen(ast parser.Ast) []string{
 		else if previous_code_block.ast_type in required_arg && item.direction=="right" && item.ast_type in required_arg{
 			code<<","
 		}
-		else if previous_code_block.ast_type in required_arg && item.direction!="right"{
-			code<<"){\n"
-		}
+		
 
 		if item.ast_type=="formatted_string"{
 			keyword=fstring(item)
@@ -296,8 +298,6 @@ pub fn codegen(ast parser.Ast) []string{
 		// }
 		
 		if next_item.tab<item.tab || item==next_item{
-				println(item)
-println(next_item)
 			if next_item==item{
 				tab_dif=int(item.tab)
 				for _ in 0..tab_dif{
@@ -305,8 +305,14 @@ println(next_item)
 				}
 			}
 
-			else if item.ast_type=="new_line" && ast.body.len>index+2 && item!=next_item{
-				tab_dif=int(next_item.tab-ast.body[index+2].tab)
+			else if next_item.ast_type=="new_line" && ast.body.len>index+2 && item!=next_item && is_loop==false{
+				tab_dif=int(item.tab-ast.body[index+2].tab)
+				if is_function_call==true || is_operator==true || is_return==true {
+					is_operator=false
+					is_return=false
+					is_return=false
+					code<<";\n"
+				}
 				for _ in 0..tab_dif{
 					code<<"\n}\n"
 				}

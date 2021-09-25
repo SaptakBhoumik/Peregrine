@@ -2,7 +2,7 @@
 #Author: Saptak Bhoumik
 #Builtin.h is imported by default
 def print(str query):
-    Ccode printf("%s",query);  Ccode
+    printf("%s",query)
 def colorprint(str string, str flags,str bg):
     Ccode _colorprint(string,flags,bg,True); Ccode
 
