@@ -7,7 +7,6 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
-// #include <stdbool.h>
 #define bool int
 #define True 1
 #define False 0

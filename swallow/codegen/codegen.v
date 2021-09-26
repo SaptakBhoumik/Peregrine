@@ -309,7 +309,7 @@ pub fn codegen(ast parser.Ast) []string{
 				tab_dif=int(item.tab-ast.body[index+2].tab)
 				if is_function_call==true || is_operator==true || is_return==true {
 					is_operator=false
-					is_return=false
+					is_function_call=false
 					is_return=false
 					code<<";\n"
 				}
