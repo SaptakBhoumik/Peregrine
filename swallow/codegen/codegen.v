@@ -161,7 +161,12 @@ pub fn codegen(ast parser.Ast) []string{
 			is_loop=true
 		}
 		else if item.line!=next_item.line && is_return==true{
-			code<<"$keyword ;\n"
+			if next_item.ast_type!="new_line"{
+				code<<"$keyword ;\n"
+			}
+			else{
+				code<<"$keyword "
+			}
 			is_return=false
 		}
 		else if is_return==true && item==next_item{
