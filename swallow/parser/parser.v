@@ -34,7 +34,7 @@ pub struct Ast {
 	folder string
 	path string
 	function_return_type []Function
-	function_define []string=["__asm__","printf","exit"]
+	function_define []string=["printf","exit"]
 	function_call []string=["main"]
 	method_define []string
 	method_call []string
@@ -57,6 +57,7 @@ pub fn parser(code []string) (Ast,string){
 	mut error := ""
 	mut line:=0
 	mut return_type:=false
+	mut is_asm:=false
 	mut first_bracket_count:=0
 	mut is_function_call:=false
 	mut is_return:=false
@@ -106,6 +107,22 @@ pub fn parser(code []string) (Ast,string){
 		if previous_code_block.keyword in swallow_type && item==":"{
 					//do nothing
 		}
+		else if item=="asm" && is_asm==false{
+			code_block=Body{ast_type:"Ccode"
+							keyword : "__asm__"
+							length :item.len
+							tab : tab}
+			is_asm=true
+		}
+		else if is_asm==true{
+			if item!=r"\n"{
+				json.body[json.body.len-1].keyword="${json.body[json.body.len-1].keyword} $item"
+			}
+			else{
+				json.body[json.body.len-1].keyword="${json.body[json.body.len-1].keyword} ;"
+				is_asm=false
+			}
+		}
 		else if item==")" && is_function_call==true{
 			code_block=Body{ast_type:"bracket"
 							keyword : item
@@ -119,16 +136,16 @@ pub fn parser(code []string) (Ast,string){
 		else if return_type==true && item == ":"{
 			return_type=false
 		}
-		else if return_type==true && is_function_call==false && item!="(" && (previous_code_block.ast_type=="function_define" || previous_code_block.ast_type in required_arg) && is_argument==false && is_operator==false && is_loop==false && is_ccode==false{
+		else if return_type==true && is_function_call==false && is_return==false && item!="(" && (previous_code_block.ast_type=="function_define" || previous_code_block.ast_type in required_arg) && is_argument==false && is_operator==false && is_loop==false && is_ccode==false{
 			if item in swallow_type{
 				json.function_return_type[json.function_return_type.len-1].return_type<<item
 			}
 		}
-		else if is_argument==true && item==")" && is_function_call==false && is_operator==false && is_loop==false && is_ccode==false{
+		else if is_argument==true && item==")" && is_function_call==false && is_return==false && is_operator==false && is_loop==false && is_ccode==false{
 			is_argument=false
 			previus_item=item
 		}
-		else if is_argument==true && item!="("  && item!=r"\n" && item!=")" && item!="," && item!=" " && (item in reserved_keywords)==false && next_item!="(" && is_function_call==false  && (next_item in reserved_keywords)==false  && is_operator==false && is_loop==false && is_ccode==false{
+		else if is_argument==true && item!="("  && item!=r"\n" && is_return==false  && item!=")" && item!="," && item!=" " && (item in reserved_keywords)==false && next_item!="(" && is_function_call==false  && (next_item in reserved_keywords)==false  && is_operator==false && is_loop==false && is_ccode==false{
 				previus_item=item
 				code_block=Body{ast_type:"required_argument"
 							keyword : item

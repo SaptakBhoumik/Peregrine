@@ -5,11 +5,9 @@ module codegen
 import parser
 
 pub fn codegen(ast parser.Ast) []string{
-	required_arg:=["str_variable_required_argument","int_variable_required_argument","bool_variable_required_argument","list_variable_required_argument","dictionary_variable_required_argument","float_variable_required_argument","void_variable_required_argument"]
 	variable_ast:=["str_variable","int_variable","bool_variable","list_variable","dictionary_variable","float_variable","void_variable"]
 	loop:=["if","while","elif","else","for","match","case","default"]
 	if_else_loop:=["if","while","elif","else","for"]
-	mut ast_type:=["function_call","function_define","binary_operator","assign"]
 	mut is_function_call:=false
 	mut is_string_compare:=false
 	mut function:=parser.Function{}
@@ -27,13 +25,8 @@ pub fn codegen(ast parser.Ast) []string{
 	mut code:=[]string{}
 	mut previous_code_block:=parser.Body{}
 	mut next_item:=parser.Body{}
-	ast_type<<required_arg
-	ast_type<<variable_ast
 	for index,mut item in ast.body{
 		keyword=item.keyword
-		// if item.ast_type in required_arg {
-		// 	//do nothing
-		// }
 		if item.ast_type=="new_line" {
 			item.keyword=""
 		}
@@ -43,7 +36,7 @@ pub fn codegen(ast parser.Ast) []string{
 		if previous_code_block.ast_type=="function_define" && item.direction!="right"{
 			code<<"){\n"
 		}
-		else if previous_code_block.ast_type in required_arg && item.direction!="right"{
+		else if "required" in previous_code_block.ast_type.split("_") && item.direction!="right"{
 			code<<"){\n"
 		}
 		if item.keyword=="case" && is_case==false{
@@ -86,7 +79,7 @@ pub fn codegen(ast parser.Ast) []string{
 			}
 			is_loop=false
 		}
-		else if previous_code_block.ast_type in required_arg && item.direction=="right" && item.ast_type in required_arg{
+		else if "required" in previous_code_block.ast_type.split("_") && item.direction=="right" && "required" in item.ast_type.split("_"){
 			code<<","
 		}
 		
@@ -247,7 +240,7 @@ pub fn codegen(ast parser.Ast) []string{
 			code[code.len-1]+=keyword
 		}
 		
-		else if item.ast_type in required_arg{
+		else if "required" in item.ast_type.split("_"){
 			if item.ast_type=="str_variable_required_argument"{
 				code<<"char * ${item.keyword}"
 			}

@@ -235,7 +235,6 @@ void _colorprint(const char *str, char *color,char* bg, bool reset) {
     else{
         printf("\e[1;%dm\e[1;%dm%s", foreground, background, str);
     }
-    if(reset)
         printf("\e[1;0m");
 }
 double mypow(double base, double power)

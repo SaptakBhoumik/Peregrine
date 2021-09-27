@@ -3,5 +3,6 @@
 /push.bat
 /push.sh
 .idea
+**/output
 **/a.out
 **/temp.c

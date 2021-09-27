@@ -1,11 +1,6 @@
 def main():
-int n1=0
-int n2 = 1
-int nth=0
-int count = 0
-int nterms=45
-    while count < nterms:
-        nth = n1 + n2
-        n1 = n2
-        n2 = nth
-        count ++
+    int arg1=45
+    int arg2=50
+    int add=0
+    __asm__ ( "addl %%ebx, %%eax;" : "=a" (add) : "a" (arg1) , "b" (arg2) )
+    printf("%lld",add)
