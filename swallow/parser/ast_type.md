@@ -5,16 +5,16 @@
 - [ ] try - Used to run a piece of code and check if it is working or else will perform the task in the except block.
 - [ ] except- Performs the code if try block fails.
 - [ ] Finally- executes the code after try and except
-- [ ] if, else, elif- Various conditional statement
-- [ ] and,or,not,in,is - As the name suggests.
-- [ ] raw_string- like this `r"hi\n"` will print `hi\n`
-- [ ] formated_string- `f"{a} and {b}"` will print `a_value and b_value`
+- [x] if, else, elif- Various conditional statement
+- [x] and,or,not,in,is - As the name suggests.
+- [x] raw_string- like this `r"hi\n"` will print `hi\n`
+- [x] formated_string- `f"{a} and {b}"` will print `a_value and b_value`
 - [X] Ccode- If you call c functions
 - [X] asign- Refers to the equals sign(=)
 - [X] binary_operator - Refers to the following `['+','-','*','/','^','//','%']`
-- [ ] compare - Refers to the following `['==', '!=', '<=', '>=', '>','<']`
+- [x] compare - Refers to the following `['==', '!=', '<=', '>=', '>','<']`
 - [ ] bool,string,void,pointer,dictionary,list- Various types of valus a variable can hold
-- [ ] pass-Do nothing
+- [x] pass-Do nothing
 - [x] return- Returns value
 - [ ] break- Stop the execution of a loop
 - [ ] continue- Continus the execution of a loop
