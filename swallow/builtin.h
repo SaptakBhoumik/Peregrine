@@ -7,9 +7,15 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
+#ifndef bool
 #define bool int
+#endif
+#ifndef True
 #define True 1
+#endif
+#ifndef False
 #define False 0
+#endif
 
 char *inputString(){
         int bufsize = 100;
