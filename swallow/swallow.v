@@ -29,34 +29,67 @@ fn main() {
     mut emitast := false
     mut help := false
     mut o := false
+    mut previous := ""
+    mut outfile := ""
+    mut idx_ := 0
     for idx, x in arg {
+        idx_ = idx
+        if idx == 0 {
+            previous = x
+            continue
+        }
         if x == "compile" {
+            previous = x
+            if arg.last() == arg[idx] {
+                help=true
+                break
+            }
             filename = arg[idx+1]
+            continue
         }
         else if x == "-emit-c" {
+            previous = x
             emitc = true
+            continue
         }
         else if x == "-emit-ast" {
+            previous = x
             emitast = true
+            continue
         }
         else if x == "-emit-token" {
+            previous = x
             return
         }
         else if x == "-o" {
+            previous = x
             o = true
             continue
         }
         else if x == "help" {
+            previous = x
             help=true
+            continue
+        }
+        else if x.contains(".sw") {
+            previous = x
+            filename = x
+            continue
         }
         else {
-            if x.contains(".sw") {
-                filename = x
+            if previous == "-o" {
+                outfile = x
+                continue
             }
+            help = true
         }
     }
 
-    if help {
+    if !o {
+        outfile = filename.trim(".sw")
+    }
+
+    if help || idx_ <= 0 {
         print_help()
         return
     }
@@ -106,11 +139,7 @@ fn main() {
         return
     }
 
-    if o {
-        os.system("gcc ./temp.c -o ${arg.last()}")
-    } else {
-        os.system("gcc ./temp.c -o ${filename.trim('.sw')}")
-    }
+    os.system("gcc ./temp.c -o ${outfile}")
     
     if !emitc {
         // os.system("rm ./temp.c")
