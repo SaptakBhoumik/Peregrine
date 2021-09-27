@@ -28,7 +28,6 @@ fn main() {
     mut emitc := false
     mut emitast := false
     mut help := false
-    mut o := false
     for idx, x in arg {
         if x == "compile" {
             filename = arg[idx+1]
@@ -43,7 +42,6 @@ fn main() {
             return
         }
         else if x == "-o" {
-            o = true
             continue
         }
         else if x == "help" {
@@ -54,11 +52,6 @@ fn main() {
                 filename = x
             }
         }
-    }
-
-    if !o {
-        print_help()
-        return
     }
 
     if help {
@@ -111,7 +104,7 @@ fn main() {
         return
     }
 
-    os.system("gcc ./temp.c -o ${arg.last()}")
+    os.system("gcc ./temp.c -o ${filename.trim('.sw')}")
     
     if !emitc {
         // os.system("rm ./temp.c")
