@@ -1,10 +1,10 @@
 #Builtin swallow function
 #Author: Saptak Bhoumik
 #Builtin.h is imported by default
-def print(str query):
+def print(const str query):
     printf("%s",query)
-def colorprint(str string, str flags,str bg):
-    Ccode _colorprint(string,flags,bg,True); Ccode
+def colorprint(const str string,str flags,str bg):
+    Ccode _colorprint(string,flags,bg); Ccode
 
 @free
 def input() ->str:

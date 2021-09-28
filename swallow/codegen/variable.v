@@ -4,17 +4,33 @@ module codegen
 import parser
 fn variable(ast_type string,keyword string)(string){
 	mut final:=""
-	if ast_type=="int_variable"{
+	split_type:=ast_type.split("_")
+	if "int" in split_type{
 		final="int64_t $keyword"
 	}
-	else if ast_type=="str_variable"{
+	else if "int32" in split_type{
+		final="int32_t $keyword"
+	}
+	else if "int16" in split_type{
+		final="int16_t $keyword"
+	}
+	else if "int8" in split_type{
+		final="int8_t $keyword"
+	}
+	else if "str" in split_type{
 		final="char* $keyword"
 	}
-	else if ast_type=="bool_variable"{
+	else if "bool" in split_type{
 		final="bool $keyword"
 	}
-	else if ast_type=="float_variable"{
+	else if "float" in split_type{
 		final="double $keyword"
+	}
+	else if "void" in split_type{
+		final="void $keyword"
+	}
+	if "constant" in split_type{
+		final="const $final"
 	}
 	return final
 }

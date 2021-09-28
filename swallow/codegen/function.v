@@ -16,7 +16,7 @@ fn func_return(name string, ast parser.Ast) (string,[]string,parser.Function){
 		}
 	}
 	if type_of_return==[]string{} || type_of_return==["void"]{
-		return_item="void * $name ("
+		return_item="void $name ("
 	}
 	else if type_of_return==["str"]{
 		return_item="char * $name ("
@@ -39,4 +39,37 @@ fn func_return_if_else(name string, ast parser.Ast) ([]string){
 		}
 	}
 	return type_of_return
+}
+fn required_arg(item parser.Body) string{
+	mut final:=""
+	keyword:=item.keyword
+	split_type:=item.ast_type.split("_")
+	if "int" in split_type{
+		final="int64_t $keyword"
+	}
+	else if "int32" in split_type{
+		final="int32_t $keyword"
+	}
+	else if "int16" in split_type{
+		final="int16_t $keyword"
+	}
+	else if "int8" in split_type{
+		final="int8_t $keyword"
+	}
+	else if "str" in split_type{
+		final="char* $keyword"
+	}
+	else if "bool" in split_type{
+		final="bool $keyword"
+	}
+	else if "float" in split_type{
+		final="double $keyword"
+	}
+	else if "void" in split_type{
+		final="void $keyword"
+	}
+	if "constant" in split_type{
+		final="const $final"
+	}
+	return final
 }

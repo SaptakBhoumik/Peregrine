@@ -43,7 +43,7 @@ pub struct Ast {
 }
 
 pub fn parser(code []string) (Ast,string){
-	swallow_type:=["int","bool","str","list","dictionary","float","void"]
+	swallow_type:=["int","bool","str","list","dictionary","float","void","int32","int16","int8"]
 	required_arg:=["str_variable_required_argument","int_variable_required_argument","bool_variable_required_argument","list_variable_required_argument","dictionary_variable_required_argument","float_variable_required_argument","void_variable_required_argument"]
 	decorator:=["@method","@free"]//more will be added soon
 	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=','++',"--","&","|","~","<<",">>","+=","-=","*=","/=","%=","<<=",">>=","&=","|="]
@@ -313,7 +313,6 @@ pub fn parser(code []string) (Ast,string){
 				}
 			}
 		}
-
 		//some basic keyword
 		else if item=="pass"{
 			code_block=Body{ast_type:"pass"
@@ -407,14 +406,19 @@ pub fn parser(code []string) (Ast,string){
 							length :item.len
 							tab : tab}
 		}
+		else if next_item!="=" && is_argument==false && previous_code_block.keyword in swallow_type{
+			code_block=Body{ast_type:"variable"
+							keyword : item
+							length :item.len
+							tab : tab}
+		}
 		else if is_func_def==true  && item!=" " && is_function_call==false{
 			
 			if item!=","{
 				code_block,previus_item,right=function(item,is_func_def,previus_item,json,right,tab)
 				is_argument=right
 			}
-		}
-
+		}	
 		//checks if new line
 		else if item==r"\n"{
 			code_block=Body{ast_type:"new_line"
@@ -537,6 +541,7 @@ pub fn parser(code []string) (Ast,string){
 							}
 						}
 					}
+					
 					else{
 						error="${code[index+2]}\n^Undefined variable"
 						break
@@ -588,6 +593,9 @@ pub fn parser(code []string) (Ast,string){
 				else{
 					error="Unable to determine type of $item"	
 				}
+				if var.var_type=="int" || var.var_type=="int32" || var.var_type=="int16" || var.var_type=="int8"{
+						var.var_type="float"
+					}
 				json.function_return_type[json.function_return_type.len-1].variable_type<<var
 			}
 			

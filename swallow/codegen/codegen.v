@@ -5,7 +5,6 @@ module codegen
 import parser
 
 pub fn codegen(ast parser.Ast) []string{
-	variable_ast:=["str_variable","int_variable","bool_variable","list_variable","dictionary_variable","float_variable","void_variable"]
 	loop:=["if","while","elif","else","for","match","case","default"]
 	if_else_loop:=["if","while","elif","else","for"]
 	mut is_function_call:=false
@@ -224,9 +223,14 @@ pub fn codegen(ast parser.Ast) []string{
 		else if previous_code_block.keyword=="^"{
 			code<<"$item.keyword)"
 		}
-		else if item.ast_type in variable_ast{
+		else if ("variable" in item.ast_type.split("_") || "constant" in item.ast_type.split("_")) && item.ast_type.split("_").len==2{
 			code<<variable(item.ast_type,keyword)
-			is_operator==true
+			if next_item.ast_type=="new_line" || item.line<next_item.line{
+				code<<";\n"
+			}
+			else{
+				is_operator==true
+			}
 		}
 		else if is_operator==true && item.ast_type!="new_line"{
 			code[code.len-1]+=keyword
@@ -241,18 +245,7 @@ pub fn codegen(ast parser.Ast) []string{
 		}
 		
 		else if "required" in item.ast_type.split("_"){
-			if item.ast_type=="str_variable_required_argument"{
-				code<<"char * ${item.keyword}"
-			}
-			else if item.ast_type=="void_variable_required_argument"{
-				code<<"void * ${item.keyword}"
-			}
-			else if item.ast_type=="int_variable_required_argument"{
-				code<<"int64_t ${item.keyword}"
-			}
-			else if item.ast_type=="bool_variable_required_argument"{
-				code<<"bool ${item.keyword}"
-			}
+			code<<required_arg(item)
 		}
 		else if item.ast_type =="function_call" && is_function_call==false{
 			code<<item.keyword

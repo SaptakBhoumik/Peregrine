@@ -150,7 +150,7 @@ char *_format(const char *fmt, ...) {
  * Example:
  * _colorprint("Hello World!", SH_FG_BLACK , true);
  */
-void _colorprint(const char *str, char *color,char* bg, bool reset) {
+void _colorprint(const char *str, char *color,char* bg) {
     int16_t bg_flags;
     int16_t flags;
     if (strcmp(color, "BLACK")==0){
@@ -176,6 +176,10 @@ void _colorprint(const char *str, char *color,char* bg, bool reset) {
     }
     else if (strcmp(color, "WHITE")==0){
         flags=(37 << 8);
+    }
+    else{
+        printf("\033[0;31m%s-> Unknown font color\033[0m",color);
+        exit(1);
     }
     if (bg!=NULL){
         if (strcmp(bg, "BLACK")==0){
@@ -226,6 +230,10 @@ void _colorprint(const char *str, char *color,char* bg, bool reset) {
         else if (strcmp(bg, "BRIGHT_WHITE")==0){
             bg_flags=107;
         }
+        else{
+            printf("\033[0;31m%s-> Unknown background color\033[0m",color);
+            exit(1);
+        }
     }
     int8_t foreground = (flags & 0xFF00) >> 8;
     int8_t background = bg_flags & 0x00FF;
@@ -235,7 +243,7 @@ void _colorprint(const char *str, char *color,char* bg, bool reset) {
     else{
         printf("\e[1;%dm\e[1;%dm%s", foreground, background, str);
     }
-        printf("\e[1;0m");
+    printf("\e[1;0m");
 }
 double mypow(double base, double power)
 {
