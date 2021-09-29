@@ -20,11 +20,17 @@ fn variable(ast_type string,keyword string)(string){
 	else if "str" in split_type{
 		final="char* $keyword"
 	}
+	else if "char" in split_type{
+		final="char $keyword"
+	}
 	else if "bool" in split_type{
 		final="bool $keyword"
 	}
 	else if "float" in split_type{
 		final="double $keyword"
+	}
+	else if "float32" in split_type{
+		final="float $keyword"
 	}
 	else if "void" in split_type{
 		final="void $keyword"

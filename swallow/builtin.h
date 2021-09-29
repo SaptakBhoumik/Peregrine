@@ -1,7 +1,5 @@
 // Original author: MD Gaziur Rahman Noor
 
-// #ifndef SWALLOW_BUILTIN_H
-// #define SWALLOW_BUILTIN_H
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
@@ -267,5 +265,3 @@ double mypow(double base, double power)
         return 1 / result;
     }
 }
-
-// #endif //SWALLOW_BUILTIN_H

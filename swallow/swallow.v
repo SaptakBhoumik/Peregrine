@@ -142,7 +142,7 @@ fn main() {
     os.system("gcc ./temp.c -o ${outfile}")
     
     if !emitc {
-        // os.system("rm ./temp.c")
+        os.system("rm ./temp.c")
     }
     }
     else{

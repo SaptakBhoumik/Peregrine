@@ -15,17 +15,37 @@ fn func_return(name string, ast parser.Ast) (string,[]string,parser.Function){
 			break
 		}
 	}
-	if type_of_return==[]string{} || type_of_return==["void"]{
+	if type_of_return.len==0{
 		return_item="void $name ("
 	}
-	else if type_of_return==["str"]{
-		return_item="char * $name ("
-	}
-	else if type_of_return==["int"]{
-		return_item="int64_t $name ("
-	}
-	else if type_of_return==["float"]{
-		return_item="double $name ("
+	else if type_of_return.len==1{
+		if type_of_return==[]string{} || type_of_return==["void"]{
+			return_item="void $name ("
+		}
+		else if type_of_return==["str"]{
+			return_item="char * $name ("
+		}
+		else if type_of_return==["int"]{
+			return_item="int64_t $name ("
+		}
+		else if type_of_return==["int32"]{
+			return_item="int32_t $name ("
+		}
+		else if type_of_return==["int16"]{
+			return_item="int16_t $name ("
+		}
+		else if type_of_return==["int8"]{
+			return_item="int8_t $name ("
+		}
+		else if type_of_return==["float"]{
+			return_item="double $name ("
+		}
+		else if type_of_return==["float32"]{
+			return_item="float $name ("
+		}
+		else if type_of_return==["char"]{
+			return_item="char $name ("
+		}
 	}
 	return return_item,free,function
 }
@@ -65,8 +85,11 @@ fn required_arg(item parser.Body) string{
 	else if "float" in split_type{
 		final="double $keyword"
 	}
-	else if "void" in split_type{
-		final="void $keyword"
+	else if "float32" in split_type{
+		final="float $keyword"
+	}
+	else if "char" in split_type{
+		final="char $keyword"
 	}
 	if "constant" in split_type{
 		final="const $final"

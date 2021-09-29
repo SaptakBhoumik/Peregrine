@@ -43,7 +43,7 @@ pub struct Ast {
 }
 
 pub fn parser(code []string) (Ast,string){
-	swallow_type:=["int","bool","str","list","dictionary","float","void","int32","int16","int8"]
+	swallow_type:=["char","int","bool","str","list","dictionary","float","void","int32","int16","int8","float32"]
 	required_arg:=["str_variable_required_argument","int_variable_required_argument","bool_variable_required_argument","list_variable_required_argument","dictionary_variable_required_argument","float_variable_required_argument","void_variable_required_argument"]
 	decorator:=["@method","@free"]//more will be added soon
 	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=','++',"--","&","|","~","<<",">>","+=","-=","*=","/=","%=","<<=",">>=","&=","|="]
@@ -593,9 +593,12 @@ pub fn parser(code []string) (Ast,string){
 				else{
 					error="Unable to determine type of $item"	
 				}
-				if var.var_type=="int" || var.var_type=="int32" || var.var_type=="int16" || var.var_type=="int8"{
-						var.var_type="float"
-					}
+				if var.var_type=="int" || var.var_type=="int32" || var.var_type=="int16" || var.var_type=="int8" || var.var_type=="float32"{
+					var.var_type="float"
+				}
+				else if var.var_type=="char"{
+					var.var_type="str"
+				}
 				json.function_return_type[json.function_return_type.len-1].variable_type<<var
 			}
 			
