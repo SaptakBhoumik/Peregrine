@@ -20,6 +20,8 @@ def main():
     else:
         print("Ok")
     print("\n")
+    if x!="saptak":
+        print("You did not enter saptak\n")
     if "a"=="b":
         print("Something is wrong")
     elif "a"=="b" and "a"=="a":

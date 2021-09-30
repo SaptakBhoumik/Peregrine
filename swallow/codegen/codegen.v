@@ -8,6 +8,7 @@ pub fn codegen(ast parser.Ast) []string{
 	loop:=["if","while","elif","else","for","match","case","default"]
 	if_else_loop:=["if","while","elif","else","for"]
 	mut is_function_call:=false
+	mut sign:=""
 	mut is_string_compare:=false
 	mut function:=parser.Function{}
 	mut tab_dif:=0
@@ -68,7 +69,8 @@ pub fn codegen(ast parser.Ast) []string{
 		else if is_loop==true && (item.direction=="left" || item.keyword=="pass"){
 			if previous_code_block.keyword!="else" {
 				if is_string_compare==true{
-					code<<")==0"
+					code<<")${sign}0"
+					sign=""
 					is_string_compare=false
 				}
 				code<<"){\n"
@@ -122,8 +124,9 @@ pub fn codegen(ast parser.Ast) []string{
 		if item.keyword=="pass"{
 			//do nothing
 		}
-		else if item.keyword=="==" && is_string_compare==true{
+		else if (item.keyword=="==" || item.keyword=="!=") && is_string_compare==true{
 			code<<","
+			sign=item.keyword
 		}
 		else if item.ast_type=="compare"{
 			code<<"$item.keyword"

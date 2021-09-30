@@ -20,6 +20,18 @@ fn variable(ast_type string,keyword string)(string){
 	else if "str" in split_type{
 		final="char* $keyword"
 	}
+	else if "uint" in split_type{
+		final="uint64_t $keyword"
+	}
+	else if "uint32" in split_type{
+		final="uint32_t $keyword"
+	}
+	else if "uint16" in split_type{
+		final="uint16_t $keyword"
+	}
+	else if "uint8" in split_type{
+		final="uint8_t $keyword"
+	}
 	else if "char" in split_type{
 		final="char $keyword"
 	}

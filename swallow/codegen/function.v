@@ -37,6 +37,18 @@ fn func_return(name string, ast parser.Ast) (string,[]string,parser.Function){
 		else if type_of_return==["int8"]{
 			return_item="int8_t $name ("
 		}
+		else if type_of_return==["uint"]{
+			return_item="uint64_t $name ("
+		}
+		else if type_of_return==["uint32"]{
+			return_item="uint32_t $name ("
+		}
+		else if type_of_return==["uint16"]{
+			return_item="uint16_t $name ("
+		}
+		else if type_of_return==["uint8"]{
+			return_item="uint8_t $name ("
+		}
 		else if type_of_return==["float"]{
 			return_item="double $name ("
 		}
@@ -75,6 +87,18 @@ fn required_arg(item parser.Body) string{
 	}
 	else if "int8" in split_type{
 		final="int8_t $keyword"
+	}
+	else if "uint" in split_type{
+		final="uint64_t $keyword"
+	}
+	else if "uint32" in split_type{
+		final="uint32_t $keyword"
+	}
+	else if "uint16" in split_type{
+		final="uint16_t $keyword"
+	}
+	else if "uint8" in split_type{
+		final="uint8_t $keyword"
 	}
 	else if "str" in split_type{
 		final="char* $keyword"

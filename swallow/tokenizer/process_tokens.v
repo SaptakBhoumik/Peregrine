@@ -2,7 +2,7 @@ module tokenizer
 // Original author: Saptak Bhoumik
 fn remove_extra_return(token []string) []string{
 	mut results:=[]string{}
-	operater:=["++","--","->","<<",">>","+=","-=","*=","/=","%=","<<=",">>=","&=","|=","int32","int16","int8","float32"]
+	operater:=["++","--","->","<<",">>","+=","-=","*=","/=","%=","<<=",">>=","&=","|=","int32","int16","int8","uint32","uint16","uint8","uint","float32"]
 	mut consequtive_item:=""
 	for item in token{
 		if results.len==0{
