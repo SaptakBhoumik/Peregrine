@@ -46,13 +46,14 @@ pub fn parser(code []string) (Ast,string){
 	swallow_type:=["char","int","bool","str","list","dictionary","float","void","int32","int16","int8","float32","uint32","uint16","uint8","uint"]
 	// required_arg:=["str_variable_required_argument","int_variable_required_argument","bool_variable_required_argument","list_variable_required_argument","dictionary_variable_required_argument","float_variable_required_argument","void_variable_required_argument"]
 	decorator:=["@method","@free"]//more will be added soon
-	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=','++',"--","&","|","~","<<",">>","+=","-=","*=","/=","%=","<<=",">>=","&=","|="]
+	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=','++',"--","&","|","~","<<",">>","+=","-=","*=","/=","%=","<<=",">>=","&=","|=","^="]
 	loop:=["if","while","elif","else","for","match","case","default"]
 	logic:=["and","or","not","in","is"]
 	error_handler:=["try","except","finally"]
 	variable:="_variable"
 	underscore:="_"
 	mut var:=Var{}
+	mut is_pointer:=false
 	mut reserved_keywords:=[]string{}
 	mut error := ""
 	mut line:=0
@@ -105,6 +106,9 @@ pub fn parser(code []string) (Ast,string){
 		//parsing starts here
 		if previous_code_block.keyword in swallow_type && item==":"{
 					//do nothing
+		}
+		else if previous_code_block.keyword=="*" && item=="*" && is_pointer==false{
+			json.body[json.body.len-1].keyword="**"
 		}
 		else if item=="asm" && is_asm==false{
 			code_block=Body{ast_type:"Ccode"

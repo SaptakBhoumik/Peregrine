@@ -216,14 +216,14 @@ pub fn codegen(ast parser.Ast) []string{
 		}
 
 
-		else if next_item.keyword=="^"{
+		else if next_item.keyword=="**"{
 			code<<"mypow($item.keyword"
 			is_operator==true
 		}
-		else if item.keyword=="^"{
+		else if item.keyword=="**"{
 			code<<","
 		}
-		else if previous_code_block.keyword=="^"{
+		else if previous_code_block.keyword=="**"{
 			code<<"$item.keyword)"
 		}
 		else if ("variable" in item.ast_type.split("_") || "constant" in item.ast_type.split("_")) && item.ast_type.split("_").len==2{
