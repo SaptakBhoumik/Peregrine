@@ -16,7 +16,7 @@ pub fn function(item string,is_func_def bool,previus_item string, json Ast,right
 		is_argument= true
 		previous_item=item
 	} 
-	else if item==")"{
+	else if item==")" || item==r"\n"{
 		previous_item=item
 		is_argument=false
 	}

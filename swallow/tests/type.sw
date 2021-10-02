@@ -48,6 +48,7 @@ def main():
     kjh=something1()
     float32 dc=2
     s=dc
+    somevar=something5()
     int a=9
     int32 v=67
     int16 vg=5

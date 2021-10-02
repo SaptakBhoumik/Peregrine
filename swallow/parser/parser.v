@@ -44,7 +44,7 @@ pub struct Ast {
 
 pub fn parser(code []string) (Ast,string){
 	swallow_type:=["char","int","bool","str","list","dictionary","float","void","int32","int16","int8","float32","uint32","uint16","uint8","uint"]
-	required_arg:=["str_variable_required_argument","int_variable_required_argument","bool_variable_required_argument","list_variable_required_argument","dictionary_variable_required_argument","float_variable_required_argument","void_variable_required_argument"]
+	// required_arg:=["str_variable_required_argument","int_variable_required_argument","bool_variable_required_argument","list_variable_required_argument","dictionary_variable_required_argument","float_variable_required_argument","void_variable_required_argument"]
 	decorator:=["@method","@free"]//more will be added soon
 	operater:=["=","==",'+','-','*','/','^','//','%','>','<','>=','<=','!=','++',"--","&","|","~","<<",">>","+=","-=","*=","/=","%=","<<=",">>=","&=","|="]
 	loop:=["if","while","elif","else","for","match","case","default"]
@@ -102,7 +102,6 @@ pub fn parser(code []string) (Ast,string){
 		if item==r"\n" && next_item==r"\n" && index!=code.len-1{
 			is_tab==false
 		}
-		
 		//parsing starts here
 		if previous_code_block.keyword in swallow_type && item==":"{
 					//do nothing
@@ -129,14 +128,14 @@ pub fn parser(code []string) (Ast,string){
 							length :item.len
 							tab : tab}
 		}
-		else if item=="->" && previus_item==")" && (previous_code_block.ast_type in required_arg || previous_code_block.ast_type=="function_define"){
+		else if item=="->" && previus_item==")" && ("required" in previous_code_block.ast_type.split("_") || previous_code_block.ast_type=="function_define"){
 			return_type=true
 		}
 		
 		else if return_type==true && item == ":"{
 			return_type=false
 		}
-		else if return_type==true && is_function_call==false && is_return==false && item!="(" && (previous_code_block.ast_type=="function_define" || previous_code_block.ast_type in required_arg) && is_argument==false && is_operator==false && is_loop==false && is_ccode==false{
+		else if return_type==true && is_function_call==false && is_return==false && item!="(" && (previous_code_block.ast_type=="function_define" ||"required" in previous_code_block.ast_type.split("_")) && is_argument==false && is_operator==false && is_loop==false && is_ccode==false{
 			if item in swallow_type{
 				json.function_return_type[json.function_return_type.len-1].return_type<<item
 			}
@@ -413,7 +412,6 @@ pub fn parser(code []string) (Ast,string){
 							tab : tab}
 		}
 		else if is_func_def==true  && item!=" " && is_function_call==false{
-			
 			if item!=","{
 				code_block,previus_item,right=function(item,is_func_def,previus_item,json,right,tab)
 				is_argument=right
