@@ -8,7 +8,7 @@ pub fn tokenize(str string) []string {
 					'None'
 					]
 	symbols := [
-			' ',//white space
+			' ', //white space
 			'!',
 			'{',
 			'}',
@@ -22,7 +22,8 @@ pub fn tokenize(str string) []string {
 			'\n', 
 			':',
 			',',
-			'#'//comment
+			'#', //comment
+			'`' //acute sign
 			]
 	logical_keywords :=[
 					"&",
