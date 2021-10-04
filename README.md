@@ -1,6 +1,6 @@
 # Swallow
 
-Swallow is a compiled programming language currently under devolopment. Docs comming soon
+Swallow is a compiled programming language currently under development. Docs coming soon
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
