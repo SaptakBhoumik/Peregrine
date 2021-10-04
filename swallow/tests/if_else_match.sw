@@ -8,6 +8,9 @@ def main():
         case 2:
             print("It is 2\n")
             break
+        case 3:
+            print("It is 2\n")
+            break
         default:
             print("I dont know what it is\n")
             break

@@ -4,9 +4,13 @@ module codegen
 import parser
 
 pub fn codegen(ast parser.Ast) []string {
-	loop := ['if', 'while', 'elif', 'else', 'for', 'match', 'case', 'default']
+	loop := ['if', 'while', 'elif', 'else', 'for', 'match', 'case']
 	if_else_loop := ['if', 'while', 'elif', 'else', 'for']
 	mut is_function_call := false
+	mut is_match_case:=false
+	mut is_default:=false
+	mut last_match:=[]parser.Body{}
+	mut match_item:=[]string{}
 	mut sign := ''
 	mut is_string_compare := false
 	mut function := parser.Function{}
@@ -26,8 +30,11 @@ pub fn codegen(ast parser.Ast) []string {
 	mut next_item := parser.Body{}
 	for index, mut item in ast.body {
 		keyword = item.keyword
-		if item.ast_type == 'new_line' {
-			item.keyword = ''
+		if item.keyword=="case" || item.keyword=="default" || item.keyword=="match"{
+			is_match_case=true
+		}
+		else if item.keyword=="else" && match_item.len>=1{
+			is_match_case=true
 		}
 		if index < ast.body.len - 1 && index != 0 {
 			next_item = ast.body[index + 1]
@@ -37,28 +44,7 @@ pub fn codegen(ast parser.Ast) []string {
 		} else if 'required' in previous_code_block.ast_type.split('_') && item.direction != 'right' {
 			code << '){\n'
 		}
-		if item.keyword == 'case' && is_case == false {
-			is_case = true
-			if is_match == true {
-				code << '){\n'
-				is_match = false
-			}
-		} else if item.keyword == 'match' && is_match == false {
-			is_match = true
-			if is_case == true {
-				code << '):{\n'
-				is_case = false
-			}
-		} else if is_case == true && item.direction == 'left' {
-			is_loop = false
-			code << '):{\n'
-			is_case = false
-		} else if item.keyword == 'default' {
-			// do nothing
-		} else if previous_code_block.keyword == 'default' {
-			is_loop = false
-			code << ':{\n'
-		} else if is_loop == true && (item.direction == 'left' || item.keyword == 'pass') {
+		if is_loop == true && (item.direction == 'left' || item.keyword == 'pass'){
 			if previous_code_block.keyword != 'else' {
 				if is_string_compare == true {
 					code << ')${sign}0'
@@ -70,6 +56,7 @@ pub fn codegen(ast parser.Ast) []string {
 				code << '{\n'
 			}
 			is_loop = false
+			is_case = false
 		} else if 'required' in previous_code_block.ast_type.split('_') && item.direction == 'right'
 			&& 'required' in item.ast_type.split('_') {
 			code << ','
@@ -88,18 +75,18 @@ pub fn codegen(ast parser.Ast) []string {
 			}
 			item.keyword = keyword
 		}
-		if previous_code_block.keyword in if_else_loop || previous_code_block.keyword == 'or'
-			|| previous_code_block.keyword == 'and' {
+		if (previous_code_block.keyword in if_else_loop || previous_code_block.keyword == 'or'
+			|| previous_code_block.keyword == 'and' ) && is_case==false{
 			if item.ast_type == 'string' {
-				code << ' strcmp('
+				code << ' compare('
 				is_string_compare = true
 			} else if item.ast_type == 'variable' && item.keyword in function.variable
 				&& var_type(function.variable_type, keyword) == 'str' {
-				code << ' strcmp('
+				code << ' compare('
 				is_string_compare = true
 			} else if item.ast_type == 'function_call'
 				&& func_return_if_else(keyword, ast) == ['str'] {
-				code << ' strcmp('
+				code << ' compare('
 				is_string_compare = true
 			}
 		}
@@ -111,9 +98,42 @@ pub fn codegen(ast parser.Ast) []string {
 		}
 
 		// codegen starts here
-		if item.keyword == 'pass' {
+		if item.keyword == 'pass'{
 			// do nothing
-		} else if (item.keyword == '==' || item.keyword == '!=') && is_string_compare == true {
+		}
+		else if item.keyword=="default"{
+			is_default=true
+		} 
+		else if previous_code_block.keyword=="match"{
+			match_item<<item.keyword
+			code<<"True"
+			is_match=true
+		}
+		
+		else if is_case == true {
+			if item.keyword=="or"{
+				code<<" || "
+			}
+			else if item.keyword=="and"{
+				code<<" && "
+			}
+			else{
+				if match_item.last().split('')[0]=="'" || match_item.last().split('')[0]=='"'{
+					code << ' compare(${match_item.last()},${item.keyword})==0 '
+				}
+					else if item.ast_type == 'variable' && item.keyword in function.variable
+					&& var_type(function.variable_type, keyword) == 'str' {
+					code << ' compare(${match_item.last()},${item.keyword})==0'
+				} else if item.ast_type == 'function_call'
+					&& func_return_if_else(keyword, ast) == ['str'] {
+					code << ' compare(${match_item.last()},${item.keyword})==0'
+				}
+				else{
+					code << ' ${match_item.last()}==${item.keyword}'
+				}
+			}
+		}
+		else if (item.keyword == '==' || item.keyword == '!=') && is_string_compare == true {
 			code << ','
 			sign = item.keyword
 		} else if item.ast_type == 'compare' {
@@ -125,13 +145,23 @@ pub fn codegen(ast parser.Ast) []string {
 		} else if item.keyword == 'break' || item.keyword == 'continue' {
 			code << '$item.keyword ;\n'
 		} else if item.keyword in loop {
-			if item.keyword == 'else' || item.keyword == 'default' {
+			if item.keyword == 'else'{
 				code << '$keyword '
 			} else {
 				if keyword == 'elif' {
 					keyword = 'else if'
 				} else if keyword == 'match' {
-					keyword = 'switch'
+					keyword = 'while '
+					last_match<<item
+				}
+				else if item.keyword =="case" && is_match == true{
+					is_match=false
+					is_case=true
+					keyword = "if "
+				}
+				else if item.keyword =="case" && is_match == false{
+					keyword = "else if "
+					is_case=true
 				}
 				code << '$keyword ('
 			}
@@ -245,7 +275,87 @@ pub fn codegen(ast parser.Ast) []string {
 		// 	}
 		// 	free=[]string{}
 		// }
-		if next_item.tab < item.tab || item == next_item {
+		if last_match.len>0 && is_match_case==true &&  is_loop == false {
+			if last_match.last().tab==next_item.tab && item!=next_item && next_item.ast_type!="new_line"{
+				is_match_case=false
+				if is_function_call == true || is_operator == true || is_return == true {
+					is_operator = false
+					is_function_call = false
+					is_return = false
+					code << ';\n'
+				}
+				if is_default==true{
+					code<<"\nbreak;\n"
+					is_default=false
+				}
+				else{
+					code<<"\n}"
+					code<<"\nbreak;\n"
+				}
+				tab_dif = int(item.tab - next_item.tab)
+				for _ in 1 .. tab_dif {
+					code << '\n}\n'
+				}
+				last_match.pop()
+			}
+			else if item.ast_type=="new_line" && ast.body.len > index + 2 && item != next_item && last_match.last().tab==next_item.tab{
+				tab_dif = int(item.tab - ast.body[index + 2].tab)
+				if is_function_call == true || is_operator == true || is_return == true {
+					is_operator = false
+					is_function_call = false
+					is_return = false
+					code << ';\n'
+				}
+				if is_default==true{
+					code<<"\nbreak;\n"
+					is_default=false
+				}
+				else{
+					code<<"\n}"
+					code<<"\nbreak;\n"
+				}
+				for _ in 1 .. tab_dif {
+					code << '\n}\n'
+				}
+				last_match.pop()
+			}
+			else if item==next_item{
+				tab_dif = int(item.tab)
+				for _ in last_match{
+					if is_default==true{
+						code<<"\nbreak;\n"
+						is_default=false
+					}
+					else {
+						code<<"\n}"
+						code<<"\nbreak;\n"
+					}
+					tab_dif--
+				}
+				for _ in 0 .. tab_dif {
+					code << '\n}\n'
+				}
+			}
+			else if next_item.ast_type == 'new_line' && ast.body.len > index + 2
+				&& item != next_item && is_loop == false {
+				tab_dif = int(item.tab - ast.body[index + 2].tab)
+				if is_function_call == true || is_operator == true || is_return == true {
+					is_operator = false
+					is_function_call = false
+					is_return = false
+					code << ';\n'
+				}
+				for _ in 0 .. tab_dif {
+					code << '\n}\n'
+				}
+			} else if next_item.direction == 'left' && item != next_item {
+				tab_dif = int(item.tab - next_item.tab)
+				for _ in 0 .. tab_dif {
+					code << '\n}\n'
+				}
+			}
+		}
+		else if next_item.tab < item.tab || item == next_item {
 			if next_item == item {
 				tab_dif = int(item.tab)
 				for _ in 0 .. tab_dif {

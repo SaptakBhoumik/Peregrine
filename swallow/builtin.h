@@ -265,3 +265,26 @@ double mypow(double base, double power)
         return 1 / result;
     }
 }
+int compare(char *a,char *b)  {  
+   int flag=0;  
+   if(a==NULL || b==NULL){
+       if (a==NULL && b==NULL){
+           flag=0;
+       }
+       else{
+           flag=1;
+       }
+   }
+   else{
+        while(*a!='\0' && *b!='\0')  // while loop  
+        {  
+            if(*a!=*b)  
+            {  
+                flag=1;  
+            }  
+            a++;  
+            b++;  
+        }  
+   }     
+    return flag;
+}  
