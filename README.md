@@ -1,6 +1,6 @@
-# Swallow
+# Peregrine
 
-Swallow is a compiled programming language currently under development. Docs coming soon.
+Peregrine is a compiled programming language currently under development. Docs coming soon.
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
@@ -23,7 +23,7 @@ I am creating it as a fast alternative to Python and an easy one to C.
 
 # How does it work?
 
-You can consider it to be a superset of C which compiles to clean C. So valid c code is also valid Swallow code (the language is named Swallow). It will have no garbage collector because it is a system programming language but it will be very easy to use so there will be less chance of memory leak.
+You can consider it to be a superset of C which compiles to clean C. So valid c code is also valid Peregrine code (the language is named Peregrine). It will have no garbage collector because it is a system programming language but it will be very easy to use so there will be less chance of memory leak.
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
@@ -33,9 +33,9 @@ You can consider it to be a superset of C which compiles to clean C. So valid c 
 
 # Build instruction
  
-- Clone this repository using the following command -> `git clone https://github.com/Swallow-lang/swallow.git`
-- Run `cd swallow/swallow`
-- To build it run `v swallow.v`
+- Clone this repository using the following command -> `git clone https://github.com/Peregrine-lang/Peregrine.git`
+- Run `cd Peregrine/Peregrine`
+- To build it run `v Peregrine.v`
 - That's it
 
 
@@ -49,7 +49,7 @@ For now it is written in V (visit vlang.io for more info) but in the future it w
 
 # Progress
 
-Currently we are working on the codegen and some swallow programs are working :) 
+Currently we are working on the codegen and some Peregrine programs are working :) 
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
@@ -76,9 +76,9 @@ Cool, you can contact me via mail.
 Great, go ahead and make the changes you want. 
 
 
-Have a look at the [open issues](https://github.com/Swallow-lang/swallow/issues) to find a mission that resonates with you.
+Have a look at the [open issues](https://github.com/Peregrine-lang/Peregrine/issues) to find a mission that resonates with you.
 
-Please check [CONTRIBUTING.md](https://github.com/Swallow-lang/swallow/blob/main/CONTRIBUTING.md) to know how you can contribute.
+Please check [CONTRIBUTING.md](https://github.com/Peregrine-lang/Peregrine/blob/main/CONTRIBUTING.md) to know how you can contribute.
 
 If you create any new file make sure to comment your name in the file as shown   `Original author: Your name`
 
@@ -86,4 +86,4 @@ If you create any new file make sure to comment your name in the file as shown  
 
 # License
 
-The swallow compiler is licensed under the [Mozilla Public License](https://github.com/Swallow-lang/swallow/blob/main/LICENSE)
+The Peregrine compiler is licensed under the [Mozilla Public License](https://github.com/Peregrine-lang/Peregrine/blob/main/LICENSE)

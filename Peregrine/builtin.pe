@@ -1,4 +1,4 @@
-#Builtin swallow function
+#Builtin Peregrine function
 #Author: Saptak Bhoumik
 #Builtin.h is imported by default
 def print(const str query):

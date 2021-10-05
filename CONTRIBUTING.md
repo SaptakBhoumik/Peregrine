@@ -1,38 +1,38 @@
-Thank you for taking an interest in swallow. 
+Thank you for taking an interest in peregrine. 
 
 Since it is a free software, you can contribute to make it better. New contributors are always welcome, whether you write code, create resources, report bugs, or suggest features.
 
-The swallow is written primarily in V
+The peregrine is written primarily in V
 
-https://github.com/Swallow-lang/swallow/tree/main/swallow/tokenizer
+https://github.com/peregrine-lang/peregrine/tree/main/peregrine/tokenizer
 
 This folder contains the tokenizer
 
 The tokenizer breaks the source code into smaller parts
 
-https://github.com/Swallow-lang/swallow/tree/main/swallow/parser
+https://github.com/peregrine-lang/peregrine/tree/main/peregrine/parser
 
 This is the parser and it generates the abstract syntax tree
 
-https://github.com/Swallow-lang/swallow/tree/main/swallow/codegen
+https://github.com/peregrine-lang/peregrine/tree/main/peregrine/codegen
 
 This folder contains the file that converts the abstract syntax tree to C code 
 
-https://github.com/Swallow-lang/swallow/blob/main/swallow/builtin.sw
+https://github.com/peregrine-lang/peregrine/blob/main/peregrine/builtin.pe
 
-https://github.com/Swallow-lang/swallow/blob/main/swallow/builtin.h
+https://github.com/peregrine-lang/peregrine/blob/main/peregrine/builtin.h
 
-Builtin function written in swallow and C
+Builtin function written in peregrine and C
 
-https://github.com/Swallow-lang/swallow/blob/main/swallow/swallow.v
+https://github.com/peregrine-lang/peregrine/blob/main/peregrine/peregrine.v
 
 This is the entry point of the program
 
-https://github.com/Swallow-lang/swallow/blob/main/swallow/test_runner.py
+https://github.com/peregrine-lang/peregrine/blob/main/peregrine/test_runner.py
 
 We use this file to run the test
 
-https://github.com/Swallow-lang/swallow/tree/main/swallow/tests
+https://github.com/peregrine-lang/peregrine/tree/main/peregrine/tests
 
 Some test files
 
