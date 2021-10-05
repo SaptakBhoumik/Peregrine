@@ -13,11 +13,11 @@ fn print_help() {
 	println('\tcompile          - compiles a given file')
 	println('\thelp             - shows this command')
 	println('\nSwallow Options:')
-	println('\t-emit-ast        - dumps ast in console and exits.')
-	println('\t-emit-c          - generates C code and exits (skips C compilation phase).')
-	println('\t-o <output file> - select the file to output binary code to.')
+	println('\t--emit-ast        - dumps ast in console and exits.')
+	println('\t--emit-c          - generates C code and exits (skips C compilation phase).')
+	println('\t--o=<output file> - select the file to output binary code to.')
 	println('\nExample:')
-	println('\tswallow compile example.sw -o example')
+	println('\tswallow compile example.sw --o=example')
 }
 
 // Original Author (CompilationOptions and compile): Shravan Asati
@@ -106,82 +106,71 @@ fn compile(opt CompilationOptions) {
 	}
 }
 
-// Original author: Saptak Bhoumik
-fn main() {
-	arg := os.args.clone()
-	mut filename := ''
-	mut emitc := false
-	mut emitast := false
-	mut help := false
-	mut o := false
-	mut previous := ''
-	mut outfile := ''
-	mut idx_ := 0
-	for idx, x in arg {
-		idx_ = idx
-		if idx == 0 {
-			previous = x
+// Original author: Pranav Baburaj(ArgumentParserOptions, argument_parser, execute)
+struct ArgumentParserOptions {
+mut:
+	command string
+	input string
+	parameters map[string]string
+	previous_element string
+	error bool
+	is_help bool
+}
+
+fn argument_parser(arguments []string) ArgumentParserOptions {
+	mut options := ArgumentParserOptions{}
+	if arguments.len == 0 {
+		options.is_help = true
+		return options
+	}
+	for index, argument in arguments {
+		if index == 0{
+			options.command = argument
 			continue
 		}
-		if x == 'compile' {
-			previous = x
-			if arg.last() == arg[idx] {
-				help = true
-				break
-			}
-			filename = arg[idx + 1]
+		if index == 1 {
+			options.input = argument
 			continue
-		} else if x == '-emit-c' {
-			previous = x
-			emitc = true
-			continue
-		} else if x == '-emit-ast' {
-			previous = x
-			emitast = true
-			continue
-		} else if x == '-emit-token' {
-			previous = x
-			return
-		} else if x == '-o' {
-			previous = x
-			o = true
-			continue
-		} else if x == 'help' {
-			previous = x
-			help = true
-			continue
-		} else if x.contains('.sw') {
-			previous = x
-			filename = x
-			continue
-		} else {
-			if previous == '-o' {
-				outfile = x
-				continue
-			}
-			help = true
 		}
-	}
 
-	if !o {
-		outfile = filename.trim('.sw')
+		options.previous_element = argument
+		is_valid_parameter := argument.starts_with("--")
+		if !is_valid_parameter {
+			println("Invalid parameter: ${argument}\nParameters should start with --")
+			options.error = true
+			return options
+		}
+		slices := argument.split("=")
+		key, value := slices[0][2..], slices[1..].join("=")
+		options.parameters[key] = value
 	}
+	return options
+}
 
-	if help || idx_ <= 0 {
+fn execute(results ArgumentParserOptions) {
+	if results.is_help || results.error {
 		print_help()
 		return
 	}
+	if results.command == "compile" {
+		filename := results.input
+		if filename.len == 0 { return }
+			
+		mut outfile := filename.trim(".sw")
+		if 'o' in results.parameters {
+			outfile = results.parameters['o']
+		}
+		compile(CompilationOptions{
+			filename: filename,
+			emitc: 'emit-c' in results.parameters,
+			emitast: 'emit-ast' in results.parameters,
+			output: outfile
+		})
+	}
+}
 
-	compile(CompilationOptions{
-		filename: filename
-		emitc: emitc
-		emitast: emitast
-		output: outfile
-	})
-
-	// println(preprocessor.formatter(content))
-	// println(tokenizer.process_tokens(tokenizer.tokenize(preprocessor.formatter(content))))
-	// println(preprocessor.import_parser(content))
-	// println(content)
-	// println(os.args)//gives the location do i can add the built i file location
+// Original author: Saptak Bhoumik
+fn main() {
+	results := argument_parser(os.args.clone()[1..])
+	execute(results)
 }
