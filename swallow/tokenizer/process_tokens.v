@@ -30,17 +30,17 @@ fn symbol_present_in_arrey(item string) int {
 		'!',
 		'#',
 		'=',
-		/* equals */
+		// equals
 		'+',
-		/* addition */
+		// addition
 		'-',
-		/* subtraction */
+		// subtraction
 		'*',
-		/* multiplication */
+		// multiplication
 		'/',
-		/* division */
+		// division
 		'^',
-		/* exponent */
+		// exponent
 		'(',
 		'.',
 		'r',
@@ -49,18 +49,18 @@ fn symbol_present_in_arrey(item string) int {
 		')',
 		':',
 		'%',
-		/* remainder */
+		// remainder
 		'>',
-		/* greater than */
+		// greater than
 		'<',
-		/* less than */
+		// less than
 		'//',
-		/* quotient */
+		// quotient
 		'==',
 		'>=',
-		/* greater than equals to */
+		// greater than equals to
 		'<=',
-		/* less than equals to */
+		// less than equals to
 		'!=',
 		// not equals to
 	]
@@ -117,12 +117,12 @@ pub fn process_tokens(list []string) []string {
 	mut is_dictionary_open := false // checks if is is a dictionary
 	multi_char_symbols := [
 		'!=',
-		/* not equals to */
+		// not equals to
 		'//',
-		/* quotient */
+		// quotient
 		'==',
 		'>=',
-		/* greater than equals to */
+		// greater than equals to
 		'<=',
 		// less than equals to
 	]

@@ -109,12 +109,12 @@ fn compile(opt CompilationOptions) {
 // Original author: Pranav Baburaj(ArgumentParserOptions, argument_parser, execute)
 struct ArgumentParserOptions {
 mut:
-	command string
-	input string
-	parameters map[string]string
+	command          string
+	input            string
+	parameters       map[string]string
 	previous_element string
-	error bool
-	is_help bool
+	error            bool
+	is_help          bool
 }
 
 fn argument_parser(arguments []string) ArgumentParserOptions {
@@ -124,7 +124,7 @@ fn argument_parser(arguments []string) ArgumentParserOptions {
 		return options
 	}
 	for index, argument in arguments {
-		if index == 0{
+		if index == 0 {
 			options.command = argument
 			continue
 		}
@@ -134,14 +134,14 @@ fn argument_parser(arguments []string) ArgumentParserOptions {
 		}
 
 		options.previous_element = argument
-		is_valid_parameter := argument.starts_with("--")
+		is_valid_parameter := argument.starts_with('--')
 		if !is_valid_parameter {
-			println("Invalid parameter: ${argument}\nParameters should start with --")
+			println('Invalid parameter: $argument\nParameters should start with --')
 			options.error = true
 			return options
 		}
-		slices := argument.split("=")
-		key, value := slices[0][2..], slices[1..].join("=")
+		slices := argument.split('=')
+		key, value := slices[0][2..], slices[1..].join('=')
 		options.parameters[key] = value
 	}
 	return options
@@ -152,18 +152,20 @@ fn execute(results ArgumentParserOptions) {
 		print_help()
 		return
 	}
-	if results.command == "compile" {
+	if results.command == 'compile' {
 		filename := results.input
-		if filename.len == 0 { return }
-			
-		mut outfile := filename.trim(".sw")
+		if filename.len == 0 {
+			return
+		}
+
+		mut outfile := filename.trim('.sw')
 		if 'o' in results.parameters {
 			outfile = results.parameters['o']
 		}
 		compile(CompilationOptions{
-			filename: filename,
-			emitc: 'emit-c' in results.parameters,
-			emitast: 'emit-ast' in results.parameters,
+			filename: filename
+			emitc: 'emit-c' in results.parameters
+			emitast: 'emit-ast' in results.parameters
 			output: outfile
 		})
 	}

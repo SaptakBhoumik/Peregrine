@@ -10,7 +10,7 @@ pub fn tokenize(str string) []string {
 	]
 	symbols := [
 		' ',
-		/* white space */
+		// white space
 		'!',
 		'{',
 		'}',
@@ -25,7 +25,7 @@ pub fn tokenize(str string) []string {
 		':',
 		',',
 		'#',
-		/* comment */
+		// comment
 		'`',
 		// acute sign
 	]
@@ -34,29 +34,29 @@ pub fn tokenize(str string) []string {
 		'|',
 		'~',
 		'=',
-		/* equals */
+		// equals
 		'+',
-		/* addition */
+		// addition
 		'-',
-		/* subtraction */
+		// subtraction
 		'*',
-		/* multiplication */
+		// multiplication
 		'/',
-		/* division */
+		// division
 		'^',
-		/* exponent */
+		// exponent
 		'//',
-		/* quotient */
+		// quotient
 		'%',
-		/* remainder */
+		// remainder
 		'>',
-		/* greater than */
+		// greater than
 		'<',
-		/* less than */
+		// less than
 		'>=',
-		/* greater than equals to */
+		// greater than equals to
 		'<=',
-		/* less than equals to */
+		// less than equals to
 		'!=',
 		// not equals to
 	]
