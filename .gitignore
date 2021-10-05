@@ -6,4 +6,5 @@
 **/output
 **/a.out
 **/temp.c
-*.exe
+**.exe
+/swallow/swallow

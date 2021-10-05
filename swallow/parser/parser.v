@@ -53,7 +53,7 @@ pub fn parser(code []string) (Ast, string) {
 	operater := ['=', '==', '+', '-', '*', '/', '^', '//', '%', '>', '<', '>=', '<=', '!=', '++',
 		'--', '&', '|', '~', '<<', '>>', '+=', '-=', '*=', '/=', '%=', '<<=', '>>=', '&=', '|=',
 		'^=']
-	loop := ['if', 'while', 'elif', 'else', 'for', 'match', 'case','default']
+	loop := ['if', 'while', 'elif', 'else', 'for', 'match', 'case', 'default']
 	logic := ['and', 'or', 'not', 'in', 'is']
 	error_handler := ['try', 'except', 'finally']
 	variable := '_variable'

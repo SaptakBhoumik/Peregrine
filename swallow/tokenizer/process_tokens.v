@@ -521,10 +521,9 @@ pub fn process_tokens(list []string) []string {
 		} else if item == ' ' && is_tab == true {
 			ultimate_result << item
 		} else {
-			if item ==";"{
-				ultimate_result << r"\n"
-			}
-			else{
+			if item == ';' {
+				ultimate_result << r'\n'
+			} else {
 				ultimate_result << item
 			}
 		}

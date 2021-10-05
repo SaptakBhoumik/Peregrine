@@ -22,17 +22,17 @@ fn print_help() {
 
 // Original Author (CompilationOptions and compile): Shravan Asati
 struct CompilationOptions {
-    filename string
-    emitc bool
-    emitast bool
-    output string
+	filename string
+	emitc    bool
+	emitast  bool
+	output   string
 }
 
 fn compile(opt CompilationOptions) {
 	content := os.read_file(opt.filename) or {
-        eprintln("Could not read file: " + opt.filename)
-        return
-    }
+		eprintln('Could not read file: ' + opt.filename)
+		return
+	}
 
 	mut path := os.executable()
 	path = path.replace(r'\', '/')
@@ -43,14 +43,14 @@ fn compile(opt CompilationOptions) {
 		folder = '$folder$item/'
 	}
 	builtin_sw := os.read_file('${folder}builtin.sw') or {
-        eprintln("Could not read file: ${folder}builtin.sw")
-        return
-    }
-    
+		eprintln('Could not read file: ${folder}builtin.sw')
+		return
+	}
+
 	builtin_h := os.read_file('${folder}builtin.h') or {
-        eprintln("Could not read file: ${folder}builtin.sw")
-        return
-    }
+		eprintln('Could not read file: ${folder}builtin.sw')
+		return
+	}
 
 	mut total := '$builtin_sw\n$content'
 	tokens := tokenizer.process_tokens(tokenizer.tokenize(total))
@@ -77,14 +77,14 @@ fn compile(opt CompilationOptions) {
 		final_code = '//Generated using the swallow compiler \n $builtin_h \n $final_code'
 
 		mut x := os.create('temp.c') or {
-            eprintln("Unable to write the file.")
-            return
-        } 
+			eprintln('Unable to write the file.')
+			return
+		}
 
 		x.writeln(final_code) or {
-            eprintln("Unable to write the file.")
-            return
-        } 
+			eprintln('Unable to write the file.')
+			return
+		}
 
 		x.close()
 		if opt.emitc && !opt.emitast {
@@ -94,7 +94,7 @@ fn compile(opt CompilationOptions) {
 			return
 		}
 
-		os.system('gcc ./temp.c -o $opt.output')
+		os.system('gcc -O3 ./temp.c -o $opt.output')
 
 		if !opt.emitc {
 			os.system('rm ./temp.c')
@@ -104,7 +104,6 @@ fn compile(opt CompilationOptions) {
 		print('$error\n') // Display error in red
 		print('\033[0m')
 	}
-
 }
 
 // Original author: Saptak Bhoumik
@@ -173,12 +172,12 @@ fn main() {
 		return
 	}
 
-    compile(CompilationOptions {
-        filename: filename
-        emitc: emitc
-        emitast: emitast
-        output: outfile
-    })
+	compile(CompilationOptions{
+		filename: filename
+		emitc: emitc
+		emitast: emitast
+		output: outfile
+	})
 	// println(preprocessor.formatter(content))
 	// println(tokenizer.process_tokens(tokenizer.tokenize(preprocessor.formatter(content))))
 	// println(preprocessor.import_parser(content))
