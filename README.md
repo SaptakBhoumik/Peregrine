@@ -27,6 +27,20 @@ You can consider it to be a superset of C which compiles to clean C. So valid c 
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
+# Requirements to build from source
+ - Gcc compiler
+ - V compiler
+
+# Build instruction
+ 
+- Clone this repository using the following command -> `git clone https://github.com/Swallow-lang/swallow.git`
+- Run `cd swallow/swallow`
+- To build it run `v swallow.v`
+- That's it
+
+
+![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
+
 # Primary implementation language
 
 For now it is written in V (visit vlang.io for more info) but in the future it will be self hosted.
