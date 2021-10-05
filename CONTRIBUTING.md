@@ -1,38 +1,38 @@
-Thank you for taking an interest in peregrine. 
+Thank you for taking an interest in Peregrine. 
 
 Since it is a free software, you can contribute to make it better. New contributors are always welcome, whether you write code, create resources, report bugs, or suggest features.
 
-The peregrine is written primarily in V
+The Peregrine is written primarily in V
 
-https://github.com/peregrine-lang/peregrine/tree/main/peregrine/tokenizer
+https://github.com/peregrine-lang/Peregrine/tree/main/Peregrine/tokenizer
 
 This folder contains the tokenizer
 
 The tokenizer breaks the source code into smaller parts
 
-https://github.com/peregrine-lang/peregrine/tree/main/peregrine/parser
+https://github.com/peregrine-lang/Peregrine/tree/main/Peregrine/parser
 
 This is the parser and it generates the abstract syntax tree
 
-https://github.com/peregrine-lang/peregrine/tree/main/peregrine/codegen
+https://github.com/peregrine-lang/Peregrine/tree/main/Peregrine/codegen
 
 This folder contains the file that converts the abstract syntax tree to C code 
 
-https://github.com/peregrine-lang/peregrine/blob/main/peregrine/builtin.pe
+https://github.com/peregrine-lang/Peregrine/blob/main/Peregrine/builtin.pe
 
-https://github.com/peregrine-lang/peregrine/blob/main/peregrine/builtin.h
+https://github.com/peregrine-lang/Peregrine/blob/main/Peregrine/builtin.h
 
-Builtin function written in peregrine and C
+Builtin function written in Peregrine and C
 
-https://github.com/peregrine-lang/peregrine/blob/main/peregrine/peregrine.v
+https://github.com/peregrine-lang/Peregrine/blob/main/Peregrine/Peregrine.v
 
 This is the entry point of the program
 
-https://github.com/peregrine-lang/peregrine/blob/main/peregrine/test_runner.py
+https://github.com/peregrine-lang/Peregrine/blob/main/Peregrine/test_runner.py
 
 We use this file to run the test
 
-https://github.com/peregrine-lang/peregrine/tree/main/peregrine/tests
+https://github.com/peregrine-lang/Peregrine/tree/main/Peregrine/tests
 
 Some test files
 
