@@ -59,7 +59,14 @@ Cool, you can contact me via mail.
 
 # Want to contribute?
 
-Great, go ahead and make the changes you want. If you create any new file make sure to comment your name in the file as shown   `Original author: Your name`
+Great, go ahead and make the changes you want. 
+
+
+Have a look at the [open issues](https://github.com/Swallow-lang/swallow/issues) to find a mission that resonates with you.
+
+Please check [CONTRIBUTING.md](https://github.com/Swallow-lang/swallow/blob/main/CONTRIBUTING.md) to know how you can contribute.
+
+If you create any new file make sure to comment your name in the file as shown   `Original author: Your name`
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
