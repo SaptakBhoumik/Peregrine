@@ -7,9 +7,9 @@ if platform == "win32":
 file=glob.glob('./tests/*.pe')
 print("This program will compile the peregrine compiler and run some tests")
 print("Compiling the peregrine compiler")
-os.system(f"v peregrine.v -o peregrine{ext}")
+os.system(f"v ./peregrine.v -o peregrine{ext}")
 for item in file:
     print(f"\n\nCompiling {item} and running it\n\n") 
-    os.system(f"peregrine compile {item} -emit-c")
+    os.system(f"./peregrine compile {item} -emit-c")
     os.system(f"gcc ./temp.c -o output{ext}")
-    os.system(f"output{ext}")   
+    os.system(f"./output{ext}")   

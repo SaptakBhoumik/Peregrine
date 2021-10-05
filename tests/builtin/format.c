@@ -1,7 +1,7 @@
 // Original author: MD Gaziur Rahman Noor
 /* Tests for _format() builtin function */
 #include<assert.h>
-#include "../../swallow/builtin.h"
+#include "../../Peregrine/builtin.h"
 
 int main() {
     assert(strcmp(_format("Hello {}!", "world"), "Hello world!") == 0);
