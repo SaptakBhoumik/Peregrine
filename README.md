@@ -56,7 +56,7 @@ Currently we are working on the codegen and some swallow programs are working :)
 # Example
 
 Here is a small example for you to understand:
-```
+```py
 def main():
     print("hi")
 ```

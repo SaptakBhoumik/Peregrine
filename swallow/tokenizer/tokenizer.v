@@ -57,7 +57,7 @@ pub fn tokenize(str string) []string {
 		// greater than equals to
 		'<=',
 		// less than equals to
-		'!='
+		'!=',
 		// not equals to
 	]
 

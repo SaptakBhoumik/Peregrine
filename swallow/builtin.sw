@@ -3,6 +3,7 @@
 #Builtin.h is imported by default
 def print(const str query):
     printf("%s",query)
+    
 def colorprint(const str string,str flags,str bg):
     Ccode _colorprint(string,flags,bg); Ccode
 
