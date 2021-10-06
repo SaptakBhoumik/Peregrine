@@ -118,7 +118,7 @@ fn main() {
 	mut outfile := ''
 	mut idx_ := 0
 	mut ext:=''
-	if '${os.user_os}'=="windows"{
+	if '${os.user_os()}'=="windows"{
 		ext = ".exe"
 	}
 	for idx, x in arg {
