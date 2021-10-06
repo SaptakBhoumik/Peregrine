@@ -149,24 +149,14 @@ pub fn process_tokens(list []string) []string {
 					is_ccode = true
 					results << item
 					results << ''
-				} else if item != 'Ccode' && is_double_quote_open == false
-					&& is_single_quote_open == false && is_list_open == false
-					&& is_dictionary_open == false && is_double_quote_open_list == false
-					&& is_single_quote_open_list == false
-					&& is_double_quote_open_dictionary == false
-					&& is_single_quote_open_dictionary == false && is_ccode == true {
+				} else if item != 'Ccode' && is_ccode == true {
 					if item == r'\n' {
 						item = '\n'
 					}
 					unsafe {
 						results[count - 1] += *item
 					}
-				} else if item == 'Ccode' && is_double_quote_open == false
-					&& is_single_quote_open == false && is_list_open == false
-					&& is_dictionary_open == false && is_double_quote_open_list == false
-					&& is_single_quote_open_list == false
-					&& is_double_quote_open_dictionary == false
-					&& is_single_quote_open_dictionary == false && is_ccode == true {
+				} else if item == 'Ccode' && is_ccode == true {
 					is_ccode = false
 					results << item
 				}
