@@ -1,3 +1,6 @@
+
+<img id="banner" src="./graphics/banner.png" style="width: 800px; align: center;"/>
+
 # Peregrine
 
 Peregrine is a compiled programming language currently under development. Docs coming soon.
