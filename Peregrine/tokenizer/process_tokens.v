@@ -61,7 +61,7 @@ fn symbol_present_in_arrey(item string) int {
 		// greater than equals to
 		'<=',
 		// less than equals to
-		'!=',
+		'!='
 		// not equals to
 	]
 	mut present := 0 // false
@@ -123,7 +123,7 @@ pub fn process_tokens(list []string) []string {
 		'==',
 		'>=',
 		// greater than equals to
-		'<=',
+		'<='
 		// less than equals to
 	]
 	mut lis := list.clone()

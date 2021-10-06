@@ -94,10 +94,10 @@ fn compile(opt CompilationOptions) {
 			return
 		}
 
-		os.system('gcc -O3 ./temp.c -o $opt.output')
+		os.system('gcc -O3 temp.c -o $opt.output')
 
 		if !opt.emitc {
-			os.system('rm ./temp.c')
+			os.system('rm temp.c')
 		}
 	} else {
 		print('\033[0;31m')
@@ -182,9 +182,4 @@ fn main() {
 		emitast: emitast
 		output: outfile
 	})
-	// println(preprocessor.formatter(content))
-	// println(tokenizer.process_tokens(tokenizer.tokenize(preprocessor.formatter(content))))
-	// println(preprocessor.import_parser(content))
-	// println(content)
-	// println(os.args)//gives the location do i can add the built i file location
 }
