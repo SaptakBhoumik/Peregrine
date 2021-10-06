@@ -61,7 +61,7 @@ fn symbol_present_in_arrey(item string) int {
 		// greater than equals to
 		'<=',
 		// less than equals to
-		'!=',
+		'!='
 		// not equals to
 	]
 	mut present := 0 // false
@@ -123,7 +123,7 @@ pub fn process_tokens(list []string) []string {
 		'==',
 		'>=',
 		// greater than equals to
-		'<=',
+		'<='
 		// less than equals to
 	]
 	mut lis := list.clone()
@@ -139,7 +139,28 @@ pub fn process_tokens(list []string) []string {
 				mut consequtive_item := '$prev_item$item'
 
 				// i know this part is a bit messy
-				if prev_item == 'r' && is_double_quote_open == false
+				// c code
+				if item == 'Ccode' && is_double_quote_open == false
+					&& is_single_quote_open == false && is_list_open == false
+					&& is_dictionary_open == false && is_double_quote_open_list == false
+					&& is_single_quote_open_list == false
+					&& is_double_quote_open_dictionary == false
+					&& is_single_quote_open_dictionary == false && is_ccode == false {
+					is_ccode = true
+					results << item
+					results << ''
+				} else if item != 'Ccode' && is_ccode == true {
+					if item == r'\n' {
+						item = '\n'
+					}
+					unsafe {
+						results[count - 1] += *item
+					}
+				} else if item == 'Ccode' && is_ccode == true {
+					is_ccode = false
+					results << item
+				}
+				else if prev_item == 'r' && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == false
 					&& is_dictionary_open == false && is_double_quote_open_list == false
 					&& is_single_quote_open_list == false
@@ -245,37 +266,7 @@ pub fn process_tokens(list []string) []string {
 						results[count - 1] += *item
 					}
 				}
-				// c code
-				else if item == 'Ccode' && is_double_quote_open == false
-					&& is_single_quote_open == false && is_list_open == false
-					&& is_dictionary_open == false && is_double_quote_open_list == false
-					&& is_single_quote_open_list == false
-					&& is_double_quote_open_dictionary == false
-					&& is_single_quote_open_dictionary == false && is_ccode == false {
-					is_ccode = true
-					results << item
-					results << ''
-				} else if item != 'Ccode' && is_double_quote_open == false
-					&& is_single_quote_open == false && is_list_open == false
-					&& is_dictionary_open == false && is_double_quote_open_list == false
-					&& is_single_quote_open_list == false
-					&& is_double_quote_open_dictionary == false
-					&& is_single_quote_open_dictionary == false && is_ccode == true {
-					if item == r'\n' {
-						item = '\n'
-					}
-					unsafe {
-						results[count - 1] += *item
-					}
-				} else if item == 'Ccode' && is_double_quote_open == false
-					&& is_single_quote_open == false && is_list_open == false
-					&& is_dictionary_open == false && is_double_quote_open_list == false
-					&& is_single_quote_open_list == false
-					&& is_double_quote_open_dictionary == false
-					&& is_single_quote_open_dictionary == false && is_ccode == true {
-					is_ccode = false
-					results << item
-				}
+				
 				// list
 				else if item == '"' && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == true
