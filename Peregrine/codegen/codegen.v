@@ -76,7 +76,7 @@ pub fn codegen(ast parser.Ast) []string {
 		}
 		if (previous_code_block.keyword in if_else_loop || previous_code_block.keyword == 'or'
 			|| previous_code_block.keyword == 'and') && is_case == false {
-			if item.ast_type == 'string' {
+			if item.ast_type == 'string' || item.ast_type == 'raw_string' || item.ast_type == 'formatted_string'{
 				code << ' compare('
 				is_string_compare = true
 			} else if item.ast_type == 'variable' && item.keyword in function.variable
@@ -111,7 +111,7 @@ pub fn codegen(ast parser.Ast) []string {
 			} else if item.keyword == 'and' {
 				code << ' && '
 			} else {
-				if match_item.last().split('')[0] == "'" || match_item.last().split('')[0] == '"' {
+				if item.ast_type == 'string' || item.ast_type == 'raw_string' || item.ast_type == 'formatted_string'{
 					code << ' compare($match_item.last(),$item.keyword)==0 '
 				} else if item.ast_type == 'variable' && item.keyword in function.variable
 					&& var_type(function.variable_type, keyword) == 'str' {
