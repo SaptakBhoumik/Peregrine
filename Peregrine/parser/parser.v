@@ -456,9 +456,7 @@ pub fn parser(code []string) (Ast, string) {
 				length: item.len
 				tab: tab
 			}
-		} else {
-			error = '$item\n^Undefined character'
-		}
+		} 
 		code_block.id = index
 		code_block.line = line
 
