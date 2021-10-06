@@ -15,6 +15,29 @@
 #define False 0
 #endif
 
+/*
+ * Color hashes for faster lookup.
+ * Author: Gabriel Gazola Milan
+ *
+ * Replaces a bunch of if statements in the code.
+ */
+#define HASH_BLACK 210668624802U
+#define HASH_RED 193468640U
+#define HASH_GREEN 210674774454U
+#define HASH_YELLOW 6952956836385U
+#define HASH_BLUE 6383898381U
+#define HASH_MAGENTA 229431915261218U
+#define HASH_CYAN 6383947824U
+#define HASH_WHITE 210693394662U
+#define HASH_BRIGHT_BLACK 13260719720051023329U
+#define HASH_BRIGHT_RED 8244608208946659167U
+#define HASH_BRIGHT_GREEN 13260719720057172981U
+#define HASH_BRIGHT_YELLOW 13328637067256300608U
+#define HASH_BRIGHT_BLUE 13817653863305463148U
+#define HASH_BRIGHT_MAGENTA 15569909508477893409U
+#define HASH_BRIGHT_CYAN 13817653863305512591U
+#define HASH_BRIGHT_WHITE 13260719720075793189U
+
 char *inputString() {
   int bufsize = 100;
   int position = 0;
@@ -135,6 +158,29 @@ char *_format(const char *fmt, ...) {
 // Foreground(text) colors
 
 /*
+ * Hash function for faster color matching
+ * Extracted from: https://stackoverflow.com/a/7666577/9944075
+ * Added here by: Gabriel Gazola Milan
+ * 
+ * Implements a hash function for the color codes.
+ * 
+ * Example:
+ * unsigned long hash = _hash("BLACK");
+ * 
+ * Output:
+ * hash = 210668624802
+ */
+unsigned long _hash(const char *str) {
+  unsigned long hash = 5381;
+  int c;
+
+  while ((c = *str++))
+    hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+  return hash;
+}
+
+/*
  * Builtin Color Print Function
  * Author: MD Gaziur Rahman Noor
  *
@@ -147,64 +193,92 @@ char *_format(const char *fmt, ...) {
 void _colorprint(const char *str, char *color, char *bg) {
   int16_t bg_flags;
   int16_t flags;
-  if (strcmp(color, "BLACK") == 0) {
-    flags = (30 << 8);
-  } else if (strcmp(color, "RED") == 0) {
-    flags = (31 << 8);
-  } else if (strcmp(color, "GREEN") == 0) {
-    flags = (32 << 8);
-  } else if (strcmp(color, "YELLOW") == 0) {
-    flags = (33 << 8);
-  } else if (strcmp(color, "BLUE") == 0) {
-    flags = (34 << 8);
-  } else if (strcmp(color, "MAGENTA") == 0) {
-    flags = (35 << 8);
-  } else if (strcmp(color, "CYAN") == 0) {
-    flags = (36 << 8);
-  } else if (strcmp(color, "WHITE") == 0) {
-    flags = (37 << 8);
-  } else {
-    printf("\033[0;31m%s-> Unknown font color\033[0m", color);
-    exit(1);
-  }
-  if (bg != NULL) {
-    if (strcmp(bg, "BLACK") == 0) {
-      bg_flags = 40;
-    } else if (strcmp(bg, "RED") == 0) {
-      bg_flags = 41;
-    } else if (strcmp(bg, "GREEN") == 0) {
-      bg_flags = 42;
-    } else if (strcmp(color, "YELLOW") == 0) {
-      bg_flags = 43;
-    } else if (strcmp(bg, "BLUE") == 0) {
-      bg_flags = 44;
-    } else if (strcmp(bg, "MAGENTA") == 0) {
-      bg_flags = 45;
-    } else if (strcmp(bg, "CYAN") == 0) {
-      bg_flags = 46;
-    } else if (strcmp(bg, "WHITE") == 0) {
-      bg_flags = 47;
-    } else if (strcmp(bg, "BRIGHT_BLACK") == 0) {
-      bg_flags = 100;
-    } else if (strcmp(bg, "BRIGHT_RED") == 0) {
-      bg_flags = 101;
-    } else if (strcmp(bg, "BRIGHT_GREEN") == 0) {
-      bg_flags = 102;
-    } else if (strcmp(color, "BRIGHT_YELLOW") == 0) {
-      bg_flags = 103;
-    } else if (strcmp(bg, "BRIGHT_BLUE") == 0) {
-      bg_flags = 104;
-    } else if (strcmp(bg, "BRIGHT_MAGENTA") == 0) {
-      bg_flags = 105;
-    } else if (strcmp(bg, "BRIGHT_CYAN") == 0) {
-      bg_flags = 106;
-    } else if (strcmp(bg, "BRIGHT_WHITE") == 0) {
-      bg_flags = 107;
-    } else {
-      printf("\033[0;31m%s-> Unknown background color\033[0m", color);
-      exit(1);
+  if (color)
+    switch (_hash(color)) {
+      case HASH_BLACK:
+        flags = (30 << 8);
+        break;
+      case HASH_RED:
+        flags = (31 << 8);
+        break;
+      case HASH_GREEN:
+        flags = (32 << 8);
+        break;
+      case HASH_YELLOW:
+        flags = (33 << 8);
+        break;
+      case HASH_BLUE:
+        flags = (34 << 8);
+        break;
+      case HASH_MAGENTA:
+        flags = (35 << 8);
+        break;
+      case HASH_CYAN:
+        flags = (36 << 8);
+        break;
+      case HASH_WHITE:
+        flags = (37 << 8);
+        break;
+      default:
+        printf("\033[0;31m%s-> Unknown font color\033[0m", color);
+        exit(1);
+        break;
     }
-  }
+  if (bg)
+    switch(_hash(bg)) {
+      case HASH_BLACK:
+        bg_flags = 40;
+        break;
+      case HASH_RED:
+        bg_flags = 41;
+        break;
+      case HASH_GREEN:
+        bg_flags = 42;
+        break;
+      case HASH_YELLOW:
+        bg_flags = 43;
+        break;
+      case HASH_BLUE:
+        bg_flags = 44;
+        break;
+      case HASH_MAGENTA:
+        bg_flags = 45;
+        break;
+      case HASH_CYAN:
+        bg_flags = 46;
+        break;
+      case HASH_WHITE:
+        bg_flags = 47;
+        break;
+      case HASH_BRIGHT_BLACK:
+        bg_flags = 100;
+        break;
+      case HASH_BRIGHT_RED:
+        bg_flags = 101;
+        break;
+      case HASH_BRIGHT_GREEN:
+        bg_flags = 102;
+        break;
+      case HASH_BRIGHT_YELLOW:
+        bg_flags = 103;
+        break;
+      case HASH_BRIGHT_BLUE:
+        bg_flags = 104;
+        break;
+      case HASH_BRIGHT_MAGENTA:
+        bg_flags = 105;
+        break;
+      case HASH_BRIGHT_CYAN:
+        bg_flags = 106;
+        break;
+      case HASH_BRIGHT_WHITE:
+        bg_flags = 107;
+        break;
+      default:
+        printf("\033[0;31m%s-> Unknown background color\033[0m", color);
+        exit(1);
+        break;
+    }
   int8_t foreground = (flags & 0xFF00) >> 8;
   int8_t background = bg_flags & 0x00FF;
   if (background == 0) {
