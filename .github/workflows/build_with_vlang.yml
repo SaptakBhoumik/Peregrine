@@ -26,6 +26,8 @@ jobs:
     name: run-tests
     runs-on: ubuntu-latest
     steps:
+      - name: Install build-essential
+        run: sudo apt-get install build-essential
       - name: Checkout
         uses: actions/checkout@v2
       - name: Download Artifact Compiled peregrine
@@ -35,8 +37,8 @@ jobs:
           path: ./Peregrine/
       - name: Run tests
         run: | 
-          sudo apt-get install build-essential
           cd Peregrine
+          ls
           sudo chmod 777 peregrine
           sudo bash ./run_tests_ci.sh
           echo TEST DONE
