@@ -38,7 +38,7 @@ You can consider it to be a superset of C which compiles to clean C. So valid c 
  
 - Clone this repository using the following command -> `git clone https://github.com/Peregrine-lang/Peregrine.git`
 - Run `cd Peregrine/Peregrine`
-- To build it run `v Peregrine.v`
+- To build it run `v peregrine.v`
 - That's it
 
 
