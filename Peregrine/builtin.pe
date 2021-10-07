@@ -12,9 +12,6 @@ def input() ->str:
     str variable="some string"
     Ccode variable = inputString(); Ccode
     return variable
-def wait(int counter):
-    Ccode int c =0, i++; Ccode
-    Ccode while( c++ < counter ); Ccode
 def sys(str command):
     Ccode char cmd[10]; Ccode
     Ccode strcpy(cmd,command); Ccode
