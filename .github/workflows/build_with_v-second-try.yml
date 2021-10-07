@@ -14,4 +14,4 @@ jobs:
       id: v
     - name: Build Peregrine
       run: |
-        v ./Peregrine/peregrine.v -o peregrine -path='builtin/'
+        sudo v ./Peregrine/peregrine.v -o peregrine -path='builtin/'
