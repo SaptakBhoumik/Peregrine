@@ -5,7 +5,9 @@ for file in *
 do
 echo $file ...
 ../peregrine compile $file -emit-c
-if [gcc temp.c -o output.o | grep 'error' -q; -ne 0];then
+gcc temp.c -o output.o | grep 'error' -q
+if [$? -ne 0]
+then
 echo "::error GCC FAILED"
 exit 1
 fi
