@@ -42,3 +42,4 @@ jobs:
           cd Peregrine
           sudo chmod +x peregrine
           sudo python test_runner.py
+          echo TEST DONE
