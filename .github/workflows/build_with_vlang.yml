@@ -38,5 +38,5 @@ jobs:
           sudo apt-get install build-essential
           cd Peregrine
           sudo chmod 777 peregrine
-          sudo ./run_tests_ci.sh
+          sudo bash ./run_tests_ci.sh
           echo TEST DONE
