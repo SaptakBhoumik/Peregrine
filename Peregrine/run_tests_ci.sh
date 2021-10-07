@@ -1,6 +1,6 @@
 # CI TEST RUNNER SCRIPT @ClientCrash 7 - okt - 2021
 cd ./tests
-chmod +x ./peregrine
+pwd
 for file in *
 do
     ./peregrine compile $file -emit-c

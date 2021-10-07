@@ -39,6 +39,7 @@ jobs:
         run: | 
           cd Peregrine
           ls
-          sudo chmod 777 peregrine
+          pwd
+          sudo chmod 777 ./peregrine
           sudo bash ./run_tests_ci.sh
           echo TEST DONE
