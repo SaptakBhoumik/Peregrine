@@ -8,9 +8,9 @@ jobs:
       - name: Install dependencies
         id: clone-build
         run: |
-          sudo apt update
-          sudo apt install build-essential
-          sudo apt install git
+          sudo apt-get update
+          sudo apt-get install build-essential
+          sudo apt-get install git
           
       - name: Clone v
         run: |
@@ -39,7 +39,7 @@ jobs:
           path: ./v
       - name: Build Peregrine
         run: |
-          chmod +x ./v
+          ls
           sudo ./v ./Peregrine/peregrine.v -o peregrine
 
 
