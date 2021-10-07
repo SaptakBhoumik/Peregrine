@@ -1,5 +1,17 @@
 name: Build Peregrine with Vlang
-on: [push, pull_request]
+on: 
+  pull_request:
+    branches:
+      - "main"
+    paths-ignore:
+      - "./github/**"
+  push:
+    branches:
+      - "main"
+    paths-ignore:
+      - "./github/**"
+  
+
 jobs:
   build-peregrine:
     name: Build Peregrine
