@@ -6,16 +6,17 @@ def print(const str query):
     
 def colorprint(const str string,str flags,str bg):
     Ccode _colorprint(string,flags,bg); Ccode
+def sys(str command):
+    Ccode char cmd[10]; Ccode
+    Ccode strcpy(cmd,command); Ccode
+    Ccode system(cmd); Ccode
 
 @free
 def input() ->str:
     str variable="some string"
     Ccode variable = inputString(); Ccode
     return variable
-def sys(str command):
-    Ccode char cmd[10]; Ccode
-    Ccode strcpy(cmd,command); Ccode
-    Ccode system(cmd); Ccode
+
 def panic(str string):
     colorprint(string,"RED",NULL)
     exit(1)
