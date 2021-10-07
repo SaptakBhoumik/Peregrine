@@ -13,7 +13,7 @@ def input() ->str:
     Ccode variable = inputString(); Ccode
     return variable
 def sys(str command):
-    Ccode system(command) Ccode
+    Ccode system(command); Ccode
 def panic(str string):
     colorprint(string,"RED",NULL)
     exit(1)
