@@ -5,9 +5,10 @@ for file in *
 do
 echo $file ...
 ../peregrine compile $file -emit-c
-if gcc temp.c -o output.o then
+gcc temp.c -o output.o
+if [ $? -ne 1] then
 echo "::error GCC FAILED"
-exit
+exit 1
 fi
 chmod +x ./output.o
 ./output.o
@@ -15,3 +16,4 @@ rm ./output.o
 
     
 done
+exit 0
