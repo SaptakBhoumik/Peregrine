@@ -1,3 +1,4 @@
 def main():
     print("Running sys test...")
-    sys("echo hi")
+    str com="echo hi"
+    sys(com)
