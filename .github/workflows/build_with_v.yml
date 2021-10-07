@@ -39,8 +39,7 @@ jobs:
           path: ./
       - name: Build Peregrine
         run: |
-          ls
-          ./v ./Peregrine/peregrine.v -o peregrine
+          sudo ./v ./Peregrine/peregrine.v -o peregrine
 
 
         
