@@ -42,7 +42,7 @@ jobs:
           ls
           sudo su
           chmod 777 ./v
-          ./v ./Peregrine/peregrine.v -o peregrine -path='@vlib|builtin'
+          ./v ./Peregrine/peregrine.v -o peregrine -path='builtin/'
 
 
         
