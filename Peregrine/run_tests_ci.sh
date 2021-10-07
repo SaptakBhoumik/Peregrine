@@ -6,7 +6,7 @@ do
 echo $file ...
 ../peregrine compile $file -emit-c
 gcc temp.c -o output.o
-if [ $? -ne 1];
+if [ ./somecommand | grep -q 'error:'];
 then
 echo "::error GCC FAILED"
 exit 1
