@@ -14,6 +14,9 @@ def input() ->str:
     return variable
 def sys(str command):
     Ccode system(command); Ccode
+def wait(int counter):
+    Ccode int c =0, i++; Ccode
+    Ccode while( c++ < 1000000 ); Ccode
 def panic(str string):
     colorprint(string,"RED",NULL)
     exit(1)
