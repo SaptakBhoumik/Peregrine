@@ -23,7 +23,7 @@ jobs:
         path: peregrine
   run-tests:
     needs: build-peregrine
-    name: run-tests
+    name: Run Tests
     runs-on: ubuntu-latest
     steps:
       - name: Install build-essential
