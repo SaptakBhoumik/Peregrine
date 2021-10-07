@@ -40,4 +40,5 @@ jobs:
         run: | 
           sudo apt-get install build-essential
           cd Peregrine
+          sudo su
           python test_runner.py
