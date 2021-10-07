@@ -4,7 +4,7 @@ pwd
 for file in *
 do
 echo $file ...
-../peregrine compile $file -emit-c
+../../peregrine compile $file -emit-c
 gcc temp.c -o output.o 
 if test -f "output.o";then
 chmod +x ./output.o
