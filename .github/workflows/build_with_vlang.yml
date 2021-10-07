@@ -39,4 +39,5 @@ jobs:
       - name: Run tests
         run: | 
           sudo apt-get install build-essential
-          python ./Peregrine/test_runner.py
+          cd Peregrine
+          python test_runner.py
