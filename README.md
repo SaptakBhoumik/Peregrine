@@ -61,7 +61,7 @@ Currently we are working on the codegen and some Peregrine programs are working 
 Here is a small example for you to understand:
 ```py
 def main():
-    print("hi")
+    print("Hello, World!")
 ```
 The `main` function is the entry point for the program.
 
