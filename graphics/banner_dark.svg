@@ -51,11 +51,11 @@
      inkscape:showpageshadow="false"
      showgrid="true"
      inkscape:document-rotation="0"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g991"
      inkscape:document-units="px"
      inkscape:cy="634.61374"
      inkscape:cx="929.56151"
-     inkscape:zoom="0.49314469"
+     inkscape:zoom="0.49824839"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0"
      borderopacity="1.0"
@@ -63,11 +63,11 @@
      pagecolor="#ffffff"
      id="base"
      units="px"
-     inkscape:window-width="1346"
-     inkscape:window-height="1009"
-     inkscape:window-x="-22"
-     inkscape:window-y="25"
-     inkscape:window-maximized="0"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
      inkscape:snap-page="true" />
   <metadata
      id="metadata5">
@@ -77,7 +77,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
         <cc:license
            rdf:resource="" />
       </cc:Work>
@@ -88,13 +88,13 @@
      inkscape:groupmode="layer"
      inkscape:label="Layer 1">
     <rect
-       style="fill:url(#linearGradient2272);fill-opacity:1;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:2.64583, 1.32292000000000010;stroke-dashoffset:1.32292;stroke-opacity:0.508064;paint-order:stroke fill markers"
+       style="fill:url(#linearGradient2272);fill-opacity:1;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:2.64583, 1.32292;stroke-dashoffset:1.32292;stroke-opacity:0.508064;paint-order:stroke fill markers"
        id="rect1638"
        width="508"
        height="285.75"
        x="0"
        y="0"
-       ry="7.0803561" />
+       ry="43.721218" />
     <g
        id="g991"
        transform="matrix(1.0467823,0,0,1.0467823,-41.200419,-15.877237)">
@@ -118,7 +118,7 @@
       </g>
       <text
          xml:space="preserve"
-         style="font-size:50.8px;line-height:1.25;font-family:Quicksand;-inkscape-font-specification:Quicksand;letter-spacing:0px;fill:#f6f5f4;stroke-width:0.264583;"
+         style="font-size:50.8px;line-height:1.25;font-family:Quicksand;-inkscape-font-specification:Quicksand;letter-spacing:0px;fill:#f6f5f4;stroke-width:0.264583"
          x="241.56702"
          y="178.95984"
          id="text983"><tspan
@@ -126,7 +126,7 @@
            id="tspan981"
            x="241.56702"
            y="178.95984"
-           style="fill:#f6f5f4;stroke-width:0.264583;">Peregirne</tspan></text>
+           style="fill:#f6f5f4;stroke-width:0.264583">Peregrine</tspan></text>
     </g>
   </g>
 </svg>
