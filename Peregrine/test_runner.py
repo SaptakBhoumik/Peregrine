@@ -1,6 +1,9 @@
 import glob
 import os
 from sys import platform
+from sys import argv
+print("NOT THE OFFICIAL CI TEST RUNNER")
+
 ext = ""
 sign = "/"
 if platform == "win32":
