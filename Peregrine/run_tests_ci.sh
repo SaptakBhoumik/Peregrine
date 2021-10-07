@@ -1,5 +1,5 @@
 # CI TEST RUNNER SCRIPT @ClientCrash 7 - okt - 2021
-cd ./tests
+cd ./tests/ci
 pwd
 for file in *
 do
