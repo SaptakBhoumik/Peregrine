@@ -11,7 +11,7 @@ chmod +x ./output.o
 ./output.o
 rm ./output.o
 else
-echo "::error GCC FAILED"
+echo "Error: gcc failed"
 exit 1
 fi
 

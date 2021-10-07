@@ -21,6 +21,7 @@ jobs:
       with:
         name: peregrine-bin
         path: peregrine
+        retention-days: 1
   run-tests:
     needs: build-peregrine
     name: Run Tests
