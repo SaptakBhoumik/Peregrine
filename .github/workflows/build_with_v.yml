@@ -41,6 +41,7 @@ jobs:
         run: |
           ls
           sudo su
+          chmod 777 ./v
           ./v ./Peregrine/peregrine.v -o peregrine
 
 
