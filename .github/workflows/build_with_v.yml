@@ -24,7 +24,7 @@ jobs:
         name: Upload V artifact
         with:
           name: v-lang-build
-          path: v/
+          path: v/v
           if-no-files-found: error        
   build-peregrine:
     name: Build Peregrine
@@ -39,8 +39,8 @@ jobs:
           path: ./v
       - name: Build Peregrine
         run: |
-          chmod +x ./v/v
-          ./v/v ./Peregrine/peregrine.v -o peregrine
+          chmod +x ./v
+          sudo ./v ./Peregrine/peregrine.v -o peregrine
 
 
         
