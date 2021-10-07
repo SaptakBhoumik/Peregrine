@@ -40,4 +40,4 @@ jobs:
           name: peregrine-bin
           path: ./
       - name: Run tests
-        run: python test_runner.py
+        run: python ./Peregrine/test_runner.py
