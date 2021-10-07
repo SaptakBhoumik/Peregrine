@@ -39,9 +39,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build Peregrine
         run: |
-          cd Peregrine
-          ls -a
-          cd ..
+          ls
+          cd v
           ./v ./Peregrine/peregrine.v -o peregrine
 
 
