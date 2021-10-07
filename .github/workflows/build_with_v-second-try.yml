@@ -14,7 +14,4 @@ jobs:
       id: v
     - name: Build Peregrine
       run: |
-        ls
-        sudo su
-        chmod 777 ./v
         v ./Peregrine/peregrine.v -o peregrine -path='builtin/'
