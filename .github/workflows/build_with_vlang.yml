@@ -35,10 +35,9 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: peregrine-bin
-          path: ./
+          path: ./Peregrine/
       - name: Run tests
         run: | 
           sudo apt-get install build-essential
-          mv ./peregrine ./Pergegrine/peregrine
           cd Peregrine
           python test_runner.py
