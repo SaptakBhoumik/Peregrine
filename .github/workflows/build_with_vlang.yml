@@ -1,6 +1,5 @@
-#Action to build Peregrine and run the tests. Original Version by ClientCrash 7 - Okt - 2021
 name: Build Peregrine with Vlang
-on: [push,pull_request]
+on: [push, pull_request]
 jobs:
   build-peregrine:
     name: Build Peregrine
