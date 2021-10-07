@@ -6,9 +6,7 @@ def print(const str query):
     
 def colorprint(const str string,str flags,str bg):
     Ccode _colorprint(string,flags,bg); Ccode
-def sys(str command) ->int:
-    Ccode char cmd[10]; Ccode
-    Ccode strcpy(cmd,command); Ccode
+def sys(str cmd) ->int:
     Ccode system(cmd); Ccode
     return 0
 
