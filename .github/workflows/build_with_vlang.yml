@@ -1,3 +1,4 @@
+# Action to build Peregrine and run the tests. Original Version by CLientCrash 7 - Okt - 2021
 name: Build Peregrine with Vlang
 on: [push,pull_request]
 jobs:
@@ -7,6 +8,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        python-version: '3.x' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+        architecture: 'x64'
     - name: Set up V version latest
       uses: nocturlab/setup-vlang-action@v1
       with:
@@ -16,6 +20,23 @@ jobs:
       run: |
         v ./Peregrine/peregrine.v -o peregrine -path='builtin/'
         ls
+    - uses: actions/upload-artifact@v2
+      with:
+        name: peregrine-bin
+        path: peregrine
   run-tests:
     name: run-tests
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+          
+      - name: Setup Python
+        uses: actions/setup-python@v2
+      - name: Download Artifact Compiled peregrine
+        uses: actions/download-artifact@v2
+        with:
+          name: peregrine-bin
+          path: ./
+      - name: Run tests
+        run: python test_runner.py

@@ -9,8 +9,10 @@ if platform == "win32":
     sign = "\\"
 file = glob.glob(f'.{sign}tests{sign}*.pe')
 print("This program will compile the peregrine compiler and run some tests")
-print("Compiling the peregrine compiler")
-os.system(f"v peregrine.v -o peregrine{ext}")
+if len(argv) > 1:
+    if argv[1] == "comp":
+        print("Compiling the peregrine compiler")
+        os.system(f"v peregrine.v -o peregrine{ext}")
 for item in file:
     print(f"\n\nCompiling {item} and running it\n\n")
     os.system(f".{sign}peregrine{ext} compile {item} -emit-c")
