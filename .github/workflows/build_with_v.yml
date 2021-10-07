@@ -39,7 +39,7 @@ jobs:
           path: v/v
       - name: Build Peregrine
         run: |
-          ./v /Peregrine/peregrine.v -o peregrine
+          ./v/v ./Peregrine/peregrine.v -o peregrine
 
 
         
