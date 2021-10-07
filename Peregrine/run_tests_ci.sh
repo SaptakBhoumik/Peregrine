@@ -3,7 +3,7 @@ cd ./tests
 pwd
 for file in *
 do
-    ./peregrine compile $file -emit-c
+    ../peregrine compile $file -emit-c
     gcc temp.c -o output.o
     chmod +x ./output.o
     ./output.o
