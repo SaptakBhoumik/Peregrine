@@ -13,6 +13,7 @@ if len(argv) > 1:
     if argv[1] == "comp":
         print("Compiling the peregrine compiler")
         os.system(f"v peregrine.v -o peregrine{ext}")
+print("compiling and running tests...")
 for item in file:
     print(f"\n\nCompiling {item} and running it\n\n")
     os.system(f".{sign}peregrine{ext} compile {item} -emit-c")
