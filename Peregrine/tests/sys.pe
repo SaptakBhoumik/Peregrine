@@ -1,0 +1,3 @@
+def main():
+    print("Running sys test...")
+    sys("echo hi")
