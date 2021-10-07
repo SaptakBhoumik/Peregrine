@@ -5,13 +5,20 @@ jobs:
     name: Build Vlang
     runs-on: ubuntu-latest
     steps:
-      - name: Clone and Build
+      - name: Install dependencies
         id: clone-build
-        run: 
-          apt-get install build-essentials
-          git clone https://github.com/vlang/v
+        run: |
+          sudo apt update
+          sudo apt install build-essential
+          sudo apt install git
+          
+      - name: Clone v
+        run: git clone https://github.com/vlang/v
+      - name: Build V from source
+        run: |
           cd v
           make
+          ls
       - uses: actions/upload-artifact@v2
         name: Upload V artifact
         with:
@@ -27,9 +34,9 @@ jobs:
         name: Download V Artifact
         with:
           name: v-lang-build
-          path: .
+          path: v/v
       - name: Build Peregrine
-        run: 
+        run: |
           ./v /Peregrine/peregrine.v -o peregrine
 
 
