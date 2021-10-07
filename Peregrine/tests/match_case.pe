@@ -1,4 +1,4 @@
-def main():
+def main2():
     print("There is a bug in this program. Please press ctrl-c to exit. We are trying to fix it\n")
     match "hi":
         case "hi" or "Hi":
@@ -19,4 +19,5 @@ def main():
                     print("Something is wrong")
                 default:
                     print("Something is wrong")
-    
+def main():
+    print("fix this test")
