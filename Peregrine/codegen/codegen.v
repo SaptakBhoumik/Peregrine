@@ -306,7 +306,7 @@ pub fn codegen(ast parser.Ast) []string {
 				}
 				last_match.pop()
 			} else if item == next_item {
-				tab_dif = int(item.tab)
+				tab_dif = int(item.tab)-1
 				for _ in last_match {
 					if is_default == true {
 						code << '\nbreak;\n'
@@ -320,6 +320,7 @@ pub fn codegen(ast parser.Ast) []string {
 				for _ in 0 .. tab_dif {
 					code << '\n}\n'
 				}
+				code<<"\nreturn 0;\n}"
 			} else if next_item.ast_type == 'new_line' && ast.body.len > index + 2
 				&& item != next_item && is_loop == false {
 				tab_dif = int(item.tab - ast.body[index + 2].tab)
@@ -340,10 +341,11 @@ pub fn codegen(ast parser.Ast) []string {
 			}
 		} else if next_item.tab < item.tab || item == next_item {
 			if next_item == item {
-				tab_dif = int(item.tab)
+				tab_dif = int(item.tab)-1
 				for _ in 0 .. tab_dif {
 					code << '\n}\n'
 				}
+				code<<"\nreturn 0;\n}"
 			} else if next_item.ast_type == 'new_line' && ast.body.len > index + 2
 				&& item != next_item && is_loop == false {
 				tab_dif = int(item.tab - ast.body[index + 2].tab)
