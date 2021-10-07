@@ -40,4 +40,6 @@ jobs:
           name: peregrine-bin
           path: ./
       - name: Run tests
-        run: python ./Peregrine/test_runner.py
+        run: | 
+          sudo apt-get install build-essential
+          python ./Peregrine/test_runner.py
