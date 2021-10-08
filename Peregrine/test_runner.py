@@ -9,7 +9,7 @@ sign = "/"
 if platform == "win32":
     ext = ".exe"
     sign = "\\"
-file = glob.glob(f'.{sign}tests{sign}non-ci{sign}*.pe')
+file = glob.glob(f'.{sign}tests{sign}manual{sign}*.pe')
 print("This program will compile the peregrine compiler and run some tests")
 print("Compiling the peregrine compiler")
 os.system(f"v peregrine.v -o peregrine{ext}")
