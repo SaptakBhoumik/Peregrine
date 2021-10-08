@@ -18,6 +18,13 @@ jobs:
       with:
         v-version: latest
       id: v
+    - name: Build libtcc
+      run: |
+        wget -o ltcc.tar.bz2 https://download.savannah.gnu.org/releases/tinycc/tcc-0.9.27.tar.bz2
+        tar -xf ltcc.tar.bz2 -C ./libtcc
+        cd libtcc
+        ./configure
+        make
     - name: Build Peregrine
       run: |
         v ./Peregrine/peregrine.v -o peregrine -path='builtin/'
