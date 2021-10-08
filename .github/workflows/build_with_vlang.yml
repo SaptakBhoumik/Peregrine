@@ -20,8 +20,8 @@ jobs:
       id: v
     - name: Build libtcc
       run: |
-        wget -o ltcc.tar.bz2 https://download.savannah.gnu.org/releases/tinycc/tcc-0.9.27.tar.bz2
-        tar -xf ltcc.tar.bz2 -C ./libtcc
+        wget https://download.savannah.gnu.org/releases/tinycc/tcc-0.9.27.tar.bz2
+        tar -xf tcc-0.9.27.tar.bz2 -C ./libtcc
         cd libtcc
         ./configure
         make
