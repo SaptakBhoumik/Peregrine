@@ -1,6 +1,6 @@
 module vlibtcc
 #flag -ltcc -ldl
-#include "libtcc.h"
+#include <libtcc.h>
 
 pub struct C.TCCState{
 }
