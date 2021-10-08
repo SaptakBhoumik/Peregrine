@@ -21,6 +21,9 @@
  *
  * Replaces a bunch of if statements in the code.
  */
+#ifdef __TINYC__
+    #undef main
+#endif
 #define HASH_BLACK 210668624802U
 #define HASH_RED 193468640U
 #define HASH_GREEN 210674774454U

@@ -2,8 +2,11 @@ import os
 import tokenizer
 import parser
 import codegen
+import vlibtcc
 
 // import preprocessor
+
+type Entry_point = fn() int
 
 // Original Author(print_help && CLI): Ethan Olchik
 fn print_help() {
@@ -24,6 +27,7 @@ fn print_help() {
 struct CompilationOptions {
 	filename string
 	emitc    bool
+	run    bool
 	emitast  bool
 	output   string
 }
@@ -75,29 +79,39 @@ fn compile(opt CompilationOptions) {
 			final_code = '$final_code$code'
 		}
 		final_code = '//Generated using the Peregrine compiler \n $builtin_h \n $final_code'
+		if opt.run==false{
+			mut x := os.create('temp.c') or {
+				eprintln('Unable to write the file.')
+				return
+			}
 
-		mut x := os.create('temp.c') or {
-			eprintln('Unable to write the file.')
-			return
+			x.writeln(final_code) or {
+				eprintln('Unable to write the file.')
+				return
+			}
+
+			x.close()
+			if opt.emitc && !opt.emitast {
+				return
+			} else if opt.emitast && opt.emitc {
+				println(ast)
+				return
+			}
+
+			os.system('gcc -O3 temp.c -o $opt.output')
+
+			if !opt.emitc {
+				os.system('rm temp.c')
+			}
 		}
-
-		x.writeln(final_code) or {
-			eprintln('Unable to write the file.')
-			return
-		}
-
-		x.close()
-		if opt.emitc && !opt.emitast {
-			return
-		} else if opt.emitast && opt.emitc {
-			println(ast)
-			return
-		}
-
-		os.system('gcc -O3 temp.c -o $opt.output')
-
-		if !opt.emitc {
-			os.system('rm temp.c')
+		else{
+			state:=vlibtcc.tcc_new()
+			vlibtcc.tcc_set_output_type(state,1)
+			vlibtcc.tcc_compile_string(state,&char(final_code.str))
+			vlibtcc.tcc_relocate(state, voidptr(1))
+			entry := Entry_point(vlibtcc.tcc_get_symbol(state, &char("main".str)))
+			entry()
+			vlibtcc.tcc_delete(state)
 		}
 	} else {
 		print('\033[0;31m')
@@ -111,6 +125,7 @@ fn main() {
 	arg := os.args.clone()
 	mut filename := ''
 	mut emitc := false
+	mut run := false
 	mut emitast := false
 	mut help := false
 	mut o := false
@@ -154,6 +169,10 @@ fn main() {
 			previous = x
 			help = true
 			continue
+		}else if x == 'run' {
+			previous = x
+			run = true
+			continue
 		} else if x.contains('.pe') {
 			previous = x
 			filename = x
@@ -181,5 +200,6 @@ fn main() {
 		emitc: emitc
 		emitast: emitast
 		output: outfile
+		run : run
 	})
 }

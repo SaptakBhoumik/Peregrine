@@ -32,6 +32,7 @@ You can consider it to be a superset of C which compiles to clean C. So valid c 
 
 # Requirements to build from source
  - [Gcc compiler](https://gcc.gnu.org/)
+ - [Libtcc](https://bellard.org/tcc/tcc-doc.html#Libtcc)
  - [V compiler](https://vlang.io)
 
 # Build instruction
