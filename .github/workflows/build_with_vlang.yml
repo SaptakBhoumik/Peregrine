@@ -6,12 +6,6 @@ on:
     paths-ignore:
       - "./github/**"
   push:
-    branches:
-      - "main"
-    paths-ignore:
-      - "./github/**"
-  
-
 jobs:
   build-peregrine:
     name: Build Peregrine
