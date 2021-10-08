@@ -52,7 +52,7 @@ fn compile(opt CompilationOptions) {
 	}
 
 	builtin_h := os.read_file('${folder}builtin.h') or {
-		eprintln('Could not read file: ${folder}builtin.pe')
+		eprintln('Could not read file: ${folder}builtin.h')
 		return
 	}
 
