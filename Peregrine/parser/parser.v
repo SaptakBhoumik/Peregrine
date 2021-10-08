@@ -45,7 +45,7 @@ pub mut:
 }
 
 pub fn parser(code []string) (Ast, string) {
-	swallow_type := ['char', 'int', 'bool', 'str', 'list', 'dictionary', 'float', 'void', 'int32',
+	peregrine_type := ['char', 'int', 'bool', 'str', 'list', 'dictionary', 'float', 'void', 'int32',
 		'int16', 'int8', 'float32', 'uint32', 'uint16', 'uint8', 'uint']
 
 	// required_arg:=["str_variable_required_argument","int_variable_required_argument","bool_variable_required_argument","list_variable_required_argument","dictionary_variable_required_argument","float_variable_required_argument","void_variable_required_argument"]
@@ -83,7 +83,7 @@ pub fn parser(code []string) (Ast, string) {
 	mut last_left_code_block := Body{}
 	mut json := Ast{}
 	reserved_keywords << loop
-	reserved_keywords << swallow_type
+	reserved_keywords << peregrine_type
 	reserved_keywords << decorator
 	reserved_keywords << operater
 	reserved_keywords << logic
@@ -110,7 +110,7 @@ pub fn parser(code []string) (Ast, string) {
 		}
 
 		// parsing starts here
-		if previous_code_block.keyword in swallow_type && item == ':' {
+		if previous_code_block.keyword in peregrine_type && item == ':' {
 			// do nothing
 		}
 		// checks if c code
@@ -152,7 +152,7 @@ pub fn parser(code []string) (Ast, string) {
 			&& item != '(' && (previous_code_block.ast_type == 'function_define'
 			|| 'required' in previous_code_block.ast_type.split('_')) && is_argument == false
 			&& is_operator == false && is_loop == false && is_ccode == false {
-			if item in swallow_type {
+			if item in peregrine_type {
 				json.function_return_type[json.function_return_type.len - 1].return_type << item
 			}
 		} else if is_argument == true && item == ')' && is_function_call == false
@@ -178,7 +178,7 @@ pub fn parser(code []string) (Ast, string) {
 			} else {
 				code_block.relative_to = json.body.last().relative_to
 			}
-			if previous_code_block.keyword in swallow_type || previous_code_block.keyword == 'const' {
+			if previous_code_block.keyword in peregrine_type || previous_code_block.keyword == 'const' {
 				code_block.ast_type = '$previous_code_block.ast_type$underscore$code_block.ast_type'
 			}
 			json.body << code_block
@@ -247,7 +247,7 @@ pub fn parser(code []string) (Ast, string) {
 					json.free << code[index + 3]
 				}
 			}
-		} else if item in swallow_type {
+		} else if item in peregrine_type {
 			if previous_code_block.keyword == 'const' {
 				code_block = Body{
 					ast_type: '$item$underscore$previous_code_block.ast_type'
@@ -432,7 +432,7 @@ pub fn parser(code []string) (Ast, string) {
 				tab: tab
 			}
 		} else if next_item != '=' && is_argument == false
-			&& previous_code_block.keyword in swallow_type {
+			&& previous_code_block.keyword in peregrine_type {
 			code_block = Body{
 				ast_type: 'variable'
 				keyword: item
@@ -506,7 +506,7 @@ pub fn parser(code []string) (Ast, string) {
 				code_block.direction = 'right'
 			}
 		}
-		if previous_code_block.keyword in swallow_type {
+		if previous_code_block.keyword in peregrine_type {
 			code_block.ast_type = previous_code_block.ast_type
 			if item in json.function_return_type[json.function_return_type.len - 1].variable {
 				error = '$item \n ^ Redefinition of an existing variable'
@@ -521,7 +521,7 @@ pub fn parser(code []string) (Ast, string) {
 					json.function_return_type[json.function_return_type.len - 1].variable_type << var
 				}
 			}
-		} else if code_block.keyword in swallow_type {
+		} else if code_block.keyword in peregrine_type {
 			// do nothing
 		} else if (code_block.ast_type == 'variable' || code_block.ast_type == 'constant')
 			&& item != 'const' && previous_code_block.keyword != ',' && next_item == '='
@@ -649,7 +649,7 @@ pub fn parser(code []string) (Ast, string) {
 				if json.body.last().direction == 'left' {
 					last_left_code_block = json.body.last()
 				}
-				if previous_code_block.keyword in swallow_type && item == ':' {
+				if previous_code_block.keyword in peregrine_type && item == ':' {
 					// do nothing
 				} else {
 					if code_block.keyword == 'f' || code_block.keyword == 'r' {
@@ -660,7 +660,7 @@ pub fn parser(code []string) (Ast, string) {
 						previous_code_block = json.body.last()
 					}
 					if json.body.last().keyword == 'const'
-						|| json.body.last().keyword in swallow_type
+						|| json.body.last().keyword in peregrine_type
 						|| json.body.last().keyword == 'def' {
 						json.body.pop()
 					}
