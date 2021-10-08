@@ -1,6 +1,6 @@
 # Graphics
 
-Logo and banner are drawn by [Rechie](https://github.com/RechieKho). All the graphics are drawn using [inkscape](https://inkscape.org/), a open-source vector program. All graphics are in png format with transparent background expect `dark` version as its background is dark. 
+Logo and banner are drawn by [Rechie](https://github.com/RechieKho) and [Mahi Chowdhury](https://github.com/Mahich123). All the graphics are drawn using [inkscape](https://inkscape.org/), a open-source vector program. All graphics are in png format with transparent background expect `dark` version as its background is dark. 
 
 ## Banner
 ![noraml_banner](banner.png)

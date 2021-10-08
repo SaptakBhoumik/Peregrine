@@ -70,6 +70,7 @@ The `main` function is the entry point for the program.
 
 Cool, you can contact me via mail.
 <br> Email: saptakbhoumik@gmail.com
+<br> Discord : https://discord.gg/CAMgzwDJDM
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
