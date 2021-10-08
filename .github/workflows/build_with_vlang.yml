@@ -18,10 +18,10 @@ jobs:
       with:
         v-version: latest
       id: v
+    - name: Build libtcc
+      run: bash ./Peregrine/build-libtcc.sh
     - name: Build Peregrine
-      run: |
-        v ./Peregrine/peregrine.v -o peregrine -path='builtin/'
-        ls
+      run: bash ./Peregrine/build.sh
     - uses: actions/upload-artifact@v2
       with:
         name: peregrine-bin
