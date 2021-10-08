@@ -18,10 +18,9 @@ fn func_return(name string, ast parser.Ast) (string, []string, parser.Function) 
 		}
 	}
 	if type_of_return.len == 0 {
-		if type_of_return == []string{} && name=="main" {
+		if type_of_return == []string{} && name == 'main' {
 			return_item = 'int $name ('
-		} 
-		else{
+		} else {
 			return_item = 'void $name ('
 		}
 	} else if type_of_return.len == 1 {

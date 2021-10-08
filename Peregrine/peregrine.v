@@ -117,9 +117,9 @@ fn main() {
 	mut previous := ''
 	mut outfile := ''
 	mut idx_ := 0
-	mut ext:=''
-	if '${os.user_os()}'=="windows"{
-		ext = ".exe"
+	mut ext := ''
+	if '$os.user_os()' == 'windows' {
+		ext = '.exe'
 	}
 	for idx, x in arg {
 		idx_ = idx
@@ -168,7 +168,7 @@ fn main() {
 	}
 
 	if !o {
-		outfile = "${filename.trim('.pe')}$ext"
+		outfile = '${filename.trim('.pe')}$ext'
 	}
 
 	if help || idx_ <= 0 {

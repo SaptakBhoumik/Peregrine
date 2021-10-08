@@ -101,7 +101,8 @@ pub fn (e SWError) display() {
 		println('  |')
 	}
 
-	println('  ╰- ' + fg(style('Hint: ', 'bold'), 'cyan') + 'Use Peregrine --explain=$e.ecode.code')
+	println('  ╰- ' + fg(style('Hint: ', 'bold'), 'cyan') +
+		'Use Peregrine --explain=$e.ecode.code')
 
 	exit(-1)
 }

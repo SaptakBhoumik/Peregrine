@@ -1,9 +1,7 @@
 import glob
 import os
 from sys import platform
-from sys import argv
-print("NOT THE OFFICIAL CI TEST RUNNER")
-print("THIS WILL ONLY RUN ALL TESTS THAT REQUIRE USER INPUT")
+print("THIS WILL ONLY RUN ALL TESTS ALONG WITH THE ONE THAT REQUIRE USER INPUT")
 ext = ""
 sign = "/"
 if platform == "win32":

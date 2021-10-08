@@ -93,7 +93,7 @@ If you add new functionality to the project please create a test for it.
 ### Its recommended to only use input when absolutly necessary (example: you test the `input()` function)
 This is the case because tests which require user input will only be compiled and can only be checked for syntax errors not issues with the functionality of the given test subject.
 ### `/Peregrine/tests/ci` - Tests which require no user input.
-### `/Peregrine/tests/manual` - Tests which require user input - **use only if absolutely necessary**
+### `/Peregrine/tests/manual` - Tests which require user input and also include the tests you write for ci- **use only if absolutely necessary**
 
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)

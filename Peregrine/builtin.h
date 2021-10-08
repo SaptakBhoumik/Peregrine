@@ -314,7 +314,16 @@ int compare(char *a, char *b) {
     } else {
       flag = 1;
     }
-  } else {
+  }
+  else if (*a==0 || *b==0) {
+    if (*a==0 && *b==0){
+      flag=0;
+    }
+    else{
+      flag=1;
+    }
+  }
+  else {
     while (*a != '\0' && *b != '\0' && !flag) // while loop
     {
       if (*a != *b) {

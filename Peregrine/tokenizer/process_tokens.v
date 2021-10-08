@@ -140,10 +140,9 @@ pub fn process_tokens(list []string) []string {
 
 				// i know this part is a bit messy
 				// c code
-				if item == 'Ccode' && is_double_quote_open == false
-					&& is_single_quote_open == false && is_list_open == false
-					&& is_dictionary_open == false && is_double_quote_open_list == false
-					&& is_single_quote_open_list == false
+				if item == 'Ccode' && is_double_quote_open == false && is_single_quote_open == false
+					&& is_list_open == false && is_dictionary_open == false
+					&& is_double_quote_open_list == false && is_single_quote_open_list == false
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
 					is_ccode = true
@@ -153,32 +152,25 @@ pub fn process_tokens(list []string) []string {
 					if item == r'\n' {
 						item = '\n'
 					}
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item == 'Ccode' && is_ccode == true {
 					is_ccode = false
 					results << item
-				}
-				else if prev_item == 'r' && is_double_quote_open == false
+				} else if prev_item == 'r' && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == false
 					&& is_dictionary_open == false && is_double_quote_open_list == false
 					&& is_single_quote_open_list == false
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false && item != "'"
 					&& item != '"' {
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if consequtive_item in multi_char_symbols && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == false
 					&& is_dictionary_open == false && is_double_quote_open_list == false
 					&& is_single_quote_open_list == false
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if prev_item != ' ' && item != ' ' && symbol_present_in_arrey(item) == 0
 					&& symbol_present_in_arrey(prev_item) == 0 && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == false
@@ -186,27 +178,21 @@ pub fn process_tokens(list []string) []string {
 					&& is_double_quote_open_list == false && is_single_quote_open_list == false
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item == '.' && number_present_in_arrey(prev_item) == 1
 					&& is_double_quote_open == false && is_single_quote_open == false
 					&& is_list_open == false && is_dictionary_open == false
 					&& is_double_quote_open_list == false && is_single_quote_open_list == false
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if prev_item == '.' && number_present_in_arrey(item) == 1
 					&& is_double_quote_open == false && is_single_quote_open == false
 					&& is_list_open == false && is_dictionary_open == false
 					&& is_double_quote_open_list == false && is_single_quote_open_list == false
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				}
 				// single quote
 				else if item == "'" && is_double_quote_open == false
@@ -223,9 +209,7 @@ pub fn process_tokens(list []string) []string {
 					&& is_single_quote_open_list == false
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item == "'" && is_double_quote_open == false
 					&& is_single_quote_open == true && is_list_open == false
 					&& is_dictionary_open == false && is_double_quote_open_list == false
@@ -233,9 +217,7 @@ pub fn process_tokens(list []string) []string {
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
 					is_single_quote_open = false
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				}
 				// double quote
 				else if item == '"' && is_double_quote_open == false
@@ -252,9 +234,7 @@ pub fn process_tokens(list []string) []string {
 					&& is_single_quote_open_list == false
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item == '"' && is_double_quote_open == true
 					&& is_single_quote_open == false && is_list_open == false
 					&& is_dictionary_open == false && is_double_quote_open_list == false
@@ -262,11 +242,8 @@ pub fn process_tokens(list []string) []string {
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
 					is_double_quote_open = false
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				}
-				
 				// list
 				else if item == '"' && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == true
@@ -275,18 +252,14 @@ pub fn process_tokens(list []string) []string {
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
 					is_double_quote_open_list = true
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item != '"' && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == true
 					&& is_dictionary_open == false && is_double_quote_open_list == true
 					&& is_single_quote_open_list == false
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item == '"' && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == true
 					&& is_dictionary_open == false && is_double_quote_open_list == true
@@ -294,9 +267,7 @@ pub fn process_tokens(list []string) []string {
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
 					is_double_quote_open_list = false
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item == "'" && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == true
 					&& is_dictionary_open == false && is_double_quote_open_list == false
@@ -304,26 +275,20 @@ pub fn process_tokens(list []string) []string {
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
 					is_single_quote_open_list = true
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item != "'" && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == true
 					&& is_dictionary_open == false && is_double_quote_open_list == false
 					&& is_single_quote_open_list == true && is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item == "'" && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == true
 					&& is_dictionary_open == false && is_double_quote_open_list == false
 					&& is_single_quote_open_list == true && is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
 					is_single_quote_open_list = false
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item == '[' && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == false
 					&& is_dictionary_open == false && is_double_quote_open_list == false
@@ -337,18 +302,14 @@ pub fn process_tokens(list []string) []string {
 					&& is_single_quote_open_list == false
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item == ']' && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == true
 					&& is_dictionary_open == false && is_double_quote_open_list == false
 					&& is_single_quote_open_list == false
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				}
 				// dictionary
 				else if item == '"' && is_double_quote_open == false
@@ -358,26 +319,20 @@ pub fn process_tokens(list []string) []string {
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
 					is_double_quote_open_dictionary = true
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item != '"' && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == false
 					&& is_dictionary_open == true && is_double_quote_open_list == false
 					&& is_single_quote_open_list == false && is_double_quote_open_dictionary == true
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item == '"' && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == false
 					&& is_dictionary_open == true && is_double_quote_open_list == false
 					&& is_single_quote_open_list == false && is_double_quote_open_dictionary == true
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
 					is_double_quote_open_dictionary = false
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item == "'" && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == false
 					&& is_dictionary_open == true && is_double_quote_open_list == false
@@ -385,18 +340,14 @@ pub fn process_tokens(list []string) []string {
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
 					is_single_quote_open_dictionary = true
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item != "'" && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == false
 					&& is_dictionary_open == true && is_double_quote_open_list == false
 					&& is_single_quote_open_list == false
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == true && is_ccode == false {
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item == "'" && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == false
 					&& is_dictionary_open == true && is_double_quote_open_list == false
@@ -404,9 +355,7 @@ pub fn process_tokens(list []string) []string {
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == true && is_ccode == false {
 					is_single_quote_open_dictionary = false
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item == '{' && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == false
 					&& is_dictionary_open == false && is_double_quote_open_list == false
@@ -420,18 +369,14 @@ pub fn process_tokens(list []string) []string {
 					&& is_single_quote_open_list == false
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else if item == '}' && is_double_quote_open == false
 					&& is_single_quote_open == false && is_list_open == false
 					&& is_dictionary_open == true && is_double_quote_open_list == false
 					&& is_single_quote_open_list == false
 					&& is_double_quote_open_dictionary == false
 					&& is_single_quote_open_dictionary == false && is_ccode == false {
-					unsafe {
-						results[count - 1] += *item
-					}
+					results[count - 1] = '$prev_item$item'
 				} else {
 					results << item
 				}

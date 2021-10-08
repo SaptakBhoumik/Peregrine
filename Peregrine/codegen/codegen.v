@@ -76,7 +76,8 @@ pub fn codegen(ast parser.Ast) []string {
 		}
 		if (previous_code_block.keyword in if_else_loop || previous_code_block.keyword == 'or'
 			|| previous_code_block.keyword == 'and') && is_case == false {
-			if item.ast_type == 'string' || item.ast_type == 'raw_string' || item.ast_type == 'formatted_string'{
+			if item.ast_type == 'string' || item.ast_type == 'raw_string'
+				|| item.ast_type == 'formatted_string' {
 				code << ' compare('
 				is_string_compare = true
 			} else if item.ast_type == 'variable' && item.keyword in function.variable
@@ -111,7 +112,8 @@ pub fn codegen(ast parser.Ast) []string {
 			} else if item.keyword == 'and' {
 				code << ' && '
 			} else {
-				if item.ast_type == 'string' || item.ast_type == 'raw_string' || item.ast_type == 'formatted_string'{
+				if item.ast_type == 'string' || item.ast_type == 'raw_string'
+					|| item.ast_type == 'formatted_string' {
 					code << ' compare($match_item.last(),$item.keyword)==0 '
 				} else if item.ast_type == 'variable' && item.keyword in function.variable
 					&& var_type(function.variable_type, keyword) == 'str' {
@@ -306,7 +308,7 @@ pub fn codegen(ast parser.Ast) []string {
 				}
 				last_match.pop()
 			} else if item == next_item {
-				tab_dif = int(item.tab)-1
+				tab_dif = int(item.tab) - 1
 				for _ in last_match {
 					if is_default == true {
 						code << '\nbreak;\n'
@@ -320,7 +322,7 @@ pub fn codegen(ast parser.Ast) []string {
 				for _ in 0 .. tab_dif {
 					code << '\n}\n'
 				}
-				code<<"\nreturn 0;\n}"
+				code << '\nreturn 0;\n}'
 			} else if next_item.ast_type == 'new_line' && ast.body.len > index + 2
 				&& item != next_item && is_loop == false {
 				tab_dif = int(item.tab - ast.body[index + 2].tab)
@@ -341,11 +343,11 @@ pub fn codegen(ast parser.Ast) []string {
 			}
 		} else if next_item.tab < item.tab || item == next_item {
 			if next_item == item {
-				tab_dif = int(item.tab)-1
+				tab_dif = int(item.tab) - 1
 				for _ in 0 .. tab_dif {
 					code << '\n}\n'
 				}
-				code<<"\nreturn 0;\n}"
+				code << '\nreturn 0;\n}'
 			} else if next_item.ast_type == 'new_line' && ast.body.len > index + 2
 				&& item != next_item && is_loop == false {
 				tab_dif = int(item.tab - ast.body[index + 2].tab)

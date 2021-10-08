@@ -112,14 +112,13 @@ pub fn parser(code []string) (Ast, string) {
 		// parsing starts here
 		if previous_code_block.keyword in swallow_type && item == ':' {
 			// do nothing
-		} 
+		}
 		// checks if c code
 		else if item == 'Ccode' && is_ccode == false && index != 0 {
 			is_ccode = true
 		} else if is_ccode == true {
 			code_block, is_ccode = ccode(item, is_ccode, tab)
-		}
-		else if previous_code_block.keyword == '*' && item == '*' && is_pointer == false {
+		} else if previous_code_block.keyword == '*' && item == '*' && is_pointer == false {
 			json.body[json.body.len - 1].keyword = '**'
 		} else if item == 'asm' && is_asm == false {
 			code_block = Body{
@@ -305,7 +304,6 @@ pub fn parser(code []string) (Ast, string) {
 				tab: tab
 			}
 		}
-		
 		// checks if operator
 		else if next_item in operater {
 			is_operator = true
@@ -456,7 +454,7 @@ pub fn parser(code []string) (Ast, string) {
 				length: item.len
 				tab: tab
 			}
-		} 
+		}
 		code_block.id = index
 		code_block.line = line
 
