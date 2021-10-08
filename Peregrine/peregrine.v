@@ -15,6 +15,7 @@ fn print_help() {
 	println('Peregrine Commands:')
 	println('\tcompile          - compiles a given file')
 	println('\thelp             - shows this command')
+	println('\trun             - to run the program without compiling')
 	println('\nPeregrine Options:')
 	println('\t-emit-ast        - dumps ast in console and exits.')
 	println('\t-emit-c          - generates C code and exits (skips C compilation phase).')
