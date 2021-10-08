@@ -86,6 +86,17 @@ If you create any new file make sure to comment your name in the file as shown  
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
+# Testing 
+The project has automatic tests which will run on any pull reuest and push to the project.   
+Tests which require user input wont run but they will still be compiled.  
+If you add new functionality to the project please create a test for it.  
+### Its recommended to only use input when absolutly necessary (example: you test the `input()` function)
+This is the case because tests which require user input will only be compiled and can only be checked for syntax errors not issues with the functionality of the given test subject.
+### `/Peregrine/tests/ci` - Tests which require no user input.
+### `/Peregrine/tests/manual` - Tests which require user input - **use only if absolutely necessary**
+
+
+![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 # License
 
 The Peregrine compiler is licensed under the [Mozilla Public License](https://github.com/Peregrine-lang/Peregrine/blob/main/LICENSE)
