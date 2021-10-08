@@ -1,6 +1,17 @@
-# Action to build Peregrine and run the tests. Original Version by CLientCrash 7 - Okt - 2021
 name: Build Peregrine with Vlang
-on: [push,pull_request]
+on: 
+  pull_request:
+    branches:
+      - "main"
+    paths-ignore:
+      - "./github/**"
+  push:
+    branches:
+      - "main"
+    paths-ignore:
+      - "./github/**"
+  
+
 jobs:
   build-peregrine:
     name: Build Peregrine
@@ -17,29 +28,30 @@ jobs:
       run: |
         v ./Peregrine/peregrine.v -o peregrine -path='builtin/'
         ls
-#    - uses: actions/upload-artifact@v2
-#      with:
-#        name: peregrine-bin
-#        path: peregrine
-#  run-tests:
-#    needs: build-peregrine
-#    name: run-tests
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v2
-#          
-#      - name: Setup Python
-#        uses: actions/setup-python@v2
-#      - name: Download Artifact Compiled peregrine
-#        uses: actions/download-artifact@v2
-#        with:
-#          name: peregrine-bin
-#          path: ./Peregrine/
-#      - name: Run tests
-#        run: | 
-#          sudo apt-get install build-essential
-#          cd Peregrine
-#          sudo chmod +x peregrine
-#          sudo python test_runner.py
-#          echo TEST DONE
+    - uses: actions/upload-artifact@v2
+      with:
+        name: peregrine-bin
+        path: peregrine
+        retention-days: 1
+  run-tests:
+    needs: build-peregrine
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install build-essential
+        run: sudo apt-get install build-essential
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download Artifact Compiled peregrine
+        uses: actions/download-artifact@v2
+        with:
+          name: peregrine-bin
+          path: ./Peregrine/
+      - name: Run tests
+        run: | 
+          cd Peregrine
+          ls
+          pwd
+          sudo chmod 777 ./peregrine
+          sudo bash ./run_tests_ci.sh
+          echo TEST DONE
