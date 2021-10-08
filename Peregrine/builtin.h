@@ -315,7 +315,7 @@ int compare(char *a, char *b) {
       flag = 1;
     }
   } else {
-    while (*a != '\0' && *b != '\0') // while loop
+    while (*a != '\0' && *b != '\0' && !flag) // while loop
     {
       if (*a != *b) {
         flag = 1;
