@@ -46,8 +46,7 @@ You can consider it to be a superset of C which compiles to clean C. So valid c 
 
 # Primary implementation language
 
-For now it is [written in V](https://vlang.io) but in the future it will be self hosted.
-
+It is [written in V](https://vlang.io) 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 # Progress
