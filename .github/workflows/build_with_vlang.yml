@@ -21,6 +21,7 @@ jobs:
     - name: Build libtcc
       run: |
         wget https://download.savannah.gnu.org/releases/tinycc/tcc-0.9.27.tar.bz2
+        mkdir libtcc
         tar -xf tcc-0.9.27.tar.bz2 -C ./libtcc
         cd libtcc
         ./configure
