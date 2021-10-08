@@ -297,11 +297,13 @@ double mypow(double base, double power) {
     }
 
     return result;
-  } else if (power < 0) {
+  } else {
     while (power++) {
       result = result * base;
     }
-    return 1 / result;
+    if(base!=0)
+      return 1 / result;
+    else return 0;
   }
 }
 int compare(char *a, char *b) {
