@@ -1,6 +1,7 @@
-// import os
+import os
 import tokenizer
-import parser
+// import parser
+import lexer
 // import codegen
 // import vlibtcc
 
@@ -204,6 +205,6 @@ import parser
 // 		run : run
 // 	})
 // }
-code:="code"
-ast,_:=parser.parser(tokenizer.process_tokens(tokenizer.tokenize(code)))
-println(ast)
+code:=os.read_file('test.txt') ?
+// ast,_:=parser.parser(tokenizer.process_tokens(tokenizer.tokenize(code)))
+println(lexer.lexer(tokenizer.process_tokens(tokenizer.tokenize(code))))

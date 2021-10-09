@@ -1,6 +1,13 @@
 module parser
 import ast{Ast,Body,Var,Function}
 // Original author: Saptak Bhoumik
+fn advance(index int,tokens []string) string{
+	mut next_item:=""
+	if tokens.len>index{
+		next_item=tokens[index]
+	}
+	return next_item
+}
 pub fn parser(code []string) (Ast, string) {
 	peregrine_type := ['char', 'int', 'bool', 'str', 'list', 'dictionary', 'float', 'void', 'int32',
 		'int16', 'int8', 'float32', 'uint32', 'uint16', 'uint8', 'uint']
@@ -36,6 +43,5 @@ pub fn parser(code []string) (Ast, string) {
 	mut previous_code_block := Body{}
 	mut last_left_code_block := Body{}
 	mut json := Ast{}
-	
 	return json, error
 }

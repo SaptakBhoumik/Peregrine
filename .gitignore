@@ -5,6 +5,7 @@
 .idea
 **/output
 **.out
+**.txt
 **/temp.c
 **.exe
 /Peregrine/peregrine
