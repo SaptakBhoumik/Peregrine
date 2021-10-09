@@ -90,6 +90,7 @@ pub enum Token_type {
 	_uint16
 	_uint8
 	_uint
+	floor_equal
 	no
 	yes
 	unknown
@@ -252,6 +253,9 @@ pub fn lexer(token []string) []Lex {
 			}
 			'//' {
 				lex_item.keyword_type = Token_type.floor
+			}
+			'//=' {
+				lex_item.keyword_type = Token_type.floor_equal
 			}
 			'&=' {
 				lex_item.keyword_type = Token_type.bitand_equal
