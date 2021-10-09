@@ -1,14 +1,15 @@
 module parser
 import ast{Ast,Body,Var,Function}
+import lexer{Lex}
 // Original author: Saptak Bhoumik
 fn advance(index int,tokens []string) string{
 	mut next_item:=""
-	if tokens.len>index{
-		next_item=tokens[index]
+	if tokens.len>=index+1{
+		next_item=tokens[index+1]
 	}
 	return next_item
 }
-pub fn parser(code []string) (Ast, string) {
+pub fn parser(code []Lex) (Ast, string) {
 	peregrine_type := ['char', 'int', 'bool', 'str', 'list', 'dictionary', 'float', 'void', 'int32',
 		'int16', 'int8', 'float32', 'uint32', 'uint16', 'uint8', 'uint']
 

@@ -1,8 +1,37 @@
 module lexer
+
+pub enum Token_type {
+			space=0
+			newline=1
+			bracket=2
+			peregrine_type=3
+			comma=4
+			dot=5
+			decorator=6
+			operator=7
+			colon=8
+			loop=9
+			logic=10
+			def=11
+			struct_name=12
+			class=13
+			constant=14
+			ccode=15
+			pass=16
+			str=17
+			integer=18
+			decimal=19
+			pointer=20
+			null=21
+			list=22
+			dictionary=23
+			true_false=24
+			unknown=25
+			}
 pub struct Lex{
 pub mut: 
 	keyword string
-	keyword_type string
+	keyword_type Token_type
 }
 pub fn lexer(token []string) []Lex{
 	peregrine_type := ['char', 'int', 'bool', 'str', 'list', 'dictionary', 'float', 'void', 'int32',
@@ -15,58 +44,67 @@ pub fn lexer(token []string) []Lex{
 	mut lex_item:=Lex{}
 	mut collection:=[]Lex{}
 	for item in token{
-		if item==" "{
-			lex_item.keyword_type = "SPACE"
+		match item{
+		" "{
+			lex_item.keyword_type = Token_type.space
+			}
+		r"\n"{
+			lex_item.keyword_type=Token_type.newline
 		}
-		else if item==r"\n"{
-			lex_item.keyword_type="NEWLINE"
+		")"{
+			lex_item.keyword_type = Token_type.bracket
 		}
-		else if item==")" || item=="("{
-			lex_item.keyword_type = "BRACKET"
+		 "("{
+			lex_item.keyword_type = Token_type.bracket
 		}
-		else if item in peregrine_type{
-			lex_item.keyword_type="TYPE"
+		","{
+			lex_item.keyword_type =Token_type.comma
 		}
-		else if item==","{
-			lex_item.keyword_type ="COMMA"
+		"."{
+			lex_item.keyword_type =Token_type.dot
 		}
-		else if item=="."{
-			lex_item.keyword_type ="DOT"
+		":"{
+			lex_item.keyword_type = Token_type.colon
 		}
-		else if item.split("")[0] =="@"{
-			lex_item.keyword_type="DECORATOR"
+		"def"{
+			lex_item.keyword_type = Token_type.def
 		}
-		else if item in operater{
-			lex_item.keyword_type = "OPERATOR"
+		"struct"{
+			lex_item.keyword_type = Token_type.struct_name 
 		}
-		else if item ==":"{
-			lex_item.keyword_type = "COLON"
-		}
-		else if item in loop{
-			lex_item.keyword_type = "LOOP"
-		}
-		else if item in logic{
-			lex_item.keyword_type = "LOGIC"
-		}
-		else if item =="def"{
-			lex_item.keyword_type = "DEF" 
-		}
-		else if item =="struct"{
-			lex_item.keyword_type = "STRUCT" 
-		}
-		else if item =="class"{
-			lex_item.keyword_type = "CLASS" 
-		}else if item =="const"{
-			lex_item.keyword_type = "CONSTANT" 
-		}else if item =="Ccode"{
-			lex_item.keyword_type = "CCODE" 
+		"class"{
+			lex_item.keyword_type = Token_type.class
+		}"const"{
+			lex_item.keyword_type= Token_type.constant
+		}"Ccode"{
+			lex_item.keyword_type = Token_type.ccode 
+		}"pass"{
+			lex_item.keyword_type = Token_type.pass 
 		}
 		else{
-			lex_item.keyword_type = know_type(item)
+			if item in peregrine_type{
+				lex_item.keyword_type=Token_type.peregrine_type
+			}
+			else if item.split("")[0] =="@"{
+				lex_item.keyword_type=Token_type.decorator
+			}
+			else if item in operater{
+				lex_item.keyword_type = Token_type.operator
+			}
+			else if item in loop{
+				lex_item.keyword_type = Token_type.loop
+			}
+			 else if item in logic{
+				lex_item.keyword_type = Token_type.logic
+			}else{
+				lex_item.keyword_type = know_type(item)
+			}
 		}
+	}
 		lex_item.keyword=item
 		collection<<lex_item
 		lex_item=Lex{}
+	
 	}
 	return collection
 }

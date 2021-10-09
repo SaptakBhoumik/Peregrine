@@ -1,6 +1,6 @@
 import os
 import tokenizer
-// import parser
+import parser
 import lexer
 // import codegen
 // import vlibtcc
