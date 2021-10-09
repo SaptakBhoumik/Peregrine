@@ -23,8 +23,9 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: peregrine-bin
-        path: peregrine
+        path: Peregrine/peregrine
         retention-days: 1
+        if-no-files-found: error 
   run-tests:
     needs: build-peregrine
     name: Run Tests
