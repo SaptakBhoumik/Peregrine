@@ -18,10 +18,8 @@ jobs:
       with:
         v-version: latest
       id: v
-    - name: Install libtcc
-      run: sudo apt install libtcc-dev
-    - name: Build Peregrine
-      run: bash ./Peregrine/build.sh
+    - name: Run build-linux-full.sh
+      run: bash ./build-linux-full.sh
     - uses: actions/upload-artifact@v2
       with:
         name: peregrine-bin
