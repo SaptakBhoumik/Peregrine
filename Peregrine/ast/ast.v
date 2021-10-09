@@ -1,5 +1,56 @@
+/*
+*  
+*  Copyright (c) Peregrine-lang, 2021. All rights reserved.
+*
+*/
+
 module ast
-// Original author: Saptak Bhoumik
+
+pub interface AstNode {
+	to_string() string
+}
+
+pub struct Program {
+pub mut:	
+	nodes []AstNode
+}
+
+fn (program Program) to_string() string {
+	mut result := ''
+
+	for node in program.nodes {
+		result += '${node.to_string()}\n'
+	}
+
+	return result
+}
+
+pub struct IntegerLiteral {
+	value string
+}
+
+fn (il IntegerLiteral) to_string() string {
+	return il.value
+}
+
+pub struct StringLiteral {
+	value string
+}
+
+fn (sl StringLiteral) to_string() string {
+	return sl.value
+}
+
+pub struct InfixExpression {
+	left AstNode
+	operator string
+	right AstNode
+}
+
+fn (ie InfixExpression) to_string() string {
+	return '${ie.left.to_string()} ${ie.operator} ${ie.right.to_string()}'
+}
+
 pub struct Body {
 pub mut:
 	ast_type    string
