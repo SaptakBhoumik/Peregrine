@@ -30,24 +30,21 @@ fn is_number(list []string) Token_type {
 pub fn know_type(item string) Token_type {
 	mut type_of_str := Token_type.unknown
 	split_text := item.split('')
-	count:=split_text.len
-		if item == 'True' || item == 'False' {
-			type_of_str =  Token_type.true_false
-		}  
-		else if split_text[count - 1] == "'" && split_text[0] == "'" {
-			type_of_str = Token_type.str
-		} else if item == 'NULL' {
-			type_of_str = Token_type.null
-		} else if split_text[0] == '&' {
-			type_of_str = Token_type.pointer
-		} else if split_text[count - 1] == '"' && split_text[0] == '"' {
-			type_of_str = Token_type.str
-		} else if split_text[0] == '{' && split_text[count - 1] == '}' {
-			type_of_str = Token_type.dictionary
-		} else if split_text[0] == '[' && split_text[count - 1] == ']' {
-			type_of_str = Token_type.list
-		} else {
-			type_of_str = is_number(split_text)
-		}
+	count := split_text.len
+	if split_text[count - 1] == "'" && split_text[0] == "'" {
+		type_of_str = Token_type.str
+	} else if item == 'NULL' {
+		type_of_str = Token_type.null
+	} else if split_text[0] == '&' {
+		type_of_str = Token_type.pointer
+	} else if split_text[count - 1] == '"' && split_text[0] == '"' {
+		type_of_str = Token_type.str
+	} else if split_text[0] == '{' && split_text[count - 1] == '}' {
+		type_of_str = Token_type.dictionary
+	} else if split_text[0] == '[' && split_text[count - 1] == ']' {
+		type_of_str = Token_type.list
+	} else {
+		type_of_str = is_number(split_text)
+	}
 	return type_of_str
 }

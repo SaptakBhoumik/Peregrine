@@ -205,6 +205,6 @@ import lexer
 // 		run : run
 // 	})
 // }
-code:=os.read_file('test.txt') ?
+code := os.read_file('test.txt') ?
 // ast,_:=parser.parser(tokenizer.process_tokens(tokenizer.tokenize(code)))
 println(lexer.lexer(tokenizer.process_tokens(tokenizer.tokenize(code))))
