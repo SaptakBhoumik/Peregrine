@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #ifndef bool
-#define bool int
+#define bool char
 #endif
 #ifndef True
 #define True 1
