@@ -53,11 +53,11 @@ fn (ie InfixExpression) to_string() string {
 
 pub struct Body {
 pub mut:
-	ast_type    string
-	keyword     string
-	length      i64
-	right		[]Body
-	left		[]Body
+	ast_type string
+	keyword  string
+	length   i64
+	right    []Body
+	left     []Body
 }
 
 pub struct Var {
