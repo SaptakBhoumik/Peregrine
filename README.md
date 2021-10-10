@@ -50,6 +50,7 @@ On debian based linux you can just run
 
 - Install libtcc
 - Install vlang
+
 - ```bash
   v peregrine.v -o peregrine
   ```
@@ -59,16 +60,15 @@ On debian based linux you can just run
 **NOT WORKING - CURRENTLY THIS DOESNT WORK**  
 **WORKAROUND => USE THE LINUX SUB SYSTEM**
 
-- Download : http://download.savannah.gnu.org/releases/tinycc/tcc-0.9.27-win64-bin.zip
+- Download : <http://download.savannah.gnu.org/releases/tinycc/tcc-0.9.27-win64-bin.zip>
 - Extract it
-- ```
+
+- ```bash
   cd tcc-0.9.27
   ./make.bat
   sh ./configure
 
   ```
-
-````
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
@@ -115,9 +115,11 @@ The `main` function is the entry point for the program.
 
 ## Have questions?
 
-Cool, you can contact me via mail.
-<br> Email: saptakbhoumik@gmail.com
-<br> Discord : <https://discord.gg/CAMgzwDJDM>
+Cool, you can contact me via mail.  
+  
+Email: saptakbhoumik@gmail.com
+  
+Discord : <https://discord.gg/CAMgzwDJDM>
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
@@ -139,10 +141,9 @@ The project has automatic tests which will run on pull requests and pushes to th
 Tests which require user input won't run but the code will still be compiled.  
 If you add new functionality to the project please run the appropriate tests for it, and create tests for your functionality if possible.
 
-#### It is recommended to only use input when absolutely necessary (example: you test the `input()` function)
+### It is recommended to only use input when absolutely necessary (example: you test the `input()` function)
 
 This is the case because tests which require user input will only be compiled and can only be checked for syntax errors, and not issues with the functionality of the given test subject.
-
 
 #### [`/Peregrine/tests/ci`](./Peregrine/tests/ci) - Tests which require no user input.
 
