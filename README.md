@@ -105,7 +105,9 @@ Here is a small example for you to understand:
 ```py
 def main():
     print("Hello, World!")
-````
+
+```
+
 
 The `main` function is the entry point for the program.
 
@@ -141,7 +143,8 @@ If you add new functionality to the project please run the appropriate tests for
 
 This is the case because tests which require user input will only be compiled and can only be checked for syntax errors, and not issues with the functionality of the given test subject.
 
-#### [`/Peregrine/tests/ci`](./Peregrine/tests/ci) - Tests which require no user input
+
+#### [`/Peregrine/tests/ci`](./Peregrine/tests/ci) - Tests which require no user input.
 
 #### [`/Peregrine/tests/manual`](./Peregrine/tests/manual) - Tests which require user input and also include the tests you write for CI
 
