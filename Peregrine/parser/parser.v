@@ -56,6 +56,14 @@ fn (mut p Parser) advance() {
 	p.tk_index++
 }
 
+fn (mut p Parser) expect(expected_token tokenizer.TokenType) {
+	p.advance()
+
+	if p.current_token.tk_type != expected_token {
+		panic('Error: expected ${int(expected_token)}, got ${p.current_token.value}')
+	}
+}
+
 fn (p Parser) next_token() ?tokenizer.Token {
 	if p.tk_index < p.tokens.len {
 		return p.tokens[p.tk_index]
@@ -99,8 +107,20 @@ fn (mut p Parser) parse_integer() AstNode {
 	return int_node
 }
 
+// these are the expressions enclosed by parenthesis, like (5 + 3)
+fn (mut p Parser) parse_grouped_expression() AstNode {
+	p.advance()
+
+	result := p.parse_expression(int(Precedence.pr_lowest))
+
+	p.expect(tokenizer.TokenType.tk_r_paren)
+
+	return result
+}
+
 fn (mut p Parser) parse_expression(precedence int) AstNode {
 	mut left := match p.current_token.tk_type {
+		.tk_l_paren { p.parse_grouped_expression() }
 		.tk_integer { p.parse_integer() }
 		else { 
 			println(int(p.current_token.tk_type))

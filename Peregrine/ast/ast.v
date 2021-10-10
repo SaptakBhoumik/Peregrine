@@ -48,7 +48,7 @@ pub struct InfixExpression {
 }
 
 fn (ie InfixExpression) to_string() string {
-	return '${ie.left.to_string()} ${ie.operator} ${ie.right.to_string()}'
+	return '(${ie.left.to_string()} ${ie.operator} ${ie.right.to_string()})'
 }
 
 pub struct Body {
