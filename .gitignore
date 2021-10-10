@@ -1,5 +1,6 @@
 /test
-.vscode
+.vscode/*
+!.vscode/extensions.json
 /push.bat
 /push.sh
 .idea
