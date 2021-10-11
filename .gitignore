@@ -1,11 +1,13 @@
 /test
+**/pycatch
 .vscode
 /push.bat
 /push.sh
 .idea
 **/output
 **.out
-**.txt
 **/temp.c
 **.exe
+*.so
+__pycache__
 /Peregrine/peregrine

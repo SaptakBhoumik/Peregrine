@@ -104,7 +104,9 @@ class TokenType(IntEnum):
 	tk_uint16 = auto()
 	tk_uint8 = auto()
 	tk_uint = auto()
-
+	tk_array = auto()
+	tk_dictionary = auto()
+	
 	tk_ident = auto()         # beginning of identation
 	tk_dedent = auto()        # end of identation
 

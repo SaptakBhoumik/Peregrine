@@ -36,40 +36,6 @@ You can consider it to be a superset of C which compiles to clean C. So valid C 
 
 ## Building/compiling Peregrine
 
-### Linux (with apt)
-
-On debian based linux you can just run
-
-- Install vlang
-
-- ```bash
-  bash build-linux-full.sh
-  ```
-
-### Other Linux
-
-- Install libtcc
-- Install vlang
-- ```bash
-  v peregrine.v -o peregrine
-  ```
-
-### Other (Example: Windows or nothing else works)
-
-**NOT WORKING - CURRENTLY THIS DOESNT WORK**  
-**WORKAROUND => USE THE LINUX SUB SYSTEM**
-
-- Download : http://download.savannah.gnu.org/releases/tinycc/tcc-0.9.27-win64-bin.zip
-- Extract it
-- ```
-  cd tcc-0.9.27
-  ./make.bat
-  sh ./configure
-
-  ```
-
-````
-
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 ### Requirements to build from source
@@ -105,7 +71,7 @@ Here is a small example for you to understand:
 ```py
 def main():
     print("Hello, World!")
-````
+```
 
 The `main` function is the entry point for the program.
 
@@ -115,7 +81,7 @@ The `main` function is the entry point for the program.
 
 Cool, you can contact me via mail.
 <br> Email: saptakbhoumik@gmail.com
-<br> Discord : <https://discord.gg/CAMgzwDJDM>
+<br> Discord : https://discord.gg/CAMgzwDJDM
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
@@ -141,7 +107,7 @@ If you add new functionality to the project please run the appropriate tests for
 
 This is the case because tests which require user input will only be compiled and can only be checked for syntax errors, and not issues with the functionality of the given test subject.
 
-#### [`/Peregrine/tests/ci`](./Peregrine/tests/ci) - Tests which require no user input
+#### [`/Peregrine/tests/ci`](./Peregrine/tests/ci) - Tests which require no user input.
 
 #### [`/Peregrine/tests/manual`](./Peregrine/tests/manual) - Tests which require user input and also include the tests you write for CI
 
