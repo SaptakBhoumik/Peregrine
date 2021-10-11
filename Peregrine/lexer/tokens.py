@@ -7,53 +7,47 @@
 from enum import IntEnum, auto
 
 class TokenType(IntEnum):
-	tk_plus = auto()       # +
-	tk_minus = auto()     # -
-	tk_divide = auto()     # /
+	tk_plus = auto()       # + #done
+	tk_minus = auto()     # -	#done
+	tk_divide = auto()     # / #done
 	tk_asterisk = auto()    # *
-	tk_xor = auto()        # ^
-	tk_modulo = auto()     # %
-	tk_greater = auto()    # >
-	tk_less = auto()       # <
-	tk_bit_and = auto()    # &
-	tk_bit_or = auto()     # |
-	tk_bit_not = auto()    # ~
-	tk_assign = auto()     # =
-	tk_excl = auto()        # !
-	tk_colon = auto()      # :
-	tk_dot = auto()        # .
-	tk_l_bracket = auto()   # {
-	tk_r_bracket = auto()   # }
-	tk_lsq_bracket = auto() # [
-	tk_rsq_bracket = auto() # ]
-	tk_l_paren = auto()     # (
-	tk_r_paren = auto()     # )
+	tk_xor = auto()        # ^ #done
+	tk_modulo = auto()     # % #done
+	tk_greater = auto()    # > #done
+	tk_less = auto()       # < #done
+	tk_ampersand = auto()    # & #done
+	tk_bit_or = auto()     # | #done
+	tk_bit_not = auto()    # ~ #done
+	tk_assign = auto()     # = #done
+	tk_excl = auto()        # ! #done
+	tk_colon = auto()      # : #done
+	tk_dot = auto()        # . 
+	tk_l_paren = auto()     # ( #done
+	tk_r_paren = auto()     # ) #done
 	tk_hashtag = auto()     # #
-	tk_comma = auto()      # ,
-	tk_sin_quote = auto()   # '
-	tk_db_quote = auto()   # "
+	tk_comma = auto()      # , #done
 
-	tk_equal = auto()             # ==
-	tk_not_equal = auto()         # !=
-	tk_floor = auto()             # //
-	tk_gr_or_equ = auto()         # >=
-	tk_less_or_equ = auto()       # <=
-	tk_increment = auto()         # ++
-	tk_decrement = auto()         # --
-	tk_arrow = auto()             # ->
-	tk_shift_right = auto()       # >>
-	tk_shift_left = auto()        # <<
-	tk_floor_equal = auto()       # /=
-	tk_plus_equal = auto()        # +=
-	tk_minus_equal = auto()        # -=
-	tk_times_equal = auto()       # *=
-	tk_slash_equal = auto()       # /=
-	tk_mod_equal = auto()         # %=
-	tk_shift_right_equal = auto()  # >>=
-	tk_shift_left_equal = auto()   # <<=
-	tk_bit_and_equal = auto()     # &=
-	tk_bit_or_equal = auto()       # |=
-	tk_bit_xor_equal = auto()      # ^=
+	tk_equal = auto()             # == #done
+	tk_not_equal = auto()         # != #done
+	tk_floor = auto()             # // #done
+	tk_gr_or_equ = auto()         # >= #done
+	tk_less_or_equ = auto()       # <= #done
+	tk_increment = auto()         # ++ #done
+	tk_decrement = auto()         # --#done
+	tk_arrow = auto()             # -> #done
+	tk_shift_right = auto()       # >> #done
+	tk_shift_left = auto()        # << #done
+	tk_floor_equal = auto()       # //= #done
+	tk_plus_equal = auto()        # += #done
+	tk_minus_equal = auto()        # -= #done
+	tk_times_equal = auto()       # *= #done
+	tk_slash_equal = auto()       # /= #done
+	tk_mod_equal = auto()         # %= #done
+	tk_shift_right_equal = auto()  # >>= #done
+	tk_shift_left_equal = auto()   # <<= #done
+	tk_bit_and_equal = auto()     # &= #done
+	tk_bit_or_equal = auto()       # |= #done
+	tk_bit_xor_equal = auto()      # ^= #done
 	
 	tk_identifier = auto()  # foo, bar
 
@@ -104,21 +98,17 @@ class TokenType(IntEnum):
 	tk_uint16 = auto()
 	tk_uint8 = auto()
 	tk_uint = auto()
-	tk_array = auto()
-	tk_dictionary = auto()
-	
+	#value type
+	default = auto()
+	integer = auto()
+	array = auto() #done
+	dictionary = auto() #done
+	string = auto() #done
 	tk_ident = auto()         # beginning of identation
 	tk_dedent = auto()        # end of identation
 
-class Token:  # change class to struct
-	keyword: str = ""
-	index: int = 0
-	line: int = 1
-	tk_type: int = 0
-	tab: float = 0
-
-	def __init__(self, value: str, type: int, index: int, line: int) -> None:
-		self.keyword = value
-		self.tk_type = type
-		self.index = index
-		self.line = line
+def next(index:int, code:list)-> str:
+	if len(code)==index+1:
+		return ""
+	else:
+		return code[index+1]
