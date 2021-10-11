@@ -1,4 +1,5 @@
 /test
+**/pycatch
 .vscode
 /push.bat
 /push.sh
@@ -7,4 +8,6 @@
 **.out
 **/temp.c
 **.exe
+*.so
+__pycache__
 /Peregrine/peregrine
