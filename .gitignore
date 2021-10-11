@@ -6,6 +6,7 @@
 .idea
 **/output
 **.out
+*.tmp
 **/temp.c
 **.exe
 *.so
