@@ -1,4 +1,8 @@
-import sys
+"""
+*  
+*  Copyright (c) Peregrine-lang, 2021. All rights reserved.
+*
+"""
 
 prefix = '\033[1;'
 suffix = 'm'
@@ -89,10 +93,6 @@ class PEError:
             print("  |")
         
         print("  ╰- " + fg(style("Hint: ", "bold"), "cyan") + f"Use peregrine --explain={self.code}")
-
-        code = int(self.code.strip("E"))
-        sys.exit(code)
-
 
 class PEWarning:
     def __init__(self, loc: Location, msg: str, submsg: str, hint: str, code: str):
