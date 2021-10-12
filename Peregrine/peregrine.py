@@ -1,3 +1,3 @@
 import parser
 from lexer import lexer
-print(lexer.lexer('"bad code:'))
+print(lexer.lexer('a=r"s"'))

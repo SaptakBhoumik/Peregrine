@@ -82,7 +82,11 @@ def is_number(item:str)->str:
         return TokenType.tk_identifier
 
 def token_type(item : str) -> int:
-    if item=="True":
+    if item=="r":
+        return TokenType.tk_raw
+    if item=="f":
+        return TokenType.tk_format
+    elif item=="True":
         return TokenType.tk_true
     elif item=="False":
         return TokenType.tk_false

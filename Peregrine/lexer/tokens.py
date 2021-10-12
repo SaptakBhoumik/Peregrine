@@ -103,6 +103,8 @@ class TokenType(IntEnum):
 	string = auto() 
 	tk_ident = auto()         # beginning of identation
 	tk_dedent = auto()        # end of identation
+	tk_raw = auto() # raw string i.e. r
+	tk_format = auto() # formatted string i.e. f
 
 def next(index:int, code:list)-> str:
 	if len(code)==index+1:
