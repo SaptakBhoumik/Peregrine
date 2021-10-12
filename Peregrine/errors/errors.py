@@ -93,3 +93,26 @@ class PEError:
             print("  |")
         
         print("  ╰- " + fg(style("Hint: ", "bold"), "cyan") + f"Use peregrine --explain={self.code}")
+
+class PEWarning:
+    def __init__(self, loc: Location, msg: str, submsg: str, hint: str, code: str):
+        self.loc = loc
+        self.msg = msg
+        self.submsg = submsg
+        self.hint = hint
+        self.code = code
+    
+    def display(self):
+        print("  ╭- " + fg(style(f'Warning {"-" * 40} {self.loc.filename}:{self.loc.line}:{self.loc.col}', 'bold'), 'yellow'))
+        print("  | " + fg(style(self.msg, 'bold'), 'magenta'))
+        print("  |\n"*3, end="")
+        print(f"{self.loc.line} | {self.loc.code[:len(self.loc.code)]}")
+        print(f"  |{' '*self.loc.col}{fg('~', 'light_yellow')}", end="")
+        print(fg(style(f' <----- {self.submsg}', 'bold'), 'light_yellow'))
+        print("  |\n"*2, end="")
+        
+        if self.hint != "":
+            print("  ├- " + fg(style("Try: ", "bold"), "light_magenta") + self.hint)
+            print("  |")
+        
+        print("  ╰- " + fg(style("Hint: ", "bold"), "cyan") + f"Use peregrine --explain={self.code}")
