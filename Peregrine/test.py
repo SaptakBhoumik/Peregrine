@@ -1,3 +1,9 @@
+"""
+*  
+*  Copyright (c) Peregrine-lang, 2021. All rights reserved.
+*
+"""
+
 from parser.parser import *
 from lexer.tokens import *
 
@@ -15,4 +21,4 @@ tokens = [
 parser = Parser(tokens)
 
 program = parser.parse()
-print(program.toString())
+print(program.__str__())

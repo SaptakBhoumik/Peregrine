@@ -6,8 +6,10 @@
 
 from parser import ast
 from lexer.tokens import *
+from errors.errors import *
 from typing import Dict, List
 from enum import IntEnum, auto
+from sys import exit
 
 class Precedence(IntEnum):
     pr_lowest = auto()   # lowest possible precedence
@@ -40,11 +42,14 @@ precedenceMap: Dict[TokenType, Precedence] = {
 
 class Parser:
     tk_index: int = 0 # index of the current token
+    filename: str = ""
     tokens: List[Token]
+    errors: List[PEError]
     current_token: Token
 
-    def __init__(self, tokens: List[Token]) -> None:
+    def __init__(self, filename: str,tokens: List[Token]) -> None:
         self.tokens = tokens
+        self.filename = filename
         self.advance()
 
     def parse(self) -> ast.Node:
@@ -85,7 +90,29 @@ class Parser:
             programNode.nodes.append(newNode)
             self.advance()
 
+        # display the errors if there is any
+        if len(self.errors):
+            for err in self.errors:
+                err.display()
+
+            exit(1)
+
         return programNode
+
+    def error(self, message: str, errorCode: str) -> None:
+        codeBlock = ""
+
+        with open(self.filename) as code:
+            for i, line in enumerate(code):
+                if i == self.current_token.line:
+                    codeBlock = line
+                    break
+
+        newError = PEError(Location(
+            self.current_token.line, self.current_token.index, self.filename, codeBlock
+        ), "error code str", message, "error code hint", errorCode)
+
+        self.errors.append(newError)
 
     def advance(self) -> None:
         if self.tk_index >= len(self.tokens):

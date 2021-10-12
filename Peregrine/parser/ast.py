@@ -7,17 +7,17 @@
 from typing import List
 
 class Node:
-    def toString(self) -> str:
+    def __str__(self) -> str:
         pass
 
 class Program(Node):
     nodes: List[Node] = []
 
-    def toString(self) -> str:
+    def __str__(self) -> str:
         result = ""
 
         for node in self.nodes:
-            result += node.toString()
+            result += node.__str__()
 
         return result
 
@@ -27,7 +27,7 @@ class IntegerLiteral(Node):
     def __init__(self, value: str) -> None:
         self.value = value
 
-    def toString(self) -> str:
+    def __str__(self) -> str:
         return self.value
 
 class StringLiteral(Node):
@@ -36,7 +36,7 @@ class StringLiteral(Node):
     def __init__(self, value: str) -> None:
         self.value = value
 
-    def toString(self) -> str:
+    def __str__(self) -> str:
         return self.value
 
 class BoolLiteral(Node):
@@ -45,7 +45,7 @@ class BoolLiteral(Node):
     def __init__(self, value: bool) -> None:
         self.value = value
 
-    def toString(self) -> str:
+    def __str__(self) -> str:
         return "true" if self.value else "false"
 
 class Identifier(Node):
@@ -54,7 +54,7 @@ class Identifier(Node):
     def __init__(self, value: str) -> None:
         self.value = value
 
-    def toString(self) -> str:
+    def __str__(self) -> str:
         return self.value
 
 class BinaryOperation(Node):
@@ -67,8 +67,8 @@ class BinaryOperation(Node):
         self.operator = operator
         self.right = right
 
-    def toString(self) -> str:
-        return f"({self.left.toString()} {self.operator} {self.right.toString()})"
+    def __str__(self) -> str:
+        return f"({self.left.__str__()} {self.operator} {self.right.__str__()})"
 
 class PrefixExpression(Node):
     prefix: str
@@ -78,5 +78,5 @@ class PrefixExpression(Node):
         self.prefix = prefix
         self.value = value
 
-    def toString(self) -> str:
-        return f"({self.prefix}{self.value.toString()})"
+    def __str__(self) -> str:
+        return f"({self.prefix}{self.value.__str__()})"

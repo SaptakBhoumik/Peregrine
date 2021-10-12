@@ -1,29 +1,19 @@
-from dataclasses import dataclass
+"""
+*  
+*  Copyright (c) Peregrine-lang, 2021. All rights reserved.
+*
+"""
 
 # peregrine has builtin support for structure so it is not needed when we write in peregrine
 from tokens import *
 
-
-@dataclass
-class Token:  # change class to struct
-    keyword: str = ""
-    index: int = 0
-    line: int = 1
-    tk_type: int = 0
-    tab: float = 0
-
-
-def token_creater(
+def token_create(
     keyword: str = "", index: int = 0, line: int = 1, tab: float = 0, tk_type: int = 0
-):
-    x = Token()
-    x.keyword = keyword
-    x.index = index
-    x.line = line
-    x.tk_type = tk_type
+) -> Token:
+    x = Token(keyword, tk_type, index, line)
     x.tab = tab
-    return x
 
+    return x
 
 def tokenizer(code: str) -> list:
     is_string: bool = False
@@ -37,7 +27,7 @@ def tokenizer(code: str) -> list:
     tab: float = 0
     line = 1
     tokens: list = []
-    token = token_creater()
+    token = token_create()
     index: int = 0
     keyword = ""
     for current_index, item in enumerate(code):
@@ -52,7 +42,6 @@ def tokenizer(code: str) -> list:
 
         if is_string == True and string_starter != item:
             keyword += item
-
 
         elif is_array == True:
             keyword += item
@@ -73,8 +62,8 @@ def tokenizer(code: str) -> list:
                 second_bracket_count -= 1
                 if second_bracket_count == 0:
                     is_array = False
-                    token = token_creater(
-                        keyword=keyword, index=index, line=line, tab=tab, tk_type=array
+                    token = token_create(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_array
                     )
 
         elif is_dictionary == True:
@@ -96,13 +85,12 @@ def tokenizer(code: str) -> list:
                 third_bracket_count -= 1
                 if third_bracket_count == 0:
                     is_dictionary = False
-                    token = token_creater(
-                        keyword=keyword, index=index, line=line, tab=tab, tk_type=dictionary
+                    token = token_create(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_dictionary
                     )
 
         elif ( item == " " and is_dictionary == False  and is_array == False and is_string == False) or item == "\n"  or item == "\r\n" :
             pass
-
 
         elif item == "[" and is_dictionary == False  and is_string == False  and is_array == False:
             index=current_index
@@ -122,8 +110,8 @@ def tokenizer(code: str) -> list:
             if is_string == True and string_starter == item:
                 is_string = False
                 keyword += item
-                token = token_creater(
-                    keyword=keyword, index=index, line=line, tab=tab, tk_type=string
+                token = token_create(
+                    keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_str
                 )
                 string_starter=""
             else:
@@ -133,14 +121,12 @@ def tokenizer(code: str) -> list:
                 index = current_index
                 string_starter = item
 
-
         else:
             pass
 
-
         if token.keyword != "":
             tokens.append(token)
-            token = token_creater()
+            token = token_create()
             keyword = ""
     return tokens
 
