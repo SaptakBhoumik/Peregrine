@@ -6,6 +6,8 @@
 
 from typing import List
 
+from lexer.tokens import Token
+
 class Node:
     def __str__(self) -> str:
         pass
@@ -80,3 +82,29 @@ class PrefixExpression(Node):
 
     def __str__(self) -> str:
         return f"({self.prefix}{self.value.__str__()})"
+
+class VariableDeclaration(Node):
+    varType: Token
+    varName: str
+    value: Node
+
+    def __init__(self, varType: Token, varName: str, value: Node = None) -> None:
+        self.varType = varType
+        self.varName = varName
+        self.value = value
+
+    def __str__(self) -> str:
+        return f"{self.varType.keyword} {self.varName} = {str(self.value)}"
+
+class VariableReassignment(Node):
+    varName: str
+    newValue: Node
+
+    def __init__(self, varName: str, newValue: Node) -> None:
+        self.varName = varName
+        self.newValue = newValue
+
+    def __str__(self) -> str:
+        return f"{self.varName} = {str(self.newValue)}"
+
+    

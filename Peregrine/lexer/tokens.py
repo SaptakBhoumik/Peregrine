@@ -5,6 +5,7 @@
 """
 
 from enum import IntEnum, auto
+from dataclasses import dataclass
 
 class TokenType(IntEnum):
 	tk_plus = auto()       # + 
@@ -96,13 +97,19 @@ class TokenType(IntEnum):
 	tk_uint8 = auto() 
 	tk_uint = auto() 
 	#value type
-	decimal = auto()  # done
-	integer = auto() 
 	array = auto() 
 	dictionary = auto() 
 	string = auto() 
 	tk_ident = auto()         # beginning of identation
 	tk_dedent = auto()        # end of identation
+
+@dataclass
+class Token:  # change class to struct
+    keyword: str = ""
+    index: int = 0
+    line: int = 1
+    tk_type: int = 0
+    tab: float = 0
 
 def next(index:int, code:list)-> str:
 	if len(code)==index+1:
