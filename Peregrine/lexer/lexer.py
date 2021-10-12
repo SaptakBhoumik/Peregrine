@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 
 # peregrine has builtin support for structure so it is not needed when we write in peregrine
-from tokens import *
+from .tokens import *
+from errors import errors
 
 
 @dataclass
@@ -652,8 +653,18 @@ def lexer(code: str) -> list:
         tokens.append(token_creater(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     ))
-        
-    return tokens
 
-
-print(lexer('int test = 5 - 4'))
+    if is_string==True or is_list_dictionary_string==True:
+        error=errors.PEError(errors.Location(line,current_index,"file_name",tokens[-1].keyword),"Unexpected end of file",f"Expecting a {string_starter}",tokens[-1].keyword, hint=f"Adding a {string_starter}",)
+        error.display()
+        return None
+    elif is_dictionary==True:
+        error=errors.PEError(errors.Location(line,current_index,"file_name",tokens[-1].keyword),"Unexpected end of file","Expecting a }",tokens[-1].keyword, hint="Adding a }",)
+        error.display()
+        return None
+    elif is_array==True:
+        error=errors.PEError(errors.Location(line,current_index,"file_name",tokens[-1].keyword),"Unexpected end of file","Expecting a ]",tokens[-1].keyword, hint="Adding a ]",)
+        error.display()
+        return None
+    else:
+        return tokens

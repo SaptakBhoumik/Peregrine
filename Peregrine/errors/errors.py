@@ -72,7 +72,7 @@ class Location:
 
 
 class PEError:
-    def __init__(self, loc: Location, msg: str, submsg: str, hint: str, code: str):
+    def __init__(self, loc: Location, msg: str, submsg: str,code:str, hint: str=""):
         self.loc = loc
         self.msg = msg
         self.submsg = submsg
@@ -87,12 +87,12 @@ class PEError:
         print(f"  |{' '*self.loc.col}{fg('~', 'red')}", end="")
         print(fg(style(f' <----- {self.submsg}', 'bold'), 'light_red'))
         print("  |\n"*2, end="")
-        
         if self.hint != "":
-            print("  ├- " + fg(style("Try: ", "bold"), "light_blue") + self.hint)
+            print("  ├- " + fg(style("Try: ", "bold"), "light_blue")+ self.hint)
             print("  |")
-        
-        print("  ╰- " + fg(style("Hint: ", "bold"), "cyan") + f"Use peregrine --explain={self.code}")
+        #will add later
+        # print("  ╰- " + fg(style("Hint: ", "bold"), "cyan") + f"Use peregrine --explain={self.code}")
+        # print("  ╰- " + fg(style("Hint: ", "bold"), "cyan"))
 
 class PEWarning:
     def __init__(self, loc: Location, msg: str, submsg: str, hint: str, code: str):
