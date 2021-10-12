@@ -70,6 +70,100 @@ def equal(
         x.tk_type = TokenType.tk_bit_xor_equal
     return x
 
+def is_number(item:str)->str:
+    number:list = ["1","2","3","4","5","6","7","8","9"]
+    if item[0] in number:
+        if len(item.split("."))==2:
+            return TokenType.decimal
+        else:
+            return TokenType.integer
+    else:
+        return TokenType.tk_identifier
+
+def token_type(item : str) -> int:
+    if item=="True":
+        return TokenType.tk_true
+    elif item=="False":
+        return TokenType.tk_false
+    elif item=="None":
+        return TokenType.tk_none
+    elif item=="import":
+        return TokenType.tk_import
+    elif item=="const":
+        return TokenType.tk_const
+    elif item=="if":
+        return TokenType.tk_if
+    elif item=="elif":
+        return TokenType.tk_elif
+    elif item=="else":
+        return TokenType.tk_else
+    elif item=="while":
+        return TokenType.tk_while
+    elif item=="for":
+        return TokenType.tk_for
+    elif item=="break":
+        return TokenType.tk_break
+    elif item=="continue":
+        return TokenType.tk_continue
+    elif item=="match":
+        return TokenType.tk_match
+    elif item=="case":
+        return TokenType.tk_case
+    elif item=="default":
+        return TokenType.tk_default
+    elif item=="def":
+        return TokenType.tk_def
+    elif item=="pass":
+        return TokenType.tk_pass
+    elif item=="return":
+        return TokenType.tk_return
+    elif item=="and":
+        return TokenType.tk_and
+    elif item=="or":
+        return TokenType.tk_or
+    elif item=="not":
+        return TokenType.tk_not
+    elif item=="is":
+        return TokenType.tk_is
+    elif item=="in":
+        return TokenType.tk_in
+    elif item=="Ccode":
+        return TokenType.tk_ccode
+    elif item=="class":
+        return TokenType.tk_class
+    elif item=="struct":
+        return TokenType.tk_struct
+    elif item=="str":
+        return TokenType.tk_str
+    elif item=="bool":
+        return TokenType.tk_bool
+    elif item=="char":
+        return TokenType.tk_char
+    elif item=="float":
+        return TokenType.tk_float
+    elif item=="float32":
+        return TokenType.tk_float32
+    elif item=="void":
+        return TokenType.tk_void
+    elif item=="int":
+        return TokenType.tk_int
+    elif item=="int32":
+        return TokenType.tk_int32
+    elif item=="int16":
+        return TokenType.tk_int16
+    elif item=="int8":
+        return TokenType.tk_int8
+    elif item=="uint":
+        return TokenType.tk_uint
+    elif item=="uint32":
+        return TokenType.tk_uint32
+    elif item=="uint16":
+        return TokenType.tk_uint16
+    elif item=="uint8":
+        return TokenType.tk_uint8
+    else:  
+        return is_number(item)
+
 def lexer(code: str) -> list:
     is_string: bool = False
     is_list_dictionary_string: bool = False
@@ -85,6 +179,8 @@ def lexer(code: str) -> list:
     token = token_creater()
     index: int = 0
     keyword = ""
+    is_comment:bool=False
+    operator:list=["!","/","//","+","-","*","%","<<",">>","&","|","^"]
     for current_index, item in enumerate(code):
         if item == " " and is_tab == True:
             tab += 0.25
@@ -95,7 +191,13 @@ def lexer(code: str) -> list:
             line += 1
             is_tab = True
 
-        if is_string == True and string_starter != item:
+        if item=="#" and is_string==False and is_list_dictionary_string==False and is_comment==False:
+            is_comment=True
+        elif is_comment==True:
+            if item=="\n" or item=="\r\n":
+                is_comment=False
+
+        elif is_string == True and string_starter != item:
             keyword += item
 
 
@@ -146,10 +248,20 @@ def lexer(code: str) -> list:
                     )
 
         elif ( item == " " and is_dictionary == False  and is_array == False and is_string == False) or item == "\n"  or item == "\r\n" :
-            pass
+            if keyword!="":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
 
 
         elif item == "[" and is_dictionary == False  and is_string == False  and is_array == False:
+            if keyword!="":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             index=current_index
             keyword = item
             is_array = True
@@ -157,6 +269,13 @@ def lexer(code: str) -> list:
         
 
         elif item == "{" and is_dictionary == False  and is_string == False  and is_array == False:
+            if keyword!="":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             index=current_index
             keyword = item
             is_dictionary = True
@@ -172,6 +291,13 @@ def lexer(code: str) -> list:
                 )
                 string_starter=""
             else:
+                if keyword!="":
+                    token = token_creater(
+                            keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                        )
+                    tokens.append(token)
+                    token = token_creater()
+                    keyword = ""
                 is_string = True
                 index=current_index
                 keyword = item
@@ -179,15 +305,58 @@ def lexer(code: str) -> list:
                 string_starter = item
 
         elif item=="(":
+            if keyword!="":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             token = token_creater(
                     keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
                 )
-        
+        elif item==".":
+            if keyword=="":
+                keyword=item
+                index=current_index
+                token = token_creater(
+                    keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
+                ) 
+            else:
+                if is_number(keyword)==TokenType.integer:
+                    keyword+=item
+                else:
+                    token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                    tokens.append(token)
+                    token = token_creater()
+                    keyword = ""
+                    keyword=item
+                    index=current_index
+                    token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
+                    )
+
         elif item==")":
+            if keyword!="":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             token = token_creater(
                     keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
                 )
         elif item=="+":
+            if keyword!="" and keyword!="+":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             if keyword=="+":
                 token = token_creater(
                         keyword="++", index=index, line=line, tab=tab, tk_type=TokenType.tk_increment
@@ -202,6 +371,13 @@ def lexer(code: str) -> list:
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_plus
                     )
         elif item==">":
+            if keyword!="" and keyword!=">":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             if keyword==">":
                 if next(current_index,code)=="=":
                     keyword=">>"
@@ -223,6 +399,13 @@ def lexer(code: str) -> list:
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_greater
                     )
         elif item=="<":
+            if keyword!="" and keyword!="<":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             if keyword=="<":
                 if next(current_index,code)=="=":
                     keyword="<<"
@@ -240,6 +423,13 @@ def lexer(code: str) -> list:
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_less
                     )
         elif item=="-":
+            if keyword!="" and keyword!="-":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             if keyword=="-":
                 token = token_creater(
                         keyword="--", index=index, line=line, tab=tab, tk_type=TokenType.tk_decrement
@@ -254,6 +444,13 @@ def lexer(code: str) -> list:
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_minus
                     )
         elif item=="=":
+            if keyword not in operator and keyword!="":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             if keyword=="=":
                 keyword="=="
                 token = token_creater(
@@ -271,8 +468,16 @@ def lexer(code: str) -> list:
                 token = equal(
                         keyword=keyword, index=index, line=line, tab=tab
                     )
+                
 
         elif item=="/":
+            if keyword!="" and keyword!="/":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             if keyword=="/":
                 if next(current_index,code)=="=":
                     keyword="//"
@@ -290,6 +495,13 @@ def lexer(code: str) -> list:
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_divide
                     )
         elif item=="^":
+            if keyword!="":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             if next(current_index,code)=="=":
                 keyword=item
                 index = current_index
@@ -300,6 +512,13 @@ def lexer(code: str) -> list:
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_xor
                     )
         elif item=="%":
+            if keyword!="":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             if next(current_index,code)=="=":
                 keyword=item
                 index = current_index
@@ -310,6 +529,13 @@ def lexer(code: str) -> list:
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_modulo
                     )
         elif item=="&":
+            if keyword!="":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             if next(current_index,code)=="=":
                 keyword=item
                 index = current_index
@@ -320,6 +546,13 @@ def lexer(code: str) -> list:
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_ampersand
                     )
         elif item=="|":
+            if keyword!="":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             if next(current_index,code)=="=":
                 keyword=item
                 index = current_index
@@ -329,17 +562,62 @@ def lexer(code: str) -> list:
                 token = token_creater(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_bit_or
                     )
+        elif item=="*":
+            if keyword!="" and keyword!="*":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
+            
+            if (next(current_index,code)=="*" or next(current_index,code)=="=") and (tokens[-1].tk_type==TokenType.tk_identifier or tokens[-1].tk_type==TokenType.decimal or tokens[-1].tk_type==TokenType.integer or next(current_index,code)=="="):
+                keyword="*"
+                index=current_index
+            elif keyword=="*":
+                token = token_creater(
+                        keyword="**", index=index, line=line, tab=tab, tk_type=TokenType.tk_exponent
+                )
+            else:
+                index = current_index
+                keyword=item
+                token = token_creater(
+                    keyword=keyword, index=index, line=line , tab=tab,tk_type=TokenType.tk_asterisk
+                )
+            
+
         elif item=="~":
+            if keyword!="":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             index = current_index
             keyword=item
             token = token_creater(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_bit_not
                     )
         elif item=="!":
+            if keyword!="":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             index = current_index
             keyword=item
 
         elif item==":":
+            if keyword!="":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             index = current_index
             keyword=item
             token = token_creater(
@@ -347,6 +625,13 @@ def lexer(code: str) -> list:
                     )
             
         elif item==",":
+            if keyword!="":
+                token = token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    )
+                tokens.append(token)
+                token = token_creater()
+                keyword = ""
             index = current_index
             keyword=item
             token = token_creater(
@@ -354,7 +639,9 @@ def lexer(code: str) -> list:
                     )
 
         else:
-            pass
+            if keyword=="":
+                index=current_index
+            keyword+= item
 
 
         if token.keyword != "":
@@ -364,4 +651,4 @@ def lexer(code: str) -> list:
     return tokens
 
 
-print(lexer("code++ + -- -// / & ^ |~ :,//= >>="))
+print(lexer('[#some text\n "yes#"] "#"'))
