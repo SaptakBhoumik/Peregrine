@@ -184,13 +184,12 @@ def lexer(code: str) -> list:
     for current_index, item in enumerate(code):
         if item == " " and is_tab == True:
             tab += 0.25
-        elif item != " " and item!="\n":
+        elif item != " " and is_tab == True:
             is_tab = False
-        elif item == "\n" or item == "\r\n" :
+        elif item == "\n" or item == "\r\n":
+            tab = 0
             line += 1
-            if is_string==False and is_dictionary==False and is_array==False and is_comment==False:    
-                tab = 0
-                is_tab = True
+            is_tab = True
 
         if item=="#" and is_string==False and is_list_dictionary_string==False and is_comment==False:
             is_comment=True
@@ -649,9 +648,12 @@ def lexer(code: str) -> list:
             tokens.append(token)
             token = token_creater()
             keyword = ""
-    # if keyword!="":
-
+    if keyword!="":
+        tokens.append(token_creater(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
+                    ))
+        
     return tokens
 
 
-print(lexer('int test = 5 - 4 '))
+print(lexer('int test = 5 - 4'))
