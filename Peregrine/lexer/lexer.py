@@ -13,13 +13,6 @@ class Token:  # change class to struct
     tab: float = 0
 
 
-def is_float(number) -> bool:
-    if int(number)==number:
-        print(number)
-        return True
-    else:
-        return False
-
 def token_creater(
     keyword: str = "", index: int = 0, line: int = 1, tab: float = 0, tk_type: int = 0
 ):
@@ -260,15 +253,6 @@ def lexer(code: str) -> list:
                 token = token_creater(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
-            else:
-                if len(tokens)!=0:
-                    if tokens[-1].tab<tab and is_float(tab)==False:
-                        # print(tab-tokens[-1].tab)
-                        for _ in range(0,int(tab-tokens[-1].tab)):
-                            # print(item)
-                            tokens.append(token_creater(
-                                keyword="", index=index, line=line, tab=tab, tk_type=TokenType.tk_ident
-                            ))
 
 
         elif item == "[" and is_dictionary == False  and is_string == False  and is_array == False:
@@ -665,7 +649,9 @@ def lexer(code: str) -> list:
             tokens.append(token)
             token = token_creater()
             keyword = ""
+    # if keyword!="":
+
     return tokens
 
 
-print(lexer('[#some text\n "yes#"]\n    "#"'))
+print(lexer('int test = 5 - 4 '))

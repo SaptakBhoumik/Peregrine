@@ -1,3 +1,9 @@
+"""
+*  
+*  Copyright (c) Peregrine-lang, 2021. All rights reserved.
+*
+"""
+
 import glob
 import os
 from sys import platform
