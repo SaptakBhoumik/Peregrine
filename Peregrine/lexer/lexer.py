@@ -1,10 +1,6 @@
-from dataclasses import dataclass
-
 # peregrine has builtin support for structure so it is not needed when we write in peregrine
 from .tokens import *
 from errors import errors
-
-
 
 
 def equal(

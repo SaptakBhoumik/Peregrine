@@ -5,6 +5,7 @@
 """
 
 from enum import IntEnum, auto
+from dataclasses import dataclass
 
 @dataclass
 class Token:  # change class to struct
