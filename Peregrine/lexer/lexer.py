@@ -173,7 +173,7 @@ def lexer(code: str,file_name:str) -> list:
     cpp_bracket_count:int=0
     is_comment:bool=False
     statement:str=""
-    operator:list=["!","/","//","+","-","*","%","<<",">>","&","|","^"]
+    operator:list=["!","/","//","+","-","*","%","<<",">>","&","|","^","="]
     for current_index, item in enumerate(code):
         if item!="\n":
             statement+=item
@@ -483,7 +483,7 @@ def lexer(code: str,file_name:str) -> list:
             elif next(current_index,code)=="=":
                 keyword=item
                 index = current_index
-            elif keyword=="":
+            elif keyword=="" and next(current_index,code)!="=":
                 keyword=item
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_assign
