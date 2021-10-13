@@ -1,6 +1,6 @@
 # peregrine has builtin support for structure so it is not needed when we write in peregrine
 from .tokens import *
-from errors import errors
+from errors import error_list
 
 
 def equal(
@@ -110,8 +110,12 @@ def token_type(item : str) -> int:
         return TokenType.tk_is
     elif item=="in":
         return TokenType.tk_in
-    elif item=="Ccode":
-        return TokenType.tk_ccode
+    elif item=="Cppcode":
+        return TokenType.tk_cppcode
+    elif item=="himport":
+        return TokenType.tk_himport
+    elif item=="cppimport":
+        return TokenType.tk_cppimport
     elif item=="class":
         return TokenType.tk_class
     elif item=="struct":
@@ -149,7 +153,7 @@ def token_type(item : str) -> int:
 
 def lexer(code: str) -> list:
     is_string: bool = False
-    is_list_dictionary_string: bool = False
+    is_list_dictionary_cpp_string: bool = False
     second_bracket_count: int = 0
     third_bracket_count: int = 0
     is_array: bool = False
@@ -161,20 +165,50 @@ def lexer(code: str) -> list:
     tokens: list = []
     token = Token()
     index: int = 0
+    last_line: int = 0
     keyword = ""
+    is_cpp:bool=False
+    cpp_bracket_count:int=0
     is_comment:bool=False
+    statement:str=""
     operator:list=["!","/","//","+","-","*","%","<<",">>","&","|","^"]
     for current_index, item in enumerate(code):
+        if item!="\n":
+            statement+=item
+        else:
+            statement=""
         if item == " " and is_tab == True:
             tab += 0.25
-        elif item != " " and is_tab == True:
+        elif item != " " and is_tab == True and item!="\n":
             is_tab = False
         elif item == "\n" or item == "\r\n":
             tab = 0
+            last_line=current_index
             line += 1
             is_tab = True
 
-        if item=="#" and is_string==False and is_list_dictionary_string==False and is_comment==False:
+        if is_cpp == True:
+            keyword += item
+            if item=="(" and is_list_dictionary_cpp_string==False:
+                cpp_bracket_count += 1
+            elif item=="'" or  item=='"':
+                if is_list_dictionary_cpp_string==True and string_starter!=item:
+                    pass
+                elif item==string_starter and is_list_dictionary_cpp_string==True:
+                    is_list_dictionary_cpp_string=False
+                    string_starter=""
+                else:
+                    string_starter=item
+                    is_list_dictionary_cpp_string=True
+            elif item == ")" and is_list_dictionary_cpp_string==False:
+                cpp_bracket_count -= 1
+                if cpp_bracket_count == 0:
+                    is_array = False
+                    token = Token(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.cpp
+                    )
+
+        elif item=="#" and is_string==False and is_list_dictionary_cpp_string==False and is_comment==False:
             is_comment=True
         elif is_comment==True:
             if item=="\n" or item=="\r\n":
@@ -186,20 +220,20 @@ def lexer(code: str) -> list:
 
         elif is_array == True:
             keyword += item
-            if item=="[" and is_list_dictionary_string==False:
+            if item=="[" and is_list_dictionary_cpp_string==False:
                 second_bracket_count += 1
             elif item=="'" or  item=='"':
-                if is_list_dictionary_string==True and string_starter!=item:
+                if is_list_dictionary_cpp_string==True and string_starter!=item:
                     pass
-                elif item==string_starter and is_list_dictionary_string==True:
-                    is_list_dictionary_string=False
+                elif item==string_starter and is_list_dictionary_cpp_string==True:
+                    is_list_dictionary_cpp_string=False
                     string_starter=""
                 else:
                     string_starter=item
-                    is_list_dictionary_string=True
+                    is_list_dictionary_cpp_string=True
 
 
-            elif item == "]" and is_list_dictionary_string==False:
+            elif item == "]" and is_list_dictionary_cpp_string==False:
                 second_bracket_count -= 1
                 if second_bracket_count == 0:
                     is_array = False
@@ -209,20 +243,20 @@ def lexer(code: str) -> list:
 
         elif is_dictionary == True:
             keyword += item
-            if item=="{" and is_list_dictionary_string==False:
+            if item=="{" and is_list_dictionary_cpp_string==False:
                 third_bracket_count += 1
             elif item=="'" or  item=='"':
-                if is_list_dictionary_string==True and string_starter!=item:
+                if is_list_dictionary_cpp_string==True and string_starter!=item:
                     pass
-                elif item==string_starter and is_list_dictionary_string==True:
-                    is_list_dictionary_string=False
+                elif item==string_starter and is_list_dictionary_cpp_string==True:
+                    is_list_dictionary_cpp_string=False
                     string_starter=""
                 else:
                     string_starter=item
-                    is_list_dictionary_string=True
+                    is_list_dictionary_cpp_string=True
 
 
-            elif item == "}" and is_list_dictionary_string==False:
+            elif item == "}" and is_list_dictionary_cpp_string==False:
                 third_bracket_count -= 1
                 if third_bracket_count == 0:
                     is_dictionary = False
@@ -295,9 +329,14 @@ def lexer(code: str) -> list:
                 tokens.append(token)
                 token = Token()
                 keyword = ""
-            token = Token(
-                    keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
-                )
+            if tokens[-1].tk_type == TokenType.tk_cppcode:
+                is_cpp = True
+                cpp_bracket_count=1
+                keyword=item
+            else:
+                token = Token(
+                        keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
+                    )
         elif item==".":
             if keyword=="":
                 keyword=item
@@ -636,17 +675,17 @@ def lexer(code: str) -> list:
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     ))
 
-    if is_string==True or is_list_dictionary_string==True:
-        error=errors.PEError(errors.Location(line,current_index,"file_name",tokens[-1].keyword),"Unexpected end of file",f"Expecting a {string_starter}",tokens[-1].keyword, hint=f"Adding a {string_starter}",)
-        error.display()
+    if is_string==True or is_list_dictionary_cpp_string==True:
+        error=error_list.message(statement, line, current_index-last_line, "file_name",expected=string_starter)
+        error.string()
         return None
     elif is_dictionary==True:
-        error=errors.PEError(errors.Location(line,current_index,"file_name",tokens[-1].keyword),"Unexpected end of file","Expecting a }",tokens[-1].keyword, hint="Adding a }",)
-        error.display()
+        error=error_list.message(statement, line, current_index-last_line,"file_name",expected="}")
+        error.dictionary()
         return None
     elif is_array==True:
-        error=errors.PEError(errors.Location(line,current_index,"file_name",tokens[-1].keyword),"Unexpected end of file","Expecting a ]",tokens[-1].keyword, hint="Adding a ]",)
-        error.display()
+        error=error_list.message(statement, line, current_index-last_line, "file_name",expected="]")
+        error.array()
         return None
     else:
         return tokens

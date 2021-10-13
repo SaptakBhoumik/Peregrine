@@ -67,6 +67,8 @@ class TokenType(IntEnum):
 	tk_none = auto()          # none 
 	tk_const = auto()         # const 
 	tk_import = auto()        # import 
+	tk_cppimport = auto()        # cppimport 
+	tk_himport = auto()        # himport
 	tk_if = auto()            # if 
 	tk_else = auto()          # else 
 	tk_elif = auto()          # elif 
@@ -85,7 +87,7 @@ class TokenType(IntEnum):
 	tk_not = auto()           # not 
 	tk_is = auto()            # is 
 	tk_in = auto()            # in 
-	tk_ccode = auto()         # Ccode 
+	tk_cppcode = auto()         # Ccode 
 	tk_class = auto()         # class 
 	tk_struct = auto()        # struct 
 
@@ -105,8 +107,9 @@ class TokenType(IntEnum):
 	tk_uint8 = auto() 
 	tk_uint = auto() 
 	#value type
-	decimal = auto()  # done
+	decimal = auto() 
 	integer = auto() 
+	cpp= auto() 
 	array = auto() 
 	dictionary = auto() 
 	string = auto() 
@@ -114,6 +117,7 @@ class TokenType(IntEnum):
 	tk_dedent = auto()        # end of identation
 	tk_raw = auto() # raw string i.e. r
 	tk_format = auto() # formatted string i.e. f
+
 
 def next(index:int, code:list)-> str:
 	if len(code)==index+1:

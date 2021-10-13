@@ -90,6 +90,7 @@ class PEError:
         if self.hint != "":
             print("  ├- " + fg(style("Try: ", "bold"), "light_blue")+ self.hint)
             print("  |")
+        print("  ╰- ")
         #will add later
         # print("  ╰- " + fg(style("Hint: ", "bold"), "cyan") + f"Use peregrine --explain={self.code}")
         # print("  ╰- " + fg(style("Hint: ", "bold"), "cyan"))

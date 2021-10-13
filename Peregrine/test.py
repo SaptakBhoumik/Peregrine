@@ -4,7 +4,7 @@
 *
 """
 
-from parser.parser import *
+from pe_parser.pe_parser import *
 from lexer.tokens import *
 
 def createToken(keyword: str, type: TokenType) -> Token:
