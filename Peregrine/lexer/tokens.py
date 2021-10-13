@@ -6,6 +6,14 @@
 
 from enum import IntEnum, auto
 
+@dataclass
+class Token:  # change class to struct
+    keyword: str = ""
+    index: int = 0
+    line: int = 1
+    tk_type: int = 0
+    tab: float = 0
+
 class TokenType(IntEnum):
 	tk_plus = auto()       # + 
 	tk_minus = auto()     # -	
