@@ -5,13 +5,6 @@ from .tokens import *
 from errors import errors
 
 
-@dataclass
-class Token:  # change class to struct
-    keyword: str = ""
-    index: int = 0
-    line: int = 1
-    tk_type: int = 0
-    tab: float = 0
 
 
 def equal(
