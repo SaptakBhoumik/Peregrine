@@ -1,7 +1,7 @@
 # peregrine has builtin support for structure so it is not needed when we write in peregrine
 from .tokens import *
 from errors import error_list
-
+from typing import List
 
 def equal(
     keyword: str = "", index: int = 0, line: int = 1, tab: float = 0, 
@@ -163,6 +163,8 @@ def lexer(code: str,file_name:str) -> list:
     string_starter: str = ""
     is_tab: bool = True
     tab: float = 0
+    identation_levels: List[int] = []
+    curr_identation_level: int = 0
     line = 1
     tokens: list = []
     token = Token()
@@ -181,13 +183,42 @@ def lexer(code: str,file_name:str) -> list:
             statement=""
         if item == " " and is_tab == True:
             tab += 0.25
+            curr_identation_level += 1
         elif item != " " and is_tab == True and item!="\n":
             is_tab = False
+
+            previous_identation = 0
+
+            if identation_levels:
+                previous_identation = identation_levels[len(identation_levels)-1]
+
+            if curr_identation_level > previous_identation:
+                token = Token("", 0, 0, TokenType.tk_ident, 0)
+                tokens.append(token)
+                
+                identation_levels.append(curr_identation_level)
+
+            while curr_identation_level < previous_identation:
+                identation_levels.pop()
+                
+                token = Token("", 0, 0, TokenType.tk_dedent, 0)
+                tokens.append(token)
+
+                if identation_levels:
+                    if curr_identation_level >= identation_levels[len(identation_levels)-1]:
+                        break
+
+                    previous_identation = identation_levels[len(identation_levels)-1]
+                else:
+                    previous_identation = 0
+                
+
         elif item == "\n" or item == "\r\n":
             tab = 0
             last_line=current_index
             line += 1
             is_tab = True
+            curr_identation_level = 0
 
         if is_cpp == True:
             keyword += item
