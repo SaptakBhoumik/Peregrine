@@ -1,17 +1,6 @@
-from dataclasses import dataclass
-
 # peregrine has builtin support for structure so it is not needed when we write in peregrine
 from .tokens import *
 from errors import errors
-
-
-@dataclass
-class Token:  # change class to struct
-    keyword: str = ""
-    index: int = 0
-    line: int = 1
-    tk_type: int = 0
-    tab: float = 0
 
 
 def equal(
