@@ -90,6 +90,8 @@ def token_type(item : str) -> int:
         return TokenType.tk_continue
     elif item=="match":
         return TokenType.tk_match
+    elif item=="extern":
+        return TokenType.tk_extern
     elif item=="case":
         return TokenType.tk_case
     elif item=="default":
@@ -151,7 +153,7 @@ def token_type(item : str) -> int:
     else:  
         return is_number(item)
 
-def lexer(code: str) -> list:
+def lexer(code: str,file_name:str) -> list:
     is_string: bool = False
     is_list_dictionary_cpp_string: bool = False
     second_bracket_count: int = 0
@@ -676,15 +678,19 @@ def lexer(code: str) -> list:
                     ))
 
     if is_string==True or is_list_dictionary_cpp_string==True:
-        error=error_list.message(statement, line, current_index-last_line, "file_name",expected=string_starter)
+        error=error_list.message(statement, line, current_index+1-last_line, file_name,expected=string_starter)
         error.string()
         return None
     elif is_dictionary==True:
-        error=error_list.message(statement, line, current_index-last_line,"file_name",expected="}")
+        error=error_list.message(statement, line, current_index+1-last_line,file_name,expected="}")
         error.dictionary()
         return None
+    elif is_cpp==True:
+        error=error_list.message(statement, line, current_index+1-last_line,file_name)
+        error.cpp()
+        return None
     elif is_array==True:
-        error=error_list.message(statement, line, current_index-last_line, "file_name",expected="]")
+        error=error_list.message(statement, line, current_index+1-last_line, file_name,expected="]")
         error.array()
         return None
     else:

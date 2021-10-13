@@ -166,6 +166,9 @@ class Parser:
     def parseInteger(self) -> pe_ast.Node:
         return pe_ast.IntegerLiteral(self.current_token.keyword)
 
+    def parseDecimal(self) -> pe_ast.Node:
+        return pe_ast.DecimalLiteral(self.current_token.keyword)
+
     def parseString(self) -> pe_ast.Node:
         return pe_ast.StringLiteral(self.current_token.keyword)
 
@@ -207,11 +210,13 @@ class Parser:
     def parseExpression(self, precedence: int) -> pe_ast.Node:
         left: pe_ast.Node
 
-        if self.current_token.tk_type == TokenType.tk_int:
+        if self.current_token.tk_type == TokenType.integer:
             left = self.parseInteger()
-        elif self.current_token.tk_type == TokenType.tk_str:
+        elif self.current_token.tk_type == TokenType.decimal:
+            left = self.parseDecimal()
+        elif self.current_token.tk_type == TokenType.string:
             left = self.parseString()
-        elif self.current_token.tk_type == TokenType.tk_bool:
+        elif self.current_token.tk_type == TokenType.tk_false or self.current_token.tk_type == TokenType.tk_true:
             left = self.parseBool()
         elif self.current_token.tk_type == TokenType.tk_identifier:
             left = self.parseIdentifier()
