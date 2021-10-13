@@ -121,33 +121,33 @@ def token_type(item : str) -> int:
     elif item=="struct":
         return TokenType.tk_struct
     elif item=="str":
-        return TokenType.tk_str
+        return TokenType.tk_type_str
     elif item=="bool":
-        return TokenType.tk_bool
+        return TokenType.tk_type_bool
     elif item=="char":
-        return TokenType.tk_char
+        return TokenType.tk_type_char
     elif item=="float":
-        return TokenType.tk_float
+        return TokenType.tk_type_float
     elif item=="float32":
-        return TokenType.tk_float32
+        return TokenType.tk_type_float32
     elif item=="void":
-        return TokenType.tk_void
+        return TokenType.tk_type_void
     elif item=="int":
-        return TokenType.tk_int
+        return TokenType.tk_type_int
     elif item=="int32":
-        return TokenType.tk_int32
+        return TokenType.tk_type_int32
     elif item=="int16":
-        return TokenType.tk_int16
+        return TokenType.tk_type_int16
     elif item=="int8":
-        return TokenType.tk_int8
+        return TokenType.tk_type_int8
     elif item=="uint":
-        return TokenType.tk_uint
+        return TokenType.tk_type_uint
     elif item=="uint32":
-        return TokenType.tk_uint32
+        return TokenType.tk_type_uint32
     elif item=="uint16":
-        return TokenType.tk_uint16
+        return TokenType.tk_type_uint16
     elif item=="uint8":
-        return TokenType.tk_uint8
+        return TokenType.tk_type_uint8
     else:  
         return is_number(item)
 

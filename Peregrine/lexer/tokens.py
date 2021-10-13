@@ -87,34 +87,38 @@ class TokenType(IntEnum):
 	tk_not = auto()           # not 
 	tk_is = auto()            # is 
 	tk_in = auto()            # in 
-	tk_cppcode = auto()         # Ccode 
+	tk_cppcode = auto()         # Cppcode 
 	tk_class = auto()         # class 
 	tk_struct = auto()        # struct 
 
 	# language types
-	tk_str = auto() 
-	tk_bool = auto() 
-	tk_char = auto() 
-	tk_float = auto() 
-	tk_float32 = auto() 
-	tk_void = auto() 
-	tk_int = auto() 
-	tk_int32 = auto() 
-	tk_int16 = auto() 
-	tk_int8 = auto() 
-	tk_uint32 = auto() 
-	tk_uint16 = auto() 
-	tk_uint8 = auto() 
-	tk_uint = auto() 
+	tk_type_str = auto() 
+	tk_type_bool = auto() 
+	tk_type_char = auto() 
+	tk_type_float = auto() 
+	tk_type_float32 = auto() 
+	tk_type_void = auto() 
+	tk_type_int = auto() 
+	tk_type_int32 = auto() 
+	tk_type_int16 = auto() 
+	tk_type_int8 = auto() 
+	tk_type_uint32 = auto() 
+	tk_type_uint16 = auto() 
+	tk_type_uint8 = auto() 
+	tk_type_uint = auto() 
+
 	#value type
-	decimal = auto() 
-	integer = auto() 
+	tk_decimal = auto() 
+	tk_integer = auto() 
+	tk_str = auto() 
+	tk_bool = auto()
 	cpp= auto() 
 	array = auto() 
 	dictionary = auto() 
-	string = auto() 
+
 	tk_ident = auto()         # beginning of identation
 	tk_dedent = auto()        # end of identation
+
 	tk_raw = auto() # raw string i.e. r
 	tk_format = auto() # formatted string i.e. f
 

@@ -41,20 +41,20 @@ precedenceMap: Dict[TokenType, Precedence] = {
 }
 
 LangTypes = [ 
-    TokenType.tk_str,
-	TokenType.tk_bool,
-	TokenType.tk_char,
-	TokenType.tk_float,
-	TokenType.tk_float32,
-	TokenType.tk_void,
-	TokenType.tk_int,
-	TokenType.tk_int32,
-	TokenType.tk_int16,
-	TokenType.tk_int8,
-	TokenType.tk_uint32,
-	TokenType.tk_uint16,
-	TokenType.tk_uint8,
-	TokenType.tk_uint
+    TokenType.tk_type_str,
+	TokenType.tk_type_bool,
+	TokenType.tk_type_char,
+	TokenType.tk_type_float,
+	TokenType.tk_type_float32,
+	TokenType.tk_type_void,
+	TokenType.tk_type_int,
+	TokenType.tk_type_int32,
+	TokenType.tk_type_int16,
+	TokenType.tk_type_int8,
+	TokenType.tk_type_uint32,
+	TokenType.tk_type_uint16,
+	TokenType.tk_type_uint8,
+	TokenType.tk_type_uint
 ]
 
 class Parser:
@@ -67,7 +67,7 @@ class Parser:
     def __init__(self, filename: str,tokens: List[Token]) -> None:
         self.tokens = tokens
         self.filename = filename
-        self.advance()
+        self.current_token = self.tokens[0]
 
     def parse(self) -> pe_ast.Node:
         programNode =  pe_ast.Program()
@@ -100,13 +100,11 @@ class Parser:
 
         self.errors.append(newError)
 
-    # TODO: check to see if we failed to advance, otherwise it could lead to an infinite loop
     def advance(self) -> None:
-        if self.tk_index >= len(self.tokens):
-            return
-
-        self.current_token = self.tokens[self.tk_index]
         self.tk_index += 1
+
+        if self.tk_index < len(self.tokens):
+            self.current_token = self.tokens[self.tk_index]
 
     def expect(self, tokenType: TokenType) -> None:
         if self.nextToken().tk_type != tokenType:
@@ -116,8 +114,8 @@ class Parser:
 
     # always check to see if the result is not None
     def nextToken(self) -> Token:
-        if self.tk_index < len(self.tokens):
-            return self.tokens[self.tk_index]
+        if self.tk_index+1 < len(self.tokens):
+            return self.tokens[self.tk_index+1]
 
         return None
 
@@ -154,8 +152,8 @@ class Parser:
         elif self.current_token.tk_type == TokenType.tk_def:
             newNode = self.parseFunctionDeclaration()
 
-        elif self.current_token.tk_type == TokenType.tk_ccode:
-            newNode = self.parseCcode()
+        elif self.current_token.tk_type == TokenType.tk_cppcode:
+            newNode = self.parseCppcode()
 
         # no matches found, current token must be part of an expression    
         else:
@@ -207,10 +205,11 @@ class Parser:
     def parseExpression(self, precedence: int) -> pe_ast.Node:
         left: pe_ast.Node
 
-        if self.current_token.tk_type == TokenType.tk_int:
+        if self.current_token.tk_type == TokenType.tk_integer:
             left = self.parseInteger()
         elif self.current_token.tk_type == TokenType.tk_str:
             left = self.parseString()
+        # TODO: add support to bools
         elif self.current_token.tk_type == TokenType.tk_bool:
             left = self.parseBool()
         elif self.current_token.tk_type == TokenType.tk_identifier:
@@ -273,4 +272,7 @@ class Parser:
         pass
 
     def parseFunctionDeclaration(self) -> pe_ast.Node:
+        pass
+
+    def parseCppcode(self) ->pe_ast.Node:
         pass
