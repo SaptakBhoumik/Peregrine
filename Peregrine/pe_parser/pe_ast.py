@@ -32,6 +32,15 @@ class IntegerLiteral(Node):
     def __str__(self) -> str:
         return self.value
 
+class DecimalLiteral(Node):
+    value: str
+
+    def __init__(self, value: str) -> None:
+        self.value = value
+
+    def __str__(self) -> str:
+        return self.value
+
 class StringLiteral(Node):
     value: str
 

@@ -77,6 +77,7 @@ class TokenType(IntEnum):
 	tk_break = auto()         # break  
 	tk_continue = auto()      # continue 
 	tk_match = auto()         # match 
+	tk_extern = auto()         # extern
 	tk_case = auto()          # case 
 	tk_default = auto()       # default 
 	tk_def = auto()           # def 
@@ -111,7 +112,6 @@ class TokenType(IntEnum):
 	tk_decimal = auto() 
 	tk_integer = auto() 
 	tk_str = auto() 
-	tk_bool = auto()
 	cpp= auto() 
 	array = auto() 
 	dictionary = auto() 

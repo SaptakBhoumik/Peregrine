@@ -164,6 +164,9 @@ class Parser:
     def parseInteger(self) -> pe_ast.Node:
         return pe_ast.IntegerLiteral(self.current_token.keyword)
 
+    def parseDecimal(self) -> pe_ast.Node:
+        return pe_ast.DecimalLiteral(self.current_token.keyword)
+
     def parseString(self) -> pe_ast.Node:
         return pe_ast.StringLiteral(self.current_token.keyword)
 
@@ -207,10 +210,11 @@ class Parser:
 
         if self.current_token.tk_type == TokenType.tk_integer:
             left = self.parseInteger()
+        elif self.current_token.tk_type == TokenType.tk_decimal:
+            left = self.parseDecimal()
         elif self.current_token.tk_type == TokenType.tk_str:
             left = self.parseString()
-        # TODO: add support to bools
-        elif self.current_token.tk_type == TokenType.tk_bool:
+        elif self.current_token.tk_type == TokenType.tk_false or self.current_token.tk_type == TokenType.tk_true:
             left = self.parseBool()
         elif self.current_token.tk_type == TokenType.tk_identifier:
             left = self.parseIdentifier()

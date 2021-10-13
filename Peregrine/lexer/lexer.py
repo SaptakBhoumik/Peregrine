@@ -53,9 +53,9 @@ def is_number(item:str)->str:
     number:list = ["1","2","3","4","5","6","7","8","9"]
     if item[0] in number:
         if len(item.split("."))==2:
-            return TokenType.decimal
+            return TokenType.tk_decimal
         else:
-            return TokenType.integer
+            return TokenType.tk_integer
     else:
         return TokenType.tk_identifier
 
@@ -90,6 +90,8 @@ def token_type(item : str) -> int:
         return TokenType.tk_continue
     elif item=="match":
         return TokenType.tk_match
+    elif item=="extern":
+        return TokenType.tk_extern
     elif item=="case":
         return TokenType.tk_case
     elif item=="default":
@@ -151,7 +153,7 @@ def token_type(item : str) -> int:
     else:  
         return is_number(item)
 
-def lexer(code: str) -> list:
+def lexer(code: str,file_name:str) -> list:
     is_string: bool = False
     is_list_dictionary_cpp_string: bool = False
     second_bracket_count: int = 0
@@ -171,7 +173,7 @@ def lexer(code: str) -> list:
     cpp_bracket_count:int=0
     is_comment:bool=False
     statement:str=""
-    operator:list=["!","/","//","+","-","*","%","<<",">>","&","|","^"]
+    operator:list=["!","/","//","+","-","*","%","<<",">>","&","|","^","="]
     for current_index, item in enumerate(code):
         if item!="\n":
             statement+=item
@@ -304,7 +306,7 @@ def lexer(code: str) -> list:
                 is_string = False
                 keyword += item
                 token = Token(
-                    keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.string
+                    keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_str
                 )
                 string_starter=""
             else:
@@ -345,7 +347,7 @@ def lexer(code: str) -> list:
                     keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
                 ) 
             else:
-                if is_number(keyword)==TokenType.integer:
+                if is_number(keyword)==TokenType.tk_integer:
                     keyword+=item
                 else:
                     token = Token(
@@ -481,7 +483,7 @@ def lexer(code: str) -> list:
             elif next(current_index,code)=="=":
                 keyword=item
                 index = current_index
-            elif keyword=="":
+            elif keyword=="" and next(current_index,code)!="=":
                 keyword=item
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_assign
@@ -593,7 +595,7 @@ def lexer(code: str) -> list:
                 token = Token()
                 keyword = ""
             
-            if (next(current_index,code)=="*" or next(current_index,code)=="=") and (tokens[-1].tk_type==TokenType.tk_identifier or tokens[-1].tk_type==TokenType.decimal or tokens[-1].tk_type==TokenType.integer or next(current_index,code)=="="):
+            if (next(current_index,code)=="*" or next(current_index,code)=="=") and (tokens[-1].tk_type==TokenType.tk_identifier or tokens[-1].tk_type==TokenType.tk_decimal or tokens[-1].tk_type==TokenType.tk_integer or next(current_index,code)=="="):
                 keyword="*"
                 index=current_index
             elif keyword=="*":
@@ -676,15 +678,19 @@ def lexer(code: str) -> list:
                     ))
 
     if is_string==True or is_list_dictionary_cpp_string==True:
-        error=error_list.message(statement, line, current_index-last_line, "file_name",expected=string_starter)
+        error=error_list.message(statement, line, current_index+1-last_line, file_name,expected=string_starter)
         error.string()
         return None
     elif is_dictionary==True:
-        error=error_list.message(statement, line, current_index-last_line,"file_name",expected="}")
+        error=error_list.message(statement, line, current_index+1-last_line,file_name,expected="}")
         error.dictionary()
         return None
+    elif is_cpp==True:
+        error=error_list.message(statement, line, current_index+1-last_line,file_name)
+        error.cpp()
+        return None
     elif is_array==True:
-        error=error_list.message(statement, line, current_index-last_line, "file_name",expected="]")
+        error=error_list.message(statement, line, current_index+1-last_line, file_name,expected="]")
         error.array()
         return None
     else:
