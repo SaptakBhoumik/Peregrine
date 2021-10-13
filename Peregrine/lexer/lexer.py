@@ -367,6 +367,7 @@ def lexer(code: str,file_name:str) -> list:
                 cpp_bracket_count=1
                 keyword=item
             else:
+                keyword=item
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
                     )
@@ -401,6 +402,7 @@ def lexer(code: str,file_name:str) -> list:
                 tokens.append(token)
                 token = Token()
                 keyword = ""
+            keyword=item
             token = Token(
                     keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
                 )
