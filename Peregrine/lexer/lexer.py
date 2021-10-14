@@ -61,111 +61,158 @@ def equal(
         
     return x
 
+
 def is_number(item: str) -> str:
     numbers: list = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
     if item[0] in numbers:
         if len(item.split(".")) == 2:
             return TokenType.tk_decimal
         else:
-            return TokenType.integer
+            return TokenType.tk_integer
     else:
         return TokenType.tk_identifier
 
+
 def token_type(item: str) -> int:
-    if item=="r":
+    if item == "r":
         return TokenType.tk_raw
-    if item=="f":
+
+    if item == "f":
         return TokenType.tk_format
-    elif item=="True":
+
+    elif item == "True":
         return TokenType.tk_true
-    elif item=="False":
+
+    elif item == "False":
         return TokenType.tk_false
-    elif item=="None":
+
+    elif item == "None":
         return TokenType.tk_none
-    elif item=="import":
+
+    elif item == "import":
         return TokenType.tk_import
-    elif item=="const":
+
+    elif item == "const":
         return TokenType.tk_const
-    elif item=="if":
+
+    elif item == "if":
         return TokenType.tk_if
-    elif item=="elif":
+
+    elif item == "elif":
         return TokenType.tk_elif
-    elif item=="else":
+
+    elif item == "else":
         return TokenType.tk_else
-    elif item=="while":
+
+    elif item == "while":
         return TokenType.tk_while
-    elif item=="for":
+
+    elif item == "for":
         return TokenType.tk_for
-    elif item=="break":
+
+    elif item == "break":
         return TokenType.tk_break
-    elif item=="continue":
+
+    elif item == "continue":
         return TokenType.tk_continue
-    elif item=="match":
+
+    elif item == "match":
         return TokenType.tk_match
-    elif item=="extern":
+
+    elif item == "extern":
         return TokenType.tk_extern
-    elif item=="case":
+
+    elif item == "case":
         return TokenType.tk_case
-    elif item=="default":
+
+    elif item == "default":
         return TokenType.tk_default
-    elif item=="def":
+
+    elif item == "def":
         return TokenType.tk_def
-    elif item=="pass":
+
+    elif item == "pass":
         return TokenType.tk_pass
-    elif item=="return":
+
+    elif item == "return":
         return TokenType.tk_return
-    elif item=="and":
+
+    elif item == "and":
         return TokenType.tk_and
-    elif item=="or":
+
+    elif item == "or":
         return TokenType.tk_or
-    elif item=="not":
+
+    elif item == "not":
         return TokenType.tk_not
-    elif item=="is":
+
+    elif item == "is":
         return TokenType.tk_is
-    elif item=="in":
+
+    elif item == "in":
         return TokenType.tk_in
-    elif item=="Cppcode":
+
+    elif item == "Cppcode":
         return TokenType.tk_cppcode
-    elif item=="himport":
+
+    elif item == "himport":
         return TokenType.tk_himport
-    elif item=="cppimport":
+
+    elif item == "cppimport":
         return TokenType.tk_cppimport
-    elif item=="class":
+
+    elif item == "class":
         return TokenType.tk_class
-    elif item=="struct":
+
+    elif item == "struct":
         return TokenType.tk_struct
-    elif item=="str":
+
+    elif item == "str":
         return TokenType.tk_type_str
-    elif item=="bool":
+
+    elif item == "bool":
         return TokenType.tk_type_bool
-    elif item=="char":
+
+    elif item == "char":
         return TokenType.tk_type_char
-    elif item=="float":
+
+    elif item == "float":
         return TokenType.tk_type_float
-    elif item=="float32":
+
+    elif item == "float32":
         return TokenType.tk_type_float32
-    elif item=="void":
+
+    elif item == "void":
         return TokenType.tk_type_void
-    elif item=="int":
+
+    elif item == "int":
         return TokenType.tk_type_int
-    elif item=="int32":
+
+    elif item == "int32":
         return TokenType.tk_type_int32
-    elif item=="int16":
+
+    elif item == "int16":
         return TokenType.tk_type_int16
-    elif item=="int8":
+
+    elif item == "int8":
         return TokenType.tk_type_int8
-    elif item=="uint":
+
+    elif item == "uint":
         return TokenType.tk_type_uint
-    elif item=="uint32":
+
+    elif item == "uint32":
         return TokenType.tk_type_uint32
-    elif item=="uint16":
+
+    elif item == "uint16":
         return TokenType.tk_type_uint16
-    elif item=="uint8":
+
+    elif item == "uint8":
         return TokenType.tk_type_uint8
     else:  
         return is_number(item)
 
-def lexer(code: str,file_name:str) -> list:
+
+def lexer(code: str, file_name: str) -> list:
     is_string: bool = False
     is_list_dictionary_cpp_string: bool = False
     second_bracket_count: int = 0
@@ -183,26 +230,26 @@ def lexer(code: str,file_name:str) -> list:
     index: int = 0
     last_line: int = 0
     keyword = ""
-    is_cpp:bool=False
-    cpp_bracket_count:int=0
-    is_comment:bool=False
-    statement:str=""
-    operator:list=["!","/","//","+","-","*","%","<<",">>","&","|","^","="]
+    is_cpp: bool = False
+    cpp_bracket_count: int = 0
+    is_comment: bool = False
+    statement: str = ""
+    operator: list = ["!", "/", "//", "+", "-", "*", "%", "<<", ">>", "&", "|", "^", "="]
     for current_index, item in enumerate(code):
-        if item!="\n":
-            statement+=item
+        if item != "\n":
+            statement += item
         else:
-            statement=""
+            statement = ""
+            
         if item == " " and is_tab == True:
             tab += 0.25
             curr_identation_level += 1
-        elif item != " " and is_tab == True and item!="\n":
+        elif item != " " and is_tab == True and item != "\n":
             is_tab = False
-
             previous_identation = 0
 
             if identation_levels:
-                previous_identation = identation_levels[len(identation_levels)-1]
+                previous_identation = identation_levels[len(identation_levels) - 1]
 
             if curr_identation_level > previous_identation:
                 token = Token("", 0, 0, TokenType.tk_ident, 0)
@@ -221,31 +268,31 @@ def lexer(code: str,file_name:str) -> list:
                         break
 
                     previous_identation = identation_levels[len(identation_levels)-1]
+                    
                 else:
                     previous_identation = 0
                 
-
         elif item == "\n" or item == "\r\n":
             tab = 0
-            last_line=current_index
+            last_line = current_index
             line += 1
             is_tab = True
             curr_identation_level = 0
 
         if is_cpp == True:
             keyword += item
-            if item=="(" and is_list_dictionary_cpp_string==False:
+            if item == "(" and is_list_dictionary_cpp_string == False:
                 cpp_bracket_count += 1
-            elif item=="'" or  item=='"':
-                if is_list_dictionary_cpp_string==True and string_starter!=item:
+            elif item == "'" or  item == '"':
+                if is_list_dictionary_cpp_string == True and string_starter != item:
                     pass
-                elif item==string_starter and is_list_dictionary_cpp_string==True:
-                    is_list_dictionary_cpp_string=False
-                    string_starter=""
+                elif item == string_starter and is_list_dictionary_cpp_string == True:
+                    is_list_dictionary_cpp_string = False
+                    string_starter = ""
                 else:
-                    string_starter=item
-                    is_list_dictionary_cpp_string=True
-            elif item == ")" and is_list_dictionary_cpp_string==False:
+                    string_starter = item
+                    is_list_dictionary_cpp_string = True
+            elif item == ")" and is_list_dictionary_cpp_string == False:
                 cpp_bracket_count -= 1
                 if cpp_bracket_count == 0:
                     is_array = False
@@ -253,32 +300,31 @@ def lexer(code: str,file_name:str) -> list:
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.cpp
                     )
 
-        elif item=="#" and is_string==False and is_list_dictionary_cpp_string==False and is_comment==False:
-            is_comment=True
-        elif is_comment==True:
-            if item=="\n" or item=="\r\n":
-                is_comment=False
+        elif item == "#" and is_string == False and is_list_dictionary_cpp_string == False and is_comment == False:
+            is_comment = True
+
+        elif is_comment == True:
+            if item == "\n" or item == "\r\n":
+                is_comment = False
 
         elif is_string == True and string_starter != item:
             keyword += item
 
-
         elif is_array == True:
             keyword += item
-            if item=="[" and is_list_dictionary_cpp_string==False:
+            if item == "[" and is_list_dictionary_cpp_string == False:
                 second_bracket_count += 1
-            elif item=="'" or  item=='"':
-                if is_list_dictionary_cpp_string==True and string_starter!=item:
+            elif item == "'" or item == '"':
+                if is_list_dictionary_cpp_string == True and string_starter != item:
                     pass
-                elif item==string_starter and is_list_dictionary_cpp_string==True:
-                    is_list_dictionary_cpp_string=False
-                    string_starter=""
+                elif item == string_starter and is_list_dictionary_cpp_string == True:
+                    is_list_dictionary_cpp_string = False
+                    string_starter = ""
                 else:
-                    string_starter=item
-                    is_list_dictionary_cpp_string=True
+                    string_starter = item
+                    is_list_dictionary_cpp_string = True
 
-
-            elif item == "]" and is_list_dictionary_cpp_string==False:
+            elif item == "]" and is_list_dictionary_cpp_string == False:
                 second_bracket_count -= 1
                 if second_bracket_count == 0:
                     is_array = False
@@ -288,20 +334,19 @@ def lexer(code: str,file_name:str) -> list:
 
         elif is_dictionary == True:
             keyword += item
-            if item=="{" and is_list_dictionary_cpp_string==False:
+            if item=="{" and is_list_dictionary_cpp_string == False:
                 third_bracket_count += 1
-            elif item=="'" or  item=='"':
-                if is_list_dictionary_cpp_string==True and string_starter!=item:
+            elif item == "'" or item == '"':
+                if is_list_dictionary_cpp_string == True and string_starter != item:
                     pass
-                elif item==string_starter and is_list_dictionary_cpp_string==True:
-                    is_list_dictionary_cpp_string=False
-                    string_starter=""
+                elif item == string_starter and is_list_dictionary_cpp_string == True:
+                    is_list_dictionary_cpp_string = False
+                    string_starter = ""
                 else:
-                    string_starter=item
-                    is_list_dictionary_cpp_string=True
+                    string_starter = item
+                    is_list_dictionary_cpp_string = True
 
-
-            elif item == "}" and is_list_dictionary_cpp_string==False:
+            elif item == "}" and is_list_dictionary_cpp_string == False:
                 third_bracket_count -= 1
                 if third_bracket_count == 0:
                     is_dictionary = False
@@ -309,40 +354,38 @@ def lexer(code: str,file_name:str) -> list:
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.dictionary
                     )
 
-        elif ( item == " " and is_dictionary == False  and is_array == False and is_string == False) or item == "\n"  or item == "\r\n" :
-            if keyword!="":
+        elif (item == " " and is_dictionary == False and is_array == False and is_string == False) or item == "\n" or item == "\r\n":
+            if keyword != "":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
 
-
-        elif item == "[" and is_dictionary == False  and is_string == False  and is_array == False:
-            if keyword!="":
+        elif item == "[" and is_dictionary == False and is_string == False and is_array == False:
+            if keyword != "":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
-            index=current_index
+
+            index = current_index
             keyword = item
             is_array = True
             second_bracket_count += 1
-        
 
-        elif item == "{" and is_dictionary == False  and is_string == False  and is_array == False:
-            if keyword!="":
+        elif item == "{" and is_dictionary == False and is_string == False and is_array == False:
+            if keyword != "":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
-            index=current_index
+            index = current_index
             keyword = item
             is_dictionary = True
             third_bracket_count += 1
-
 
         elif item == "'" or item == '"' and is_array == False and is_dictionary == False:
             if is_string == True and string_starter == item:
@@ -351,48 +394,52 @@ def lexer(code: str,file_name:str) -> list:
                 token = Token(
                     keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_str
                 )
-                string_starter=""
+                string_starter = ""
+
             else:
-                if keyword!="":
+                if keyword != "":
                     token = Token(
                             keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                         )
                     tokens.append(token)
                     token = Token()
                     keyword = ""
+
                 is_string = True
-                index=current_index
+                index = current_index
                 keyword = item
                 index = current_index
                 string_starter = item
 
-        elif item=="(":
-            if keyword!="":
+        elif item == "(":
+            if keyword != "":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
+
             if tokens[-1].tk_type == TokenType.tk_cppcode:
                 is_cpp = True
-                cpp_bracket_count=1
-                keyword=item
+                cpp_bracket_count = 1
+                keyword = item
             else:
-                keyword=item
+                keyword = item
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
                     )
-        elif item==".":
-            if keyword=="":
-                keyword=item
-                index=current_index
+
+        elif item == ".":
+            if keyword == "":
+                keyword = item
+                index = current_index
                 token = Token(
                     keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
                 ) 
             else:
-                if is_number(keyword)==TokenType.tk_integer:
-                    keyword+=item
+                if is_number(keyword) == TokenType.tk_integer:
+                    keyword += item
                 else:
                     token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
@@ -400,38 +447,42 @@ def lexer(code: str,file_name:str) -> list:
                     tokens.append(token)
                     token = Token()
                     keyword = ""
-                    keyword=item
-                    index=current_index
+                    keyword = item
+                    index = current_index
                     token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
                     )
 
-        elif item==")":
-            if keyword!="":
+        elif item == ")":
+            if keyword != "":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
-            keyword=item
+
+            keyword = item
             token = Token(
                     keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
                 )
-        elif item=="+":
-            if keyword!="" and keyword!="+":
+
+        elif item == "+":
+            if keyword != "" and keyword != "+":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
-            if keyword=="+":
+
+            if keyword == "+":
                 token = Token(
                         keyword="++", index=index, line=line, tab=tab, tk_type=TokenType.tk_increment
                     )
-            elif next(current_index,code)=="+" or  next(current_index,code)=="=" :
-                keyword=item
+
+            elif next(current_index, code) == "+" or next(current_index, code) == "=":
+                keyword = item
                 index = current_index
             else:
                 index = current_index
@@ -439,97 +490,105 @@ def lexer(code: str,file_name:str) -> list:
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_plus
                     )
-        elif item==">":
-            if keyword!="" and keyword!=">":
+        elif item == ">":
+            if keyword != "" and keyword != ">":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
-            if keyword==">":
-                if next(current_index,code)=="=":
-                    keyword=">>"
+            if keyword == ">":
+                if next(current_index, code) == "=":
+                    keyword = ">>"
                 else:
                     token = Token(
                             keyword=">>", index=index, line=line, tab=tab, tk_type=TokenType.tk_shift_right
                         )
-            elif keyword=="-":
+            elif keyword == "-":
                 token = Token(
                             keyword="->", index=index, line=line, tab=tab, tk_type=TokenType.tk_arrow
                         )
-            elif next(current_index,code)==">" or  next(current_index,code)=="=" :
-                keyword=item
+            elif next(current_index,code) == ">" or next(current_index, code) == "=" :
+                keyword = item
                 index = current_index
             else:
                 index = current_index
-                keyword=item
+                keyword = item
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_greater
                     )
-        elif item=="<":
-            if keyword!="" and keyword!="<":
+
+        elif item == "<":
+            if keyword != "" and keyword != "<":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
-            if keyword=="<":
-                if next(current_index,code)=="=":
-                    keyword="<<"
+
+            if keyword == "<":
+                if next(current_index, code) == "=":
+                    keyword = "<<"
                 else:
                     token = Token(
                             keyword="<<", index=index, line=line, tab=tab, tk_type=TokenType.tk_shift_left
                         )
-            elif next(current_index,code)=="<" or  next(current_index,code)=="=" :
-                keyword=item
+
+            elif next(current_index, code) == "<" or next(current_index, code) == "=" :
+                keyword = item
                 index = current_index
             else:
                 index = current_index
-                keyword=item
+                keyword = item
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_less
                     )
-        elif item=="-":
-            if keyword!="" and keyword!="-":
+        elif item == "-":
+            if keyword != "" and keyword != "-":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
-            if keyword=="-":
+
+            if keyword == "-":
                 token = Token(
                         keyword="--", index=index, line=line, tab=tab, tk_type=TokenType.tk_decrement
                     )
-            elif next(current_index,code)=="-" or next(current_index,code)==">" or   next(current_index,code)=="=" :
-                keyword=item
+
+            elif next(current_index, code) == "-" or next(current_index, code) == ">" or next(current_index, code) == "=":
+                keyword = item
                 index = current_index
             else:
                 index = current_index
-                keyword=item
+                keyword = item
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_minus
                     )
-        elif item=="=":
-            if keyword not in operator and keyword!="":
+
+        elif item == "=":
+            if keyword not in operator and keyword != "":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
-            if keyword=="=":
-                keyword="=="
+            if keyword == "=":
+                keyword = "=="
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_equal
                     )
-            elif next(current_index,code)=="=":
-                keyword=item
+
+            elif next(current_index, code) == "=":
+                keyword = item
                 index = current_index
-            elif keyword=="" and next(current_index,code)!="=":
-                keyword=item
+
+            elif keyword == "" and next(current_index, code) != "=":
+                keyword = item
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_assign
                     )
@@ -537,102 +596,111 @@ def lexer(code: str,file_name:str) -> list:
                 token = equal(
                         keyword=keyword, index=index, line=line, tab=tab
                     )
-                
 
-        elif item=="/":
-            if keyword!="" and keyword!="/":
+        elif item == "/":
+            if keyword != "" and keyword != "/":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
-            if keyword=="/":
-                if next(current_index,code)=="=":
-                    keyword="//"
+
+            if keyword == "/":
+                if next(current_index, code) == "=":
+                    keyword = "//"
                 else:
                     token = Token(
                             keyword="//", index=index, line=line, tab=tab, tk_type=TokenType.tk_floor
                         )
-            elif next(current_index,code)=="/" or  next(current_index,code)=="=" :
-                keyword=item
+
+            elif next(current_index, code) == "/" or next(current_index, code) == "=":
+                keyword = item
                 index = current_index
             else:
                 index = current_index
-                keyword=item
+                keyword = item
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_divide
                     )
-        elif item=="^":
-            if keyword!="":
+
+        elif item == "^":
+            if keyword != "":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
-            if next(current_index,code)=="=":
-                keyword=item
+
+            if next(current_index, code) == "=":
+                keyword = item
                 index = current_index
             else:
                 index = current_index
-                keyword=item
+                keyword = item
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_xor
                     )
-        elif item=="%":
-            if keyword!="":
+
+        elif item == "%":
+            if keyword != "":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
-            if next(current_index,code)=="=":
+
+            if next(current_index, code) == "=":
                 keyword=item
                 index = current_index
             else:
                 index = current_index
-                keyword=item
+                keyword = item
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_modulo
                     )
-        elif item=="&":
-            if keyword!="":
+
+        elif item == "&":
+            if keyword != "":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
-            if next(current_index,code)=="=":
-                keyword=item
+
+            if next(current_index, code) == "=":
+                keyword = item
                 index = current_index
             else:
                 index = current_index
-                keyword=item
+                keyword = item
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_ampersand
                     )
-        elif item=="|":
-            if keyword!="":
+
+        elif item == "|":
+            if keyword != "":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
-            if next(current_index,code)=="=":
-                keyword=item
+
+            if next(current_index, code) == "=":
+                keyword = item
                 index = current_index
             else:
                 index = current_index
-                keyword=item
+                keyword = item
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_bit_or
                     )
-        elif item=="*":
-            if keyword!="" and keyword!="*":
+        elif item == "*":
+            if keyword != "" and keyword != "*":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
@@ -640,23 +708,22 @@ def lexer(code: str,file_name:str) -> list:
                 token = Token()
                 keyword = ""
             
-            if (next(current_index,code)=="*" or next(current_index,code)=="=") and (tokens[-1].tk_type==TokenType.tk_identifier or tokens[-1].tk_type==TokenType.tk_decimal or tokens[-1].tk_type==TokenType.tk_integer or next(current_index,code)=="="):
-                keyword="*"
-                index=current_index
-            elif keyword=="*":
+            if (next(current_index, code) == "*" or next(current_index, code) == "=") and (tokens[-1].tk_type == TokenType.tk_identifier or tokens[-1].tk_type == TokenType.tk_decimal or tokens[-1].tk_type == TokenType.tk_integer or next(current_index, code) == "="):
+                keyword = "*"
+                index = current_index
+            elif keyword == "*":
                 token = Token(
                         keyword="**", index=index, line=line, tab=tab, tk_type=TokenType.tk_exponent
                 )
             else:
                 index = current_index
-                keyword=item
+                keyword = item
                 token = Token(
                     keyword=keyword, index=index, line=line , tab=tab,tk_type=TokenType.tk_asterisk
                 )
-            
 
-        elif item=="~":
-            if keyword!="":
+        elif item == "~":
+            if keyword != "":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
@@ -664,12 +731,12 @@ def lexer(code: str,file_name:str) -> list:
                 token = Token()
                 keyword = ""
             index = current_index
-            keyword=item
+            keyword = item
             token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_bit_not
                     )
-        elif item=="!":
-            if keyword!="":
+        elif item == "!":
+            if keyword != "":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
@@ -679,63 +746,67 @@ def lexer(code: str,file_name:str) -> list:
             index = current_index
             keyword=item
 
-        elif item==":":
-            if keyword!="":
+        elif item == ":":
+            if keyword != "":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
+
             index = current_index
-            keyword=item
+            keyword = item
             token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_colon
                     )
             
-        elif item==",":
-            if keyword!="":
+        elif item == ",":
+            if keyword != "":
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     )
                 tokens.append(token)
                 token = Token()
                 keyword = ""
+
             index = current_index
-            keyword=item
+            keyword = item
             token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_comma
                     )
 
         else:
-            if keyword=="":
-                index=current_index
-            keyword+= item
-
+            if keyword == "":
+                index = current_index
+            keyword += item
 
         if token.keyword != "":
             tokens.append(token)
             token = Token()
             keyword = ""
-    if keyword!="":
+    if keyword != "":
         tokens.append(Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=token_type(keyword)
                     ))
 
-    if is_string==True or is_list_dictionary_cpp_string==True:
-        error=error_list.message(statement, line, current_index+1-last_line, file_name,expected=string_starter)
+    if is_string == True or is_list_dictionary_cpp_string == True:
+        error = error_list.message(statement, line, current_index+1-last_line, file_name,expected=string_starter)
         error.string()
         return None
-    elif is_dictionary==True:
-        error=error_list.message(statement, line, current_index+1-last_line,file_name,expected="}")
+
+    elif is_dictionary == True:
+        error = error_list.message(statement, line, current_index + 1 - last_line, file_name, expected="}")
         error.dictionary()
         return None
-    elif is_cpp==True:
-        error=error_list.message(statement, line, current_index+1-last_line,file_name)
+
+    elif is_cpp == True:
+        error = error_list.message(statement, line, current_index + 1 - last_line, file_name)
         error.cpp()
         return None
-    elif is_array==True:
-        error=error_list.message(statement, line, current_index+1-last_line, file_name,expected="]")
+
+    elif is_array == True:
+        error = error_list.message(statement, line, current_index + 1 - last_line, file_name, expected="]")
         error.array()
         return None
     else:
