@@ -277,13 +277,15 @@ class Parser:
     def parseIf(self) -> pe_ast.Node:
         self.advance()
         condition = self.parseExpression(Precedence.pr_lowest)
-        #self.expect(TokenType.tk_colon)
-        #self.advance()
+        self.expect(TokenType.tk_colon)
+        self.advance()
 
         else_branch = None
         then_branch = self.parseBlock()
-        self.advance()
+
         if self.current_token.tk_type == TokenType.tk_else:
+            self.expect(TokenType.tk_colon)
+            self.advance()
             else_branch = self.parseBlock()
 
         return pe_ast.IfStatement(condition, then_branch, else_branch)

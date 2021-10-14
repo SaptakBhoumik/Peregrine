@@ -120,7 +120,7 @@ class Block(Node):
     block: List[Node] = []
 
     def __str__(self) -> str:
-        return "{" + self.block.__str__() + "}"
+        return "(" + self.block.__str__() + ")"
 
 class IfStatement(Node):
     condition: Node
@@ -133,4 +133,4 @@ class IfStatement(Node):
         self.else_branch = else_branch
     
     def __str__(self) -> str:
-        return "if" + "(" + self.condition.__str__() + ") " + self.then_branch.__str__() + " " + (("else {" + self.else_branch.__str__() + "}") if self.else_branch is not None else "")
+        return "if" + "(" + self.condition.__str__() + ") " + self.then_branch.__str__() + " " + "else " + self.else_branch.__str__()

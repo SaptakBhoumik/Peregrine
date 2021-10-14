@@ -55,7 +55,7 @@ def is_number(item:str)->str:
         if len(item.split("."))==2:
             return TokenType.tk_decimal
         else:
-            return TokenType.tk_integer
+            return TokenType.integer
     else:
         return TokenType.tk_identifier
 
