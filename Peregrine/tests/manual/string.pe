@@ -1,15 +1,9 @@
 def main():
-
-    str a = NULL 
-    
     if "a"==NULL:
         print("Not ok")
     if "a"!=NULL:
         print("Ok\n")
-    if "a">=NULL:
-        print("Not ok")
-    if "a"<=NULL:
-        print("Not Ok")
+    str a=NULL
     if a!=NULL:
         print("Not Ok\n")
     if a==NULL:
