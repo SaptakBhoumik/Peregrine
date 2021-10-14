@@ -1,7 +1,7 @@
 # peregrine has builtin support for structure so it is not needed when we write in peregrine
 from .tokens import *
 from errors import error_list
-
+from typing import List
 
 def equal(
     keyword: str = "", index: int = 0, line: int = 1, tab: float = 0, 
@@ -53,9 +53,9 @@ def is_number(item:str)->str:
     number:list = ["1","2","3","4","5","6","7","8","9"]
     if item[0] in number:
         if len(item.split("."))==2:
-            return TokenType.decimal
+            return TokenType.tk_decimal
         else:
-            return TokenType.integer
+            return TokenType.tk_integer
     else:
         return TokenType.tk_identifier
 
@@ -123,33 +123,33 @@ def token_type(item : str) -> int:
     elif item=="struct":
         return TokenType.tk_struct
     elif item=="str":
-        return TokenType.tk_str
+        return TokenType.tk_type_str
     elif item=="bool":
-        return TokenType.tk_bool
+        return TokenType.tk_type_bool
     elif item=="char":
-        return TokenType.tk_char
+        return TokenType.tk_type_char
     elif item=="float":
-        return TokenType.tk_float
+        return TokenType.tk_type_float
     elif item=="float32":
-        return TokenType.tk_float32
+        return TokenType.tk_type_float32
     elif item=="void":
-        return TokenType.tk_void
+        return TokenType.tk_type_void
     elif item=="int":
-        return TokenType.tk_int
+        return TokenType.tk_type_int
     elif item=="int32":
-        return TokenType.tk_int32
+        return TokenType.tk_type_int32
     elif item=="int16":
-        return TokenType.tk_int16
+        return TokenType.tk_type_int16
     elif item=="int8":
-        return TokenType.tk_int8
+        return TokenType.tk_type_int8
     elif item=="uint":
-        return TokenType.tk_uint
+        return TokenType.tk_type_uint
     elif item=="uint32":
-        return TokenType.tk_uint32
+        return TokenType.tk_type_uint32
     elif item=="uint16":
-        return TokenType.tk_uint16
+        return TokenType.tk_type_uint16
     elif item=="uint8":
-        return TokenType.tk_uint8
+        return TokenType.tk_type_uint8
     else:  
         return is_number(item)
 
@@ -163,6 +163,8 @@ def lexer(code: str,file_name:str) -> list:
     string_starter: str = ""
     is_tab: bool = True
     tab: float = 0
+    identation_levels: List[int] = []
+    curr_identation_level: int = 0
     line = 1
     tokens: list = []
     token = Token()
@@ -181,13 +183,42 @@ def lexer(code: str,file_name:str) -> list:
             statement=""
         if item == " " and is_tab == True:
             tab += 0.25
+            curr_identation_level += 1
         elif item != " " and is_tab == True and item!="\n":
             is_tab = False
+
+            previous_identation = 0
+
+            if identation_levels:
+                previous_identation = identation_levels[len(identation_levels)-1]
+
+            if curr_identation_level > previous_identation:
+                token = Token("", 0, 0, TokenType.tk_ident, 0)
+                tokens.append(token)
+                
+                identation_levels.append(curr_identation_level)
+
+            while curr_identation_level < previous_identation:
+                identation_levels.pop()
+                
+                token = Token("", 0, 0, TokenType.tk_dedent, 0)
+                tokens.append(token)
+
+                if identation_levels:
+                    if curr_identation_level >= identation_levels[len(identation_levels)-1]:
+                        break
+
+                    previous_identation = identation_levels[len(identation_levels)-1]
+                else:
+                    previous_identation = 0
+                
+
         elif item == "\n" or item == "\r\n":
             tab = 0
             last_line=current_index
             line += 1
             is_tab = True
+            curr_identation_level = 0
 
         if is_cpp == True:
             keyword += item
@@ -306,7 +337,7 @@ def lexer(code: str,file_name:str) -> list:
                 is_string = False
                 keyword += item
                 token = Token(
-                    keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.string
+                    keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_str
                 )
                 string_starter=""
             else:
@@ -336,6 +367,7 @@ def lexer(code: str,file_name:str) -> list:
                 cpp_bracket_count=1
                 keyword=item
             else:
+                keyword=item
                 token = Token(
                         keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
                     )
@@ -347,7 +379,7 @@ def lexer(code: str,file_name:str) -> list:
                     keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
                 ) 
             else:
-                if is_number(keyword)==TokenType.integer:
+                if is_number(keyword)==TokenType.tk_integer:
                     keyword+=item
                 else:
                     token = Token(
@@ -370,6 +402,7 @@ def lexer(code: str,file_name:str) -> list:
                 tokens.append(token)
                 token = Token()
                 keyword = ""
+            keyword=item
             token = Token(
                     keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
                 )
@@ -595,7 +628,7 @@ def lexer(code: str,file_name:str) -> list:
                 token = Token()
                 keyword = ""
             
-            if (next(current_index,code)=="*" or next(current_index,code)=="=") and (tokens[-1].tk_type==TokenType.tk_identifier or tokens[-1].tk_type==TokenType.decimal or tokens[-1].tk_type==TokenType.integer or next(current_index,code)=="="):
+            if (next(current_index,code)=="*" or next(current_index,code)=="=") and (tokens[-1].tk_type==TokenType.tk_identifier or tokens[-1].tk_type==TokenType.tk_decimal or tokens[-1].tk_type==TokenType.tk_integer or next(current_index,code)=="="):
                 keyword="*"
                 index=current_index
             elif keyword=="*":

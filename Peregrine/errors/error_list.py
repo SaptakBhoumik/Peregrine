@@ -1,3 +1,9 @@
+"""
+*  
+*  Copyright (c) Peregrine-lang, 2021. All rights reserved.
+*
+"""
+
 from .errors import *
 
 class message:
