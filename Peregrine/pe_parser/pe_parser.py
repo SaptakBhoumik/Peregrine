@@ -281,12 +281,13 @@ class Parser:
         self.advance()
 
         else_branch = None
-        then_branch = self.parseBlock()
+        then_branch = self.parseStatement()
+        self.advance()
 
         if self.current_token.tk_type == TokenType.tk_else:
             self.expect(TokenType.tk_colon)
             self.advance()
-            else_branch = self.parseBlock()
+            else_branch = self.parseStatement()
 
         return pe_ast.IfStatement(condition, then_branch, else_branch)
 
