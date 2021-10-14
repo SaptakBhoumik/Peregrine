@@ -116,4 +116,21 @@ class VariableReassignment(Node):
     def __str__(self) -> str:
         return f"{self.varName} = {str(self.newValue)}"
 
+class Block(Node):
+    block: List[Node] = []
+
+    def __str__(self) -> str:
+        return "{" + self.block.__str__() + "}"
+
+class IfStatement(Node):
+    condition: Node
+    then_branch: Node
+    else_branch: Node
+
+    def __init__(self, condition: Node, then_branch: Node, else_branch: Node) -> None:
+        self.condition = condition
+        self.then_branch = then_branch
+        self.else_branch = else_branch
     
+    def __str__(self) -> str:
+        return "if" + "(" + self.condition.__str__() + ") " + self.then_branch.__str__() + " " + (("else {" + self.else_branch.__str__() + "}") if self.else_branch is not None else "")

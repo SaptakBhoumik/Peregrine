@@ -126,6 +126,15 @@ class Parser:
             return precedenceMap[self.nextToken().tk_type]
 
         return Precedence.pr_lowest
+    
+    def parseBlock(self) -> pe_ast.Node:
+        blockNode =  pe_ast.Block()
+        starting_tab = self.current_token.tab
+        #while not self.current_token.tab < starting_tab:
+        blockNode.block.append(self.parseStatement().__str__())
+        self.advance()
+
+        return blockNode
 
     def parseStatement(self) -> pe_ast.Node:
         newNode: pe_ast.Node
@@ -154,8 +163,8 @@ class Parser:
         elif self.current_token.tk_type == TokenType.tk_def:
             newNode = self.parseFunctionDeclaration()
 
-        elif self.current_token.tk_type == TokenType.tk_ccode:
-            newNode = self.parseCcode()
+        elif self.current_token.tk_type == TokenType.tk_cppcode:
+            newNode = self.parseCppcode()
 
         # no matches found, current token must be part of an expression    
         else:
@@ -243,7 +252,7 @@ class Parser:
         self.advance()
         self.advance()
 
-        newValue = self.parseExpression(Precedence.pr_lowestr)
+        newValue = self.parseExpression(Precedence.pr_lowest)
 
         return pe_ast.VariableReassignment(identifier, newValue)
 
@@ -266,7 +275,18 @@ class Parser:
         return pe_ast.VariableDeclaration(varType, name, value)
 
     def parseIf(self) -> pe_ast.Node:
-        pass
+        self.advance()
+        condition = self.parseExpression(Precedence.pr_lowest)
+        #self.expect(TokenType.tk_colon)
+        #self.advance()
+
+        else_branch = None
+        then_branch = self.parseBlock()
+        self.advance()
+        if self.current_token.tk_type == TokenType.tk_else:
+            else_branch = self.parseBlock()
+
+        return pe_ast.IfStatement(condition, then_branch, else_branch)
 
     def parseWhile(self) -> pe_ast.Node:
         pass
@@ -278,4 +298,7 @@ class Parser:
         pass
 
     def parseFunctionDeclaration(self) -> pe_ast.Node:
+        pass
+
+    def parseCppcode(self) -> pe_ast.Node:
         pass
