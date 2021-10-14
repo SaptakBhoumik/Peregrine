@@ -11,55 +11,67 @@ def equal(
     x.line = line
     x.tab = tab
 
-    if keyword=="!":
+    if keyword == "!":
         x.keyword = "!="
         x.tk_type = TokenType.tk_not_equal
-    elif keyword=="/":
+        
+    elif keyword == "/":
         x.keyword = "/="
         x.tk_type = TokenType.tk_slash_equal
-    elif keyword=="//":
+        
+    elif keyword == "//":
         x.keyword = "//="
         x.tk_type = TokenType.tk_floor_equal
-    elif keyword=="+":
+        
+    elif keyword == "+":
         x.keyword = "+="
         x.tk_type = TokenType.tk_plus_equal
-    elif keyword=="-":
+        
+    elif keyword == "-":
         x.keyword = "-="
         x.tk_type = TokenType.tk_minus_equal
-    elif keyword=="*":
+        
+    elif keyword == "*":
         x.keyword = "*="
         x.tk_type = TokenType.tk_times_equal
-    elif keyword=="%":
+        
+    elif keyword == "%":
         x.keyword = "%="
         x.tk_type = TokenType.tk_mod_equal
-    elif keyword=="<<":
+        
+    elif keyword == "<<":
         x.keyword = "<<="
         x.tk_type = TokenType.tk_shift_left_equal
-    elif keyword==">>":
+        
+    elif keyword == ">>":
         x.keyword = ">>="
         x.tk_type = TokenType.tk_shift_right_equal
-    elif keyword=="&":
+        
+    elif keyword == "&":
         x.keyword = "&="
         x.tk_type = TokenType.tk_bit_and_equal
-    elif keyword=="|":
+        
+    elif keyword == "|":
         x.keyword = "|="
         x.tk_type = TokenType.tk_bit_or_equal
-    elif keyword=="^":
+        
+    elif keyword == "^":
         x.keyword = "^="
         x.tk_type = TokenType.tk_bit_xor_equal
+        
     return x
 
-def is_number(item:str)->str:
-    number:list = ["1","2","3","4","5","6","7","8","9"]
-    if item[0] in number:
-        if len(item.split("."))==2:
+def is_number(item: str) -> str:
+    numbers: list = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    if item[0] in numbers:
+        if len(item.split(".")) == 2:
             return TokenType.tk_decimal
         else:
             return TokenType.tk_integer
     else:
         return TokenType.tk_identifier
 
-def token_type(item : str) -> int:
+def token_type(item: str) -> int:
     if item=="r":
         return TokenType.tk_raw
     if item=="f":
