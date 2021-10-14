@@ -66,9 +66,9 @@ def is_number(item: str) -> str:
     numbers: list = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
     if item[0] in numbers:
         if len(item.split(".")) == 2:
-            return TokenType.tk_decimal
+            return TokenType.decimal
         else:
-            return TokenType.tk_integer
+            return TokenType.integer
     else:
         return TokenType.tk_identifier
 
@@ -438,7 +438,7 @@ def lexer(code: str, file_name: str) -> list:
                     keyword=keyword, index=index, line=line, tab=tab, tk_type=TokenType.tk_l_paren
                 ) 
             else:
-                if is_number(keyword) == TokenType.tk_integer:
+                if is_number(keyword) == TokenType.integer:
                     keyword += item
                 else:
                     token = Token(
@@ -708,7 +708,7 @@ def lexer(code: str, file_name: str) -> list:
                 token = Token()
                 keyword = ""
             
-            if (next(current_index, code) == "*" or next(current_index, code) == "=") and (tokens[-1].tk_type == TokenType.tk_identifier or tokens[-1].tk_type == TokenType.tk_decimal or tokens[-1].tk_type == TokenType.tk_integer or next(current_index, code) == "="):
+            if (next(current_index, code) == "*" or next(current_index, code) == "=") and (tokens[-1].tk_type == TokenType.tk_identifier or tokens[-1].tk_type == TokenType.decimal or tokens[-1].tk_type == TokenType.integer or next(current_index, code) == "="):
                 keyword = "*"
                 index = current_index
             elif keyword == "*":
