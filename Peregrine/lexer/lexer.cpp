@@ -257,7 +257,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
                 token = Token();
                 keyword = "";
             }
-            if (tokens[-1].tk_type == tk_cppcode){
+            if (tokens.back().tk_type == tk_cppcode){
                 is_cpp = true;
                 cpp_bracket_count = 1;
                 keyword = item;
@@ -308,7 +308,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
             if (keyword == "+"){
                 token = token_init("++",tk_increment, start_index, current_index, line);
             }
-            else if (next(current_index,charecters) == "+" or next(current_index, charecters) == "="){
+            else if (next(current_index,charecters) == "+" || next(current_index, charecters) == "="){
                 keyword = item;
                 start_index = current_index;
             }
@@ -319,7 +319,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
             }
     }
     else if (item == ">"){
-            if (keyword != "" and keyword != ">"){
+            if (keyword != "" && keyword != ">"){
                 token = token_init(keyword,token_type(keyword), start_index, current_index, line);
                 tokens.push_back(token);
                 token = Token();
@@ -336,7 +336,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
             else if (keyword == "-"){
                 token = token_init("->",tk_shift_right, start_index, current_index, line);
             }
-            else if (next(current_index,charecters) == ">" or next(current_index, charecters) == "=" ){
+            else if (next(current_index,charecters) == ">" || next(current_index, charecters) == "=" ){
                 keyword = item;
                 start_index = current_index;
             }
@@ -347,7 +347,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
             }
     }
     else if (item == "<"){
-            if (keyword != "" and keyword != "<"){
+            if (keyword != "" && keyword != "<"){
                 token = token_init(keyword,token_type(keyword), start_index, current_index, line);
                 tokens.push_back(token);
                 token = Token();
@@ -362,7 +362,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
                 token = token_init("<<",tk_shift_left, start_index, current_index, line);
                 }
             }
-            else if (next(current_index, charecters) == "<" or next(current_index, charecters) == "=" ){
+            else if (next(current_index, charecters) == "<" || next(current_index, charecters) == "=" ){
                 keyword = item;
                 start_index = current_index;
             }
@@ -373,7 +373,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
             }
     }
     else if (item == "-"){
-            if (keyword != "" and keyword != "-"){
+            if (keyword != "" && keyword != "-"){
                 token = token_init(keyword,token_type(keyword), start_index, current_index, line);
                 tokens.push_back(token);
                 token = Token();
@@ -383,7 +383,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
                 token = token_init("--",tk_decrement, start_index, current_index, line);
             }
 
-            else if (next(current_index, charecters) == "-" or next(current_index,charecters) == ">" or next(current_index, charecters) == "="){
+            else if (next(current_index, charecters) == "-" || next(current_index,charecters) == ">" || next(current_index, charecters) == "="){
                 keyword = item;
                 start_index = current_index;
             }
