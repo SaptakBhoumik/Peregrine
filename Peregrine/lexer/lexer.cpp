@@ -14,9 +14,13 @@ std::vector<std::string> split(std::string code) {
   std::vector<std::string> split_code;
   std::string character;
   INTEGER index = 0;
+  //reserving a the number of charecters for vector because this function literally breaks down the code into a vector of charecter
+  //vectors copy and move value to a new location whenever we exceed that limit which makes it slow. to prevent this we are reserving space 
+  //i am using vector because it is much plesent to work with
+  split_code.reserve(code.size());
   while (index < code.length()) {
     character = code[index];
-    split_code.push_back(character);
+    split_code.emplace_back(character);
     index++;
   }
   return split_code;
@@ -64,6 +68,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
   bool is_comment = false;
   bool is_string = false;
   bool is_tab = true;
+  tokens.reserve(charecters.size());//we are reserving extra space but he advantage is that it will reduce the time it takes to run
   while (current_index < charecters.size()) {
     item = charecters[current_index];
     if (item != "\n") {
@@ -83,15 +88,15 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
 
       if (curr_identation_level > previous_identation) {
         token = token_init("", tk_ident, start_index, current_index, line);
-        tokens.push_back(token);
+        tokens.emplace_back(token);
 
-        identation_level.push_back(curr_identation_level);
+        identation_level.emplace_back(curr_identation_level);
       }
 
       while (curr_identation_level < previous_identation) {
         identation_level.pop_back();
         token = token_init("", tk_dedent, start_index, current_index, line);
-        tokens.push_back(token);
+        tokens.emplace_back(token);
 
         if (identation_level.size() != 0) {
           if (curr_identation_level >=
@@ -208,7 +213,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
     else if (item == "[" && is_dictionary == false && is_string == false && is_array == false){
             if (keyword != ""){
                 token = token_init(keyword,token_type(keyword), start_index, current_index, line);
-                tokens.push_back(token);
+                tokens.emplace_back(token);
                 token = Token();
                 keyword = "";
             }
@@ -220,7 +225,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
     else if (item == "{" && is_dictionary == false && is_string == false && is_array == false){
             if (keyword != ""){
                 token = token_init(keyword,token_type(keyword), start_index, current_index, line);
-                tokens.push_back(token);
+                tokens.emplace_back(token);
                 token = Token();
                 keyword = "";
             }
@@ -240,7 +245,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
             else{
                 if (keyword != ""){
                   token = token_init(keyword,token_type(keyword), start_index, current_index, line);
-                    tokens.push_back(token);
+                    tokens.emplace_back(token);
                     token = Token();
                     keyword = "";
                 }
@@ -253,7 +258,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
     else if (item == "("){
             if (keyword != ""){
                 token = token_init(keyword,token_type(keyword), start_index, current_index, line);
-                tokens.push_back(token);
+                tokens.emplace_back(token);
                 token = Token();
                 keyword = "";
             }
@@ -279,7 +284,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
                 }
                 else{
                     token = token_init(keyword,token_type(keyword), start_index, current_index, line);
-                    tokens.push_back(token);
+                    tokens.emplace_back(token);
                     token = Token();
                     keyword = "";
                     keyword = item;
@@ -291,7 +296,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
     else if (item == ")"){
             if (keyword != ""){
                 token = token_init(keyword,token_type(keyword), start_index, current_index, line);
-                tokens.push_back(token);
+                tokens.emplace_back(token);
                 token = Token();
                 keyword = "";
             }
@@ -301,7 +306,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
     else if (item == "+"){
             if (keyword != "" && keyword != "+"){
                 token = token_init(keyword,token_type(keyword), start_index, current_index, line);
-                tokens.push_back(token);
+                tokens.emplace_back(token);
                 token = Token();
                 keyword = "";
             }
@@ -321,7 +326,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
     else if (item == ">"){
             if (keyword != "" && keyword != ">"){
                 token = token_init(keyword,token_type(keyword), start_index, current_index, line);
-                tokens.push_back(token);
+                tokens.emplace_back(token);
                 token = Token();
                 keyword = "";
             }
@@ -349,7 +354,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
     else if (item == "<"){
             if (keyword != "" && keyword != "<"){
                 token = token_init(keyword,token_type(keyword), start_index, current_index, line);
-                tokens.push_back(token);
+                tokens.emplace_back(token);
                 token = Token();
                 keyword = "";
             }
@@ -375,7 +380,7 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
     else if (item == "-"){
             if (keyword != "" && keyword != "-"){
                 token = token_init(keyword,token_type(keyword), start_index, current_index, line);
-                tokens.push_back(token);
+                tokens.emplace_back(token);
                 token = Token();
                 keyword = "";
             }
@@ -393,8 +398,9 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
                 token = token_init(keyword,tk_minus, start_index, current_index, line);
             }
     }
+    
     if (token.keyword != ""){
-            tokens.push_back(token);
+            tokens.emplace_back(token);
             token = Token();
             keyword = "";
     }
