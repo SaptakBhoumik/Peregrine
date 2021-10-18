@@ -5,6 +5,6 @@
 #include <vector>
 #define INTEGER unsigned long int
 std::vector<Token> lexer(std::vector<std::string> charecters);
-Token token_init(std::string keyword, TokenType tk_type, INTEGER start = 0,
+static inline  Token token_init(std::string keyword, TokenType tk_type, INTEGER start = 0,
                  INTEGER end = 0, INTEGER line = 1);
 #endif

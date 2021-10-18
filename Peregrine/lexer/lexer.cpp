@@ -3,7 +3,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
-std::string next(INTEGER index, std::vector<std::string> code) {
+#include <algorithm>
+static inline std::string next(INTEGER index, std::vector<std::string> code) {
   std::string next_item;
   if (index != code.size()) {
     next_item = code[index + 1];
@@ -26,7 +27,7 @@ std::vector<std::string> split(std::string code) {
   return split_code;
 }
 
-Token token_init(std::string keyword, TokenType tk_type, INTEGER start,
+static inline Token token_init(std::string keyword, TokenType tk_type, INTEGER start,
                  INTEGER end, INTEGER line) {
   return Token{.keyword = keyword,
                .start = start,
@@ -34,13 +35,17 @@ Token token_init(std::string keyword, TokenType tk_type, INTEGER start,
                .line = line,
                .tk_type = tk_type};
 }
-TokenType token_type(std::string keyword){
+static inline TokenType token_type(std::string keyword){
   TokenType result=tk_identifier;
   return result;
 }
-TokenType is_number(std::string keyword){
+static inline TokenType is_number(std::string keyword){
   TokenType result=tk_identifier;
   return result;
+}
+static inline TokenType equal( std::string keyword ){
+    TokenType result=tk_identifier;
+    return result;
 }
 std::vector<Token> lexer(std::vector<std::string> charecters) {
   Token token;
@@ -397,6 +402,153 @@ std::vector<Token> lexer(std::vector<std::string> charecters) {
                 keyword = item;
                 token = token_init(keyword,tk_minus, start_index, current_index, line);
             }
+    }
+    else if (item == "="){
+            if ((std::count(operators.begin(), operators.end(), keyword)==0) && keyword != ""){
+                token = token_init(keyword,token_type(keyword), start_index, current_index, line);
+                tokens.emplace_back(token);
+                token = Token();
+                keyword = "";
+            }
+            if (keyword == "="){
+                keyword = "==";
+                token = token_init(keyword,tk_equal, start_index, current_index, line);
+            }
+            else if (next(current_index, charecters) == "="){
+                keyword = item;
+                start_index = current_index;
+            }
+            else if (keyword == "" && next(current_index, charecters) != "="){
+                keyword = item;
+                token = token_init(keyword,tk_assign, start_index, current_index, line);
+            }
+            else{
+                token = token_init(keyword,equal(keyword), start_index, current_index, line);
+            }
+    }
+    else if (item == "/"){
+            if (keyword != "" && keyword != "/"){
+                token = token_init(keyword,token_type(keyword), start_index, current_index, line);
+                tokens.emplace_back(token);
+                token = Token();
+                keyword = "";
+            }
+            if (keyword == "/"){
+                if (next(current_index, charecters) == "="){
+                    keyword = "//";
+                }
+                else{
+                token = token_init("//",tk_floor, start_index, current_index, line);
+                }
+            }
+            else if (next(current_index, charecters) == "/" or next(current_index, charecters) == "="){
+                keyword = item;
+                start_index = current_index;
+            }
+            else{
+                start_index = current_index;
+                keyword = item;
+                token = token_init(keyword,tk_divide, start_index, current_index, line);
+            }
+    }
+    else if (item == "^"){
+            if (keyword != ""){
+                token = token_init(keyword,token_type(keyword), start_index, current_index, line);
+                tokens.emplace_back(token);
+                token = Token();
+                keyword = "";
+            }
+            if (next(current_index, charecters) == "="){
+                keyword = item;
+                start_index = current_index;
+            }
+            else{
+                start_index = current_index;
+                keyword = item;
+                token = token_init(keyword,tk_xor, start_index, current_index, line);
+            }
+    }
+    else if (item == "%"){
+            if (keyword != ""){
+                token = token_init(keyword,token_type(keyword), start_index, current_index, line);
+                tokens.emplace_back(token);
+                token = Token();
+                keyword = "";
+            }
+            if (next(current_index, charecters) == "="){
+                keyword=item;
+                start_index = current_index;
+            }
+            else{
+                start_index = current_index;
+                keyword = item;
+                token = token_init(keyword,tk_modulo, start_index, current_index, line);
+            }
+    }
+    else if (item == "&"){
+            if (keyword != ""){
+                token = token_init(keyword,token_type(keyword), start_index, current_index, line);
+                tokens.emplace_back(token);
+                token = Token();
+                keyword = "";
+            }
+            if (next(current_index, charecters) == "="){
+                keyword = item;
+                start_index = current_index;
+            }
+            else{
+                start_index = current_index;
+                keyword = item;
+                token = token_init(keyword,tk_ampersand, start_index, current_index, line);
+            }
+    }
+    else if (item == "|"){
+            if (keyword != ""){
+                token = token_init(keyword,token_type(keyword), start_index, current_index, line);
+                tokens.emplace_back(token);
+                token = Token();
+                keyword = "";
+            }
+            if (next(current_index, charecters) == "="){
+                keyword = item;
+                start_index = current_index;
+            }
+            else{
+                start_index = current_index;
+                keyword = item;
+                token = token_init(keyword,tk_bit_or, start_index, current_index, line);
+            }
+    }
+    else if (item == "*"){
+            if (keyword != "" && keyword != "*"){
+                token = token_init(keyword,token_type(keyword), start_index, current_index, line);
+                tokens.emplace_back(token);
+                token = Token();
+                keyword = "";
+            }   
+            if ((next(current_index, charecters) == "*" || next(current_index, charecters) == "=") and (tokens.back().tk_type == tk_identifier or tokens.back().tk_type == tk_decimal or tokens.back().tk_type == tk_integer or next(current_index, charecters) == "=")){
+                keyword = "*";
+                start_index = current_index;
+            }
+            else if (keyword == "*"){
+                token = token_init("**",tk_exponent, start_index, current_index, line);
+            }
+            else{
+                start_index = current_index;
+                keyword = item;
+                token = token_init(keyword,tk_asterisk, start_index, current_index, line);
+            }
+    }
+    else if (item == "~"){
+            if (keyword != ""){
+                token = token_init(keyword,token_type(keyword), start_index, current_index, line);
+                tokens.emplace_back(token);
+                token = Token();
+                keyword = "";
+            }
+            start_index = current_index;
+            keyword = item;
+            token = token_init(keyword,tk_bit_not, start_index, current_index, line);
     }
     
     if (token.keyword != ""){
