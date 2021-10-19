@@ -12,6 +12,7 @@ std::string next(INTEGER index, std::vector<std::string> code) {
   }
   return next_item;
 }
+
 std::vector<std::string> split(std::string code) {
   std::vector<std::string> split_code;
   std::string character;
@@ -62,10 +63,12 @@ Token token_init(std::string statement,std::string keyword, TokenType tk_type,
 }
 
 TokenType is_number(std::string keyword) {
-  const std::vector<std::string> numbers = {"1", "2", "3", "4", "5",
+  std::vector<std::string> split_key=split(keyword);
+  const std::vector<std::string> numbers = {"0","1", "2", "3", "4", "5",
                                             "6", "7", "8", "9"};
-  if (std::count(numbers.begin(), numbers.end(), keyword.at(0))) {
-    if (std::count(split(keyword).begin(), split(keyword).end(), ".")) {
+  if (std::count(numbers.begin(), numbers.end(), split(keyword)[0])) {
+
+    if (std::count(split_key.begin(), split_key.end(), ".")) {
       return tk_decimal;
     } else {
       return tk_integer;
@@ -217,7 +220,6 @@ std::vector<Token> lexer(std::string src) {
   INTEGER third_bracket_count = 0;
   INTEGER line = 1;
   INTEGER curr_identation_level = 0;
-  INTEGER last_line = 0;
   INTEGER cpp_bracket_count = 0;
   bool is_list_dictionary_cpp_string = false;
   bool is_array = false;
@@ -263,7 +265,6 @@ std::vector<Token> lexer(std::string src) {
         }
       }
     } else if (item == "\n" || item == "\r\n") {
-      last_line = current_index;
       is_tab = true;
       curr_identation_level = 0;
     }
@@ -732,12 +733,4 @@ std::vector<Token> lexer(std::string src) {
                                    current_index, line));
   }
   return tokens;
-}
-int main() {
-  std::vector<Token> test;
-  test=lexer("code");
-  for (int i;i < test.size();++i){
-      std::cout << test.at(i).statement << std::endl;
-  }
-  return 0;
 }
