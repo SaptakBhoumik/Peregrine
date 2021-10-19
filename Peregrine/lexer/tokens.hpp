@@ -114,6 +114,7 @@ typedef enum {
 TokenType;
 
 typedef struct {
+  std::string statement;
   std::string keyword;
   unsigned long int start = 0;
   unsigned long int end = 0;
