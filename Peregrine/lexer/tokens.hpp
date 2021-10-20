@@ -51,9 +51,13 @@ typedef enum {
   tk_identifier, // foo, bar
 
   // keywords tokens
-  tk_true,      // true
-  tk_false,     // false
-  tk_none,      // none
+  tk_true,      // True
+  tk_false,     // False
+  tk_with,     // with
+  tk_as,       // as
+  tk_async,    // async
+  tk_await,     //await
+  tk_none,      // None
   tk_const,     // const
   tk_import,    // import
   tk_cppimport, // cppimport

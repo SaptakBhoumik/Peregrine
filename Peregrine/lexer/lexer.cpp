@@ -1,13 +1,14 @@
 #include "lexer.hpp"
+#include "../errors/error.hpp"
 #include "tokens.hpp"
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 std::string next(INTEGER index, std::vector<std::string> code) {
   std::string next_item;
-  if (index != code.size()) {
+  if (index+1 < code.size()) {
     next_item = code.at(index + 1);
   }
   return next_item;
@@ -37,25 +38,24 @@ std::vector<std::string> split_ln(std::string code) {
   INTEGER index = 0;
   while (index < code.length()) {
     character = code.at(index);
-    if (character=="\n"){
-        split_code.push_back(temp);
-        temp="";
-    }
-    else{
-        temp+=character;
+    if (character == "\n") {
+      split_code.push_back(temp);
+      temp = "";
+    } else {
+      temp += character;
     }
     index++;
   }
-  if (temp!=""){
+  if (temp != "") {
     split_code.push_back(temp);
   }
   return split_code;
 }
 
-Token token_init(std::string statement,std::string keyword, TokenType tk_type,
-                               INTEGER start, INTEGER end, INTEGER line) {
+Token token_init(std::string statement, std::string keyword, TokenType tk_type,
+                 INTEGER start, INTEGER end, INTEGER line) {
   return Token{.statement = statement,
-                .keyword = keyword,
+               .keyword = keyword,
                .start = start,
                .end = end,
                .line = line,
@@ -63,9 +63,9 @@ Token token_init(std::string statement,std::string keyword, TokenType tk_type,
 }
 
 TokenType is_number(std::string keyword) {
-  std::vector<std::string> split_key=split(keyword);
-  const std::vector<std::string> numbers = {"0","1", "2", "3", "4", "5",
-                                            "6", "7", "8", "9"};
+  std::vector<std::string> split_key = split(keyword);
+  const std::vector<std::string> numbers = {"0", "1", "2", "3", "4",
+                                            "5", "6", "7", "8", "9"};
   if (std::count(numbers.begin(), numbers.end(), split(keyword)[0])) {
 
     if (std::count(split_key.begin(), split_key.end(), ".")) {
@@ -104,6 +104,8 @@ TokenType token_type(std::string item) {
     return tk_for;
   } else if (item == "break") {
     return tk_break;
+  } else if (item == "with") {
+    return tk_with;
   } else if (item == "continue") {
     return tk_continue;
   } else if (item == "match") {
@@ -120,6 +122,12 @@ TokenType token_type(std::string item) {
     return tk_pass;
   } else if (item == "return") {
     return tk_return;
+  } else if (item == "as") {
+    return tk_as;
+  } else if (item == "async") {
+    return tk_async;
+  } else if (item == "await") {
+    return tk_await;
   } else if (item == "and") {
     return tk_and;
   } else if (item == "or") {
@@ -201,7 +209,7 @@ TokenType equal(std::string keyword) {
   }
   return result;
 }
-std::vector<Token> lexer(std::string src) {
+LEXEME lexer(std::string src, std::string filename) {
   std::vector<std::string> charecters(split(src));
   std::vector<std::string> seperate_lines(split_ln(src));
   Token token;
@@ -210,7 +218,7 @@ std::vector<Token> lexer(std::string src) {
   const std::vector<std::string> operators(
       {"!", "/", "//", "+", "-", "*", "%", "<<", ">>", "&", "|", "^", "="});
   std::string string_starter;
-  std::string statement=seperate_lines.at(0);
+  std::string statement = seperate_lines.at(0);
   std::string item;
   std::string keyword;
   INTEGER start_index = 0;
@@ -219,6 +227,7 @@ std::vector<Token> lexer(std::string src) {
   INTEGER second_bracket_count = 0;
   INTEGER third_bracket_count = 0;
   INTEGER line = 1;
+  INTEGER last_line = 0;
   INTEGER curr_identation_level = 0;
   INTEGER cpp_bracket_count = 0;
   bool is_list_dictionary_cpp_string = false;
@@ -234,9 +243,12 @@ std::vector<Token> lexer(std::string src) {
   while (current_index < charecters.size()) {
     item = charecters.at(current_index);
     if (item == "\n" || item == "\r\n") {
-      line += 1;
-      statement = seperate_lines.at(line-1);
-    } 
+      last_line = current_index;
+      line ++;
+      if (seperate_lines.size() > line-1) {
+        statement = seperate_lines.at(line-1);
+      }
+    }
     if (item == " " && is_tab == true) {
       curr_identation_level += 1;
     } else if (item != " " && is_tab == true && item != "\n") {
@@ -246,20 +258,22 @@ std::vector<Token> lexer(std::string src) {
         previous_identation = identation_level.at(identation_level.size() - 1);
       }
       if (curr_identation_level > previous_identation) {
-        token = token_init(statement,"", tk_ident, start_index, current_index, line);
+        token = token_init(statement, "", tk_ident, current_index,
+                           current_index, line);
         tokens.emplace_back(token);
         identation_level.emplace_back(curr_identation_level);
       }
       while (curr_identation_level < previous_identation) {
         identation_level.pop_back();
-        token = token_init(statement,"", tk_dedent, start_index, current_index, line);
+        token = token_init(statement, "", tk_dedent, current_index,
+                           current_index, line);
         tokens.emplace_back(token);
         if (identation_level.size() != 0) {
           if (curr_identation_level >=
               identation_level.at(identation_level.size() - 1)) {
             break;
           }
-          previous_identation = identation_level.at(identation_level.size() - 1);
+          previous_identation =identation_level.at(identation_level.size() - 1);
         } else {
           previous_identation = 0;
         }
@@ -289,7 +303,8 @@ std::vector<Token> lexer(std::string src) {
           is_array = false;
         }
       }
-      token = token_init(statement,keyword, cpp, start_index, current_index, line);
+      token =
+          token_init(statement, keyword, cpp, start_index, current_index, line);
     } else if (item == "#" && is_string == false &&
                is_list_dictionary_cpp_string == false && is_comment == false) {
       is_comment = true;
@@ -298,9 +313,22 @@ std::vector<Token> lexer(std::string src) {
         is_comment = false;
       }
     } else if (is_string == true && string_starter != item) {
-      keyword += item;
+      if (item=="\"" && string_starter=="'"){
+        keyword += R"(\")";
+      }
+      else{
+        keyword += item;
+      }
     } else if (is_array == true) {
-      keyword += item;
+      if (item=="'" && (is_list_dictionary_cpp_string==false||item==string_starter)){
+        keyword += "\"";
+      }
+      else if (item=="\"" && item!=string_starter && is_list_dictionary_cpp_string==true){
+        keyword += R"(\")";
+      }
+      else{
+        keyword += item;
+      }
       if (item == "[" && is_list_dictionary_cpp_string == false) {
         second_bracket_count += 1;
       } else if (item == "'" || item == "\"") {
@@ -317,11 +345,20 @@ std::vector<Token> lexer(std::string src) {
         second_bracket_count -= 1;
         if (second_bracket_count == 0) {
           is_array = false;
-          token = token_init(statement,keyword, array, start_index, current_index, line);
+          token = token_init(statement, keyword, array, start_index,
+                             current_index, line);
         }
       }
     } else if (is_dictionary == true) {
-      keyword += item;
+      if (item=="'" && (is_list_dictionary_cpp_string==false||item==string_starter)){
+        keyword += "\"";
+      }
+      else if (item=="\"" && item!=string_starter && is_list_dictionary_cpp_string==true){
+        keyword += R"(\")";
+      }
+      else{
+        keyword += item;
+      }
       if (item == "{" && is_list_dictionary_cpp_string == false) {
         third_bracket_count += 1;
       } else if (item == "'" || item == "\"") {
@@ -338,20 +375,21 @@ std::vector<Token> lexer(std::string src) {
         third_bracket_count -= 1;
         if (third_bracket_count == 0) {
           is_dictionary = false;
-          token = token_init(statement,keyword, array, start_index, current_index, line);
+          token = token_init(statement, keyword, array, start_index,
+                             current_index, line);
         }
       }
     } else if ((item == " " && is_dictionary == false && is_array == false &&
                 is_string == false) ||
                item == "\n" || item == "\r\n") {
       if (keyword != "") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
       }
     } else if (item == "[" && is_dictionary == false && is_string == false &&
                is_array == false) {
       if (keyword != "") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -364,7 +402,7 @@ std::vector<Token> lexer(std::string src) {
     } else if (item == "{" && is_dictionary == false && is_string == false &&
                is_array == false) {
       if (keyword != "") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -378,26 +416,36 @@ std::vector<Token> lexer(std::string src) {
                is_dictionary == false) {
       if (is_string == true && string_starter == item) {
         is_string = false;
-        keyword += item;
-        token =
-            token_init(statement,keyword, tk_string, start_index, current_index, line);
+        if (item=="'"){
+          keyword += "\"";
+        }
+        else{
+          keyword+=item;
+        }
+        token = token_init(statement, keyword, tk_string, start_index,
+                           current_index, line);
         string_starter = "";
       } else {
         if (keyword != "") {
-          token = token_init(statement,keyword, token_type(keyword), start_index,
-                             current_index, line);
+          token = token_init(statement, keyword, token_type(keyword),
+                             start_index, current_index, line);
           tokens.emplace_back(token);
           token = Token();
           keyword = "";
         }
         is_string = true;
         start_index = current_index;
-        keyword = item;
+        if (item=="'"){
+          keyword = "\"";
+        }
+        else{
+          keyword=item;
+        }
         string_starter = item;
       }
     } else if (item == "(") {
       if (keyword != "") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -409,49 +457,52 @@ std::vector<Token> lexer(std::string src) {
         keyword = item;
       } else {
         keyword = item;
-        token =
-            token_init(statement,keyword, tk_l_paren, start_index, current_index, line);
+        token = token_init(statement, keyword, tk_l_paren, start_index,
+                           current_index, line);
       }
     } else if (item == ".") {
       if (keyword == "") {
         keyword = item;
         start_index = current_index;
-        token = token_init(statement,keyword, tk_dot, start_index, current_index, line);
+        token = token_init(statement, keyword, tk_dot, start_index,
+                           current_index, line);
       } else {
         if (is_number(keyword) == tk_integer) {
           keyword += item;
         } else {
-          token = token_init(statement,keyword, token_type(keyword), start_index,
-                             current_index, line);
+          token = token_init(statement, keyword, token_type(keyword),
+                             start_index, current_index, line);
           tokens.emplace_back(token);
           token = Token();
           keyword = "";
           keyword = item;
           start_index = current_index;
-          token = token_init(statement,keyword, tk_dot, start_index, current_index, line);
+          token = token_init(statement, keyword, tk_dot, start_index,
+                             current_index, line);
         }
       }
     } else if (item == ")") {
       if (keyword != "") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
         keyword = "";
       }
       keyword = item;
-      token = token_init(statement,keyword, tk_r_paren, start_index, current_index, line);
+      token = token_init(statement, keyword, tk_r_paren, start_index,
+                         current_index, line);
     } else if (item == "+") {
       if (keyword != "" && keyword != "+") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
         keyword = "";
       }
       if (keyword == "+") {
-        token =
-            token_init(statement,"++", tk_increment, start_index, current_index, line);
+        token = token_init(statement, "++", tk_increment, start_index,
+                           current_index, line);
       } else if (next(current_index, charecters) == "+" ||
                  next(current_index, charecters) == "=") {
         keyword = item;
@@ -459,11 +510,12 @@ std::vector<Token> lexer(std::string src) {
       } else {
         start_index = current_index;
         keyword = item;
-        token = token_init(statement,keyword, tk_plus, start_index, current_index, line);
+        token = token_init(statement, keyword, tk_plus, start_index,
+                           current_index, line);
       }
     } else if (item == ">") {
       if (keyword != "" && keyword != ">") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -473,12 +525,12 @@ std::vector<Token> lexer(std::string src) {
         if (next(current_index, charecters) == "=") {
           keyword = ">>";
         } else {
-          token = token_init(statement,">>", tk_shift_right, start_index, current_index,
-                             line);
+          token = token_init(statement, ">>", tk_shift_right, start_index,
+                             current_index, line);
         }
       } else if (keyword == "-") {
-        token =
-            token_init(statement,"->", tk_shift_right, start_index, current_index, line);
+        token = token_init(statement, "->", tk_shift_right, start_index,
+                           current_index, line);
       } else if (next(current_index, charecters) == ">" ||
                  next(current_index, charecters) == "=") {
         keyword = item;
@@ -486,11 +538,12 @@ std::vector<Token> lexer(std::string src) {
       } else {
         start_index = current_index;
         keyword = item;
-        token = token_init(statement,"->", tk_greater, start_index, current_index, line);
+        token = token_init(statement, "->", tk_greater, start_index,
+                           current_index, line);
       }
     } else if (item == "<") {
       if (keyword != "" && keyword != "<") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -500,8 +553,8 @@ std::vector<Token> lexer(std::string src) {
         if (next(current_index, charecters) == "=") {
           keyword = "<<";
         } else {
-          token =
-              token_init(statement,"<<", tk_shift_left, start_index, current_index, line);
+          token = token_init(statement, "<<", tk_shift_left, start_index,
+                             current_index, line);
         }
       } else if (next(current_index, charecters) == "<" ||
                  next(current_index, charecters) == "=") {
@@ -510,19 +563,20 @@ std::vector<Token> lexer(std::string src) {
       } else {
         start_index = current_index;
         keyword = item;
-        token = token_init(statement,keyword, tk_less, start_index, current_index, line);
+        token = token_init(statement, keyword, tk_less, start_index,
+                           current_index, line);
       }
     } else if (item == "-") {
       if (keyword != "" && keyword != "-") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
         keyword = "";
       }
       if (keyword == "-") {
-        token =
-            token_init(statement,"--", tk_decrement, start_index, current_index, line);
+        token = token_init(statement, "--", tk_decrement, start_index,
+                           current_index, line);
       } else if (next(current_index, charecters) == "-" ||
                  next(current_index, charecters) == ">" ||
                  next(current_index, charecters) == "=") {
@@ -531,12 +585,13 @@ std::vector<Token> lexer(std::string src) {
       } else {
         start_index = current_index;
         keyword = item;
-        token = token_init(statement,keyword, tk_minus, start_index, current_index, line);
+        token = token_init(statement, keyword, tk_minus, start_index,
+                           current_index, line);
       }
     } else if (item == "=") {
       if ((std::count(operators.begin(), operators.end(), keyword) == 0) &&
           keyword != "") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -544,22 +599,23 @@ std::vector<Token> lexer(std::string src) {
       }
       if (keyword == "=") {
         keyword = "==";
-        token = token_init(statement,keyword, tk_equal, start_index, current_index, line);
+        token = token_init(statement, keyword, tk_equal, start_index,
+                           current_index, line);
       } else if (next(current_index, charecters) == "=") {
         keyword = item;
         start_index = current_index;
       } else if (keyword == "" && next(current_index, charecters) != "=") {
         keyword = item;
-        token =
-            token_init(statement,keyword, tk_assign, start_index, current_index, line);
+        token = token_init(statement, keyword, tk_assign, start_index,
+                           current_index, line);
       } else {
         keyword += item;
-        token = token_init(statement,keyword, equal(keyword), start_index, current_index,
-                           line);
+        token = token_init(statement, keyword, equal(keyword), start_index,
+                           current_index, line);
       }
     } else if (item == "/") {
       if (keyword != "" && keyword != "/") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -569,7 +625,8 @@ std::vector<Token> lexer(std::string src) {
         if (next(current_index, charecters) == "=") {
           keyword = "//";
         } else {
-          token = token_init(statement,"//", tk_floor, start_index, current_index, line);
+          token = token_init(statement, "//", tk_floor, start_index,
+                             current_index, line);
         }
       } else if (next(current_index, charecters) == "/" ||
                  next(current_index, charecters) == "=") {
@@ -578,12 +635,12 @@ std::vector<Token> lexer(std::string src) {
       } else {
         start_index = current_index;
         keyword = item;
-        token =
-            token_init(statement,keyword, tk_divide, start_index, current_index, line);
+        token = token_init(statement, keyword, tk_divide, start_index,
+                           current_index, line);
       }
     } else if (item == "^") {
       if (keyword != "") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -595,11 +652,12 @@ std::vector<Token> lexer(std::string src) {
       } else {
         start_index = current_index;
         keyword = item;
-        token = token_init(statement,keyword, tk_xor, start_index, current_index, line);
+        token = token_init(statement, keyword, tk_xor, start_index,
+                           current_index, line);
       }
     } else if (item == "%") {
       if (keyword != "") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -611,12 +669,12 @@ std::vector<Token> lexer(std::string src) {
       } else {
         start_index = current_index;
         keyword = item;
-        token =
-            token_init(statement,keyword, tk_modulo, start_index, current_index, line);
+        token = token_init(statement, keyword, tk_modulo, start_index,
+                           current_index, line);
       }
     } else if (item == "&") {
       if (keyword != "") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -628,12 +686,12 @@ std::vector<Token> lexer(std::string src) {
       } else {
         start_index = current_index;
         keyword = item;
-        token =
-            token_init(statement,keyword, tk_ampersand, start_index, current_index, line);
+        token = token_init(statement, keyword, tk_ampersand, start_index,
+                           current_index, line);
       }
     } else if (item == "|") {
       if (keyword != "") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -645,12 +703,12 @@ std::vector<Token> lexer(std::string src) {
       } else {
         start_index = current_index;
         keyword = item;
-        token =
-            token_init(statement,keyword, tk_bit_or, start_index, current_index, line);
+        token = token_init(statement, keyword, tk_bit_or, start_index,
+                           current_index, line);
       }
     } else if (item == "*") {
       if (keyword != "" && keyword != "*") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -665,16 +723,17 @@ std::vector<Token> lexer(std::string src) {
         keyword = "*";
         start_index = current_index;
       } else if (keyword == "*") {
-        token = token_init(statement,"**", tk_exponent, start_index, current_index, line);
+        token = token_init(statement, "**", tk_exponent, start_index,
+                           current_index, line);
       } else {
         start_index = current_index;
         keyword = item;
-        token =
-            token_init(statement,keyword, tk_asterisk, start_index, current_index, line);
+        token = token_init(statement, keyword, tk_asterisk, start_index,
+                           current_index, line);
       }
     } else if (item == "~") {
       if (keyword != "") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -682,10 +741,11 @@ std::vector<Token> lexer(std::string src) {
       }
       start_index = current_index;
       keyword = item;
-      token = token_init(statement,keyword, tk_bit_not, start_index, current_index, line);
+      token = token_init(statement, keyword, tk_bit_not, start_index,
+                         current_index, line);
     } else if (item == "!") {
       if (keyword != "") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -695,7 +755,7 @@ std::vector<Token> lexer(std::string src) {
       keyword = item;
     } else if (item == ":") {
       if (keyword != "") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -703,10 +763,11 @@ std::vector<Token> lexer(std::string src) {
       }
       start_index = current_index;
       keyword = item;
-      token = token_init(statement,keyword, tk_colon, start_index, current_index, line);
+      token = token_init(statement, keyword, tk_colon, start_index,
+                         current_index, line);
     } else if (item == ",") {
       if (keyword != "") {
-        token = token_init(statement,keyword, token_type(keyword), start_index,
+        token = token_init(statement, keyword, token_type(keyword), start_index,
                            current_index, line);
         tokens.emplace_back(token);
         token = Token();
@@ -714,7 +775,8 @@ std::vector<Token> lexer(std::string src) {
       }
       start_index = current_index;
       keyword = item;
-      token = token_init(statement,keyword, tk_comma, start_index, current_index, line);
+      token = token_init(statement, keyword, tk_comma, start_index,
+                         current_index, line);
     } else {
       if (keyword == "") {
         start_index = current_index;
@@ -729,8 +791,60 @@ std::vector<Token> lexer(std::string src) {
     current_index++;
   }
   if (keyword != "") {
-    tokens.emplace_back(token_init(statement,keyword, token_type(keyword), start_index,
-                                   current_index, line));
+    tokens.emplace_back(token_init(statement, keyword, token_type(keyword),
+                                   start_index, current_index, line));
+  }
+  curr_identation_level /= 4; // dividing by 4 to know the number of tabs
+  while (curr_identation_level != 0) {
+    token = token_init(statement, "", tk_dedent, current_index, current_index,
+                       line);
+    tokens.emplace_back(token);
+    curr_identation_level--;
+  }
+  if (is_string == true || is_list_dictionary_cpp_string == true) {
+    std::string temp = "Expecting a ";
+    temp += string_starter;
+    display(PEError({.loc = Location({.line = line,
+                                      .col = current_index - last_line,
+                                      .file = filename,
+                                      .code = statement}),
+                     .msg = "Unexpected end of file",
+                     .submsg = temp,
+                     .ecode = "e1"}));
+    tokens.clear();
+  }
+  if (is_dictionary == true) {
+    std::string temp = "Expecting a }";
+    display(PEError({.loc = Location({.line = line,
+                                      .col = current_index - last_line,
+                                      .file = filename,
+                                      .code = statement}),
+                     .msg = "Unexpected end of file",
+                     .submsg = temp,
+                     .ecode = "e2"}));
+    tokens.clear();
+  }
+  if (is_array == true) {
+    std::string temp = "Expecting a ]";
+    display(PEError({.loc = Location({.line = line,
+                                      .col = current_index - last_line,
+                                      .file = filename,
+                                      .code = statement}),
+                     .msg = "Unexpected end of file",
+                     .submsg = temp,
+                     .ecode = "e3"}));
+    tokens.clear();
+  }
+  if (is_cpp == true) {
+    std::string temp = "Expecting a )";
+    display(PEError({.loc = Location({.line = line,
+                                      .col = current_index - last_line,
+                                      .file = filename,
+                                      .code = statement}),
+                     .msg = "Unexpected end of file",
+                     .submsg = temp,
+                     .ecode = "e4"}));
+    tokens.clear();
   }
   return tokens;
 }
