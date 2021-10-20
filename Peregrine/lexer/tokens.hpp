@@ -9,6 +9,7 @@ typedef enum {
   tk_minus,     // -
   tk_divide,    // /
   tk_asterisk,  // *
+  tk_multiply, //  // *
   tk_xor,       // ^
   tk_modulo,    // %
   tk_greater,   // >

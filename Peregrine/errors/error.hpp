@@ -1,3 +1,5 @@
+#ifndef PEREGRINE_ERROR
+#define PEREGRINE_ERROR
 #include <string>
 typedef struct{
   unsigned long int line;
@@ -15,3 +17,4 @@ typedef struct{
 } PEError;
 
 void display(PEError e);
+#endif // PEREGRINE_ERROR

@@ -8,7 +8,7 @@
 
 std::string next(INTEGER index, std::vector<std::string> code) {
   std::string next_item;
-  if (index+1 < code.size()) {
+  if (index + 1 < code.size()) {
     next_item = code.at(index + 1);
   }
   return next_item;
@@ -244,9 +244,9 @@ LEXEME lexer(std::string src, std::string filename) {
     item = charecters.at(current_index);
     if (item == "\n" || item == "\r\n") {
       last_line = current_index;
-      line ++;
-      if (seperate_lines.size() > line-1) {
-        statement = seperate_lines.at(line-1);
+      line++;
+      if (seperate_lines.size() > line - 1) {
+        statement = seperate_lines.at(line - 1);
       }
     }
     if (item == " " && is_tab == true) {
@@ -273,7 +273,8 @@ LEXEME lexer(std::string src, std::string filename) {
               identation_level.at(identation_level.size() - 1)) {
             break;
           }
-          previous_identation =identation_level.at(identation_level.size() - 1);
+          previous_identation =
+              identation_level.at(identation_level.size() - 1);
         } else {
           previous_identation = 0;
         }
@@ -313,20 +314,19 @@ LEXEME lexer(std::string src, std::string filename) {
         is_comment = false;
       }
     } else if (is_string == true && string_starter != item) {
-      if (item=="\"" && string_starter=="'"){
+      if (item == "\"" && string_starter == "'") {
         keyword += R"(\")";
-      }
-      else{
+      } else {
         keyword += item;
       }
     } else if (is_array == true) {
-      if (item=="'" && (is_list_dictionary_cpp_string==false||item==string_starter)){
+      if (item == "'" &&
+          (is_list_dictionary_cpp_string == false || item == string_starter)) {
         keyword += "\"";
-      }
-      else if (item=="\"" && item!=string_starter && is_list_dictionary_cpp_string==true){
+      } else if (item == "\"" && item != string_starter &&
+                 is_list_dictionary_cpp_string == true) {
         keyword += R"(\")";
-      }
-      else{
+      } else {
         keyword += item;
       }
       if (item == "[" && is_list_dictionary_cpp_string == false) {
@@ -350,13 +350,13 @@ LEXEME lexer(std::string src, std::string filename) {
         }
       }
     } else if (is_dictionary == true) {
-      if (item=="'" && (is_list_dictionary_cpp_string==false||item==string_starter)){
+      if (item == "'" &&
+          (is_list_dictionary_cpp_string == false || item == string_starter)) {
         keyword += "\"";
-      }
-      else if (item=="\"" && item!=string_starter && is_list_dictionary_cpp_string==true){
+      } else if (item == "\"" && item != string_starter &&
+                 is_list_dictionary_cpp_string == true) {
         keyword += R"(\")";
-      }
-      else{
+      } else {
         keyword += item;
       }
       if (item == "{" && is_list_dictionary_cpp_string == false) {
@@ -416,11 +416,10 @@ LEXEME lexer(std::string src, std::string filename) {
                is_dictionary == false) {
       if (is_string == true && string_starter == item) {
         is_string = false;
-        if (item=="'"){
+        if (item == "'") {
           keyword += "\"";
-        }
-        else{
-          keyword+=item;
+        } else {
+          keyword += item;
         }
         token = token_init(statement, keyword, tk_string, start_index,
                            current_index, line);
@@ -435,11 +434,10 @@ LEXEME lexer(std::string src, std::string filename) {
         }
         is_string = true;
         start_index = current_index;
-        if (item=="'"){
+        if (item == "'") {
           keyword = "\"";
-        }
-        else{
-          keyword=item;
+        } else {
+          keyword = item;
         }
         string_starter = item;
       }
@@ -728,8 +726,23 @@ LEXEME lexer(std::string src, std::string filename) {
       } else {
         start_index = current_index;
         keyword = item;
-        token = token_init(statement, keyword, tk_asterisk, start_index,
-                           current_index, line);
+        if (tokens.size() > 0) {
+          if ((tokens.back().tk_type == tk_true ||
+              tokens.back().tk_type == tk_false ||
+              tokens.back().tk_type == tk_integer ||
+              tokens.back().tk_type == tk_decimal ||
+              tokens.back().tk_type == tk_identifier|| 
+              tokens.back().tk_type == tk_r_paren) && line==tokens.back().line){
+            token = token_init(statement, keyword, tk_multiply, start_index,
+                               current_index, line);
+          } else {
+            token = token_init(statement, keyword, tk_asterisk, start_index,
+                               current_index, line);
+          }
+        } else {
+          token = token_init(statement, keyword, tk_asterisk, start_index,
+                             current_index, line);
+        }
       }
     } else if (item == "~") {
       if (keyword != "") {
