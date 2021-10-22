@@ -9,5 +9,7 @@
 **/temp.c
 **.exe
 *.so
+*.o
+temp
 __pycache__
 /Peregrine/peregrine
