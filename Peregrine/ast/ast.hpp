@@ -1,26 +1,26 @@
-
 #ifndef PEREGRINE_AST
 #define PEREGRINE_AST
+#include "../lexer/tokens.hpp"
+#include <vector>
+#include <string>
 
-typedef enum {
-  ast_function_define,
-  ast_function_call,
-  ast_if,
-  ast_elif,
-  ast_else,
-  ast_int,
-  ast_int32,
-  ast_int16,
-  ast_int8,
-  ast_uint,
-  ast_uint32,
-  ast_uint16,
-  ast_uint8,
-  ast_float,
-  ast_float32,
-  ast_str,
-  ast_char,
+typedef enum{
+    ast_asign//will define more later
+}Ast_Type;
 
-}AST_TYPE;
+typedef struct Body{
+    Ast_Type ast_type;
+    Token token;
+    Body *left =NULL;
+    Body *right =NULL;
+}Body;
 
+typedef struct{
+	std::vector<std::string> import_file;         
+	std::vector<std::string> header_file;         
+	std::vector<std::string> cpp_file;        
+	std::string folder;
+	std::string path;
+	Body *body;
+}Ast;
 #endif

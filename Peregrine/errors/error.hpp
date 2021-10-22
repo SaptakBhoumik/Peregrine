@@ -1,14 +1,14 @@
 #ifndef PEREGRINE_ERROR
 #define PEREGRINE_ERROR
 #include <string>
-typedef struct{
+typedef struct {
   unsigned long int line;
   unsigned long int col;
   std::string file;
   std::string code;
 } Location;
 
-typedef struct{
+typedef struct {
   Location loc;
   std::string msg;
   std::string submsg;

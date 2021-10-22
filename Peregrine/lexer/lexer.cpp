@@ -94,6 +94,8 @@ TokenType token_type(std::string item) {
     return tk_const;
   } else if (item == "if") {
     return tk_if;
+  } else if (item == "type") {
+    return tk_type;
   } else if (item == "elif") {
     return tk_elif;
   } else if (item == "else") {
@@ -104,6 +106,14 @@ TokenType token_type(std::string item) {
     return tk_for;
   } else if (item == "break") {
     return tk_break;
+  } else if (item == "assert") {
+    return tk_assert;
+  } else if (item == "try") {
+    return tk_try;
+  } else if (item == "except") {
+    return tk_except;
+  } else if (item == "raise") {
+    return tk_raise;
   } else if (item == "with") {
     return tk_with;
   } else if (item == "continue") {
@@ -728,11 +738,12 @@ LEXEME lexer(std::string src, std::string filename) {
         keyword = item;
         if (tokens.size() > 0) {
           if ((tokens.back().tk_type == tk_true ||
-              tokens.back().tk_type == tk_false ||
-              tokens.back().tk_type == tk_integer ||
-              tokens.back().tk_type == tk_decimal ||
-              tokens.back().tk_type == tk_identifier|| 
-              tokens.back().tk_type == tk_r_paren) && line==tokens.back().line){
+               tokens.back().tk_type == tk_false ||
+               tokens.back().tk_type == tk_integer ||
+               tokens.back().tk_type == tk_decimal ||
+               tokens.back().tk_type == tk_identifier ||
+               tokens.back().tk_type == tk_r_paren) &&
+              line == tokens.back().line) {
             token = token_init(statement, keyword, tk_multiply, start_index,
                                current_index, line);
           } else {
@@ -834,7 +845,7 @@ LEXEME lexer(std::string src, std::string filename) {
                                       .code = statement}),
                      .msg = "Unexpected end of file",
                      .submsg = temp,
-                     .ecode = "e2"}));
+                     .ecode = "e1"}));
     tokens.clear();
   }
   if (is_array == true) {
@@ -845,7 +856,7 @@ LEXEME lexer(std::string src, std::string filename) {
                                       .code = statement}),
                      .msg = "Unexpected end of file",
                      .submsg = temp,
-                     .ecode = "e3"}));
+                     .ecode = "e1"}));
     tokens.clear();
   }
   if (is_cpp == true) {
@@ -856,7 +867,7 @@ LEXEME lexer(std::string src, std::string filename) {
                                       .code = statement}),
                      .msg = "Unexpected end of file",
                      .submsg = temp,
-                     .ecode = "e4"}));
+                     .ecode = "e1"}));
     tokens.clear();
   }
   return tokens;

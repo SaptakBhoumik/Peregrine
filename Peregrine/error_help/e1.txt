@@ -1,0 +1,10 @@
+Unexpected end of file
+
+The compiler was expecting something like a ' or " or } or ) or ]
+
+Take the following example:-
+
+def main():
+    a='bad code
+
+As you can see that here the ' is missing at the end. This is the reason of the error. Same goes for dictionary, list, Cppcode elc

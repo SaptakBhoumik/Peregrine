@@ -48,5 +48,4 @@ void display(PEError e) {
   }
   std::cout << "  ╰- " << fg(style("Hint: ", bold), cyan)
             << "Use peregrine --explain=" << e.ecode << std::endl;
-
 }

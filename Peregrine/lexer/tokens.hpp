@@ -5,11 +5,11 @@
 // Create a string variable
 typedef enum {
   // Some operators
-  tk_plus ,     // +
+  tk_plus,      // +
   tk_minus,     // -
   tk_divide,    // /
   tk_asterisk,  // *
-  tk_multiply, //  // *
+  tk_multiply,  //  // *
   tk_xor,       // ^
   tk_modulo,    // %
   tk_greater,   // >
@@ -52,12 +52,16 @@ typedef enum {
   tk_identifier, // foo, bar
 
   // keywords tokens
+  tk_assert,    // assert
+  tk_try,       // try
+  tk_except,    // except
+  tk_raise,     // raise
   tk_true,      // True
   tk_false,     // False
-  tk_with,     // with
-  tk_as,       // as
-  tk_async,    // async
-  tk_await,     //await
+  tk_with,      // with
+  tk_as,        // as
+  tk_async,     // async
+  tk_await,     // await
   tk_none,      // None
   tk_const,     // const
   tk_import,    // import
@@ -87,6 +91,7 @@ typedef enum {
   tk_struct,    // struct
 
   // language types
+  tk_type, // type defination 
   tk_type_str,
   tk_type_bool,
   tk_type_char,
@@ -115,8 +120,7 @@ typedef enum {
 
   tk_raw,    // raw string i.e. r
   tk_format, // formatted string i.e. f
-}
-TokenType;
+} TokenType;
 
 typedef struct {
   std::string statement;
