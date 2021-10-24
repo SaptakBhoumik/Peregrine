@@ -1,15 +1,18 @@
 #include "lexer.hpp"
 #include "../errors/error.hpp"
 #include "tokens.hpp"
+#include <cstdint>
 #include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
 
-std::string next(INTEGER index, std::vector<std::string> code) {
+static inline std::string next( uint64_t index, std::vector<std::string> code) {
   std::string next_item;
   if (index + 1 < code.size()) {
     next_item = code.at(index + 1);
+  } else {
+    next_item = "";
   }
   return next_item;
 }
@@ -17,7 +20,7 @@ std::string next(INTEGER index, std::vector<std::string> code) {
 std::vector<std::string> split(std::string code) {
   std::vector<std::string> split_code;
   std::string character;
-  INTEGER index = 0;
+   uint64_t index = 0;
   // reserving a the number of charecters for vector because this function
   // literally breaks down the code into a vector of charecter vectors copy and
   // move value to a new location whenever we exceed that limit which makes it
@@ -35,7 +38,7 @@ std::vector<std::string> split_ln(std::string code) {
   std::vector<std::string> split_code;
   std::string character;
   std::string temp;
-  INTEGER index = 0;
+   uint64_t index = 0;
   while (index < code.length()) {
     character = code.at(index);
     if (character == "\n") {
@@ -52,8 +55,9 @@ std::vector<std::string> split_ln(std::string code) {
   return split_code;
 }
 
-Token token_init(std::string statement, std::string keyword, TokenType tk_type,
-                 INTEGER start, INTEGER end, INTEGER line) {
+static inline Token token_init(std::string statement, std::string keyword,
+                               TokenType tk_type,  uint64_t start,  uint64_t end,
+                                uint64_t line) {
   return Token{.statement = statement,
                .keyword = keyword,
                .start = start,
@@ -62,7 +66,7 @@ Token token_init(std::string statement, std::string keyword, TokenType tk_type,
                .tk_type = tk_type};
 }
 
-TokenType is_number(std::string keyword) {
+static inline TokenType is_number(std::string keyword) {
   std::vector<std::string> split_key = split(keyword);
   const std::vector<std::string> numbers = {"0", "1", "2", "3", "4",
                                             "5", "6", "7", "8", "9"};
@@ -77,7 +81,7 @@ TokenType is_number(std::string keyword) {
     return tk_identifier;
   }
 }
-TokenType token_type(std::string item) {
+static inline TokenType token_type(std::string item) {
   if (item == "r") {
     return tk_raw;
   } else if (item == "f") {
@@ -96,6 +100,12 @@ TokenType token_type(std::string item) {
     return tk_if;
   } else if (item == "type") {
     return tk_type;
+  } else if (item == "any") {
+    return tk_any;
+  } else if (item == "enum") {
+    return tk_enum;
+  } else if (item == "scope") {
+    return tk_scope;
   } else if (item == "elif") {
     return tk_elif;
   } else if (item == "else") {
@@ -134,11 +144,15 @@ TokenType token_type(std::string item) {
     return tk_return;
   } else if (item == "as") {
     return tk_as;
-  } else if (item == "async") {
-    return tk_async;
-  } else if (item == "await") {
-    return tk_await;
-  } else if (item == "and") {
+  }
+  // This is not necessary because peregrine has special library for
+  // multithreading
+  // else if (item == "async") {
+  //   return tk_async;
+  // } else if (item == "await") {
+  //   return tk_await;
+  // }
+  else if (item == "and") {
     return tk_and;
   } else if (item == "or") {
     return tk_or;
@@ -158,39 +172,15 @@ TokenType token_type(std::string item) {
     return tk_class;
   } else if (item == "struct") {
     return tk_struct;
-  } else if (item == "str") {
-    return tk_type_str;
-  } else if (item == "bool") {
-    return tk_type_bool;
-  } else if (item == "char") {
-    return tk_type_char;
-  } else if (item == "float") {
-    return tk_type_float;
-  } else if (item == "float32") {
-    return tk_type_float32;
-  } else if (item == "void") {
-    return tk_type_void;
-  } else if (item == "int") {
-    return tk_type_int;
-  } else if (item == "int32") {
-    return tk_type_int32;
-  } else if (item == "int16") {
-    return tk_type_int16;
-  } else if (item == "int8") {
-    return tk_type_int8;
-  } else if (item == "uint") {
-    return tk_type_uint;
-  } else if (item == "uint32") {
-    return tk_type_uint32;
-  } else if (item == "uint16") {
-    return tk_type_uint16;
-  } else if (item == "uint8") {
-    return tk_type_uint8;
+  } else if (item == "dict") {
+    return tk_dict;
+  } else if (item == "flags") {
+    return tk_flags;
   } else {
     return is_number(item);
   }
 }
-TokenType equal(std::string keyword) {
+static inline TokenType equal(std::string keyword) {
   TokenType result = tk_identifier;
   if (keyword == "!=") {
     result = tk_not_equal;
@@ -224,22 +214,22 @@ LEXEME lexer(std::string src, std::string filename) {
   std::vector<std::string> seperate_lines(split_ln(src));
   Token token;
   std::vector<Token> tokens;
-  std::vector<INTEGER> identation_level;
+  std::vector< uint64_t> identation_level;
   const std::vector<std::string> operators(
       {"!", "/", "//", "+", "-", "*", "%", "<<", ">>", "&", "|", "^", "="});
   std::string string_starter;
   std::string statement = seperate_lines.at(0);
   std::string item;
   std::string keyword;
-  INTEGER start_index = 0;
-  INTEGER previous_identation = 0;
-  INTEGER current_index = 0;
-  INTEGER second_bracket_count = 0;
-  INTEGER third_bracket_count = 0;
-  INTEGER line = 1;
-  INTEGER last_line = 0;
-  INTEGER curr_identation_level = 0;
-  INTEGER cpp_bracket_count = 0;
+   uint64_t start_index = 0;
+   uint64_t previous_identation = 0;
+   uint64_t current_index = 0;
+   uint64_t second_bracket_count = 0;
+   uint64_t third_bracket_count = 0;
+   uint64_t line = 1;
+   uint64_t last_line = 0;
+   uint64_t curr_identation_level = 0;
+   uint64_t cpp_bracket_count = 0;
   bool is_list_dictionary_cpp_string = false;
   bool is_array = false;
   bool is_dictionary = false;
@@ -259,39 +249,46 @@ LEXEME lexer(std::string src, std::string filename) {
         statement = seperate_lines.at(line - 1);
       }
     }
-    if (item == " " && is_tab == true) {
-      curr_identation_level += 1;
-    } else if (item != " " && is_tab == true && item != "\n") {
-      is_tab = false;
-      previous_identation = 0;
-      if (identation_level.size() != 0) {
-        previous_identation = identation_level.at(identation_level.size() - 1);
-      }
-      if (curr_identation_level > previous_identation) {
-        token = token_init(statement, "", tk_ident, current_index,
-                           current_index, line);
-        tokens.emplace_back(token);
-        identation_level.emplace_back(curr_identation_level);
-      }
-      while (curr_identation_level < previous_identation) {
-        identation_level.pop_back();
-        token = token_init(statement, "", tk_dedent, current_index,
-                           current_index, line);
-        tokens.emplace_back(token);
-        if (identation_level.size() != 0) {
-          if (curr_identation_level >=
-              identation_level.at(identation_level.size() - 1)) {
-            break;
-          }
-          previous_identation =
-              identation_level.at(identation_level.size() - 1);
+    if (is_comment == false && is_array==false && is_dictionary==false && is_cpp == false && is_string==false) {
+      if (item == " " && is_tab == true) {
+        curr_identation_level += 1;
+      } else if (item != " " && is_tab == true && item != "\n") {
+        is_tab = false;
+        if (item == "#") {
+          curr_identation_level -= 4;
         } else {
           previous_identation = 0;
         }
+        if (identation_level.size() != 0) {
+          previous_identation =
+              identation_level.at(identation_level.size() - 1);
+        }
+        if (curr_identation_level > previous_identation) {
+          token = token_init(statement, "", tk_ident, current_index,
+                             current_index, line);
+          tokens.emplace_back(token);
+          identation_level.emplace_back(curr_identation_level);
+        }
+        while (curr_identation_level < previous_identation) {
+          identation_level.pop_back();
+          token = token_init(statement, "", tk_dedent, current_index,
+                             current_index, line);
+          tokens.emplace_back(token);
+          if (identation_level.size() != 0) {
+            if (curr_identation_level >=
+                identation_level.at(identation_level.size() - 1)) {
+              break;
+            }
+            previous_identation =
+                identation_level.at(identation_level.size() - 1);
+          } else {
+            previous_identation = 0;
+          }
+        }
+      } else if (item == "\n" || item == "\r\n") {
+        is_tab = true;
+        curr_identation_level = 0;
       }
-    } else if (item == "\n" || item == "\r\n") {
-      is_tab = true;
-      curr_identation_level = 0;
     }
     if (is_cpp == true) {
       keyword += item;

@@ -52,16 +52,22 @@ typedef enum {
   tk_identifier, // foo, bar
 
   // keywords tokens
-  tk_assert,    // assert
-  tk_try,       // try
-  tk_except,    // except
-  tk_raise,     // raise
-  tk_true,      // True
-  tk_false,     // False
-  tk_with,      // with
-  tk_as,        // as
-  tk_async,     // async
-  tk_await,     // await
+  tk_scope,  // scope
+  tk_enum,   // enum
+  tk_any,    // any
+  tk_assert, // assert
+  tk_try,    // try
+  tk_except, // except
+  tk_raise,  // raise
+  tk_true,   // True
+  tk_false,  // False
+  tk_with,   // with
+  tk_as,     // as
+  // This is not necessary because peregrine has special library for
+  // multithreading
+  // tk_async,     // async
+  // tk_await,     // await
+  tk_flags,     // flags
   tk_none,      // None
   tk_const,     // const
   tk_import,    // import
@@ -89,23 +95,8 @@ typedef enum {
   tk_cppcode,   // Cppcode
   tk_class,     // class
   tk_struct,    // struct
-
-  // language types
-  tk_type, // type defination 
-  tk_type_str,
-  tk_type_bool,
-  tk_type_char,
-  tk_type_float,
-  tk_type_float32,
-  tk_type_void,
-  tk_type_int,
-  tk_type_int32,
-  tk_type_int16,
-  tk_type_int8,
-  tk_type_uint32,
-  tk_type_uint16,
-  tk_type_uint8,
-  tk_type_uint,
+  tk_dict,      // dict
+  tk_type,      // type defination
 
   // value type
   tk_decimal,
@@ -125,9 +116,9 @@ typedef enum {
 typedef struct {
   std::string statement;
   std::string keyword;
-  unsigned long int start = 0;
-  unsigned long int end = 0;
-  unsigned long int line = 1;
+  unsigned long int start;
+  unsigned long int end;
+  unsigned long int line;
   TokenType tk_type;
 } Token;
 #endif
