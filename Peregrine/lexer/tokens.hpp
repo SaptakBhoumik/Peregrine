@@ -52,15 +52,15 @@ typedef enum {
   tk_identifier, // foo, bar   //done
 
   // keywords tokens
-  tk_scope,  // scope
-  tk_enum,   // enum
-  tk_any,    // any
-  tk_assert, // assert
-  tk_try,    // try
+  tk_scope,  // scope //done
+  tk_enum,   // enum  //done
+  tk_any,    // any //done
+  tk_assert, // assert 
+  tk_try,    // try 
   tk_except, // except
   tk_raise,  // raise
-  tk_true,   // True
-  tk_false,  // False
+  tk_true,   // True  //done
+  tk_false,  // False //done
   tk_with,   // with
   tk_as,     // as
   // This is not necessary because peregrine has special library for
@@ -86,9 +86,9 @@ typedef enum {
   tk_default,   // default 
   tk_def,       // def  //done
   tk_pass,      // pass
-  tk_return,    // return
-  tk_and,       // and
-  tk_or,        // or
+  tk_return,    // return //done
+  tk_and,       // and //done
+  tk_or,        // or //done
   tk_not,       // not
   tk_is,        // is
   tk_in,        // in

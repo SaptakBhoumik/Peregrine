@@ -24,6 +24,13 @@ class StringExprAST : public Ast {
 public:
   StringExprAST(Token Val) : Val(Val) {}
 };
+/// true_false_AST - Expression class for bool values like True and False.
+class true_false_AST : public Ast {
+  Token Val;
+
+public:
+  true_false_AST(Token Val) : Val(Val) {}
+};
 /// ListExprAST - Expression class for list literals like "[a,b]".
 class ListExprAST : public Ast {
   Token Val;
@@ -55,13 +62,13 @@ public:
       : Name(Name), Type(Type), is_const(is_const) {}
 };
 
-/// BinaryExprAST - Expression class for a binary operator.
-class BinaryExprAST : public Ast {
+/// OperaterExprAST - Expression class for a binary operator+assign+compare+or_and etc.
+class OperaterExprAST : public Ast {
   Token Op;
   std::unique_ptr<Ast> LHS, RHS;
 
 public:
-  BinaryExprAST(Token &op, std::unique_ptr<Ast> LHS, std::unique_ptr<Ast> RHS)
+  OperaterExprAST(Token &op, std::unique_ptr<Ast> LHS, std::unique_ptr<Ast> RHS)
       : Op(op), LHS(std::move(LHS)), RHS(std::move(RHS)) {}
 };
 // formatted_str - formated string like f"Hello {name}"
@@ -138,4 +145,32 @@ public:
   ClassAST(std::unique_ptr<PrototypeAST> Proto, std::unique_ptr<Ast> Body)
       : Proto(std::move(Proto)), Body(std::move(Body)){}
 };
+/// ScopeAST - This class represents a scope definition .
+class ScopeAST {
+  Token token;
+  std::vector<std::unique_ptr<Ast>> Body;
+
+public:
+  ScopeAST(Token token, std::vector<std::unique_ptr<Ast>> Body)
+      : token(token), Body(std::move(Body)){}
+};
+/// EnumAST - This class represents a enum definition .
+class EnumAST {
+  Token token;
+  std::vector<std::unique_ptr<Ast>> Body;
+
+public:
+  EnumAST(Token token, std::vector<std::unique_ptr<Ast>> Body)
+      : token(token), Body(std::move(Body)){}
+};
+/// ReturnAST - This class represents a return definition .
+class ReturnAST {
+  Token token;
+  std::vector<std::unique_ptr<Ast>> Body;
+
+public:
+  ReturnAST(Token token, std::vector<std::unique_ptr<Ast>> Body)
+      : token(token), Body(std::move(Body)){}
+};
+
 #endif
