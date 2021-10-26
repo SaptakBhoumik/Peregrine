@@ -3,6 +3,7 @@
 #include "../lexer/tokens.hpp"
 #include <bits/stdc++.h>
 #include <cstdint>
+#include <vector>
 
 precedence create_map() {
   precedence precidence_map;
@@ -21,16 +22,6 @@ precedence create_map() {
   precidence_map[tk_divide] = pr_mul_div;
   return precidence_map;
 }
-Ast Parser::parse() {
-  Ast result;
-  result.body.reserve(tokens.size());//reserving extra space to save time
-  current_token =tokens[0];
-  while (tk_index< tokens.size()) {
-    result.body.emplace_back(parse_exp());
-    advance();//to prevent infinite loop
-  }
-  return result;
-}
 void Parser::advance(){
   tk_index++;
   if (tk_index<tokens.size()){
@@ -40,7 +31,29 @@ void Parser::advance(){
 Token Parser::next(){
   Token token;
   if (tk_index+1<tokens.size()){
-    token=tokens[tk_index];
+    token=tokens[tk_index+1];
   }
   return token;
+}
+Precedence_type  Parser::next_precedence(){ 
+        if (precidence_map.count(next().tk_type)>0){
+            return precidence_map[next().tk_type];
+        }
+
+        return pr_lowest;
+}
+void Parser::expect(std::vector<TokenType> list,TokenType res){
+  if (std::count(list.begin(), list.end(), res)){
+    //raise error
+  }
+}
+Ast Parser::parse() {
+  Ast result;
+  // result.body.reserve(tokens.size());//reserving extra space to save time
+  // current_token =tokens[0];
+  // while (current_token.tk_type!=tk_eof) {
+  //   result.body.emplace_back(parse_statement());
+  //   advance();//to prevent infinite loop
+  // }
+  return result;
 }

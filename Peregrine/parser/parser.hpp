@@ -6,6 +6,7 @@
 #include "../lexer/lexer.hpp"
 #include "../lexer/tokens.hpp"
 #include <cstdint>
+#include <vector>
 #define precedence std::map<TokenType, Precedence_type>
 typedef enum {
   pr_lowest,         // lowest possible precedence
@@ -22,11 +23,12 @@ private:
   precedence precidence_map = create_map();
   void advance();
   Token next();
-  Body parse_exp();
-
-public:
+  void expect(std::vector<TokenType> list,TokenType res);
+  Precedence_type next_precedence();
   Token current_token;
   uint64_t tk_index = 0;
+
+public:
   LEXEME tokens;
   std::string filename;
   Ast parse();
