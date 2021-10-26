@@ -3,7 +3,7 @@ module codegen
 
 import parser
 
-pub fn codegen(ast parser.Ast) []string {
+pub fn codegen(mut ast parser.Ast) []string {
 	loop := ['if', 'while', 'elif', 'else', 'for', 'match', 'case']
 	if_else_loop := ['if', 'while', 'elif', 'else', 'for']
 	mut is_function_call := false
