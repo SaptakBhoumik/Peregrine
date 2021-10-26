@@ -102,9 +102,8 @@ public:
       : Callee(Callee), Args(std::move(Args)) {}
 };
 
-/// PrototypeAST - This class represents the "prototype" for a function,
-/// which captures its name, and its argument names (thus implicitly the number
-/// of arguments the function takes).
+/// PrototypeAST - This class represents the "prototype" for a function+class,
+/// which captures its name, and its argument names .
 class PrototypeAST {
   Token Name;
   std::vector<std::unique_ptr<Ast>> Args;
@@ -132,13 +131,11 @@ public:
 };
 /// ClassAST - This class represents a class/object definition itself.
 class ClassAST {
-  std::unique_ptr<FunctionAST> Proto;
+  std::unique_ptr<PrototypeAST> Proto;
   std::unique_ptr<Ast> Body;
-  std::vector<DecoratorExprAST> decorator;
 
 public:
-  ClassAST(std::unique_ptr<FunctionAST> Proto, std::unique_ptr<Ast> Body,
-           std::vector<DecoratorExprAST> decorator)
-      : Proto(std::move(Proto)), Body(std::move(Body)), decorator(decorator) {}
+  ClassAST(std::unique_ptr<PrototypeAST> Proto, std::unique_ptr<Ast> Body)
+      : Proto(std::move(Proto)), Body(std::move(Body)){}
 };
 #endif
