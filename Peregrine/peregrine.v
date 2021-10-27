@@ -60,7 +60,7 @@ fn compile(opt CompilationOptions) {
 	mut total := '$builtin_pe\n$content'
 	tokens := tokenizer.process_tokens(tokenizer.tokenize(total))
 
-	ast, error := parser.parser(tokens)
+	mut ast, error := parser.parser(tokens)
 	if opt.emitast && !opt.emitc {
 		print(ast)
 		return
@@ -75,7 +75,7 @@ fn compile(opt CompilationOptions) {
 	if error == '' {
 		// print(ast)
 		// println(ast.function_return_type)
-		codes := codegen.codegen(ast)
+		codes := codegen.codegen(mut ast)
 		for code in codes {
 			final_code = '$final_code$code'
 		}
