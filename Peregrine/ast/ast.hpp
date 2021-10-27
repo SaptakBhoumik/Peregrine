@@ -62,7 +62,8 @@ public:
       : Name(Name), Type(Type), is_const(is_const) {}
 };
 
-/// OperaterExprAST - Expression class for a binary operator+assign+compare+or_and etc.
+/// OperaterExprAST - Expression class for a binary
+/// operator+assign+compare+or_and etc.
 class OperaterExprAST : public Ast {
   Token Op;
   std::unique_ptr<Ast> LHS, RHS;
@@ -115,35 +116,37 @@ class PrototypeAST {
   Token Name;
   std::vector<std::unique_ptr<Ast>> Args;
   std::vector<Token> return_type;
-  std::vector<DecoratorExprAST> decorator;
+  std::vector<std::unique_ptr<DecoratorExprAST>> decorator;
 
 public:
   PrototypeAST(const Token &name, std::vector<std::unique_ptr<Ast>> Args,
                std::vector<Token> return_type,
-               std::vector<DecoratorExprAST> decorator)
+               std::vector<std::unique_ptr<DecoratorExprAST>> decorator)
       : Name(name), Args(std::move(Args)), return_type(return_type),
-        decorator(decorator) {}
+        decorator(std::move(decorator)) {}
 
-  const Token &getName() const { return Name; }
+  // const Token &getName() const { return Name; }
 };
 
 /// FunctionAST - This class represents a function definition itself.
 class FunctionAST {
   std::unique_ptr<PrototypeAST> Proto;
-  std::unique_ptr<Ast> Body;
+  std::vector<std::unique_ptr<Ast>> Body;
 
 public:
-  FunctionAST(std::unique_ptr<PrototypeAST> Proto, std::unique_ptr<Ast> Body)
+  FunctionAST(std::unique_ptr<PrototypeAST> Proto,
+              std::vector<std::unique_ptr<Ast>> Body)
       : Proto(std::move(Proto)), Body(std::move(Body)) {}
 };
 /// ClassAST - This class represents a class/object definition itself.
 class ClassAST {
   std::unique_ptr<PrototypeAST> Proto;
-  std::unique_ptr<Ast> Body;
+  std::vector<std::unique_ptr<Ast>> Body;
 
 public:
-  ClassAST(std::unique_ptr<PrototypeAST> Proto, std::unique_ptr<Ast> Body)
-      : Proto(std::move(Proto)), Body(std::move(Body)){}
+  ClassAST(std::unique_ptr<PrototypeAST> Proto,
+           std::vector<std::unique_ptr<Ast>> Body)
+      : Proto(std::move(Proto)), Body(std::move(Body)) {}
 };
 /// ScopeAST - This class represents a scope definition .
 class ScopeAST {
@@ -152,7 +155,7 @@ class ScopeAST {
 
 public:
   ScopeAST(Token token, std::vector<std::unique_ptr<Ast>> Body)
-      : token(token), Body(std::move(Body)){}
+      : token(token), Body(std::move(Body)) {}
 };
 /// EnumAST - This class represents a enum definition .
 class EnumAST {
@@ -161,7 +164,7 @@ class EnumAST {
 
 public:
   EnumAST(Token token, std::vector<std::unique_ptr<Ast>> Body)
-      : token(token), Body(std::move(Body)){}
+      : token(token), Body(std::move(Body)) {}
 };
 /// ReturnAST - This class represents a return definition .
 class ReturnAST {
@@ -170,7 +173,7 @@ class ReturnAST {
 
 public:
   ReturnAST(Token token, std::vector<std::unique_ptr<Ast>> Body)
-      : token(token), Body(std::move(Body)){}
+      : token(token), Body(std::move(Body)) {}
 };
 
 #endif

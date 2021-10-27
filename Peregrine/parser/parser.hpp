@@ -25,6 +25,8 @@ private:
   Token next();
   void expect(std::vector<TokenType> list,TokenType res);
   Precedence_type next_precedence();
+  std::unique_ptr<Ast> ParseNumberExpr();
+  std::unique_ptr<Ast> ParseStringExpr();
   Token current_token;
   uint64_t tk_index = 0;
 
