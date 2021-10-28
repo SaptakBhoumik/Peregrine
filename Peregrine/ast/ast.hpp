@@ -57,9 +57,14 @@ class VariableExprAST : public Ast {
   Token Name;
   Token Type;            // infer type and also includes the `type` keyword
   bool is_const = false; // checks if constant
+  bool is_live;          // checks if it's lifetime is still valid in this scope
+  bool called_after_lifetime; // checks if it's called after it's lifetime has
+                              // ended. If yes then throw an error or implecitely clone it along with a warning
 public:
-  VariableExprAST(const Token &Name, Token Type, bool is_const)
-      : Name(Name), Type(Type), is_const(is_const) {}
+  VariableExprAST(Token &Name, Token Type, bool is_const, bool is_live,
+                  bool called_after_lifetime)
+      : Name(Name), Type(Type), is_const(is_const), is_live(is_live),
+        called_after_lifetime(called_after_lifetime) {}
 };
 
 /// OperaterExprAST - Expression class for a binary
@@ -96,7 +101,7 @@ class CallExprAST : public Ast {
   std::vector<std::unique_ptr<Ast>> Args;
 
 public:
-  CallExprAST(const Token &Callee, std::vector<std::unique_ptr<Ast>> Args)
+  CallExprAST(Token &Callee, std::vector<std::unique_ptr<Ast>> Args)
       : Callee(Callee), Args(std::move(Args)) {}
 };
 
@@ -106,7 +111,7 @@ class DecoratorExprAST : public Ast {
   std::vector<std::unique_ptr<Ast>> Args;
 
 public:
-  DecoratorExprAST(const Token &Callee, std::vector<std::unique_ptr<Ast>> Args)
+  DecoratorExprAST(Token &Callee, std::vector<std::unique_ptr<Ast>> Args)
       : Callee(Callee), Args(std::move(Args)) {}
 };
 
@@ -117,15 +122,17 @@ class PrototypeAST {
   std::vector<std::unique_ptr<Ast>> Args;
   std::vector<Token> return_type;
   std::vector<std::unique_ptr<DecoratorExprAST>> decorator;
+  std::vector<Token> variables; // list of variables declared in this scope
 
 public:
-  PrototypeAST(const Token &name, std::vector<std::unique_ptr<Ast>> Args,
+  PrototypeAST(Token &name, std::vector<std::unique_ptr<Ast>> Args,
                std::vector<Token> return_type,
-               std::vector<std::unique_ptr<DecoratorExprAST>> decorator)
+               std::vector<std::unique_ptr<DecoratorExprAST>> decorator,
+               std::vector<Token> variables)
       : Name(name), Args(std::move(Args)), return_type(return_type),
-        decorator(std::move(decorator)) {}
+        decorator(std::move(decorator)), variables(variables) {}
 
-  // const Token &getName() const { return Name; }
+  Token &getName() { return Name; }
 };
 
 /// FunctionAST - This class represents a function definition itself.
@@ -152,10 +159,12 @@ public:
 class ScopeAST {
   Token token;
   std::vector<std::unique_ptr<Ast>> Body;
+  std::vector<Token> variables; // list of variables declared in this scope
 
 public:
-  ScopeAST(Token token, std::vector<std::unique_ptr<Ast>> Body)
-      : token(token), Body(std::move(Body)) {}
+  ScopeAST(Token token, std::vector<std::unique_ptr<Ast>> Body,
+           std::vector<Token> variables)
+      : token(token), Body(std::move(Body)), variables(variables) {}
 };
 /// EnumAST - This class represents a enum definition .
 class EnumAST {

@@ -4,6 +4,7 @@ all:
 	 ${CC} ${CFLAGS} lexer/lexer.cpp -o lexer.o
 	 ${CC} ${CFLAGS} errors/errors.cpp -o error.o
 	 ${CC} ${CFLAGS} parser/parser.cpp -o parser.o
+	 ${CC} ${CFLAGS} parser/literals.cpp -o literals.o
 test_all:
 	 ${CC} ${CFLAGS} lexer/lexer.cpp -o lexer.o
 	 ${CC} ${CFLAGS} lexer/lexer_test.cpp -o lexer_test.o

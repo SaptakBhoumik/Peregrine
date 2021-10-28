@@ -23,12 +23,16 @@ private:
   precedence precidence_map = create_map();
   void advance();
   Token next();
-  void expect(std::vector<TokenType> list,TokenType res);
+  void expect(std::vector<TokenType> list, TokenType res);
   Precedence_type next_precedence();
-  std::unique_ptr<Ast> ParseNumberExpr();
-  std::unique_ptr<Ast> ParseStringExpr();
   Token current_token;
   uint64_t tk_index = 0;
+  std::unique_ptr<Ast> ParseNumberExpr();
+  std::unique_ptr<Ast> ParseBoolExpr();
+  std::unique_ptr<Ast> ParseStringExpr();
+  std::unique_ptr<Ast> ParseCppExpr();
+  std::unique_ptr<Ast> ParseDictExpr();
+  std::unique_ptr<Ast> ParseListExpr();
 
 public:
   LEXEME tokens;
