@@ -27,6 +27,11 @@ private:
   Precedence_type next_precedence();
   Token current_token;
   uint64_t tk_index = 0;
+  void handle_function_def();
+std::unique_ptr<Ast> ParseParenExpr();
+std::unique_ptr<Ast> ParseExpression() ;
+std::unique_ptr<Ast> ParseIdentifierExpr();
+  void handle_exp();
   std::unique_ptr<Ast> ParseNumberExpr();
   std::unique_ptr<Ast> ParseBoolExpr();
   std::unique_ptr<Ast> ParseStringExpr();
@@ -37,6 +42,6 @@ private:
 public:
   LEXEME tokens;
   std::string filename;
-  Ast parse();
+  void parse();
 };
 #endif

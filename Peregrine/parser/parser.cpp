@@ -22,38 +22,46 @@ precedence create_map() {
   precidence_map[tk_divide] = pr_mul_div;
   return precidence_map;
 }
-void Parser::advance(){
+void Parser::advance() {
   tk_index++;
-  if (tk_index<tokens.size()){
-    current_token=tokens[tk_index];
+  if (tk_index < tokens.size()) {
+    current_token = tokens[tk_index];
   }
 }
-Token Parser::next(){
+Token Parser::next() {
   Token token;
-  if (tk_index+1<tokens.size()){
-    token=tokens[tk_index+1];
+  if (tk_index + 1 < tokens.size()) {
+    token = tokens[tk_index + 1];
   }
   return token;
 }
-Precedence_type  Parser::next_precedence(){ 
-        if (precidence_map.count(next().tk_type)>0){
-            return precidence_map[next().tk_type];
-        }
+Precedence_type Parser::next_precedence() {
+  if (precidence_map.count(next().tk_type) > 0) {
+    return precidence_map[next().tk_type];
+  }
 
-        return pr_lowest;
+  return pr_lowest;
 }
-void Parser::expect(std::vector<TokenType> list,TokenType res){
-  if (std::count(list.begin(), list.end(), res)){
-    //raise error
+void Parser::expect(std::vector<TokenType> list, TokenType res) {
+  if (std::count(list.begin(), list.end(), res)) {
+    // raise error
   }
 }
-Ast Parser::parse() {
+/// top ::= definition | external | expression
+void Parser::parse() {
   Ast result;
-  // result.body.reserve(tokens.size());//reserving extra space to save time
-  // current_token =tokens[0];
-  // while (current_token.tk_type!=tk_eof) {
-  //   result.body.emplace_back(parse_statement());
-  //   advance();//to prevent infinite loop
-  // }
-  return result;
+  current_token = tokens[0];
+  while (true) {
+    switch (current_token.tk_type) {
+    case tk_def: {
+      handle_function_def();
+      break;
+    }
+    default: {
+      handle_exp();
+      break;
+    }
+    }
+  advance();//preventing infinite loop
+  }
 }
