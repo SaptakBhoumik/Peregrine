@@ -54,6 +54,7 @@ typedef enum {
 
   // keywords tokens
   tk_scope,  // scope 
+  tk_union,  // union 
   tk_enum,   // enum  
   tk_any,    // any 
   tk_assert, // assert

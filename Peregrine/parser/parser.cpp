@@ -8,6 +8,9 @@
 
 precedence create_map() {
   precedence precidence_map;
+  precidence_map[tk_negative] = pr_prefix;
+  precidence_map[tk_bit_not] = pr_prefix;
+  precidence_map[tk_not] = pr_prefix;
   precidence_map[tk_and] = pr_and_or;
   precidence_map[tk_or] = pr_and_or;
   precidence_map[tk_not] = pr_not;
@@ -113,6 +116,16 @@ ast_node Parser::parse_statement() {
   }
   case tk_none: {
     node = parseExpression(precidence_map[tk_none]);
+    break;
+  }case tk_negative: {
+    node = parseExpression(precidence_map[tk_negative]);
+    break;
+  }
+  case tk_bit_not: {
+    node = parseExpression(precidence_map[tk_bit_not]);
+    break;
+  }case tk_not: {
+    node = parseExpression(precidence_map[tk_not]);
     break;
   }
   default: {

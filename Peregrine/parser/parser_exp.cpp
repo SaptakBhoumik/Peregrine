@@ -18,7 +18,8 @@ ast_node Parser::parseExpression(Precedence_type curr_precedence) {
              current_token.tk_type == tk_true) {
     left = ParseBoolExpr();
   } else if (current_token.tk_type == tk_negative ||
-             current_token.tk_type == tk_not) {
+             current_token.tk_type == tk_not||
+             current_token.tk_type == tk_bit_not) {
     left = parsePrefixExpression();
   }
   auto temp = next();
@@ -47,12 +48,10 @@ ast_node Parser::parseBinaryOperation(ast_node left) {
 }
 ast_node Parser::parsePrefixExpression() {
   ast_node res;
-  sexp += current_token.keyword;
   auto infix = current_token;
   res.token = infix;
   res.kind = AST_INFIX;
   advance();
-  sexp += current_token.keyword;
   auto right = parseExpression(precidence_map[tk_type]);
   res.children.infix.child = &right;
   return res;
@@ -66,7 +65,7 @@ ast_node Parser::ParseGroupExpr() {
 ast_node Parser::ParseIdentifierExpr() {
   ast_node res;
   res.kind = AST_VAR;
-  res.token =
-      current_token; // TODO :- Check if a variable or something like that
+  res.token = current_token; 
+  // TODO :- Check if a variable or something like that
   return res;
 }

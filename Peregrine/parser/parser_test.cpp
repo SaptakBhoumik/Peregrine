@@ -2,7 +2,7 @@
 #include "parser.hpp"
 #include <iostream>
 int main() {
-  LEXEME test = lexer("a+b*8", "file name");
+  LEXEME test = lexer("-a+b*8", "file name");
   Parser parse_obj;
   parse_obj.tokens = test;
   auto x = parse_obj.parse();
