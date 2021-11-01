@@ -1,9 +1,11 @@
-#include "parser.hpp"
 #include "../lexer/lexer.hpp"
-int main(){
- auto  test=lexer("a=9","file name");
- Parser parse_obj;
- parse_obj.tokens=test;
- parse_obj.parse();
-    return 0;
+#include "parser.hpp"
+#include <iostream>
+int main() {
+  LEXEME test = lexer("a+b*8", "file name");
+  Parser parse_obj;
+  parse_obj.tokens = test;
+  auto x = parse_obj.parse();
+  std::cout << parse_obj.sexp << std::endl;
+  return 0;
 }

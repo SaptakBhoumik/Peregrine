@@ -1,40 +1,63 @@
 #include "../ast/ast.hpp"
 #include "parser.hpp"
 /// numberexpr ::= number
-std::unique_ptr<Ast> Parser::ParseNumberExpr() {
-  auto Result = std::make_unique<NumberExprAST>(current_token);
-  advance(); // consume the number
-  return std::move(Result);
+ast_node Parser::ParseNumberExpr() {
+  ast_node Result;
+  Result.kind = AST_NUMBER;
+  Result.token = current_token;
+
+  return Result;
 }
 /// stringexpr ::= string
-std::unique_ptr<Ast> Parser::ParseStringExpr() {
-  auto Result = std::make_unique<StringExprAST>(current_token);
-  advance(); // consume the string
-  return std::move(Result);
+ast_node Parser::ParseStringExpr(bool is_formatted, bool is_raw) {
+  ast_node Result;
+  Result.kind = AST_STRING;
+  Result.token = current_token;
+  Result.children.string.is_formatted = is_formatted;
+  Result.children.string.is_raw = is_raw;
+  return Result;
 }
 
 /// true_false_expr ::= true or false
-std::unique_ptr<Ast> Parser::ParseBoolExpr() {
-  auto Result = std::make_unique<true_false_AST>(current_token);
-  advance(); // consume the bool
-  return std::move(Result);
+ast_node Parser::ParseBoolExpr() {
+  ast_node Result;
+  Result.kind = AST_BOOL;
+  Result.token = current_token;
+
+  return Result;
 }
 
 /// ListExprAST ::= list
-std::unique_ptr<Ast> Parser::ParseListExpr() {
-  auto Result = std::make_unique<ListExprAST>(current_token);
-  advance(); // consume the list
-  return std::move(Result);
+ast_node Parser::ParseListExpr() {
+  ast_node Result;
+  Result.kind = AST_LIST;
+  Result.token = current_token;
+
+  return Result;
 }
-/// DictExprAST ::= dictionary 
-std::unique_ptr<Ast> Parser::ParseDictExpr() {
-  auto Result = std::make_unique<DictExprAST>(current_token);
-  advance(); // consume the dictionary
-  return std::move(Result);
+
+/// DictExprAST ::= dictionary
+ast_node Parser::ParseDictExpr() {
+  ast_node Result;
+  Result.kind = AST_DICT;
+  Result.token = current_token;
+
+  return Result;
 }
+
 /// CppExprAST ::= C++ code
-std::unique_ptr<Ast> Parser::ParseCppExpr() {
-  auto Result = std::make_unique<CppExprAST>(current_token);
-  advance(); // consume the C++ code
-  return std::move(Result);
+ast_node Parser::ParseCppExpr() {
+  ast_node Result;
+  Result.kind = AST_CPP;
+  Result.token = current_token;
+
+  return Result;
+}
+/// NoneExprAST ::= None
+ast_node Parser::ParseNoneExpr() {
+  ast_node Result;
+  Result.kind = AST_NONE;
+  Result.token = current_token;
+
+  return Result;
 }

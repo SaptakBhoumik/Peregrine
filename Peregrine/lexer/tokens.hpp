@@ -5,62 +5,63 @@
 // Create a string variable
 typedef enum {
   // Some operators
-  tk_plus,      // +    //done
-  tk_minus,     // -    //done
-  tk_divide,    // /    //done
-  tk_asterisk,  // *    //done
-  tk_multiply,  // *  //done
-  tk_xor,       // ^        //done
-  tk_modulo,    // %     //done
-  tk_greater,   // >     //done
-  tk_less,      // <     //done
-  tk_ampersand, // &     //done
-  tk_bit_or,    // |     //done
-  tk_bit_not,   // ~     //done
-  tk_assign,    // =     //done
-  tk_excl,      // !     //done
-  tk_colon,     // :     //done
-  tk_dot,       // .     //done
-  tk_l_paren,   // (     //done
-  tk_r_paren,   // )     //done
-  tk_hashtag,   // //     //done
-  tk_comma,     // ,     //done
+  tk_plus,      // +    
+  tk_negative,  // negative number
+  tk_minus,     // -    
+  tk_divide,    // /    
+  tk_asterisk,  // *    
+  tk_multiply,  // *  
+  tk_xor,       // ^        
+  tk_modulo,    // %     
+  tk_greater,   // >     
+  tk_less,      // <     
+  tk_ampersand, // &     
+  tk_bit_or,    // |     
+  tk_bit_not,   // ~     
+  tk_assign,    // =     
+  tk_excl,      // !     
+  tk_colon,     // :     
+  tk_dot,       // .     
+  tk_l_paren,   // (     
+  tk_r_paren,   // )     
+  tk_hashtag,   // //     
+  tk_comma,     // ,     
 
-  tk_exponent,          //**      //done
-  tk_equal,             // ==   //done
-  tk_not_equal,         // !=   //done
-  tk_floor,             // //   //done
-  tk_gr_or_equ,         // >=   //done
-  tk_less_or_equ,       // <=   //done
-  tk_increment,         // ++   //done
-  tk_decrement,         // --   //done
-  tk_arrow,             // ->   //done
-  tk_shift_right,       // >>   //done
-  tk_shift_left,        // <<   //done
-  tk_floor_equal,       // //=   //done
-  tk_plus_equal,        // +=   //done
-  tk_minus_equal,       // -=   //done
-  tk_times_equal,       // *=   //done
-  tk_slash_equal,       // /=   //done
-  tk_mod_equal,         // %=   //done
-  tk_shift_right_equal, // >>=   //done
-  tk_shift_left_equal,  // <<=   //done
-  tk_bit_and_equal,     // &=   //done
-  tk_bit_or_equal,      // |=   //done
-  tk_bit_xor_equal,     // ^=   //done
+  tk_exponent,          //**      
+  tk_equal,             // ==   
+  tk_not_equal,         // !=   
+  tk_floor,             // //   
+  tk_gr_or_equ,         // >=   
+  tk_less_or_equ,       // <=   
+  tk_increment,         // ++   
+  tk_decrement,         // --   
+  tk_arrow,             // ->   
+  tk_shift_right,       // >>   
+  tk_shift_left,        // <<   
+  tk_floor_equal,       // //=   
+  tk_plus_equal,        // +=   
+  tk_minus_equal,       // -=   
+  tk_times_equal,       // *=   
+  tk_slash_equal,       // /=   
+  tk_mod_equal,         // %=   
+  tk_shift_right_equal, // >>=   
+  tk_shift_left_equal,  // <<=   
+  tk_bit_and_equal,     // &=   
+  tk_bit_or_equal,      // |=   
+  tk_bit_xor_equal,     // ^=   
 
-  tk_identifier, // foo, bar   //done
+  tk_identifier, // foo, bar   
 
   // keywords tokens
-  tk_scope,  // scope //done
-  tk_enum,   // enum  //done
-  tk_any,    // any //done
-  tk_assert, // assert 
-  tk_try,    // try 
+  tk_scope,  // scope 
+  tk_enum,   // enum  
+  tk_any,    // any 
+  tk_assert, // assert
+  tk_try,    // try
   tk_except, // except
   tk_raise,  // raise
-  tk_true,   // True  //done
-  tk_false,  // False //done
+  tk_true,   // True  
+  tk_false,  // False 
   tk_with,   // with
   tk_as,     // as
   // This is not necessary because peregrine has special library for
@@ -83,35 +84,35 @@ typedef enum {
   tk_match,     // match
   tk_extern,    // extern
   tk_case,      // case
-  tk_default,   // default 
-  tk_def,       // def  //done
+  tk_default,   // default
+  tk_def,       // def  
   tk_pass,      // pass
-  tk_return,    // return //done
-  tk_and,       // and //done
-  tk_or,        // or //done
+  tk_return,    // return 
+  tk_and,       // and 
+  tk_or,        // or 
   tk_not,       // not
   tk_is,        // is
   tk_in,        // in
   tk_cppcode,   // Cppcode
-  tk_class,     // class //done
+  tk_class,     // class 
   tk_struct,    // struct
   tk_dict,      // dict
-  tk_type,      // type defination //done
+  tk_type,      // type defination 
 
   // value type
-  tk_decimal,//done
-  tk_integer,//done
-  tk_string,//done
-  cpp,//done
-  array,//done
-  dictionary,//done
+  tk_decimal, // done
+  tk_integer, // done
+  tk_string,  // done
+  cpp,        // done
+  array,      // done
+  dictionary, // done
 
   tk_ident,  // beginning of identation
   tk_dedent, // end of identation
 
-  tk_raw,    // raw string i.e. r //done
-  tk_format, // formatted string i.e. f //done
-  tk_eof//end of file //done
+  tk_raw,    // raw string i.e. r 
+  tk_format, // formatted string i.e. f 
+  tk_eof     // end of file 
 } TokenType;
 
 typedef struct {

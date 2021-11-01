@@ -23,25 +23,30 @@ private:
   precedence precidence_map = create_map();
   void advance();
   Token next();
-  void expect(std::vector<TokenType> list, TokenType res);
+  bool expect(std::vector<TokenType> list, TokenType res);
   Precedence_type next_precedence();
   Token current_token;
   uint64_t tk_index = 0;
-  void handle_function_def();
-std::unique_ptr<Ast> ParseParenExpr();
-std::unique_ptr<Ast> ParseExpression() ;
-std::unique_ptr<Ast> ParseIdentifierExpr();
-  void handle_exp();
-  std::unique_ptr<Ast> ParseNumberExpr();
-  std::unique_ptr<Ast> ParseBoolExpr();
-  std::unique_ptr<Ast> ParseStringExpr();
-  std::unique_ptr<Ast> ParseCppExpr();
-  std::unique_ptr<Ast> ParseDictExpr();
-  std::unique_ptr<Ast> ParseListExpr();
+  // literals
+  ast_node ParseStringExpr(bool is_formatted, bool is_raw);
+  ast_node ParseNoneExpr();
+  ast_node ParseNumberExpr();
+  ast_node ParseBoolExpr();
+  ast_node ParseListExpr();
+  ast_node ParseCppExpr();
+  ast_node ParseDictExpr();
+  // operators
+  ast_node parseExpression(Precedence_type type);
+  ast_node parsePrefixExpression();
+  ast_node ParseIdentifierExpr();
+  ast_node ParseGroupExpr();
+  ast_node parseBinaryOperation(ast_node left);
 
 public:
   LEXEME tokens;
   std::string filename;
-  void parse();
+  std::string sexp; // for debuging
+  AST parse();
+  ast_node parse_statement();
 };
 #endif
