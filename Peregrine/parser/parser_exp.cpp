@@ -21,9 +21,13 @@ ast_node Parser::parseExpression(Precedence_type curr_precedence) {
              current_token.tk_type == tk_not) {
     left = parsePrefixExpression();
   }
-  while (next_precedence() > curr_precedence) {
-    advance();
-    left = parseBinaryOperation(left);
+  auto temp = next();
+  if (temp.line == current_token.line && temp.tk_type != tk_eof &&
+      temp.tk_type != tk_ident && temp.tk_type != tk_dedent) {
+    while (next_precedence() > curr_precedence) {
+      advance();
+      left = parseBinaryOperation(left);
+    }
   }
   return left;
 }
@@ -59,9 +63,10 @@ ast_node Parser::ParseGroupExpr() {
   auto node = parseExpression(pr_lowest);
   return node;
 }
-ast_node Parser::ParseIdentifierExpr(){
+ast_node Parser::ParseIdentifierExpr() {
   ast_node res;
   res.kind = AST_VAR;
-  res.token = current_token;//TODO :- Check if a variable or something like that
-    return res;
+  res.token =
+      current_token; // TODO :- Check if a variable or something like that
+  return res;
 }
