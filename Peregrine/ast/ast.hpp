@@ -27,7 +27,7 @@ struct STRING {
   bool is_formatted;
   bool is_raw;
 };
-typedef struct child {
+typedef union child {
   binary_op operator_op;
   infix_op infix;
   STRING string;
