@@ -39,7 +39,8 @@ ast_node Parser::parseBinaryOperation(ast_node left) {
   sexp += curr_operator.keyword;
   advance();
   auto currentPrecedence = precidence_map[tk_type];
-  static auto right = parseExpression(currentPrecedence);
+  static ast_node right;
+  right = parseExpression(currentPrecedence);
   res.children.operator_op.right = &right;
   return res;
 }
@@ -49,7 +50,8 @@ ast_node Parser::parsePrefixExpression() {
   res.token = infix;
   res.kind = AST_INFIX;
   advance();
-  static auto right = parseExpression(precidence_map[current_token.tk_type]);
+  static ast_node right;
+  right = parseExpression(precidence_map[tk_type]);
   res.children.infix.child = &right;
   return res;
 }

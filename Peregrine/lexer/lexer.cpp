@@ -138,6 +138,8 @@ static inline TokenType token_type(std::string item, std::string next_item) {
     return tk_case;
   } else if (item == "default") {
     return tk_default;
+  } else if (item == "static") {
+    return tk_static;
   } else if (item == "def") {
     return tk_def;
   } else if (item == "pass") {

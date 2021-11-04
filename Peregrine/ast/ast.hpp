@@ -4,17 +4,16 @@
 #include <vector>
 struct ast_node;
 typedef enum ast_kind {
-  AST_NUMBER,
-  AST_STRING,
-  AST_VARIABLE,
-  AST_BOOL,
+  AST_NUMBER, //done
+  AST_STRING, //done
+  AST_BOOL, //done
   AST_LIST,
   AST_DICT,
-  AST_CPP,
-  AST_NONE,
+  AST_CPP,//done
+  AST_NONE,//done
   AST_OPERATOR,
   AST_INFIX,
-  AST_VAR
+  AST_VAR //done
 } ast_kind;
 struct binary_op {
   ast_node *left;

@@ -54,6 +54,7 @@ typedef enum {
   tk_identifier, // foo, bar
 
   // keywords tokens
+  tk_static, // static
   tk_scope,  // scope
   tk_union,  // union
   tk_enum,   // enum

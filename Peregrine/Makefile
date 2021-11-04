@@ -6,6 +6,9 @@ all:
 	 ${CC} ${CFLAGS} parser/parser_exp.cpp -o parser_exp.o
 	 ${CC} ${CFLAGS} parser/parser.cpp -o parser.o
 	 ${CC} ${CFLAGS} parser/literals.cpp -o literals.o
+	 ${CC} ${CFLAGS} codegen/codegen.cpp -o codegen.o
+	 ${CC} ${CFLAGS} codegen/codegen_op.cpp -o codegen_op.o
+
 test_all:
 	 ${CC} ${CFLAGS} lexer/lexer.cpp -o lexer.o
 	 ${CC} ${CFLAGS} lexer/lexer_test.cpp -o lexer_test.o
@@ -14,9 +17,14 @@ test_all:
 	 ${CC} ${CFLAGS} parser/literals.cpp -o literals.o
 	 ${CC} ${CFLAGS} parser/parser_test.cpp -o parser_test.o
 	 ${CC} ${CFLAGS} parser/parser_exp.cpp -o parser_exp.o
+	 ${CC} ${CFLAGS} codegen/codegen.cpp -o codegen.o
+	 ${CC} ${CFLAGS} codegen/codegen_op.cpp -o codegen_op.o
+	 ${CC} ${CFLAGS} codegen/codegen_test.cpp -o codegen_test.o
 	 ${CC}  error.o lexer_test.o lexer.o -o temp
 	 ./temp
 	 ${CC} parser.o parser_test.o error.o lexer.o literals.o parser_exp.o -o temp
+	 ./temp
+	 ${CC} codegen.o codegen_test.o parser.o error.o lexer.o literals.o parser_exp.o codegen_op.o -o temp
 	 ./temp
 clean:
 	rm *.o
