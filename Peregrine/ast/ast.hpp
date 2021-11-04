@@ -1,7 +1,6 @@
 #ifndef PEREGRINE_AST_AST_HPP
 #define PEREGRINE_AST_AST_HPP
 #include "../lexer/tokens.hpp"
-#include <memory>
 #include <vector>
 struct ast_node;
 typedef enum ast_kind {
@@ -28,7 +27,7 @@ struct STRING {
   bool is_formatted;
   bool is_raw;
 };
-typedef union child {
+typedef struct child {
   binary_op operator_op;
   infix_op infix;
   STRING string;
