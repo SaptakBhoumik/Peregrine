@@ -22,8 +22,7 @@ ast_node Parser::parseExpression(Precedence_type curr_precedence) {
              current_token.tk_type == tk_bit_not) {
     left = parsePrefixExpression();
   }
-  auto temp = next();
-    while (next_precedence() > curr_precedence) {
+  while (next_precedence() > curr_precedence) {
       advance();
       left = parseBinaryOperation(left);
     }
@@ -38,9 +37,8 @@ ast_node Parser::parseBinaryOperation(ast_node left) {
   res.children.operator_op.left = &left;
   sexp += curr_operator.keyword;
   advance();
-  auto currentPrecedence = precidence_map[tk_type];
   static ast_node right;
-  right = parseExpression(currentPrecedence);
+  right = parse_statement();
   res.children.operator_op.right = &right;
   return res;
 }
@@ -51,14 +49,13 @@ ast_node Parser::parsePrefixExpression() {
   res.kind = AST_INFIX;
   advance();
   static ast_node right;
-  right = parseExpression(precidence_map[tk_type]);
+  right = parse_statement();
   res.children.infix.child = &right;
   return res;
 }
 ast_node Parser::ParseGroupExpr() {
   advance();
-  sexp += current_token.keyword;
-  auto node = parseExpression(pr_lowest);
+  auto node = parse_statement();
   return node;
 }
 ast_node Parser::ParseIdentifierExpr() {

@@ -14,7 +14,6 @@ precedence create_map() {
   precidence_map[tk_and] = pr_and_or;
   precidence_map[tk_or] = pr_and_or;
   precidence_map[tk_not] = pr_not;
-  precidence_map[tk_assign] = pr_assign_compare;
   precidence_map[tk_not_equal] = pr_assign_compare;
   precidence_map[tk_greater] = pr_assign_compare;
   precidence_map[tk_less] = pr_assign_compare;
@@ -90,46 +89,8 @@ ast_node Parser::parse_statement() {
     node = ParseStringExpr(false, true);
     break;
   }
-  case tk_string: {
-    node = parseExpression(precidence_map[tk_string]);
-    break;
-  }
-  case tk_identifier: {
-    node = parseExpression(precidence_map[tk_identifier]);
-    break;
-  }
-  case tk_integer: {
-    node = parseExpression(precidence_map[tk_integer]);
-    break;
-  }
-  case tk_decimal: {
-    node = parseExpression(precidence_map[tk_decimal]);
-    break;
-  }
-  case tk_true: {
-    node = parseExpression(precidence_map[tk_true]);
-    break;
-  }
-  case tk_false: {
-    node = parseExpression(precidence_map[tk_false]);
-    break;
-  }
-  case tk_none: {
-    node = parseExpression(precidence_map[tk_none]);
-    break;
-  }case tk_negative: {
-    node = parseExpression(precidence_map[tk_negative]);
-    break;
-  }
-  case tk_bit_not: {
-    node = parseExpression(precidence_map[tk_bit_not]);
-    break;
-  }case tk_not: {
-    node = parseExpression(precidence_map[tk_not]);
-    break;
-  }
   default: {
-    // do something lol
+    node= parseExpression(precidence_map[current_token.tk_type]);
   }
   }
   return node;

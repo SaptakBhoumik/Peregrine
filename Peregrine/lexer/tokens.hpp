@@ -58,7 +58,7 @@ typedef enum {
   tk_scope,  // scope
   tk_union,  // union
   tk_enum,   // enum
-  tk_any,    // any
+  tk_unknown,    // unknown type
   tk_assert, // assert
   tk_try,    // try
   tk_except, // except
