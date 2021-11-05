@@ -12,5 +12,7 @@ Peregrine/test
 *.so
 *.o
 temp
-__pycache__
 /Peregrine/peregrine
+/objs
+*.elf
+doctest.h
