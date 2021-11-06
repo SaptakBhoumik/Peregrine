@@ -3,11 +3,12 @@
 #include "../parser/parser.hpp"
 
 class CodeGen {
-private:
-    std::string gen_operator(ast_node curr_node);
-    std::string gen(ast_node curr_node);
-    std::string gen_infix(ast_node curr_node);
-public:
+  private:
+    std::string gen_operator(AstNode curr_node);
+    std::string gen(AstNode curr_node);
+    std::string gen_infix(AstNode curr_node);
+
+  public:
     AST ast;
     std::string codegen();
 };
