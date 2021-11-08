@@ -55,6 +55,7 @@ class Parser {
     AstNodePtr ParseBinaryOperation(AstNodePtr left);
 
     AstNodePtr ParseStatement();
+    AstNodePtr ParseBlockStatement();
     AstNodePtr ParseIf();
     AstNodePtr ParseWhile();
     AstNodePtr ParseFunctionDef();

@@ -133,9 +133,77 @@ AstNodePtr Parser::ParseStatement() {
     return stmt;
 }
 
-AstNodePtr Parser::ParseIf() {}
+AstNodePtr Parser::ParseBlockStatement() {
+    advance(); // when this is called, we are on the tk_ident token
 
-AstNodePtr Parser::ParseWhile() {}
+    std::vector<AstNodePtr> statements;
+
+    while (m_current_token.tk_type != tk_dedent) {
+        if (m_current_token.tk_type == tk_eof) {
+            error(m_current_token, "expected end of identation, got eof instead");
+        }
+
+        statements.push_back(ParseStatement());
+        advance();
+    }
+
+    return std::make_shared<BlockStatement>(statements);
+}
+
+AstNodePtr Parser::ParseIf() {
+    advance(); // skip the if token
+
+    AstNodePtr condition = ParseExpression(pr_lowest);
+
+    expect(tk_colon);
+
+    //TODO: maybe support single-line ifs
+    expect(tk_ident);
+
+    AstNodePtr if_body = ParseBlockStatement();
+
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs;
+
+    while (next().tk_type == tk_elif) {
+        advance();
+        advance();
+
+        AstNodePtr condition = ParseExpression(pr_lowest);
+
+        expect(tk_colon);
+        expect(tk_ident);
+
+        AstNodePtr body = ParseBlockStatement();
+
+        elifs.push_back(std::pair(condition, body));
+    }
+
+    AstNodePtr else_body = std::make_shared<NoneLiteral>();
+
+    if (next().tk_type == tk_else) {
+        advance();
+
+        expect(tk_colon);
+        expect(tk_ident);
+
+        else_body = ParseBlockStatement();
+    }
+
+    return std::make_shared<IfStatement>(condition, if_body, else_body, elifs);
+}
+
+AstNodePtr Parser::ParseWhile() {
+    advance(); // skip the while token
+
+    AstNodePtr condition = ParseExpression(pr_lowest);
+
+    expect(tk_colon);
+    expect(tk_ident);
+
+    AstNodePtr body = ParseBlockStatement();
+
+    return std::make_shared<WhileStatement>(condition, body);
+}
 
 AstNodePtr Parser::ParseFunctionDef() {}
 
