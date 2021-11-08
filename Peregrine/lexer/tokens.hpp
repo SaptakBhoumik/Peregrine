@@ -1,5 +1,5 @@
-#ifndef PEREGRINE_TOKENS
-#define PEREGRINE_TOKENS
+#ifndef PEREGRINE_TOKENS_HPP
+#define PEREGRINE_TOKENS_HPP
 #include <string>
 
 // Create a string variable

@@ -2,6 +2,7 @@
 #define PEREGRINE_AST_HPP
 
 #include "lexer/tokens.hpp"
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -12,6 +13,7 @@ enum AstKind {
     KAstString,
     KAstBool,
     KAstNone,
+    KAstIdentifier,
     KAstList,
     KAstDict,
     KAstCpp,
@@ -28,15 +30,17 @@ enum AstKind {
 
 class AstNode {
   public:
-    virtual AstKind type() = 0;
-    virtual std::string stringify() = 0;
+    virtual AstKind type() { return KAstNone; };
+    virtual std::string stringify() { return ""; };
 };
 
+typedef std::shared_ptr<AstNode> AstNodePtr;
+
 class Program : public AstNode {
-    std::vector<AstNode> m_statements;
+    std::vector<AstNodePtr> m_statements;
 
   public:
-    Program(std::vector<AstNode> statements);
+    Program(std::vector<AstNodePtr> statements);
 
     AstKind type();
     std::string stringify();
@@ -100,31 +104,43 @@ class NoneLiteral : public AstNode {
     std::string stringify();
 };
 
-class ListLiteral : public AstNode {
-    AstNode m_type;
-    std::vector<AstNode> m_elements;
+class IdentifierExpression : public AstNode {
+    std::string m_value;
 
   public:
-    ListLiteral(AstNode type, std::vector<AstNode> elements);
+    IdentifierExpression(std::string_view value);
 
-    AstNode list_type();
-    std::vector<AstNode> elements();
+    std::string value();
+
+    AstKind type();
+    std::string stringify();
+};
+
+class ListLiteral : public AstNode {
+    AstNodePtr m_type;
+    std::vector<AstNodePtr> m_elements;
+
+  public:
+    ListLiteral(AstNodePtr type, std::vector<AstNodePtr> elements);
+
+    AstNodePtr list_type();
+    std::vector<AstNodePtr> elements();
 
     AstKind type();
     std::string stringify();
 };
 
 class BinaryOperation : public AstNode {
-    AstNode m_left;
+    AstNodePtr m_left;
     std::string m_operator;
-    AstNode m_right;
+    AstNodePtr m_right;
 
   public:
-    BinaryOperation(AstNode left, std::string_view op, AstNode right);
+    BinaryOperation(AstNodePtr left, std::string_view op, AstNodePtr right);
 
-    AstNode left();
+    AstNodePtr left();
     std::string op();
-    AstNode right();
+    AstNodePtr right();
 
     AstKind type();
     std::string stringify();
@@ -132,13 +148,13 @@ class BinaryOperation : public AstNode {
 
 class PrefixExpression : public AstNode {
     std::string m_prefix;
-    AstNode m_right;
+    AstNodePtr m_right;
 
   public:
-    PrefixExpression(std::string_view prefix, AstNode right);
+    PrefixExpression(std::string_view prefix, AstNodePtr right);
 
     std::string prefix();
-    AstNode right();
+    AstNodePtr right();
 
     AstKind type();
     std::string stringify();
@@ -146,134 +162,122 @@ class PrefixExpression : public AstNode {
 
 // variable declaration, assignment and reassignment
 class VariableStatement : public AstNode {
-    AstNode m_type;
-    AstNode m_name;
-    AstNode m_value;
+    AstNodePtr m_type;
+    AstNodePtr m_name;
+    AstNodePtr m_value;
 
   public:
-    /*
-        We need to handle all the possibilities, hence the NoneLiteral()
+    VariableStatement(AstNodePtr type, AstNodePtr name, AstNodePtr value);
 
-        "int a" has no value
-        "a = 32" has no type (it's inferred)
-    */
-    VariableStatement(AstNode type = NoneLiteral(), AstNode name,
-                      AstNode value = NoneLiteral());
-
-    AstNode var_type();
-    AstNode name();
-    AstNode value();
+    AstNodePtr var_type();
+    AstNodePtr name();
+    AstNodePtr value();
 
     AstKind type();
     std::string stringify();
 };
 
 class ConstDeclaration : public AstNode {
-    AstNode m_type;
-    AstNode m_name;
-    AstNode m_value;
+    AstNodePtr m_type;
+    AstNodePtr m_name;
+    AstNodePtr m_value;
 
   public:
-    ConstDeclaration(AstNode type = NoneLiteral(), AstNode name, AstNode value);
+    ConstDeclaration(AstNodePtr type, AstNodePtr name, AstNodePtr value);
 
-    AstNode const_type();
-    AstNode name();
-    AstNode value();
+    AstNodePtr const_type();
+    AstNodePtr name();
+    AstNodePtr value();
 
     AstKind type();
     std::string stringify();
 };
 
 class BlockStatement : public AstNode {
-    std::vector<AstNode> m_statements;
+    std::vector<AstNodePtr> m_statements;
 
   public:
-    BlockStatement(std::vector<AstNode> statements);
+    BlockStatement(std::vector<AstNodePtr> statements);
 
-    std::vector<AstNode> statements();
+    std::vector<AstNodePtr> statements();
 
     AstKind type();
     std::string stringify();
 };
 
 struct parameter {
-    AstNode p_type;
-    AstNode p_name;
+    AstNodePtr p_type;
+    AstNodePtr p_name;
 };
 
 class FunctionDefinition : public AstNode {
-    AstNode m_return_type;
-    AstNode m_name;
+    AstNodePtr m_return_type;
+    AstNodePtr m_name;
 
     std::vector<parameter> m_parameters;
 
-    AstNode m_body;
+    AstNodePtr m_body;
 
   public:
     // TODO: return void by default?
-    FunctionDefinition(
-        AstNode return_type, AstNode name,
-        std::vector<parameter> parameters = std::vector<parameter>(),
-        AstNode body);
+    FunctionDefinition(AstNodePtr return_type, AstNodePtr name,
+                       std::vector<parameter> parameters, AstNodePtr body);
 
-    AstNode return_type();
-    AstNode name();
+    AstNodePtr return_type();
+    AstNodePtr name();
     std::vector<parameter> parameters();
-    AstNode body();
+    AstNodePtr body();
 
     AstKind type();
     std::string stringify();
 };
 
 class FunctionCall : public AstNode {
-    AstNode m_name;
-    std::vector<AstNode> m_arguments;
+    AstNodePtr m_name;
+    std::vector<AstNodePtr> m_arguments;
 
   public:
-    FunctionCall(AstNode name,
-                 std::vector<AstNode> arguments = std::vector<AstNode>());
+    FunctionCall(AstNodePtr name, std::vector<AstNodePtr> arguments);
 
-    AstNode name();
-    std::vector<AstNode> arguments();
+    AstNodePtr name();
+    std::vector<AstNodePtr> arguments();
 
     AstKind type();
     std::string stringify();
 };
 
 class IfStatement : public AstNode {
-    AstNode m_condition;
-    AstNode m_if_body;
+    AstNodePtr m_condition;
+    AstNodePtr m_if_body;
 
     // first item in the pair is the condition, and the second is the block to
     // be executed
-    std::vector<std::pair<AstNode, AstNode>> m_elifs;
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> m_elifs;
 
-    AstNode m_else_body;
+    AstNodePtr m_else_body;
 
   public:
-    IfStatement(AstNode condition, AstNode if_body,
-                AstNode else_body = NoneLiteral(),
-                std::vector<std::pair<AstNode, AstNode>> elifs =
-                    std::vector<std::pair<AstNode, AstNode>>());
+    IfStatement(AstNodePtr condition, AstNodePtr if_body, AstNodePtr else_body,
+                std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs);
 
-    AstNode condition();
-    AstNode if_body();
-    std::vector<std::pair<AstNode, AstNode>> elifs();
-    AstNode else_body();
+    AstNodePtr condition();
+    AstNodePtr if_body();
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs();
+    AstNodePtr else_body();
 
     AstKind type();
     std::string stringify();
 };
 
 class WhileStatement : public AstNode {
-    AstNode m_condition;
-    AstNode m_body;
+    AstNodePtr m_condition;
+    AstNodePtr m_body;
 
   public:
-    WhileStatement(AstNode condition, AstNode body);
+    WhileStatement(AstNodePtr condition, AstNodePtr body);
 
-    AstNode condition();
-    AstNode body();
+    AstNodePtr condition();
+    AstNodePtr body();
 
     AstKind type();
     std::string stringify();

@@ -1,5 +1,5 @@
-#ifndef PEREGRINE_LEXER
-#define PEREGRINE_LEXER
+#ifndef PEREGRINE_LEXER_HPP
+#define PEREGRINE_LEXER_HPP
 #define LEXEME std::vector<Token>
 #include "tokens.hpp"
 #include <string>

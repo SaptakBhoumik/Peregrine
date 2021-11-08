@@ -1,20 +1,23 @@
-#ifndef PEREGRINE_ERROR
-#define PEREGRINE_ERROR
+#ifndef PEREGRINE_ERROR_HPP
+#define PEREGRINE_ERROR_HPP
+
 #include <string>
-typedef struct {
-    unsigned long int line;
-    unsigned long int col;
+
+struct Location {
+    size_t line;
+    size_t col;
     std::string file;
     std::string code;
-} Location;
+};
 
-typedef struct {
+struct PEError {
     Location loc;
     std::string msg;
     std::string submsg;
     std::string hint;
     std::string ecode;
-} PEError;
+};
 
 void display(PEError e);
-#endif // PEREGRINE_ERROR
+
+#endif

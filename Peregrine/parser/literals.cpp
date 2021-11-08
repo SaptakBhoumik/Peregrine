@@ -1,34 +1,29 @@
 #include "ast/ast.hpp"
 #include "parser.hpp"
 
-AstNode Parser::ParseInteger() {
-    return IntegerLiteral(m_current_token.keyword);
+#include <memory>
+
+AstNodePtr Parser::ParseInteger() {
+    return std::make_shared<IntegerLiteral>(m_current_token.keyword);
 }
 
-AstNode Parser::ParseDecimal() {
-    return DecimalLiteral(m_current_token.keyword);
+AstNodePtr Parser::ParseDecimal() {
+    return std::make_shared<DecimalLiteral>(m_current_token.keyword);
 }
 
-AstNode Parser::ParseString(bool is_formatted) {
-    return StringLiteral(m_current_token.keyword, is_formatted);
+AstNodePtr Parser::ParseString(bool is_formatted) {
+    return std::make_shared<StringLiteral>(m_current_token.keyword,
+                                           is_formatted);
 }
 
-AstNode Parser::ParseBool() {
-    return BoolLiteral(m_current_token.keyword);
+AstNodePtr Parser::ParseBool() {
+    return std::make_shared<BoolLiteral>(m_current_token.keyword);
 }
 
-AstNode Parser::ParseList() {
-    
-}
+AstNodePtr Parser::ParseList() {}
 
-AstNode Parser::ParseDict() {
-    
-}
+AstNodePtr Parser::ParseDict() {}
 
-AstNode Parser::ParseCpp() {
+AstNodePtr Parser::ParseCpp() {}
 
-}
-
-AstNode Parser::ParseNone() {
-    return NoneLiteral();
-}
+AstNodePtr Parser::ParseNone() { return std::make_shared<NoneLiteral>(); }

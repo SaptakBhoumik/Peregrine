@@ -1,7 +1,8 @@
-#ifndef PEREGRINE_PARSER
-#define PEREGRINE_PARSER
+#ifndef PEREGRINE_PARSER_HPP
+#define PEREGRINE_PARSER_HPP
 
 #include "ast/ast.hpp"
+#include "errors/error.hpp"
 #include "lexer/lexer.hpp"
 #include "lexer/tokens.hpp"
 #include <map>
@@ -12,12 +13,12 @@ enum Precedence_type {
     pr_and_or,         // and,or
     pr_not,            // not
     pr_assign_compare, // =, ==, !=, <, >, <=, >=
-    pr_sum_minus,      //+, -
-    pr_mul_div,        //*, /, %, //
+    pr_sum_minus,      // +, -
+    pr_mul_div,        // *, /, %, //
     pr_prefix          // -x
 };
 
-precedence create_map();
+std::map<TokenType, Precedence_type> create_map();
 
 class Parser {
   private:
@@ -27,6 +28,8 @@ class Parser {
     std::vector<Token> m_tokens;
     std::string m_filename;
 
+    std::vector<PEError> m_errors;
+
     std::map<TokenType, Precedence_type> precedence_map = create_map();
 
     void advance();
@@ -34,28 +37,33 @@ class Parser {
     Token next();
     Precedence_type next_precedence();
 
-    AstNode ParseInteger();
-    AstNode ParseDecimal();
-    AstNode ParseString(bool is_formatted, bool is_raw);
-    AstNode ParseBool();
-    AstNode ParseNone();
-    AstNode ParseList();
-    AstNode ParseDict();
-    AstNode ParseCpp();
+    void error(Token tok, std::string_view msg);
 
-    AstNode ParseExpression(Precedence_type type);
-    AstNode ParsePrefixExpression();
-    AstNode ParseIdentifierExpr();
-    AstNode ParseGroupExpr();
-    AstNode ParseBinaryOperation(AstNode left);
+    AstNodePtr ParseInteger();
+    AstNodePtr ParseDecimal();
+    AstNodePtr ParseString(bool is_formatted);
+    AstNodePtr ParseBool();
+    AstNodePtr ParseNone();
+    AstNodePtr ParseIdentifier();
+    AstNodePtr ParseList();
+    AstNodePtr ParseDict();
+    AstNodePtr ParseCpp();
 
-    AstNode ParseStatement();
+    AstNodePtr ParseExpression(Precedence_type type);
+    AstNodePtr ParsePrefixExpression();
+    AstNodePtr ParseGroupedExpr();
+    AstNodePtr ParseBinaryOperation(AstNodePtr left);
+
+    AstNodePtr ParseStatement();
+    AstNodePtr ParseIf();
+    AstNodePtr ParseWhile();
+    AstNodePtr ParseFunctionDef();
 
   public:
     Parser(const std::vector<Token>& tokens);
     ~Parser();
 
-    AstNode parse();
+    AstNodePtr parse();
 };
 
 #endif

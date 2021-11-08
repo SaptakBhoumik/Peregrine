@@ -1,5 +1,5 @@
 #include "lexer.hpp"
-#include "../errors/error.hpp"
+#include "errors/error.hpp"
 #include "tokens.hpp"
 #include <algorithm>
 #include <cstdint>

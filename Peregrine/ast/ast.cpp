@@ -1,10 +1,13 @@
 #include "ast.hpp"
 #include "lexer/tokens.hpp"
 
+#include <iostream>
 #include <string>
 #include <vector>
 
-Program::Program(std::vector<AstNode> statements) { m_statements = statements; }
+Program::Program(std::vector<AstNodePtr> statements) {
+    m_statements = statements;
+}
 
 AstKind Program::type() { return KAstProgram; }
 
@@ -12,7 +15,7 @@ std::string Program::stringify() {
     std::string res = "";
 
     for (auto& stmt : m_statements) {
-        res += stmt.stringify();
+        res += stmt->stringify();
         res += "\n";
     }
 
@@ -35,8 +38,8 @@ AstKind DecimalLiteral::type() { return KAstDecimal; }
 
 std::string DecimalLiteral::stringify() { return m_value; }
 
-StringLiteral::StringLiteral(std::string_view value, bool formatted) { 
-    m_value = value; 
+StringLiteral::StringLiteral(std::string_view value, bool formatted) {
+    m_value = value;
     m_formatted = formatted;
 }
 
@@ -62,14 +65,24 @@ AstKind NoneLiteral::type() { return KAstNone; }
 
 std::string NoneLiteral::stringify() { return "None"; }
 
-ListLiteral::ListLiteral(AstNode type, std::vector<AstNode> elements) {
+IdentifierExpression::IdentifierExpression(std::string_view value) {
+    m_value = value;
+}
+
+std::string IdentifierExpression::value() { return m_value; }
+
+AstKind IdentifierExpression::type() { return KAstIdentifier; }
+
+std::string IdentifierExpression::stringify() { return m_value; }
+
+ListLiteral::ListLiteral(AstNodePtr type, std::vector<AstNodePtr> elements) {
     m_type = type;
     m_elements = elements;
 }
 
-AstNode ListLiteral::list_type() { return m_type; }
+AstNodePtr ListLiteral::list_type() { return m_type; }
 
-std::vector<AstNode> ListLiteral::elements() { return m_elements; }
+std::vector<AstNodePtr> ListLiteral::elements() { return m_elements; }
 
 AstKind ListLiteral::type() { return KAstList; }
 
@@ -77,24 +90,24 @@ std::string ListLiteral::stringify() {
     std::string res = "";
 
     for (auto& elem : m_elements) {
-        res += elem.stringify();
+        res += elem->stringify();
     }
 
     return res;
 }
 
-BinaryOperation::BinaryOperation(AstNode left, std::string_view operator,
-                                 AstNode right) {
+BinaryOperation::BinaryOperation(AstNodePtr left, std::string_view op,
+                                 AstNodePtr right) {
     m_left = left;
     m_operator = op;
     m_right = right;
 }
 
-AstNode BinaryOperation::left() { return m_left; }
+AstNodePtr BinaryOperation::left() { return m_left; }
 
 std::string BinaryOperation::op() { return m_operator; }
 
-AstNode BinaryOperation::right() { return m_right; }
+AstNodePtr BinaryOperation::right() { return m_right; }
 
 AstKind BinaryOperation::type() { return KAstBinaryOp; }
 
@@ -102,103 +115,104 @@ AstKind BinaryOperation::type() { return KAstBinaryOp; }
 std::string BinaryOperation::stringify() {
     std::string res = "(";
 
-    res += m_left.stringify() res += " ";
+    res += m_left->stringify();
+    res += " ";
     res += m_operator;
     res += " ";
-    res += m_right.stringify();
+    res += m_right->stringify();
     res += ")";
 
     return res;
 }
 
-PrefixExpression::PrefixExpression(std::string_view prefix, AstNode right) {
+PrefixExpression::PrefixExpression(std::string_view prefix, AstNodePtr right) {
     m_prefix = prefix;
     m_right = right;
 }
 
 std::string PrefixExpression::prefix() { return m_prefix; }
 
-AstNode PrefixExpression::right() { return m_right; }
+AstNodePtr PrefixExpression::right() { return m_right; }
 
 AstKind PrefixExpression::type() { return KAstPrefixExpr; }
 
 std::string PrefixExpression::stringify() {
     std::string res = m_prefix;
 
-    res += m_right.stringify();
+    res += m_right->stringify();
 
     return res;
 }
 
-VariableStatement::VariableStatement(AstNode type = NoneLiteral(), AstNode name,
-                                     AstNode value = NoneLiteral()) {
+VariableStatement::VariableStatement(AstNodePtr type, AstNodePtr name,
+                                     AstNodePtr value) {
     m_type = type;
     m_name = name;
     m_value = value;
 }
 
-AstNode VariableStatement::var_type() { return m_type; }
+AstNodePtr VariableStatement::var_type() { return m_type; }
 
-AstNode VariableStatement::name() { return m_name; }
+AstNodePtr VariableStatement::name() { return m_name; }
 
-AstNode VariableStatement::value() { return m_value; }
+AstNodePtr VariableStatement::value() { return m_value; }
 
 AstKind VariableStatement::type() { return KAstVariableStmt; }
 
 std::string VariableStatement::stringify() {
     std::string res = "";
 
-    if (m_type.type() != KAstNone) {
-        res += m_type.stringify();
+    if (m_type->type() != KAstNone) {
+        res += m_type->stringify();
         res += " ";
     }
 
-    res += m_name.stringify();
+    res += m_name->stringify();
 
-    if (m_value.type() != KAstNone) {
+    if (m_value->type() != KAstNone) {
         res += " = ";
-        res += m_value.stringify();
+        res += m_value->stringify();
     }
 
     return res;
 }
 
-ConstDeclaration::ConstDeclaration(AstNode type = NoneLiteral(), AstNode name,
-                                   AstNode value) {
+ConstDeclaration::ConstDeclaration(AstNodePtr type, AstNodePtr name,
+                                   AstNodePtr value) {
     m_type = type;
     m_name = name;
     m_value = value;
 }
 
-AstNode ConstDeclaration::const_type() { return m_type; }
+AstNodePtr ConstDeclaration::const_type() { return m_type; }
 
-AstNode ConstDeclaration::name() { return m_name; }
+AstNodePtr ConstDeclaration::name() { return m_name; }
 
-AstNode ConstDeclaration::value() { return m_value; }
+AstNodePtr ConstDeclaration::value() { return m_value; }
 
 AstKind ConstDeclaration::type() { return KAstConstDecl; }
 
 std::string ConstDeclaration::stringify() {
     std::string res = "const ";
 
-    if (m_type.type() != KAstNone) {
-        res += m_type.stringify();
+    if (m_type->type() != KAstNone) {
+        res += m_type->stringify();
         res += " ";
     }
 
-    res += m_name.stringify();
+    res += m_name->stringify();
 
     res += " = ";
-    res += m_value.stringify();
+    res += m_value->stringify();
 
     return res;
 }
 
-BlockStatement::BlockStatement(std::vector<AstNode> statements) {
+BlockStatement::BlockStatement(std::vector<AstNodePtr> statements) {
     m_statements = statements;
 }
 
-std::vector<AstNode> BlockStatement::statements() { return m_statements; }
+std::vector<AstNodePtr> BlockStatement::statements() { return m_statements; }
 
 AstKind BlockStatement::type() { return KAstBlockStmt; }
 
@@ -206,37 +220,36 @@ std::string BlockStatement::stringify() {
     std::string res = "";
 
     for (auto& stmt : m_statements) {
-        res += stmt.stringify();
+        res += stmt->stringify();
         res += "\n";
     }
 
     return res;
 }
 
-FunctionDefinition::FunctionDefinition(
-    AstNode return_type, AstNode name,
-    std::vector<parameter> parameters = std::vector<parameter>(),
-    AstNode body) {
+FunctionDefinition::FunctionDefinition(AstNodePtr return_type, AstNodePtr name,
+                                       std::vector<parameter> parameters,
+                                       AstNodePtr body) {
     m_return_type = return_type;
     m_name = name;
     m_parameters = parameters;
     m_body = body;
 }
 
-AstNode FunctionDefinition::return_type() { return m_return_type; }
+AstNodePtr FunctionDefinition::return_type() { return m_return_type; }
 
-AstNode FunctionDefinition::name() { return m_name; }
+AstNodePtr FunctionDefinition::name() { return m_name; }
 
 std::vector<parameter> FunctionDefinition::parameters() { return m_parameters; }
 
-AstNode FunctionDefinition::body() { return m_body; }
+AstNodePtr FunctionDefinition::body() { return m_body; }
 
 AstKind FunctionDefinition::type() { return KAstFunctionDef; }
 
 std::string FunctionDefinition::stringify() {
     std::string res = "def ";
 
-    res += m_name;
+    res += m_name->stringify();
     res += "(";
 
     if (!m_parameters.empty()) {
@@ -247,44 +260,43 @@ std::string FunctionDefinition::stringify() {
                 res += ", ";
             }
 
-            res += param.p_type.stringify();
+            res += param.p_type->stringify();
             res += " ";
-            res += param.p_name.stringify();
+            res += param.p_name->stringify();
         }
     }
 
     res += ") -> ";
-    res += m_return_type.stringify();
+    res += m_return_type->stringify();
     res += ":\n";
 
-    res += m_body.stringify();
+    res += m_body->stringify();
 
     return res;
 }
 
-FunctionCall::FunctionCall(
-    AstNode name, std::vector<AstNode> arguments = std::vector<AstNode>()) {
+FunctionCall::FunctionCall(AstNodePtr name, std::vector<AstNodePtr> arguments) {
     m_name = name;
     m_arguments = arguments;
 }
 
-AstNode FunctionCall::name() { return m_name; }
+AstNodePtr FunctionCall::name() { return m_name; }
 
-std::vector<AstNode> FunctionCall::arguments() { return m_arguments; }
+std::vector<AstNodePtr> FunctionCall::arguments() { return m_arguments; }
 
 AstKind FunctionCall::type() { return KAstFunctionCall; }
 
 std::string FunctionCall::stringify() {
     std::string res = "";
 
-    res += m_name.stringify();
+    res += m_name->stringify();
     res += "(";
 
     for (size_t i = 0; i < m_arguments.size(); i++) {
         if (i)
             res += ", ";
 
-        res += m_arguments[i].stringify();
+        res += m_arguments[i]->stringify();
     }
 
     res += ")";
@@ -292,73 +304,72 @@ std::string FunctionCall::stringify() {
     return res;
 }
 
-IfStatement::IfStatement(AstNode condition, AstNode if_body,
-                         AstNode else_body = NoneLiteral(),
-                         std::vector<std::pair<AstNode, AstNode>> elifs =
-                             std::vector<std::pair<AstNode, AstNode>>()) {
+IfStatement::IfStatement(AstNodePtr condition, AstNodePtr if_body,
+                         AstNodePtr else_body,
+                         std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs) {
     m_condition = condition;
     m_if_body = if_body;
     m_else_body = else_body;
     m_elifs = elifs;
 }
 
-AstNode IfStatement::condition() { return m_condition; }
+AstNodePtr IfStatement::condition() { return m_condition; }
 
-AstNode IfStatement::if_body() { return m_if_body; }
+AstNodePtr IfStatement::if_body() { return m_if_body; }
 
-std::vector<std::pair<AstNode, AstNode>> IfStatement::elifs() {
+std::vector<std::pair<AstNodePtr, AstNodePtr>> IfStatement::elifs() {
     return m_elifs;
 }
 
-AstNode IfStatement::else_body() { return m_else_body; }
+AstNodePtr IfStatement::else_body() { return m_else_body; }
 
 AstKind IfStatement::type() { return KAstIfStmt; }
 
 std::string IfStatement::stringify() {
     std::string res = "if ";
 
-    res += m_condition.stringify();
+    res += m_condition->stringify();
     res += ":\n";
 
-    res += m_if_body.stringify();
+    res += m_if_body->stringify();
     res += "\n";
 
     for (auto& elif : m_elifs) {
         res += "elif ";
-        res += elif.first.stringify();
+        res += elif.first->stringify();
         res += ":\n";
 
-        res += elif.second.stringify();
+        res += elif.second->stringify();
         res += "\n";
     }
 
-    if (m_else_body.type() != KAstNone) {
+    if (m_else_body->type() != KAstNone) {
         res += "else:\n";
-        res += m_else_body.stringify();
+        res += m_else_body->stringify();
         res += "\n";
     }
 
     return res;
 }
 
-WhileStatement::WhileStatement(AstNode condition, AstNode body) {
+WhileStatement::WhileStatement(AstNodePtr condition, AstNodePtr body) {
     m_condition = condition;
     m_body = body;
 }
 
-AstNode WhileStatement::condition() { return m_condition; }
+AstNodePtr WhileStatement::condition() { return m_condition; }
 
-AstNode WhileStatement::body() { return m_body; }
+AstNodePtr WhileStatement::body() { return m_body; }
 
 AstKind WhileStatement::type() { return KAstWhileStmt; }
 
 std::string WhileStatement::stringify() {
-    std::string = "while ";
+    std::string res = "while ";
 
-    res += m_condition.stringify();
+    res += m_condition->stringify();
     res += ":\n";
 
-    res += m_body.stringify();
+    res += m_body->stringify();
     res += "\n";
 
     return res;

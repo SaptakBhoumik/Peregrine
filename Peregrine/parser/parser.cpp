@@ -4,10 +4,11 @@
 
 #include <iostream>
 #include <map>
+#include <memory>
 #include <vector>
 
 std::map<TokenType, Precedence_type> create_map() {
-    precedence precedence_map;
+    std::map<TokenType, Precedence_type> precedence_map;
 
     precedence_map[tk_negative] = pr_prefix;
     precedence_map[tk_bit_not] = pr_prefix;
@@ -36,18 +37,18 @@ Parser::Parser(const std::vector<Token>& tokens) : m_tokens(tokens) {
 Parser::~Parser() {}
 
 void Parser::advance() {
-    tk_index++;
+    m_tk_index++;
 
-    if (tk_index < tokens.size()) {
-        current_token = tokens[tk_index];
+    if (m_tk_index < m_tokens.size()) {
+        m_current_token = m_tokens[m_tk_index];
     }
 }
 
 Token Parser::next() {
     Token token;
 
-    if (tk_index + 1 < tokens.size()) {
-        token = tokens[tk_index + 1];
+    if (m_tk_index + 1 < m_tokens.size()) {
+        token = m_tokens[m_tk_index + 1];
     }
 
     return token;
@@ -61,32 +62,85 @@ Precedence_type Parser::next_precedence() {
     return pr_lowest;
 }
 
+void Parser::error(Token tok, std::string_view msg) {
+    PEError err = {{tok.line, tok.start, m_filename, tok.statement},
+                   std::string(msg),
+                   "",
+                   "",
+                   ""};
+
+    m_errors.push_back(err);
+}
+
 bool Parser::expect(TokenType expected_type) {
     if (next().tk_type != expected_type) {
-        // panic
+        error(next(), "expected token of type " +
+                          std::to_string(expected_type) + ", got " +
+                          std::to_string(next().tk_type) + " instead");
     }
 
     advance();
 }
 
-AstNode Parser::parse() {
-    std::vector<AstNode> statements;
+AstNodePtr Parser::parse() {
+    std::vector<AstNodePtr> statements;
 
-    while (current_token.tk_type != tk_eof) {
-        statements.push_back(parse_statement());
-        advance(); 
+    while (m_current_token.tk_type != tk_eof) {
+        statements.push_back(ParseStatement());
+        advance();
     }
 
-    return Program(statements);
+    if (!m_errors.empty()) {
+        for (auto& err : m_errors) {
+            display(err);
+        }
+
+        exit(1);
+    }
+
+    return std::make_shared<Program>(statements);
 }
 
-AstNode Parser::ParseStatement() {
+AstNodePtr Parser::ParseStatement() {
+    AstNodePtr stmt;
 
+    switch (m_current_token.tk_type) {
+        case tk_if: {
+            stmt = ParseIf();
+            break;
+        }
+
+        case tk_while: {
+            stmt = ParseWhile();
+            break;
+        }
+
+        case tk_def: {
+            stmt = ParseFunctionDef();
+            break;
+        }
+
+        default: {
+            /*
+                if it didn't match the statements above, then it must be
+                either an expression or invalid
+            */
+            stmt = ParseExpression(pr_lowest);
+            break;
+        }
+    }
+
+    return stmt;
 }
 
+AstNodePtr Parser::ParseIf() {}
 
-AstNode Parser::ParseExpression(Precedence_type curr_precedence) {
-    AstNode left;
+AstNodePtr Parser::ParseWhile() {}
+
+AstNodePtr Parser::ParseFunctionDef() {}
+
+AstNodePtr Parser::ParseExpression(Precedence_type curr_precedence) {
+    AstNodePtr left;
 
     switch (m_current_token.tk_type) {
         case tk_integer: {
@@ -105,11 +159,12 @@ AstNode Parser::ParseExpression(Precedence_type curr_precedence) {
         }
 
         case tk_string: {
-            left = ParseString(false, false);
+            left = ParseString(false);
             break;
         }
 
-        case tk_true: case tk_false: {
+        case tk_true:
+        case tk_false: {
             left = ParseBool();
             break;
         }
@@ -124,58 +179,60 @@ AstNode Parser::ParseExpression(Precedence_type curr_precedence) {
             break;
         }
 
-        case tk_negative: case tk_not: case tk_bit_not: {
+        case tk_negative:
+        case tk_not:
+        case tk_bit_not: {
             left = ParsePrefixExpression();
             break;
         }
 
         default: {
-            // panic
+            error(m_current_token,
+                  m_current_token.keyword + " is not an expression");
             break;
         }
     }
 
     while (next_precedence() > curr_precedence) {
         advance();
-        left = parseBinaryOperation(left);
+        left = ParseBinaryOperation(left);
     }
-    
+
     return left;
 }
 
-AstNode Parser::ParseBinaryOperation(AstNode left) {
+AstNodePtr Parser::ParseBinaryOperation(AstNodePtr left) {
     std::string op = m_current_token.keyword;
     Precedence_type precedence = precedence_map[m_current_token.tk_type];
 
     advance();
 
-    AstNode right = ParseExpression(precedence);
+    AstNodePtr right = ParseExpression(precedence);
 
-    return BinaryOperation(left, op, right);
+    return std::make_shared<BinaryOperation>(left, op, right);
 }
 
-AstNode Parser::ParsePrefixExpression() {
-    AstNode res;
-    auto infix = current_token;
-    res.token = infix;
-    res.kind = AST_INFIX;
+AstNodePtr Parser::ParsePrefixExpression() {
+    std::string prefix = m_current_token.keyword;
+    Precedence_type precedence = precedence_map[m_current_token.tk_type];
+
     advance();
-    static AstNode right;
-    right = parseExpression(precidence_map[tk_type]);
-    res.children.infix.child = &right;
-    return res;
+
+    AstNodePtr right = ParseExpression(precedence);
+
+    return std::make_shared<PrefixExpression>(prefix, right);
 }
 
-AstNode Parser::ParseGroupExpr() {
+AstNodePtr Parser::ParseGroupedExpr() {
     advance();
-    auto node = parseExpression(pr_lowest);
-    return node;
+
+    AstNodePtr expr = ParseExpression(pr_lowest);
+
+    expect(tk_r_paren);
+
+    return expr;
 }
 
-AstNode Parser::ParseIdentifierExpr() {
-    AstNode res;
-    res.kind = AST_VAR;
-    res.token = current_token;
-    // TODO :- Check if a variable or something like that
-    return res;
+AstNodePtr Parser::ParseIdentifier() {
+    return std::make_shared<IdentifierExpression>(m_current_token.keyword);
 }

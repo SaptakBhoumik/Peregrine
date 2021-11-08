@@ -1,5 +1,5 @@
 CC := g++
-CFLAGS := -Wall 
+CFLAGS := -Wall -I ./Peregrine
 
 OUTPUT := peregrine.elf
 
@@ -15,7 +15,7 @@ $(OUTPUT): $(OBJS)
 	$(CC) -o $(OUTPUT) $(OBJS)
 
 objs/%.o: Peregrine/%.cpp | dirs
-	$(CC) -c $< -o $@ 
+	$(CC) $(CFLAGS) -c $< -o $@ 
 
 dirs:
 	mkdir -p $(shell dirname $(OBJS))
