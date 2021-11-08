@@ -1,5 +1,6 @@
 #ifndef PEREGRINE_TOKENS_HPP
 #define PEREGRINE_TOKENS_HPP
+
 #include <string>
 
 // Create a string variable
@@ -54,19 +55,19 @@ enum TokenType {
     tk_identifier, // foo, bar
 
     // keywords tokens
-    tk_static, // static
-    tk_scope,  // scope
-    tk_union,  // union
-    tk_enum,   // enum
-    tk_any,    // any
-    tk_assert, // assert
-    tk_try,    // try
-    tk_except, // except
-    tk_raise,  // raise
-    tk_true,   // True
-    tk_false,  // False
-    tk_with,   // with
-    tk_as,     // as
+    tk_static,  // static
+    tk_scope,   // scope
+    tk_union,   // union
+    tk_enum,    // enum
+    tk_unknown, // unknown type
+    tk_assert,  // assert
+    tk_try,     // try
+    tk_except,  // except
+    tk_raise,   // raise
+    tk_true,    // True
+    tk_false,   // False
+    tk_with,    // with
+    tk_as,      // as
     // This is not necessary because peregrine has special library for
     // multithreading
     // tk_async,     // async
@@ -126,4 +127,5 @@ struct Token {
     size_t line;
     TokenType tk_type;
 };
+
 #endif
