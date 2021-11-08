@@ -41,7 +41,7 @@ std::vector<std::string> split_ln(std::string code) {
     uint64_t index = 0;
     while (index < code.length()) {
         character = code.at(index);
-        if (character == "\n") {
+        if (character == "\n"||character == "\r\n"||character == "\r") {
             split_code.push_back(temp);
             temp = "";
         } else {
@@ -233,6 +233,7 @@ LEXEME lexer(std::string src, std::string filename) {
     uint64_t last_line = 0;
     uint64_t curr_identation_level = 0;
     uint64_t cpp_bracket_count = 0;
+    uint64_t first_bracket_count = 0;
     bool is_list_dictionary_cpp_string = false;
     bool is_array = false;
     bool is_dictionary = false;
@@ -245,18 +246,24 @@ LEXEME lexer(std::string src, std::string filename) {
                      // is that it will reduce the time it takes to run
     while (current_index < src.size()) {
         item = src.at(current_index);
-        if (item == "\n" || item == "\r\n") {
+        if (item == "\n"||item == "\r\n"||item == "\r") {
             last_line = current_index;
             line++;
             if (seperate_lines.size() > line - 1) {
                 statement = seperate_lines.at(line - 1);
             }
         }
+        if (item=="(" && !is_comment && !is_string && !is_list_dictionary_cpp_string) {
+            first_bracket_count++;
+        }
+        else if (item==")" && !is_comment && !is_string && !is_list_dictionary_cpp_string) {
+            first_bracket_count--;
+        }
         if (is_comment == false && is_array == false &&
             is_dictionary == false && is_cpp == false && is_string == false) {
             if (item == " " && is_tab == true) {
                 curr_identation_level += 1;
-            } else if (item != " " && is_tab == true && item != "\n") {
+            } else if (item != " " && is_tab == true && !(item == "\n"||item == "\r\n"||item == "\r")) {
                 is_tab = false;
                 if (item == "#") {
                     curr_identation_level -= 4;
@@ -289,7 +296,7 @@ LEXEME lexer(std::string src, std::string filename) {
                         previous_identation = 0;
                     }
                 }
-            } else if (item == "\n" || item == "\r\n") {
+            } else if (item == "\n"||item == "\r\n"||item == "\r") {
                 is_tab = true;
                 curr_identation_level = 0;
             }
@@ -324,7 +331,7 @@ LEXEME lexer(std::string src, std::string filename) {
                    is_comment == false) {
             is_comment = true;
         } else if (is_comment == true) {
-            if (item == "\n" || item == "\r\n") {
+            if (item == "\n"||item == "\r\n"||item == "\r") {
                 is_comment = false;
             }
         } else if (is_string == true && string_starter != item) {
@@ -397,12 +404,28 @@ LEXEME lexer(std::string src, std::string filename) {
             }
         } else if ((item == " " && is_dictionary == false &&
                     is_array == false && is_string == false) ||
-                   item == "\n" || item == "\r\n") {
+                   item == "\n"||item == "\r\n"||item == "\r") {
             if (keyword != "") {
                 token = token_init(
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, line);
+                    tokens.emplace_back(token);
+                    token = Token();
+                    keyword = "";
+            }
+        if ((item == "\n"||item == "\r\n"||item == "\r")&& tokens.size()>0 && first_bracket_count==0){ //we want the no of bracket count to be zero
+                                                                                    //because peregrine allows you to write code as follows
+                                                                                    // print(arg1,
+                                                                                    //       arg2)
+                                                                                    //to reduce the confusion while parsing 
+            if (tokens.back().tk_type!=new_line//we dont want to add 2 newline one after the other
+               && tokens.back().tk_type!=tk_colon//again to reduce confusion
+               ){
+                   token=token_init(statement,"<new_line>",new_line,current_index,current_index,line);
+                   tokens.emplace_back(token);
+                   token = Token();
+               }
             }
         } else if (item == "[" && is_dictionary == false &&
                    is_string == false && is_array == false) {

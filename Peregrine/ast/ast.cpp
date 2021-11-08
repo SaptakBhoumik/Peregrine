@@ -38,14 +38,17 @@ AstKind DecimalLiteral::type() { return KAstDecimal; }
 
 std::string DecimalLiteral::stringify() { return m_value; }
 
-StringLiteral::StringLiteral(std::string_view value, bool formatted) {
+StringLiteral::StringLiteral(std::string_view value, bool formatted,bool raw) {
     m_value = value;
     m_formatted = formatted;
+    m_raw = raw;
 }
 
 std::string StringLiteral::value() { return m_value; }
 
 bool StringLiteral::formatted() { return m_formatted; }
+
+bool StringLiteral::raw() { return m_raw; }
 
 AstKind StringLiteral::type() { return KAstString; }
 

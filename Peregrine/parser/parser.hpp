@@ -41,7 +41,7 @@ class Parser {
 
     AstNodePtr ParseInteger();
     AstNodePtr ParseDecimal();
-    AstNodePtr ParseString(bool is_formatted);
+    AstNodePtr ParseString(bool is_formatted,bool is_raw);
     AstNodePtr ParseBool();
     AstNodePtr ParseNone();
     AstNodePtr ParseIdentifier();
@@ -54,7 +54,7 @@ class Parser {
     AstNodePtr ParseGroupedExpr();
     AstNodePtr ParseBinaryOperation(AstNodePtr left);
 
-    AstNodePtr ParseStatement();
+    AstNodePtr ParseStatement(std::vector<TokenType> stop_at={});
     AstNodePtr ParseIf();
     AstNodePtr ParseWhile();
     AstNodePtr ParseFunctionDef();

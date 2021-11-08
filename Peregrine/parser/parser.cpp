@@ -2,6 +2,7 @@
 #include "lexer/lexer.hpp"
 #include "lexer/tokens.hpp"
 
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -101,7 +102,7 @@ AstNodePtr Parser::parse() {
     return std::make_shared<Program>(statements);
 }
 
-AstNodePtr Parser::ParseStatement() {
+AstNodePtr Parser::ParseStatement(std::vector<TokenType> stop_at) {
     AstNodePtr stmt;
 
     switch (m_current_token.tk_type) {
@@ -121,12 +122,23 @@ AstNodePtr Parser::ParseStatement() {
         }
 
         default: {
-            /*
-                if it didn't match the statements above, then it must be
-                either an expression or invalid
-            */
+        /*
+            if it didn't match the statements above, then it must be
+            either an expression or invalid
+        */
+        if (stop_at.size()>0){
+            if (std::count(stop_at.begin(), stop_at.end(), m_current_token.tk_type) != 0) {
+                return stmt;
+            }
+            else{
+                stmt = ParseExpression(pr_lowest);
+                break;
+            }
+        } 
+        else{
             stmt = ParseExpression(pr_lowest);
             break;
+        }
         }
     }
 
@@ -157,9 +169,18 @@ AstNodePtr Parser::ParseExpression(Precedence_type curr_precedence) {
             left = ParseNone();
             break;
         }
-
+        case tk_format:{
+            advance();//making it a string
+            left = ParseString(true,false);
+            break;
+        }
+        case tk_raw:{
+            advance();//making it a string
+            left = ParseString(false,true);
+            break;
+        }
         case tk_string: {
-            left = ParseString(false);
+            left = ParseString(false,false);
             break;
         }
 
@@ -185,7 +206,9 @@ AstNodePtr Parser::ParseExpression(Precedence_type curr_precedence) {
             left = ParsePrefixExpression();
             break;
         }
-
+        case new_line:{
+            return left;
+        }
         default: {
             error(m_current_token,
                   m_current_token.keyword + " is not an expression");
@@ -207,7 +230,7 @@ AstNodePtr Parser::ParseBinaryOperation(AstNodePtr left) {
 
     advance();
 
-    AstNodePtr right = ParseExpression(precedence);
+    AstNodePtr right = ParseStatement({new_line});
 
     return std::make_shared<BinaryOperation>(left, op, right);
 }
@@ -226,7 +249,7 @@ AstNodePtr Parser::ParsePrefixExpression() {
 AstNodePtr Parser::ParseGroupedExpr() {
     advance();
 
-    AstNodePtr expr = ParseExpression(pr_lowest);
+    AstNodePtr expr = ParseStatement({tk_r_paren});
 
     expect(tk_r_paren);
 
