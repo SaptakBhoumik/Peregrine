@@ -13,16 +13,15 @@ int main() {
     std::stringstream buf;
     buf << file.rdbuf();
 
-    std::vector<Token> tokens = lexer("54 * 12 / 2", "test");
+    std::vector<Token> tokens = lexer(buf.str(), "test");
     
-    for (auto& tok : tokens) {
-        std::cout << tok.keyword << " " << tok.tk_type << "\n";
+    for (auto& token : tokens) {
+        std::cout <<"Keyword= "<< token.keyword << " Type= "<< token.tk_type<< "\n";
     }
 
     Parser parser(tokens);
-
     AstNodePtr program = parser.parse();
-    
+
     std::cout << program->stringify() << "\n";
 
     Codegen codegen("out.txt");

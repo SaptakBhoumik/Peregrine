@@ -28,6 +28,7 @@ enum TokenType {
     tk_r_paren,   // )
     tk_hashtag,   // //
     tk_comma,     // ,
+    new_line,     // \n
 
     tk_exponent,          //**
     tk_equal,             // ==

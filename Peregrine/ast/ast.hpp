@@ -4,6 +4,7 @@
 #include "lexer/tokens.hpp"
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 enum AstKind {
@@ -75,12 +76,14 @@ class DecimalLiteral : public AstNode {
 class StringLiteral : public AstNode {
     std::string m_value;
     bool m_formatted;
+    bool m_raw;
 
   public:
-    StringLiteral(std::string_view value, bool formatted);
+    StringLiteral(std::string_view value, bool formatted,bool raw);
 
     std::string value();
     bool formatted();
+    bool raw();
 
     AstKind type();
     std::string stringify();

@@ -11,9 +11,9 @@ AstNodePtr Parser::ParseDecimal() {
     return std::make_shared<DecimalLiteral>(m_current_token.keyword);
 }
 
-AstNodePtr Parser::ParseString(bool is_formatted) {
+AstNodePtr Parser::ParseString(bool is_formatted,bool is_raw) {
     return std::make_shared<StringLiteral>(m_current_token.keyword,
-                                           is_formatted);
+                                           is_formatted,is_raw);
 }
 
 AstNodePtr Parser::ParseBool() {

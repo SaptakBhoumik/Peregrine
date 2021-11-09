@@ -33,6 +33,7 @@ class Parser {
     std::map<TokenType, Precedence_type> precedence_map = create_map();
 
     void advance();
+    void advanceOnNewLine();
     bool expect(TokenType expected_type);
     Token next();
     Precedence_type next_precedence();
@@ -41,7 +42,7 @@ class Parser {
 
     AstNodePtr ParseInteger();
     AstNodePtr ParseDecimal();
-    AstNodePtr ParseString(bool is_formatted);
+    AstNodePtr ParseString(bool is_formatted,bool is_raw);
     AstNodePtr ParseBool();
     AstNodePtr ParseNone();
     AstNodePtr ParseIdentifier();
