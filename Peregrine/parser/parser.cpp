@@ -126,7 +126,6 @@ AstNodePtr Parser::ParseStatement() {
             stmt = ParseFunctionDef();
             break;
         }
-
         default: {
             /*
                 if it didn't match the statements above, then it must be
@@ -292,9 +291,7 @@ AstNodePtr Parser::ParseBinaryOperation(AstNodePtr left) {
     Precedence_type precedence = precedence_map[m_current_token.tk_type];
 
     advance();
-
-    AstNodePtr right = ParseExpression(pr_lowest);
-
+    AstNodePtr right = ParseExpression(precedence);
     return std::make_shared<BinaryOperation>(left, op, right);
 }
 
@@ -304,7 +301,7 @@ AstNodePtr Parser::ParsePrefixExpression() {
 
     advance();
 
-    AstNodePtr right = ParseExpression(precedence);
+    AstNodePtr right =ParseExpression(precedence);
 
     return std::make_shared<PrefixExpression>(prefix, right);
 }
