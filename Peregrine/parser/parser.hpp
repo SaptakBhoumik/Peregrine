@@ -54,7 +54,7 @@ class Parser {
     AstNodePtr ParseGroupedExpr();
     AstNodePtr ParseBinaryOperation(AstNodePtr left);
 
-    AstNodePtr ParseStatement(std::vector<TokenType> stop_at={});
+    AstNodePtr ParseStatement();
     AstNodePtr ParseIf();
     AstNodePtr ParseWhile();
     AstNodePtr ParseFunctionDef();

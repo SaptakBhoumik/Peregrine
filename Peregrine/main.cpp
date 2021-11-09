@@ -5,7 +5,7 @@
 #include <vector>
 
 int main() {
-    std::vector<Token> tokens = lexer("(54 + 2) * 34", "");
+    std::vector<Token> tokens = lexer("(54 + 2) * 34/6", "");
 
     for (auto token : tokens) {
         std::cout <<"Keyword= "<< token.keyword << " Type= "<< token.tk_type<< "\n";

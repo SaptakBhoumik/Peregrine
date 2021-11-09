@@ -102,7 +102,7 @@ AstNodePtr Parser::parse() {
     return std::make_shared<Program>(statements);
 }
 
-AstNodePtr Parser::ParseStatement(std::vector<TokenType> stop_at) {
+AstNodePtr Parser::ParseStatement() {
     AstNodePtr stmt;
 
     switch (m_current_token.tk_type) {
@@ -120,25 +120,13 @@ AstNodePtr Parser::ParseStatement(std::vector<TokenType> stop_at) {
             stmt = ParseFunctionDef();
             break;
         }
-
         default: {
         /*
             if it didn't match the statements above, then it must be
             either an expression or invalid
         */
-        if (stop_at.size()>0){
-            if (std::count(stop_at.begin(), stop_at.end(), m_current_token.tk_type) != 0) {
-                return stmt;
-            }
-            else{
-                stmt = ParseExpression(pr_lowest);
-                break;
-            }
-        } 
-        else{
-            stmt = ParseExpression(pr_lowest);
+            stmt = ParseExpression(precedence_map[m_current_token.tk_type]);
             break;
-        }
         }
     }
 
@@ -207,7 +195,7 @@ AstNodePtr Parser::ParseExpression(Precedence_type curr_precedence) {
             break;
         }
         case new_line:{
-            return left;
+            break;
         }
         default: {
             error(m_current_token,
@@ -229,9 +217,7 @@ AstNodePtr Parser::ParseBinaryOperation(AstNodePtr left) {
     Precedence_type precedence = precedence_map[m_current_token.tk_type];
 
     advance();
-
-    AstNodePtr right = ParseStatement({new_line});
-
+    AstNodePtr right = ParseExpression(precedence);
     return std::make_shared<BinaryOperation>(left, op, right);
 }
 
@@ -241,7 +227,7 @@ AstNodePtr Parser::ParsePrefixExpression() {
 
     advance();
 
-    AstNodePtr right = ParseExpression(precedence);
+    AstNodePtr right =ParseExpression(precedence);
 
     return std::make_shared<PrefixExpression>(prefix, right);
 }
@@ -249,7 +235,7 @@ AstNodePtr Parser::ParsePrefixExpression() {
 AstNodePtr Parser::ParseGroupedExpr() {
     advance();
 
-    AstNodePtr expr = ParseStatement({tk_r_paren});
+    AstNodePtr expr = ParseExpression(precedence_map[m_current_token.tk_type]);
 
     expect(tk_r_paren);
 

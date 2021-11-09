@@ -936,8 +936,7 @@ LEXEME lexer(std::string src, std::string filename) {
         curr_identation_level--;
     }
     if (is_string == true || is_list_dictionary_cpp_string == true) {
-        std::string temp = "Expecting a ";
-        temp += string_starter;
+        std::string temp = "Expecting a "+string_starter;
         display(PEError({.loc = Location({.line = line,
                                           .col = current_index - last_line,
                                           .file = filename,
@@ -970,6 +969,17 @@ LEXEME lexer(std::string src, std::string filename) {
         tokens.clear();
     }
     if (is_cpp == true) {
+        std::string temp = "Expecting a )";
+        display(PEError({.loc = Location({.line = line,
+                                          .col = current_index - last_line,
+                                          .file = filename,
+                                          .code = statement}),
+                         .msg = "Unexpected end of file",
+                         .submsg = temp,
+                         .ecode = "e1"}));
+        tokens.clear();
+    }
+    else if (first_bracket_count!=0){
         std::string temp = "Expecting a )";
         display(PEError({.loc = Location({.line = line,
                                           .col = current_index - last_line,
