@@ -9,6 +9,10 @@ Program::Program(std::vector<AstNodePtr> statements) {
     m_statements = statements;
 }
 
+std::vector<AstNodePtr> Program::statements() {
+    return m_statements;
+}
+
 AstKind Program::type() { return KAstProgram; }
 
 std::string Program::stringify() {

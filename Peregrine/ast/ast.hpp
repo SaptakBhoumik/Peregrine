@@ -42,6 +42,8 @@ class Program : public AstNode {
   public:
     Program(std::vector<AstNodePtr> statements);
 
+    std::vector<AstNodePtr> statements();
+
     AstKind type();
     std::string stringify();
 };
