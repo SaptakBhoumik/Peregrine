@@ -439,3 +439,19 @@ std::string ForStatement::stringify() {
 
     return res;
 }
+
+AstKind BreakStatement::type() {
+    return KAstBreakStatement;
+}
+
+std::string BreakStatement::stringify() {
+    return "break";
+}
+
+AstKind ContinueStatement::type() {
+    return KAstContinueStatement;
+}
+
+std::string ContinueStatement::stringify() {
+    return "continue";
+}

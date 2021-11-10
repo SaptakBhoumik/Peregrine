@@ -28,7 +28,9 @@ enum AstKind {
     KAstFunctionCall,
     KAstIfStmt,
     KAstWhileStmt,
-    KAstForStatement
+    KAstForStatement,
+    KAstBreakStatement,
+    KAstContinueStatement
 };
 
 class AstNode {
@@ -313,6 +315,18 @@ class ForStatement : public AstNode {
     AstNodePtr sequence();
     AstNodePtr body();
 
+    AstKind type();
+    std::string stringify();
+};
+
+class BreakStatement : public AstNode {
+  public:
+    AstKind type();
+    std::string stringify();
+};
+
+class ContinueStatement : public AstNode {
+  public:
     AstKind type();
     std::string stringify();
 };

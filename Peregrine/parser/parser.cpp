@@ -131,6 +131,23 @@ AstNodePtr Parser::ParseStatement() {
             break;
         }
 
+        case tk_break: {
+            stmt = std::make_shared<BreakStatement>();
+            advanceOnNewLine();
+            break;
+        }
+
+        case tk_continue: {
+            stmt = std::make_shared<ContinueStatement>();
+            advanceOnNewLine();
+            break;
+        }
+
+        case tk_return: {
+            stmt = ParseReturn();
+            break;
+        }
+
         case tk_identifier: {
             if (next().tk_type == tk_identifier || next().tk_type == tk_assign) {
                 // variable 
@@ -320,6 +337,19 @@ AstNodePtr Parser::ParseFunctionDef() {
     AstNodePtr body = ParseBlockStatement();
 
     return std::make_shared<FunctionDefinition>(return_type, name, parameters, body);
+}
+
+AstNodePtr Parser::ParseReturn() {
+    AstNodePtr return_value = std::make_shared<NoneLiteral>();
+
+    if (next().tk_type != tk_new_line) {
+        advance();
+        return_value = ParseExpression(pr_lowest);
+    } else {
+        advance();
+    }
+
+    return std::make_shared<ReturnStatement>(return_value);
 }
 
 AstNodePtr Parser::ParseExpression(Precedence_type curr_precedence) {
