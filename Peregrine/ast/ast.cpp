@@ -282,6 +282,28 @@ std::string FunctionDefinition::stringify() {
     return res;
 }
 
+ReturnStatement::ReturnStatement(AstNodePtr return_value) {
+    m_return_value = return_value;
+}
+
+AstNodePtr ReturnStatement::return_value() {
+    return m_return_value;
+}
+
+AstKind ReturnStatement::type() {
+    return KAstReturnStatement;
+}
+
+std::string ReturnStatement::stringify() {
+    std::string res = "return";
+
+    if (m_return_value->type() != KAstNone) {
+        res += " " + m_return_value->stringify();
+    }
+
+    return res;
+}
+
 FunctionCall::FunctionCall(AstNodePtr name, std::vector<AstNodePtr> arguments) {
     m_name = name;
     m_arguments = arguments;

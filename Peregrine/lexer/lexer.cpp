@@ -419,10 +419,10 @@ LEXEME lexer(std::string src, std::string filename) {
                                                                                     // print(arg1,
                                                                                     //       arg2)
                                                                                     //to reduce the confusion while parsing 
-            if (tokens.back().tk_type!=new_line//we dont want to add 2 newline one after the other
+            if (tokens.back().tk_type!=tk_new_line//we dont want to add 2 newline one after the other
                && tokens.back().tk_type!=tk_colon//again to reduce confusion
                ){
-                   token=token_init(statement,"<new_line>",new_line,current_index,current_index,line);
+                   token=token_init(statement,"<tk_new_line>",tk_new_line,current_index,current_index,line);
                    tokens.emplace_back(token);
                    token = Token();
                }

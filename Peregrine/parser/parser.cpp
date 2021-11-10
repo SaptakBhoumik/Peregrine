@@ -17,12 +17,11 @@ std::map<TokenType, Precedence_type> create_map() {
     precedence_map[tk_and] = pr_and_or;
     precedence_map[tk_or] = pr_and_or;
     precedence_map[tk_not] = pr_not;
-    precedence_map[tk_assign] = pr_assign_compare;
-    precedence_map[tk_not_equal] = pr_assign_compare;
-    precedence_map[tk_greater] = pr_assign_compare;
-    precedence_map[tk_less] = pr_assign_compare;
-    precedence_map[tk_gr_or_equ] = pr_assign_compare;
-    precedence_map[tk_less_or_equ] = pr_assign_compare;
+    precedence_map[tk_not_equal] = pr_compare;
+    precedence_map[tk_greater] = pr_compare;
+    precedence_map[tk_less] = pr_compare;
+    precedence_map[tk_gr_or_equ] = pr_compare;
+    precedence_map[tk_less_or_equ] = pr_compare;
     precedence_map[tk_plus] = pr_sum_minus;
     precedence_map[tk_minus] = pr_sum_minus;
     precedence_map[tk_multiply] = pr_mul_div;
@@ -46,7 +45,7 @@ void Parser::advance() {
 }
 
 void Parser::advanceOnNewLine() {
-    if (next().tk_type == new_line) {
+    if (next().tk_type == tk_new_line) {
         advance();
     }
 }
@@ -112,6 +111,11 @@ AstNodePtr Parser::ParseStatement() {
     AstNodePtr stmt;
 
     switch (m_current_token.tk_type) {
+        case tk_const: {
+            stmt = ParseConstDeclaration();
+            break;
+        }
+
         case tk_if: {
             stmt = ParseIf();
             break;
@@ -126,16 +130,29 @@ AstNodePtr Parser::ParseStatement() {
             stmt = ParseFunctionDef();
             break;
         }
+
+        case tk_identifier: {
+            if (next().tk_type == tk_identifier || next().tk_type == tk_assign) {
+                // variable 
+                stmt = ParseVariableStatement();
+                break;
+            }
+            
+            // if it got here, it will go down the cases and match the default case
+            // DO NOT add another case below this one
+        }
+
         default: {
             /*
                 if it didn't match the statements above, then it must be
                 either an expression or invalid
             */
+        
             stmt = ParseExpression(pr_lowest);
             break;
         }
     }
-
+    
     return stmt;
 }
 
@@ -154,6 +171,51 @@ AstNodePtr Parser::ParseBlockStatement() {
     }
 
     return std::make_shared<BlockStatement>(statements);
+}
+
+// TODO: make this invalid: int = 43
+AstNodePtr Parser::ParseVariableStatement() {
+    AstNodePtr var_type = std::make_shared<NoneLiteral>();
+
+    if (next().tk_type == tk_identifier) {
+        var_type = ParseIdentifier();
+        advance();
+    }
+
+    AstNodePtr name = ParseIdentifier();
+
+    AstNodePtr value = std::make_shared<NoneLiteral>();
+    
+    if (next().tk_type == tk_assign) {
+        advance();
+        advance();
+
+        value = ParseExpression(pr_lowest);
+    } else {
+        advanceOnNewLine();
+    }
+    
+    return std::make_shared<VariableStatement>(var_type, name, value);    
+}
+
+AstNodePtr Parser::ParseConstDeclaration() {
+    expect(tk_identifier);
+
+    AstNodePtr const_type = std::make_shared<NoneLiteral>();
+
+    if (next().tk_type == tk_identifier) {
+        const_type = ParseIdentifier();
+        advance();
+    }
+
+    AstNodePtr name = ParseIdentifier();
+
+    expect(tk_assign);
+    advance();
+
+    AstNodePtr value = ParseExpression(pr_lowest);
+
+    return std::make_shared<ConstDeclaration>(const_type, name, value);
 }
 
 AstNodePtr Parser::ParseIf() {
@@ -211,7 +273,31 @@ AstNodePtr Parser::ParseWhile() {
     return std::make_shared<WhileStatement>(condition, body);
 }
 
-AstNodePtr Parser::ParseFunctionDef() {}
+//TODO: finish
+AstNodePtr Parser::ParseFunctionDef() {
+    expect(tk_identifier);
+
+    AstNodePtr name = ParseIdentifier();
+
+    expect(tk_l_paren);
+    advance();
+
+    std::vector<parameter> parameters;
+
+    while (m_current_token.tk_type == tk_comma) {
+        AstNodePtr param_type = ParseIdentifier();
+        advance();
+        AstNodePtr param_name = ParseIdentifier();
+
+        parameters.push_back(parameter {param_type, param_name});
+        advance();
+    }
+
+    if (m_current_token.tk_type != tk_r_paren) {
+        error(m_current_token, "expected ), got " + m_current_token.keyword + " instead");
+    }
+
+}
 
 AstNodePtr Parser::ParseExpression(Precedence_type curr_precedence) {
     AstNodePtr left;

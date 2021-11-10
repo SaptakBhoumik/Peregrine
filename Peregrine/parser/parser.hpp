@@ -12,7 +12,7 @@ enum Precedence_type {
     pr_lowest,         // lowest possible precedence
     pr_and_or,         // and,or
     pr_not,            // not
-    pr_assign_compare, // =, ==, !=, <, >, <=, >=
+    pr_compare,        // ==, !=, <, >, <=, >=
     pr_sum_minus,      // +, -
     pr_mul_div,        // *, /, %, //
     pr_prefix          // -x
@@ -57,6 +57,8 @@ class Parser {
 
     AstNodePtr ParseStatement();
     AstNodePtr ParseBlockStatement();
+    AstNodePtr ParseVariableStatement();
+    AstNodePtr ParseConstDeclaration();
     AstNodePtr ParseIf();
     AstNodePtr ParseWhile();
     AstNodePtr ParseFunctionDef();

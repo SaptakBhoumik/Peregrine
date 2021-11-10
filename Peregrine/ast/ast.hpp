@@ -24,6 +24,7 @@ enum AstKind {
     KAstConstDecl,
     KAstBlockStmt,
     KAstFunctionDef,
+    KAstReturnStatement,
     KAstFunctionCall,
     KAstIfStmt,
     KAstWhileStmt
@@ -232,6 +233,18 @@ class FunctionDefinition : public AstNode {
     AstNodePtr name();
     std::vector<parameter> parameters();
     AstNodePtr body();
+
+    AstKind type();
+    std::string stringify();
+};
+
+class ReturnStatement : public AstNode {
+    AstNodePtr m_return_value;
+
+  public:
+    ReturnStatement(AstNodePtr return_value);
+
+    AstNodePtr return_value();
 
     AstKind type();
     std::string stringify();

@@ -1,10 +1,4 @@
-if "test":
-    53 + 2
-elif 54:
-    100
-elif 123:
-    65
-else:
-    "nothing"
+int a
+b + 34
 
-3 + 3
+const test = "hello"
