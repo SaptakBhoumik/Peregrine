@@ -10,12 +10,11 @@
 class Codegen {
     std::ofstream m_file;
 
-    void write(std::string_view code);
-
   public:
+    void write(std::string_view code);
     Codegen(std::string output_filename);
 
-    void generate(AstNodePtr ast_node);
+    std::string generate(AstNodePtr ast_node);
 };
 
 #endif
