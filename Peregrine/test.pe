@@ -1,10 +1,10 @@
-if "test":
-    53 + 2
-elif 54:
-    100
-elif 123:
-    65
+if True:
+    3 + 3
+    if True:
+        3 + 3
+elif False:
+    8+8
 else:
-    "nothing"
-
-3 + 3
+    7
+while True:
+    0

@@ -246,7 +246,9 @@ LEXEME lexer(std::string src, std::string filename) {
                      // is that it will reduce the time it takes to run
     while (current_index < src.size()) {
         item = src.at(current_index);
-        if (item == "\n"||item == "\r\n"||item == "\r") {
+        if ((item == "\n"||item == "\r\n"||item == "\r")
+               && next(current_index,src)!=""//dont want it to be the end of file
+        ) {
             last_line = current_index;
             line++;
             if (seperate_lines.size() > line - 1) {
@@ -296,7 +298,7 @@ LEXEME lexer(std::string src, std::string filename) {
                         previous_identation = 0;
                     }
                 }
-            } else if (item == "\n"||item == "\r\n"||item == "\r") {
+            } else if (item == "\n"||item == "\r\n"||item == "\r"){
                 is_tab = true;
                 curr_identation_level = 0;
             }
@@ -928,13 +930,6 @@ LEXEME lexer(std::string src, std::string filename) {
                        token_type(keyword, next(current_index - 1, src)),
                        start_index, current_index, line));
     }
-    curr_identation_level /= 4; // dividing by 4 to know the number of tabs
-    while (curr_identation_level != 0) {
-        token = token_init(statement, "", tk_dedent, current_index,
-                           current_index, line);
-        tokens.emplace_back(token);
-        curr_identation_level--;
-    }
     if (is_string == true || is_list_dictionary_cpp_string == true) {
         std::string temp = "Expecting a "+string_starter;
         display(PEError({.loc = Location({.line = line,
@@ -944,7 +939,7 @@ LEXEME lexer(std::string src, std::string filename) {
                          .msg = "Unexpected end of file",
                          .submsg = temp,
                          .ecode = "e1"}));
-        tokens.clear();
+        exit(1);
     }
     if (is_dictionary == true) {
         std::string temp = "Expecting a }";
@@ -955,7 +950,7 @@ LEXEME lexer(std::string src, std::string filename) {
                          .msg = "Unexpected end of file",
                          .submsg = temp,
                          .ecode = "e1"}));
-        tokens.clear();
+        exit(1);
     }
     if (is_array == true) {
         std::string temp = "Expecting a ]";
@@ -966,7 +961,7 @@ LEXEME lexer(std::string src, std::string filename) {
                          .msg = "Unexpected end of file",
                          .submsg = temp,
                          .ecode = "e1"}));
-        tokens.clear();
+        exit(1);
     }
     if (is_cpp == true) {
         std::string temp = "Expecting a )";
@@ -977,7 +972,7 @@ LEXEME lexer(std::string src, std::string filename) {
                          .msg = "Unexpected end of file",
                          .submsg = temp,
                          .ecode = "e1"}));
-        tokens.clear();
+        exit(1);
     }
     else if (first_bracket_count!=0){
         std::string temp = "Expecting a )";
@@ -988,9 +983,30 @@ LEXEME lexer(std::string src, std::string filename) {
                          .msg = "Unexpected end of file",
                          .submsg = temp,
                          .ecode = "e1"}));
-        tokens.clear();
+        exit(1);
     }
     if (tokens.size() > 0) {
+        uint64_t total_tab=0;
+        for (auto tok : tokens){
+            switch (tok.tk_type) {
+                case tk_ident:{
+                    total_tab++;
+                    break;
+                }
+                case tk_dedent:{
+                    total_tab--;
+                    break;
+                }
+                default:{
+                }
+            }
+        }
+        while (total_tab!=0){
+             token = token_init(statement, "", tk_dedent, current_index,
+                           current_index, line);
+            tokens.push_back(token);
+            total_tab--;
+        }
         tokens.push_back(
             token_init("", "", tk_eof, current_index, current_index, line));
     }

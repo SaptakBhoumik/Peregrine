@@ -24,9 +24,9 @@ int main() {
 
     std::cout << program->stringify() << "\n";
 
-    Codegen codegen("out.txt");
-
-    codegen.generate(program);
-
+    Codegen codegen("temp.cc");
+    auto res=codegen.generate(program);
+    std::cout<<res<<"\n";
+    codegen.write(res);
     return 0;
 }

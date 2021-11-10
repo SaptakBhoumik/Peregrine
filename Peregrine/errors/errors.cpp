@@ -39,6 +39,11 @@ void display(PEError e) {
         std::cout << "  |"
                   << "\n";
     }
-    std::cout << "  ╰- " << fg(style("Hint: ", bold), cyan)
-              << "Use peregrine --explain=" << e.ecode << "\n";
+    if (e.ecode==""){
+        std::cout << "  ╰----------------------------------------- ";
+    }
+    else{
+        std::cout << "  ╰- " << fg(style("Hint: ", bold), cyan)
+                << "Use peregrine --explain=" << e.ecode << "\n";
+    }
 }

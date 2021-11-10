@@ -96,7 +96,6 @@ AstNodePtr Parser::parse() {
         statements.push_back(ParseStatement());
         advance();
     }
-
     if (!m_errors.empty()) {
         for (auto& err : m_errors) {
             display(err);
