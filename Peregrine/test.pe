@@ -2,3 +2,6 @@ int a
 b + 34
 
 const test = "hello"
+
+def test(str msg, int num, int a) -> int:
+    msg + "hey"

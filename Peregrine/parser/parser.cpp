@@ -273,30 +273,53 @@ AstNodePtr Parser::ParseWhile() {
     return std::make_shared<WhileStatement>(condition, body);
 }
 
-//TODO: finish
 AstNodePtr Parser::ParseFunctionDef() {
     expect(tk_identifier);
 
     AstNodePtr name = ParseIdentifier();
 
     expect(tk_l_paren);
-    advance();
 
     std::vector<parameter> parameters;
 
-    while (m_current_token.tk_type == tk_comma) {
-        AstNodePtr param_type = ParseIdentifier();
+    do {
         advance();
+
+        //TODO: make this a separate function
+        if (m_current_token.tk_type != tk_identifier) {
+            error(next(), "expected token of type " +
+                          std::to_string(tk_identifier) + ", got " +
+                          std::to_string(m_current_token.tk_type) + " instead");
+        }
+
+        AstNodePtr param_type = ParseIdentifier();
+        expect(tk_identifier);
         AstNodePtr param_name = ParseIdentifier();
 
         parameters.push_back(parameter {param_type, param_name});
         advance();
-    }
+    } while (m_current_token.tk_type == tk_comma);
 
     if (m_current_token.tk_type != tk_r_paren) {
         error(m_current_token, "expected ), got " + m_current_token.keyword + " instead");
     }
 
+    // returns None by default
+    AstNodePtr return_type = std::make_shared<IdentifierExpression>("None");
+
+    if (next().tk_type == tk_arrow) {
+        advance();
+        expect(tk_identifier);
+
+        return_type = ParseIdentifier();
+    }
+
+    expect(tk_colon);
+    expect(tk_ident);
+
+    AstNodePtr body = ParseBlockStatement();
+
+    return std::make_shared<FunctionDefinition>(return_type, name, parameters, body);
 }
 
 AstNodePtr Parser::ParseExpression(Precedence_type curr_precedence) {

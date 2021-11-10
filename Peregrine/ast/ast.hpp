@@ -226,7 +226,6 @@ class FunctionDefinition : public AstNode {
     AstNodePtr m_body;
 
   public:
-    // TODO: return void by default?
     FunctionDefinition(AstNodePtr return_type, AstNodePtr name,
                        std::vector<parameter> parameters, AstNodePtr body);
 
