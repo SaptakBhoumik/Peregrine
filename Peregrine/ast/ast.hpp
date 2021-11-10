@@ -27,7 +27,8 @@ enum AstKind {
     KAstReturnStatement,
     KAstFunctionCall,
     KAstIfStmt,
-    KAstWhileStmt
+    KAstWhileStmt,
+    KAstForStatement
 };
 
 class AstNode {
@@ -295,6 +296,22 @@ class WhileStatement : public AstNode {
     WhileStatement(AstNodePtr condition, AstNodePtr body);
 
     AstNodePtr condition();
+    AstNodePtr body();
+
+    AstKind type();
+    std::string stringify();
+};
+
+class ForStatement : public AstNode {
+    AstNodePtr m_variable;
+    AstNodePtr m_sequence; // the object that we will iterate on the loop, like a list
+    AstNodePtr m_body;
+
+  public:
+    ForStatement(AstNodePtr variable, AstNodePtr sequence, AstNodePtr body);
+
+    AstNodePtr variable();
+    AstNodePtr sequence();
     AstNodePtr body();
 
     AstKind type();

@@ -403,3 +403,39 @@ std::string WhileStatement::stringify() {
 
     return res;
 }
+
+ForStatement::ForStatement(AstNodePtr variable, AstNodePtr sequence, AstNodePtr body) {
+    m_variable = variable;
+    m_sequence = sequence;
+    m_body = body;
+}
+
+AstNodePtr ForStatement::variable() {
+    return m_variable;
+}
+
+AstNodePtr ForStatement::sequence() {
+    return m_sequence;
+}
+
+AstNodePtr ForStatement::body() {
+    return m_body;
+}
+
+AstKind ForStatement::type() {
+    return KAstForStatement;
+}
+
+std::string ForStatement::stringify() {
+    std::string res = "for ";
+
+    res += m_variable->stringify();
+    res += " in ";
+    res += m_sequence->stringify(); 
+    res += ":\n";
+
+    res += m_body->stringify();
+    res += "\n";
+
+    return res;
+}
