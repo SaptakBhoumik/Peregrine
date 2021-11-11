@@ -108,10 +108,10 @@ enum TokenType {
     tk_type,      // type defination
 
     // value type
-    tk_decimal, // done
-    tk_integer, // done
-    tk_string,  // done
-    cpp,        // done
+    tk_decimal, 
+    tk_integer, 
+    tk_string,  
+    cpp,        
 
     tk_ident,  // beginning of identation
     tk_dedent, // end of identation

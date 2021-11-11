@@ -232,7 +232,7 @@ LEXEME lexer(std::string src, std::string filename) {
     uint64_t curr_identation_level = 0;
     uint64_t cpp_bracket_count = 0;
     uint64_t first_bracket_count = 0;
-    bool is_list_dictionary_cpp_string = false;
+    bool is_cpp_string = false;
     bool is_array = false;
     bool is_dictionary = false;
     bool is_cpp = false;
@@ -253,10 +253,10 @@ LEXEME lexer(std::string src, std::string filename) {
                 statement = seperate_lines.at(line - 1);
             }
         }
-        if (item=="(" && !is_comment && !is_string && !is_list_dictionary_cpp_string) {
+        if (item=="(" && !is_comment && !is_string && !is_cpp_string) {
             first_bracket_count++;
         }
-        else if (item==")" && !is_comment && !is_string && !is_list_dictionary_cpp_string) {
+        else if (item==")" && !is_comment && !is_string && !is_cpp_string) {
             first_bracket_count--;
         }
         if (is_comment == false && is_array == false &&
@@ -303,22 +303,27 @@ LEXEME lexer(std::string src, std::string filename) {
         }
         // lexing starts here
         if (is_cpp == true) {
-            keyword += item;
-            if (item == "(" && is_list_dictionary_cpp_string == false) {
+            if (is_cpp_string==false && cpp_bracket_count==1 && item==")"){
+                //do nothing
+            }
+            else{
+                keyword += item;
+            }
+            if (item == "(" && is_cpp_string == false) {
                 cpp_bracket_count += 1;
             } else if (item == "'" || item == "\"") {
-                if (is_list_dictionary_cpp_string == true &&
+                if (is_cpp_string == true &&
                     string_starter != item) {
                     // do nothing
                 } else if (item == string_starter &&
-                           is_list_dictionary_cpp_string == true) {
-                    is_list_dictionary_cpp_string = false;
+                           is_cpp_string == true) {
+                    is_cpp_string = false;
                     string_starter = "";
                 } else {
                     string_starter = item;
-                    is_list_dictionary_cpp_string = true;
+                    is_cpp_string = true;
                 }
-            } else if (item == ")" && is_list_dictionary_cpp_string == false) {
+            } else if (item == ")" && is_cpp_string == false) {
                 cpp_bracket_count -= 1;
                 if (cpp_bracket_count == 0) {
                     is_cpp = false;
@@ -327,7 +332,7 @@ LEXEME lexer(std::string src, std::string filename) {
                 }
             }
         } else if (item == "#" && is_string == false &&
-                   is_list_dictionary_cpp_string == false &&
+                   is_cpp_string == false &&
                    is_comment == false) {
             is_comment = true;
         } else if (is_comment == true) {
@@ -461,7 +466,6 @@ LEXEME lexer(std::string src, std::string filename) {
                 start_index = current_index;
                 is_cpp = true;
                 cpp_bracket_count = 1;
-                keyword = item;
             } else {
                 start_index = current_index - 1;
                 keyword = item;
@@ -887,7 +891,7 @@ LEXEME lexer(std::string src, std::string filename) {
                        token_type(keyword, next(current_index - 1, src)),
                        start_index, current_index, line));
     }
-    if (is_string == true || is_list_dictionary_cpp_string == true) {
+    if (is_string == true || is_cpp_string == true) {
         std::string temp = "Expecting a "+string_starter;
         display(PEError({.loc = Location({.line = line,
                                           .col = current_index - last_line,
