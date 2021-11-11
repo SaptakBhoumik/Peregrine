@@ -1,4 +1,5 @@
 a = [54, 2, 87]
+c = []
 
 b = {
     12: 45,
@@ -11,7 +12,7 @@ b + 34
 
 const test = "hello"
 
-def test(str msg, int num, int a) -> int:
+def test() -> int:
     msg + "hey"
     return
 

@@ -299,23 +299,27 @@ AstNodePtr Parser::ParseFunctionDef() {
 
     std::vector<parameter> parameters;
 
-    do {
+    if (next().tk_type != tk_r_paren) {
+        do {
+            advance();
+
+            //TODO: make this a separate function
+            if (m_current_token.tk_type != tk_identifier) {
+                error(next(), "expected token of type " +
+                            std::to_string(tk_identifier) + ", got " +
+                            std::to_string(m_current_token.tk_type) + " instead");
+            }
+
+            AstNodePtr param_type = ParseIdentifier();
+            expect(tk_identifier);
+            AstNodePtr param_name = ParseIdentifier();
+
+            parameters.push_back(parameter {param_type, param_name});
+            advance();
+        } while (m_current_token.tk_type == tk_comma);
+    } else {
         advance();
-
-        //TODO: make this a separate function
-        if (m_current_token.tk_type != tk_identifier) {
-            error(next(), "expected token of type " +
-                          std::to_string(tk_identifier) + ", got " +
-                          std::to_string(m_current_token.tk_type) + " instead");
-        }
-
-        AstNodePtr param_type = ParseIdentifier();
-        expect(tk_identifier);
-        AstNodePtr param_name = ParseIdentifier();
-
-        parameters.push_back(parameter {param_type, param_name});
-        advance();
-    } while (m_current_token.tk_type == tk_comma);
+    }
 
     if (m_current_token.tk_type != tk_r_paren) {
         error(m_current_token, "expected ), got " + m_current_token.keyword + " instead");
@@ -458,13 +462,17 @@ AstNodePtr Parser::ParseBinaryOperation(AstNodePtr left) {
 AstNodePtr Parser::ParseFunctionCall(AstNodePtr left) {
     std::vector<AstNodePtr> arguments;
 
-    do {
-        advance();
+    if (next().tk_type != tk_r_paren) {
+        do {
+            advance();
 
-        arguments.push_back(ParseExpression(pr_lowest));
+            arguments.push_back(ParseExpression(pr_lowest));
 
+            advance();
+        } while (m_current_token.tk_type == tk_comma);
+    } else {
         advance();
-    } while (m_current_token.tk_type == tk_comma);
+    }
 
     if (m_current_token.tk_type != tk_r_paren) {
         error(m_current_token, "expected ), got " + m_current_token.keyword + " instead");
