@@ -15,7 +15,8 @@ enum Precedence_type {
     pr_compare,        // ==, !=, <, >, <=, >=
     pr_sum_minus,      // +, -
     pr_mul_div,        // *, /, %, //
-    pr_prefix          // -x
+    pr_prefix,         // -x
+    pr_call            // x()
 };
 
 std::map<TokenType, Precedence_type> create_map();
@@ -53,7 +54,9 @@ class Parser {
     AstNodePtr ParseExpression(Precedence_type type);
     AstNodePtr ParsePrefixExpression();
     AstNodePtr ParseGroupedExpr();
+
     AstNodePtr ParseBinaryOperation(AstNodePtr left);
+    AstNodePtr ParseFunctionCall(AstNodePtr left);
 
     AstNodePtr ParseStatement();
     AstNodePtr ParseBlockStatement();

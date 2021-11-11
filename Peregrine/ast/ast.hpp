@@ -139,6 +139,19 @@ class ListLiteral : public AstNode {
     std::string stringify();
 };
 
+class DictLiteral : public AstNode {
+    // first is the key, second is the value
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> m_elements;
+
+  public:
+    DictLiteral(std::vector<std::pair<AstNodePtr, AstNodePtr>> elements);
+
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> elements();
+
+    AstKind type();
+    std::string stringify();
+};
+
 class BinaryOperation : public AstNode {
     AstNodePtr m_left;
     std::string m_operator;

@@ -20,9 +20,53 @@ AstNodePtr Parser::ParseBool() {
     return std::make_shared<BoolLiteral>(m_current_token.keyword);
 }
 
-AstNodePtr Parser::ParseList() {}
+AstNodePtr Parser::ParseList() {
+    std::vector<AstNodePtr> elements;
 
-AstNodePtr Parser::ParseDict() {}
+    do {
+        advance();
+
+        elements.push_back(ParseExpression(pr_lowest));
+
+        advance();
+    } while (m_current_token.tk_type == tk_comma);
+
+    if (m_current_token.tk_type != tk_list_close) {
+        error(m_current_token, "expected ], got " + m_current_token.keyword + " instead");
+    }
+
+    advanceOnNewLine();
+
+    //TODO: remove the type member? im not sure
+    AstNodePtr type = std::make_shared<NoneLiteral>();
+
+    return std::make_shared<ListLiteral>(type, elements);
+}
+
+AstNodePtr Parser::ParseDict() {
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> elements;
+
+    do {
+        advance();
+
+        //TODO: keys should not be made out of any type of expression
+        AstNodePtr key = ParseExpression(pr_lowest);
+        expect(tk_colon);
+        advance();
+        AstNodePtr value = ParseExpression(pr_lowest);
+
+        elements.push_back(std::pair(key, value));
+        advance();
+    } while (m_current_token.tk_type == tk_comma);
+
+    if (m_current_token.tk_type != tk_dict_close) {
+        error(m_current_token, "expected }, got " + m_current_token.keyword + " instead");
+    }
+
+    advanceOnNewLine();
+
+    return std::make_shared<DictLiteral>(elements);
+}
 
 AstNodePtr Parser::ParseCpp() {}
 
