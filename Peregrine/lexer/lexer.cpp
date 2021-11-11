@@ -373,9 +373,7 @@ LEXEME lexer(std::string src, std::string filename) {
                 if (third_bracket_count == 0) {
                     is_dictionary = false;
                 }
-        } else if ((item == " " && is_dictionary == false &&
-                    is_array == false && is_string == false) ||
-                   item == "\n"||item == "\r\n"||item == "\r") {
+        } else if (item == " " || item == "\n"||item == "\r\n"||item == "\r") {
             if (keyword != "") {
                 token = token_init(
                     statement, keyword,
@@ -392,8 +390,9 @@ LEXEME lexer(std::string src, std::string filename) {
                                                                                     //to reduce the confusion while parsing 
             if (tokens.back().tk_type!=tk_new_line//we dont want to add 2 newline one after the other
                && tokens.back().tk_type!=tk_colon//again to reduce confusion
-               && is_array==false
-                && is_dictionary==false
+                && is_dictionary == false 
+                && is_array == false
+                && is_string == false
                ){
                    token=token_init(statement,"<tk_new_line>",tk_new_line,current_index,current_index,line);
                    tokens.emplace_back(token);
