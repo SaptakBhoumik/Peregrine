@@ -28,6 +28,10 @@ enum TokenType {
     tk_r_paren,   // )
     tk_hashtag,   // //
     tk_comma,     // ,
+    tk_list_close, // ]
+    tk_list_open,  // [
+    tk_dict_close, // }
+    tk_dict_open,  // {
     tk_new_line,     // \n
 
     tk_exponent,          //**
@@ -101,7 +105,6 @@ enum TokenType {
     tk_cppcode,   // Cppcode
     tk_class,     // class
     tk_struct,    // struct
-    tk_dict,      // dict
     tk_type,      // type defination
 
     // value type
@@ -109,8 +112,6 @@ enum TokenType {
     tk_integer, // done
     tk_string,  // done
     cpp,        // done
-    array,      // done
-    dictionary, // done
 
     tk_ident,  // beginning of identation
     tk_dedent, // end of identation
