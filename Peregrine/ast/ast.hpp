@@ -83,7 +83,7 @@ class StringLiteral : public AstNode {
     bool m_raw;
 
   public:
-    StringLiteral(std::string_view value, bool formatted,bool raw);
+    StringLiteral(std::string_view value, bool formatted, bool raw);
 
     std::string value();
     bool formatted();
@@ -132,7 +132,7 @@ class ListLiteral : public AstNode {
   public:
     ListLiteral(AstNodePtr type, std::vector<AstNodePtr> elements);
 
-    AstNodePtr list_type();
+    AstNodePtr listType();
     std::vector<AstNodePtr> elements();
 
     AstKind type();
@@ -191,7 +191,7 @@ class VariableStatement : public AstNode {
   public:
     VariableStatement(AstNodePtr type, AstNodePtr name, AstNodePtr value);
 
-    AstNodePtr var_type();
+    AstNodePtr varType();
     AstNodePtr name();
     AstNodePtr value();
 
@@ -207,7 +207,7 @@ class ConstDeclaration : public AstNode {
   public:
     ConstDeclaration(AstNodePtr type, AstNodePtr name, AstNodePtr value);
 
-    AstNodePtr const_type();
+    AstNodePtr constType();
     AstNodePtr name();
     AstNodePtr value();
 
@@ -233,7 +233,7 @@ struct parameter {
 };
 
 class FunctionDefinition : public AstNode {
-    AstNodePtr m_return_type;
+    AstNodePtr m_returnType;
     AstNodePtr m_name;
 
     std::vector<parameter> m_parameters;
@@ -241,10 +241,10 @@ class FunctionDefinition : public AstNode {
     AstNodePtr m_body;
 
   public:
-    FunctionDefinition(AstNodePtr return_type, AstNodePtr name,
+    FunctionDefinition(AstNodePtr returnType, AstNodePtr name,
                        std::vector<parameter> parameters, AstNodePtr body);
 
-    AstNodePtr return_type();
+    AstNodePtr returnType();
     AstNodePtr name();
     std::vector<parameter> parameters();
     AstNodePtr body();
@@ -254,12 +254,12 @@ class FunctionDefinition : public AstNode {
 };
 
 class ReturnStatement : public AstNode {
-    AstNodePtr m_return_value;
+    AstNodePtr m_returnValue;
 
   public:
-    ReturnStatement(AstNodePtr return_value);
+    ReturnStatement(AstNodePtr returnValue);
 
-    AstNodePtr return_value();
+    AstNodePtr returnValue();
 
     AstKind type();
     std::string stringify();
@@ -281,22 +281,22 @@ class FunctionCall : public AstNode {
 
 class IfStatement : public AstNode {
     AstNodePtr m_condition;
-    AstNodePtr m_if_body;
+    AstNodePtr m_ifBody;
 
     // first item in the pair is the condition, and the second is the block to
     // be executed
     std::vector<std::pair<AstNodePtr, AstNodePtr>> m_elifs;
 
-    AstNodePtr m_else_body;
+    AstNodePtr m_elseBody;
 
   public:
-    IfStatement(AstNodePtr condition, AstNodePtr if_body, AstNodePtr else_body,
+    IfStatement(AstNodePtr condition, AstNodePtr ifBody, AstNodePtr elseBody,
                 std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs);
 
     AstNodePtr condition();
-    AstNodePtr if_body();
+    AstNodePtr ifBody();
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs();
-    AstNodePtr else_body();
+    AstNodePtr elseBody();
 
     AstKind type();
     std::string stringify();
@@ -318,7 +318,8 @@ class WhileStatement : public AstNode {
 
 class ForStatement : public AstNode {
     AstNodePtr m_variable;
-    AstNodePtr m_sequence; // the object that we will iterate on the loop, like a list
+    AstNodePtr
+        m_sequence; // the object that we will iterate on the loop, like a list
     AstNodePtr m_body;
 
   public:

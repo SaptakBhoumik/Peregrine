@@ -16,7 +16,7 @@ int main() {
     std::vector<Token> tokens = lexer(buf.str(), "test");
     
     for (auto& token : tokens) {
-        std::cout <<"Keyword= "<< token.keyword << " Type= "<< token.tk_type<< "\n";
+        std::cout <<"Keyword= "<< token.keyword << " Type= "<< token.tkType<< "\n";
     }
 
     Parser parser(tokens);

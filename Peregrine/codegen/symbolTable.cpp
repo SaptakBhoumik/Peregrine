@@ -1,4 +1,4 @@
-#include "symbol_table.hpp"
+#include "symbolTable.hpp"
 
 #include <memory>
 #include <string_view>

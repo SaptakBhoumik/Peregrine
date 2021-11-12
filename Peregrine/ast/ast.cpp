@@ -9,9 +9,7 @@ Program::Program(std::vector<AstNodePtr> statements) {
     m_statements = statements;
 }
 
-std::vector<AstNodePtr> Program::statements() {
-    return m_statements;
-}
+std::vector<AstNodePtr> Program::statements() { return m_statements; }
 
 AstKind Program::type() { return KAstProgram; }
 
@@ -42,7 +40,7 @@ AstKind DecimalLiteral::type() { return KAstDecimal; }
 
 std::string DecimalLiteral::stringify() { return m_value; }
 
-StringLiteral::StringLiteral(std::string_view value, bool formatted,bool raw) {
+StringLiteral::StringLiteral(std::string_view value, bool formatted, bool raw) {
     m_value = value;
     m_formatted = formatted;
     m_raw = raw;
@@ -87,7 +85,7 @@ ListLiteral::ListLiteral(AstNodePtr type, std::vector<AstNodePtr> elements) {
     m_elements = elements;
 }
 
-AstNodePtr ListLiteral::list_type() { return m_type; }
+AstNodePtr ListLiteral::listType() { return m_type; }
 
 std::vector<AstNodePtr> ListLiteral::elements() { return m_elements; }
 
@@ -97,7 +95,7 @@ std::string ListLiteral::stringify() {
     std::string res = "[";
 
     for (size_t i = 0; i < m_elements.size(); i++) {
-        if (i) 
+        if (i)
             res += ", ";
 
         res += m_elements[i]->stringify();
@@ -108,7 +106,8 @@ std::string ListLiteral::stringify() {
     return res;
 }
 
-DictLiteral::DictLiteral(std::vector<std::pair<AstNodePtr, AstNodePtr>> elements)  {
+DictLiteral::DictLiteral(
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> elements) {
     m_elements = elements;
 }
 
@@ -116,9 +115,7 @@ std::vector<std::pair<AstNodePtr, AstNodePtr>> DictLiteral::elements() {
     return m_elements;
 }
 
-AstKind DictLiteral::type() {
-    return KAstDict;
-}
+AstKind DictLiteral::type() { return KAstDict; }
 
 std::string DictLiteral::stringify() {
     std::string res = "{";
@@ -191,7 +188,7 @@ VariableStatement::VariableStatement(AstNodePtr type, AstNodePtr name,
     m_value = value;
 }
 
-AstNodePtr VariableStatement::var_type() { return m_type; }
+AstNodePtr VariableStatement::varType() { return m_type; }
 
 AstNodePtr VariableStatement::name() { return m_name; }
 
@@ -224,7 +221,7 @@ ConstDeclaration::ConstDeclaration(AstNodePtr type, AstNodePtr name,
     m_value = value;
 }
 
-AstNodePtr ConstDeclaration::const_type() { return m_type; }
+AstNodePtr ConstDeclaration::constType() { return m_type; }
 
 AstNodePtr ConstDeclaration::name() { return m_name; }
 
@@ -267,16 +264,16 @@ std::string BlockStatement::stringify() {
     return res;
 }
 
-FunctionDefinition::FunctionDefinition(AstNodePtr return_type, AstNodePtr name,
+FunctionDefinition::FunctionDefinition(AstNodePtr returnType, AstNodePtr name,
                                        std::vector<parameter> parameters,
                                        AstNodePtr body) {
-    m_return_type = return_type;
+    m_returnType = returnType;
     m_name = name;
     m_parameters = parameters;
     m_body = body;
 }
 
-AstNodePtr FunctionDefinition::return_type() { return m_return_type; }
+AstNodePtr FunctionDefinition::returnType() { return m_returnType; }
 
 AstNodePtr FunctionDefinition::name() { return m_name; }
 
@@ -307,7 +304,7 @@ std::string FunctionDefinition::stringify() {
     }
 
     res += ") -> ";
-    res += m_return_type->stringify();
+    res += m_returnType->stringify();
     res += ":\n";
 
     res += m_body->stringify();
@@ -315,23 +312,19 @@ std::string FunctionDefinition::stringify() {
     return res;
 }
 
-ReturnStatement::ReturnStatement(AstNodePtr return_value) {
-    m_return_value = return_value;
+ReturnStatement::ReturnStatement(AstNodePtr returnValue) {
+    m_returnValue = returnValue;
 }
 
-AstNodePtr ReturnStatement::return_value() {
-    return m_return_value;
-}
+AstNodePtr ReturnStatement::returnValue() { return m_returnValue; }
 
-AstKind ReturnStatement::type() {
-    return KAstReturnStatement;
-}
+AstKind ReturnStatement::type() { return KAstReturnStatement; }
 
 std::string ReturnStatement::stringify() {
     std::string res = "return";
 
-    if (m_return_value->type() != KAstNone) {
-        res += " " + m_return_value->stringify();
+    if (m_returnValue->type() != KAstNone) {
+        res += " " + m_returnValue->stringify();
     }
 
     return res;
@@ -366,24 +359,24 @@ std::string FunctionCall::stringify() {
     return res;
 }
 
-IfStatement::IfStatement(AstNodePtr condition, AstNodePtr if_body,
-                         AstNodePtr else_body,
+IfStatement::IfStatement(AstNodePtr condition, AstNodePtr ifBody,
+                         AstNodePtr elseBody,
                          std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs) {
     m_condition = condition;
-    m_if_body = if_body;
-    m_else_body = else_body;
+    m_ifBody = ifBody;
+    m_elseBody = elseBody;
     m_elifs = elifs;
 }
 
 AstNodePtr IfStatement::condition() { return m_condition; }
 
-AstNodePtr IfStatement::if_body() { return m_if_body; }
+AstNodePtr IfStatement::ifBody() { return m_ifBody; }
 
 std::vector<std::pair<AstNodePtr, AstNodePtr>> IfStatement::elifs() {
     return m_elifs;
 }
 
-AstNodePtr IfStatement::else_body() { return m_else_body; }
+AstNodePtr IfStatement::elseBody() { return m_elseBody; }
 
 AstKind IfStatement::type() { return KAstIfStmt; }
 
@@ -393,7 +386,7 @@ std::string IfStatement::stringify() {
     res += m_condition->stringify();
     res += ":\n";
 
-    res += m_if_body->stringify();
+    res += m_ifBody->stringify();
     res += "\n";
 
     for (auto& elif : m_elifs) {
@@ -405,9 +398,9 @@ std::string IfStatement::stringify() {
         res += "\n";
     }
 
-    if (m_else_body->type() != KAstNone) {
+    if (m_elseBody->type() != KAstNone) {
         res += "else:\n";
-        res += m_else_body->stringify();
+        res += m_elseBody->stringify();
         res += "\n";
     }
 
@@ -437,34 +430,27 @@ std::string WhileStatement::stringify() {
     return res;
 }
 
-ForStatement::ForStatement(AstNodePtr variable, AstNodePtr sequence, AstNodePtr body) {
+ForStatement::ForStatement(AstNodePtr variable, AstNodePtr sequence,
+                           AstNodePtr body) {
     m_variable = variable;
     m_sequence = sequence;
     m_body = body;
 }
 
-AstNodePtr ForStatement::variable() {
-    return m_variable;
-}
+AstNodePtr ForStatement::variable() { return m_variable; }
 
-AstNodePtr ForStatement::sequence() {
-    return m_sequence;
-}
+AstNodePtr ForStatement::sequence() { return m_sequence; }
 
-AstNodePtr ForStatement::body() {
-    return m_body;
-}
+AstNodePtr ForStatement::body() { return m_body; }
 
-AstKind ForStatement::type() {
-    return KAstForStatement;
-}
+AstKind ForStatement::type() { return KAstForStatement; }
 
 std::string ForStatement::stringify() {
     std::string res = "for ";
 
     res += m_variable->stringify();
     res += " in ";
-    res += m_sequence->stringify(); 
+    res += m_sequence->stringify();
     res += ":\n";
 
     res += m_body->stringify();
@@ -473,18 +459,10 @@ std::string ForStatement::stringify() {
     return res;
 }
 
-AstKind BreakStatement::type() {
-    return KAstBreakStatement;
-}
+AstKind BreakStatement::type() { return KAstBreakStatement; }
 
-std::string BreakStatement::stringify() {
-    return "break";
-}
+std::string BreakStatement::stringify() { return "break"; }
 
-AstKind ContinueStatement::type() {
-    return KAstContinueStatement;
-}
+AstKind ContinueStatement::type() { return KAstContinueStatement; }
 
-std::string ContinueStatement::stringify() {
-    return "continue";
-}
+std::string ContinueStatement::stringify() { return "continue"; }

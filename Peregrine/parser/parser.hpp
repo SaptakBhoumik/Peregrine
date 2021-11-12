@@ -8,64 +8,64 @@
 #include <map>
 #include <vector>
 
-enum Precedence_type {
-    pr_lowest,         // lowest possible precedence
-    pr_and_or,         // and,or
-    pr_not,            // not
-    pr_compare,        // ==, !=, <, >, <=, >=
-    pr_sum_minus,      // +, -
-    pr_mul_div,        // *, /, %, //
-    pr_prefix,         // -x
-    pr_call            // x()
+enum PrecedenceType {
+    pr_lowest,    // lowest possible precedence
+    pr_and_or,    // and,or
+    pr_not,       // not
+    pr_compare,   // ==, !=, <, >, <=, >=
+    pr_sum_minus, // +, -
+    pr_mul_div,   // *, /, %, //
+    pr_prefix,    // -x
+    pr_call       // x()
 };
 
-std::map<TokenType, Precedence_type> create_map();
+std::map<TokenType, PrecedenceType> createMap();
 
 class Parser {
   private:
-    size_t m_tk_index{0};
-    Token m_current_token;
+    size_t m_tokIndex{0};
+    Token m_currentToken;
 
     std::vector<Token> m_tokens;
     std::string m_filename;
 
     std::vector<PEError> m_errors;
 
-    std::map<TokenType, Precedence_type> precedence_map = create_map();
+    std::map<TokenType, PrecedenceType> precedenceMap = createMap();
 
     void advance();
     void advanceOnNewLine();
-    bool expect(TokenType expected_type);
+    bool expect(TokenType expectedType);
     Token next();
-    Precedence_type next_precedence();
+    PrecedenceType nextPrecedence();
 
     void error(Token tok, std::string_view msg);
 
-    AstNodePtr ParseInteger();
-    AstNodePtr ParseDecimal();
-    AstNodePtr ParseString(bool is_formatted,bool is_raw);
-    AstNodePtr ParseBool();
-    AstNodePtr ParseNone();
-    AstNodePtr ParseIdentifier();
-    AstNodePtr ParseList();
+    AstNodePtr parseInteger();
+    AstNodePtr parseDecimal();
+    AstNodePtr parseString(bool isFormatted, bool isRaw);
+    AstNodePtr parseBool();
+    AstNodePtr parseNone();
+    AstNodePtr parseIdentifier();
+    AstNodePtr parseList();
     AstNodePtr ParseDict();
-    AstNodePtr ParseCpp();
+    AstNodePtr parseCpp();
 
-    AstNodePtr ParseExpression(Precedence_type type);
+    AstNodePtr parseExpression(PrecedenceType type);
     AstNodePtr ParsePrefixExpression();
-    AstNodePtr ParseGroupedExpr();
+    AstNodePtr parseGroupedExpr();
 
-    AstNodePtr ParseBinaryOperation(AstNodePtr left);
-    AstNodePtr ParseFunctionCall(AstNodePtr left);
+    AstNodePtr parseBinaryOperation(AstNodePtr left);
+    AstNodePtr parseFunctionCall(AstNodePtr left);
 
-    AstNodePtr ParseStatement();
-    AstNodePtr ParseBlockStatement();
-    AstNodePtr ParseVariableStatement();
-    AstNodePtr ParseConstDeclaration();
-    AstNodePtr ParseIf();
-    AstNodePtr ParseWhile();
-    AstNodePtr ParseFunctionDef();
-    AstNodePtr ParseReturn();
+    AstNodePtr parseStatement();
+    AstNodePtr parseBlockStatement();
+    AstNodePtr parseVariableStatement();
+    AstNodePtr parseConstDeclaration();
+    AstNodePtr parseIf();
+    AstNodePtr parseWhile();
+    AstNodePtr parseFunctionDef();
+    AstNodePtr parseReturn();
 
   public:
     Parser(const std::vector<Token>& tokens);

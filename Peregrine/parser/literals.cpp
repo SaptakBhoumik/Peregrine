@@ -3,45 +3,46 @@
 
 #include <memory>
 
-AstNodePtr Parser::ParseInteger() {
-    return std::make_shared<IntegerLiteral>(m_current_token.keyword);
+AstNodePtr Parser::parseInteger() {
+    return std::make_shared<IntegerLiteral>(m_currentToken.keyword);
 }
 
-AstNodePtr Parser::ParseDecimal() {
-    return std::make_shared<DecimalLiteral>(m_current_token.keyword);
+AstNodePtr Parser::parseDecimal() {
+    return std::make_shared<DecimalLiteral>(m_currentToken.keyword);
 }
 
-AstNodePtr Parser::ParseString(bool is_formatted,bool is_raw) {
-    return std::make_shared<StringLiteral>(m_current_token.keyword,
-                                           is_formatted,is_raw);
+AstNodePtr Parser::parseString(bool isFormatted, bool isRaw) {
+    return std::make_shared<StringLiteral>(m_currentToken.keyword, isFormatted,
+                                           isRaw);
 }
 
-AstNodePtr Parser::ParseBool() {
-    return std::make_shared<BoolLiteral>(m_current_token.keyword);
+AstNodePtr Parser::parseBool() {
+    return std::make_shared<BoolLiteral>(m_currentToken.keyword);
 }
 
-AstNodePtr Parser::ParseList() {
+AstNodePtr Parser::parseList() {
     std::vector<AstNodePtr> elements;
 
-    if (next().tk_type != tk_list_close) {
+    if (next().tkType != tk_list_close) {
         do {
             advance();
 
-            elements.push_back(ParseExpression(pr_lowest));
+            elements.push_back(parseExpression(pr_lowest));
 
             advance();
-        } while (m_current_token.tk_type == tk_comma);
+        } while (m_currentToken.tkType == tk_comma);
     } else {
         advance();
     }
 
-    if (m_current_token.tk_type != tk_list_close) {
-        error(m_current_token, "expected ], got " + m_current_token.keyword + " instead");
+    if (m_currentToken.tkType != tk_list_close) {
+        error(m_currentToken,
+              "expected ], got " + m_currentToken.keyword + " instead");
     }
 
     advanceOnNewLine();
 
-    //TODO: remove the type member? im not sure
+    // TODO: remove the type member? im not sure
     AstNodePtr type = std::make_shared<NoneLiteral>();
 
     return std::make_shared<ListLiteral>(type, elements);
@@ -50,25 +51,26 @@ AstNodePtr Parser::ParseList() {
 AstNodePtr Parser::ParseDict() {
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elements;
 
-    if (next().tk_type != tk_dict_close) {
+    if (next().tkType != tk_dict_close) {
         do {
             advance();
 
-            //TODO: keys should not be made out of any type of expression
-            AstNodePtr key = ParseExpression(pr_lowest);
+            // TODO: keys should not be made out of any type of expression
+            AstNodePtr key = parseExpression(pr_lowest);
             expect(tk_colon);
             advance();
-            AstNodePtr value = ParseExpression(pr_lowest);
+            AstNodePtr value = parseExpression(pr_lowest);
 
             elements.push_back(std::pair(key, value));
             advance();
-        } while (m_current_token.tk_type == tk_comma);
+        } while (m_currentToken.tkType == tk_comma);
     } else {
         advance();
     }
 
-    if (m_current_token.tk_type != tk_dict_close) {
-        error(m_current_token, "expected }, got " + m_current_token.keyword + " instead");
+    if (m_currentToken.tkType != tk_dict_close) {
+        error(m_currentToken,
+              "expected }, got " + m_currentToken.keyword + " instead");
     }
 
     advanceOnNewLine();
@@ -76,6 +78,6 @@ AstNodePtr Parser::ParseDict() {
     return std::make_shared<DictLiteral>(elements);
 }
 
-AstNodePtr Parser::ParseCpp() {}
+AstNodePtr Parser::parseCpp() {}
 
-AstNodePtr Parser::ParseNone() { return std::make_shared<NoneLiteral>(); }
+AstNodePtr Parser::parseNone() { return std::make_shared<NoneLiteral>(); }
