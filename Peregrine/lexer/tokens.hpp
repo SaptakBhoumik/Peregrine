@@ -18,6 +18,7 @@ enum TokenType {
     tk_greater,   // >
     tk_less,      // <
     tk_ampersand, // &
+    tk_bit_and,   // &
     tk_bit_or,    // |
     tk_bit_not,   // ~
     tk_assign,    // =

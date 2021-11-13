@@ -735,11 +735,28 @@ LEXEME lexer(std::string src, std::string filename) {
             if (next(current_index, src) == "=") {
                 keyword = item;
                 start_index = current_index;
-            } else {
+            } 
+            else {
                 start_index = current_index - 1;
                 keyword = item;
-                token = token_init(statement, keyword, tk_ampersand,
-                                   start_index, current_index, line);
+                if (tokens.size() > 0) {
+                    if ((tokens.back().tk_type == tk_true ||
+                         tokens.back().tk_type == tk_false ||
+                         tokens.back().tk_type == tk_integer ||
+                         tokens.back().tk_type == tk_decimal ||
+                         tokens.back().tk_type == tk_identifier ||
+                         tokens.back().tk_type == tk_r_paren) &&
+                        line == tokens.back().line) {
+                        token = token_init(statement, keyword, tk_bit_and,
+                                           start_index, current_index, line);
+                    } else {
+                        token = token_init(statement, keyword, tk_ampersand,
+                                           start_index, current_index, line);
+                    }
+                } else {
+                    token = token_init(statement, keyword, tk_ampersand,
+                                       start_index, current_index, line);
+                }
             }
         } else if (item == "|") {
             if (keyword != "") {
