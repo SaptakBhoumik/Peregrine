@@ -325,8 +325,8 @@ AstNodePtr Parser::ParseFunctionDef() {
         error(m_current_token, "expected ), got " + m_current_token.keyword + " instead");
     }
 
-    // returns None by default
-    AstNodePtr return_type = std::make_shared<IdentifierExpression>("None");
+    // returns void by default
+    AstNodePtr return_type = std::make_shared<IdentifierExpression>("void");
 
     if (next().tk_type == tk_arrow) {
         advance();

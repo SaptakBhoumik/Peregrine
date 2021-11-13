@@ -5,14 +5,18 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include <string>
 #include <string_view>
 
 Codegen::Codegen(std::string output_filename) {
-    m_file = std::ofstream(output_filename);
+    m_file.open(output_filename);
 }
 
-void Codegen::write(std::string_view code) { m_file << code; }
+void Codegen::write(std::string_view code) { 
+    m_file << code;
+    m_file.close();//this will be used only once so we can close it
+    }
 
 std::string Codegen::generate(AstNodePtr ast_node) {
     std::string res;
@@ -37,7 +41,15 @@ std::string Codegen::generate(AstNodePtr ast_node) {
             res+=node->value();
             break;
         }
-
+        case KAstString: {
+            auto node=std::dynamic_pointer_cast<StringLiteral>(ast_node);
+            //todo- do this in type check
+            
+            res+="\"";
+            res+=node->value();
+            res+="\"";
+            break;
+        }
         case KAstBool: {
             auto node = std::dynamic_pointer_cast<BoolLiteral>(ast_node);
             res+=((node->value() == "True") ? "true" : "false");
@@ -78,9 +90,56 @@ std::string Codegen::generate(AstNodePtr ast_node) {
             res+="while("+generate(node->condition())+"){\n"+generate(node->body())+"}";
             break;
         }
+        case KAstIdentifier:{
+            auto node = std::dynamic_pointer_cast<IdentifierExpression>(ast_node);
+            res+=node->value();
+            break;
+        }
+        case KAstFunctionCall:{
+            auto node =std::dynamic_pointer_cast<FunctionCall>(ast_node);
+            auto func_name=generate(node->name());
+            std::string arg;
+            auto x=node->arguments();
+            if (x.size()!=0){
+                for (uint64_t i=0;i<x.size();++i){
+                    arg+=generate(x[i])+" ";
+                    if (i==x.size()-1){}
+                    else{
+                        arg+=",";
+                    }
+                }
+            }
+            res+=func_name+"("+arg+")";
+            break;
+        }
+        case KAstFunctionDef:{
+            auto node = std::dynamic_pointer_cast<FunctionDefinition>(ast_node);
+            auto function_name=generate(node->name());
+            auto return_type=generate(node->return_type());
+            std::string param;
+            if (node->parameters().size()>0){
+                auto x=node->parameters();
+                for (uint64_t i=0;i<x.size();++i){
+                    param+=generate(x[i].p_type)+" "+generate(x[i].p_name);
+                    if (i==x.size()-1){}
+                    else{
+                        param+=",";
+                    }
+                }
+            }
+            if (function_name=="main" && return_type=="void"){
+                //we want the main function to always return 0 if success
+                res+="int main("+param+"){\n"+generate(node->body())+"return 0;\n}";
+            }
+            else{
+                res+=return_type+" "+function_name+"("+param+"){\n"+generate(node->body())+"\n}";
+            }
+            
+            break;
+        }
         default: {
             std::cerr << fg(style("Error: invalid ast node passed to generate(). This should never happen.", bold), light_red) << "\n";
-            std::cerr << "This is most likely not an issue with the compiler itself. You can seek help at our discord server: https://discord.gg/CAMgzwDJDM" << "\n";
+            std::cerr << "This is most likely an issue with the compiler itself. You can seek help at our discord server: https://discord.gg/CAMgzwDJDM" << "\n";
             exit(1);
         }
     }
