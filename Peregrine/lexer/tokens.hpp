@@ -107,6 +107,14 @@ enum TokenType {
     tk_class,     // class
     tk_struct,    // struct
     tk_type,      // type defination
+    
+    // variable data type 
+
+    tk_int,       // int 
+    tk_char,      // char
+    tk_float,     // float
+    tk_double,    // double
+
 
     // value type
     tk_decimal, 
