@@ -94,12 +94,45 @@ std::vector<AstNodePtr> ListLiteral::elements() { return m_elements; }
 AstKind ListLiteral::type() { return KAstList; }
 
 std::string ListLiteral::stringify() {
-    std::string res = "";
+    std::string res = "[";
 
-    for (auto& elem : m_elements) {
-        res += elem->stringify();
+    for (size_t i = 0; i < m_elements.size(); i++) {
+        if (i) 
+            res += ", ";
+
+        res += m_elements[i]->stringify();
     }
 
+    res += "]";
+
+    return res;
+}
+
+DictLiteral::DictLiteral(std::vector<std::pair<AstNodePtr, AstNodePtr>> elements)  {
+    m_elements = elements;
+}
+
+std::vector<std::pair<AstNodePtr, AstNodePtr>> DictLiteral::elements() {
+    return m_elements;
+}
+
+AstKind DictLiteral::type() {
+    return KAstDict;
+}
+
+std::string DictLiteral::stringify() {
+    std::string res = "{";
+
+    for (size_t i = 0; i < m_elements.size(); i++) {
+        if (i)
+            res += ", ";
+
+        res += m_elements[i].first->stringify();
+        res += " : ";
+        res += m_elements[i].second->stringify();
+    }
+
+    res += "}";
     return res;
 }
 
