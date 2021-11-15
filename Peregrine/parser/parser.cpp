@@ -208,12 +208,18 @@ AstNodePtr Parser::ParseVariableStatement() {
         }
 
     }
-    else if (next().tk_type == tk_int){
+    else if ((next().tk_type == tk_int || next().tk_type == tk_char || next().tk_type == tk_float || next().tk_type == tk_double) &&  m_current_token.tk_type == tk_const){
 
         var_type = ParseIdentifier();
         advance();
+        advance();
+
+        if (m_current_token.tk_type == tk_assign){
+            error(m_current_token, "expected a identifier instead got only a data-type declaration");  
+        }
 
     }
+
 
     AstNodePtr name = ParseIdentifier();
 
@@ -229,11 +235,7 @@ AstNodePtr Parser::ParseVariableStatement() {
     }
     
     return std::make_shared<VariableStatement>(var_type, name, value); 
-
-
     
-    
-    return std::make_shared<VariableStatement>(var_type, name, value);    
 }
 
 AstNodePtr Parser::ParseConstDeclaration() {
