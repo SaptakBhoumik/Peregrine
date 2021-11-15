@@ -192,7 +192,7 @@ AstNodePtr Parser::ParseBlockStatement() {
 
 // TODO: make this invalid: int = 43
 AstNodePtr Parser::ParseVariableStatement() {
-    AstNodePtr var_type = std::make_shared<NoneLiteral>();
+    AstNodePtr var_type = std::make_shared<NoLiteral>();
 
     if (next().tk_type == tk_identifier) {
         var_type = ParseIdentifier();
@@ -201,7 +201,7 @@ AstNodePtr Parser::ParseVariableStatement() {
 
     AstNodePtr name = ParseIdentifier();
 
-    AstNodePtr value = std::make_shared<NoneLiteral>();
+    AstNodePtr value = std::make_shared<NoLiteral>();
     
     if (next().tk_type == tk_assign) {
         advance();
@@ -218,7 +218,7 @@ AstNodePtr Parser::ParseVariableStatement() {
 AstNodePtr Parser::ParseConstDeclaration() {
     expect(tk_identifier);
 
-    AstNodePtr const_type = std::make_shared<NoneLiteral>();
+    AstNodePtr const_type = std::make_shared<NoLiteral>();
 
     if (next().tk_type == tk_identifier) {
         const_type = ParseIdentifier();
@@ -344,7 +344,7 @@ AstNodePtr Parser::ParseFunctionDef() {
 }
 
 AstNodePtr Parser::ParseReturn() {
-    AstNodePtr return_value = std::make_shared<NoneLiteral>();
+    AstNodePtr return_value = std::make_shared<NoLiteral>();
 
     if (next().tk_type != tk_new_line) {
         advance();

@@ -72,6 +72,12 @@ AstKind NoneLiteral::type() { return KAstNone; }
 
 std::string NoneLiteral::stringify() { return "None"; }
 
+NoLiteral::NoLiteral() {}
+
+AstKind NoLiteral::type() {return KAstNoLiteral;}
+
+std::string NoLiteral::stringify() { return ""; }
+
 IdentifierExpression::IdentifierExpression(std::string_view value) {
     m_value = value;
 }

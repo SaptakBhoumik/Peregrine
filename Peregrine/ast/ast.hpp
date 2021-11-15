@@ -8,6 +8,7 @@
 #include <vector>
 
 enum AstKind {
+    KAstNoLiteral,
     KAstProgram,
     KAstInteger,
     KAstDecimal,
@@ -108,6 +109,14 @@ class BoolLiteral : public AstNode {
 class NoneLiteral : public AstNode {
   public:
     NoneLiteral();
+
+    AstKind type();
+    std::string stringify();
+};
+
+class NoLiteral : public AstNode {
+  public:
+    NoLiteral();
 
     AstKind type();
     std::string stringify();

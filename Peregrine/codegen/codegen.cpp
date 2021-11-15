@@ -95,6 +95,15 @@ std::string Codegen::generate(AstNodePtr ast_node) {
             res+=node->value();
             break;
         }
+        case  KAstReturnStatement:{
+            auto node = std::dynamic_pointer_cast<ReturnStatement>(ast_node);
+            res+="return ";
+            auto value=node->return_value();
+            if (value->type()!=KAstNoLiteral){
+                res+=generate(value);
+            }
+            break;
+        }
         case KAstFunctionCall:{
             auto node =std::dynamic_pointer_cast<FunctionCall>(ast_node);
             auto func_name=generate(node->name());

@@ -1,2 +1,4 @@
+def test(int x)->int:
+    return x
 def main():
-    printf("Hello World")
+    printf("%d",test(4))
