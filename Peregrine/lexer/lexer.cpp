@@ -260,7 +260,7 @@ LEXEME lexer(std::string src, std::string filename) {
             first_bracket_count--;
         }
         if (is_comment == false && is_array == false &&
-            is_dictionary == false && is_cpp == false && is_string == false) {
+            is_dictionary == false && is_cpp == false && is_string == false && first_bracket_count==0) {
             if (item == " " && is_tab == true) {
                 curr_identation_level += 1;
             } else if (item != " " && is_tab == true && !(item == "\n"||item == "\r\n"||item == "\r")) {

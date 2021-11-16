@@ -1,4 +1,9 @@
 def test(int x)->int:
     return x
 def main():
+    Cppcode(#ifdef _WIN32)
+    printf("On windows\n")
+    Cppcode(#elif __linux__)
+    printf("On linux\n")
+    Cppcode(#endif)
     printf("%d",test(4))

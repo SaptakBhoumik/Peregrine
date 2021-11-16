@@ -208,14 +208,14 @@ AstKind VariableStatement::type() { return KAstVariableStmt; }
 std::string VariableStatement::stringify() {
     std::string res = "";
 
-    if (m_type->type() != KAstNone) {
+    if (m_type->type() != KAstNoLiteral) {
         res += m_type->stringify();
         res += " ";
     }
 
     res += m_name->stringify();
 
-    if (m_value->type() != KAstNone) {
+    if (m_value->type() != KAstNoLiteral) {
         res += " = ";
         res += m_value->stringify();
     }
@@ -241,7 +241,7 @@ AstKind ConstDeclaration::type() { return KAstConstDecl; }
 std::string ConstDeclaration::stringify() {
     std::string res = "const ";
 
-    if (m_type->type() != KAstNone) {
+    if (m_type->type() != KAstNoLiteral) {
         res += m_type->stringify();
         res += " ";
     }
@@ -336,7 +336,7 @@ AstKind ReturnStatement::type() {
 std::string ReturnStatement::stringify() {
     std::string res = "return";
 
-    if (m_return_value->type() != KAstNone) {
+    if (m_return_value->type() != KAstNoLiteral) {
         res += " " + m_return_value->stringify();
     }
 
@@ -411,7 +411,7 @@ std::string IfStatement::stringify() {
         res += "\n";
     }
 
-    if (m_else_body->type() != KAstNone) {
+    if (m_else_body->type() != KAstNoLiteral) {
         res += "else:\n";
         res += m_else_body->stringify();
         res += "\n";
@@ -493,4 +493,24 @@ AstKind ContinueStatement::type() {
 
 std::string ContinueStatement::stringify() {
     return "continue";
+}
+
+CppStatement::CppStatement(std::string cpp_code) {
+    m_cpp_code = cpp_code;
+}
+
+std::string CppStatement::value() {
+    return m_cpp_code;
+}
+
+AstKind CppStatement::type() {
+    return KAstCpp;
+}
+
+std::string CppStatement::stringify() {
+    std::string res = "Cppcode";
+
+    res += "(" + m_cpp_code+")";
+
+    return res;
 }

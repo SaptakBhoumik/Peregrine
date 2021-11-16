@@ -353,4 +353,13 @@ class ContinueStatement : public AstNode {
     std::string stringify();
 };
 
+class CppStatement : public AstNode {
+    std::string  m_cpp_code;
+
+  public:
+    CppStatement(std::string cpp);
+    std::string value();
+    AstKind type();
+    std::string stringify();
+};
 #endif

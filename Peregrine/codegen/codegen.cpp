@@ -85,6 +85,24 @@ std::string Codegen::generate(AstNodePtr ast_node) {
             }
             break;
         }
+        case KAstContinueStatement:{
+            res+="continue";
+            break;
+        }
+        case  KAstBreakStatement:{
+            res+="break";
+            break;
+        }
+        case KAstVariableStmt:{
+            //Todo
+            break;
+        }
+        case KAstCpp:{
+            auto node = std::dynamic_pointer_cast<CppStatement>(ast_node);
+            res+=node->value()+"\n//";//we are making it a comment because ; is added to each node at the end. 
+                                    //we dont want that to happen because it will result in ;; which is an error  
+            break;
+        }
         case KAstWhileStmt:{
             auto node = std::dynamic_pointer_cast<WhileStatement>(ast_node);
             res+="while("+generate(node->condition())+"){\n"+generate(node->body())+"}";

@@ -147,7 +147,12 @@ AstNodePtr Parser::ParseStatement() {
             stmt = ParseReturn();
             break;
         }
-
+        case tk_cppcode:{
+            advance();
+            stmt = std::make_shared<CppStatement>(m_current_token.keyword);
+            advanceOnNewLine();
+            break;
+        }
         case tk_identifier: {
             if (next().tk_type == tk_identifier || next().tk_type == tk_assign) {
                 // variable 
