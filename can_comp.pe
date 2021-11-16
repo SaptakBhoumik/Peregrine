@@ -6,4 +6,6 @@ def main():
     Cppcode(#elif __linux__)
     printf("On linux\n")
     Cppcode(#endif)
+    scope:
+        printf("Hello from new scope\n")
     printf("%d",test(4))

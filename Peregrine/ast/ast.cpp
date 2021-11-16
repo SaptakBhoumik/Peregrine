@@ -514,3 +514,19 @@ std::string CppStatement::stringify() {
 
     return res;
 }
+
+
+ScopeStatement::ScopeStatement(AstNodePtr body){
+    m_scope_body=body;
+}
+
+AstNodePtr ScopeStatement::body() { return m_scope_body; }
+
+AstKind ScopeStatement::type() { return KAstScopeStmt; }
+
+std::string ScopeStatement::stringify() {
+    std::string res = "scope:\n ";
+    res += m_scope_body->stringify();
+    res += "\n";
+    return res;
+}

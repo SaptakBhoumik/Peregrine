@@ -113,6 +113,11 @@ std::string Codegen::generate(AstNodePtr ast_node) {
             res+=node->value();
             break;
         }
+        case KAstScopeStmt:{
+            auto node = std::dynamic_pointer_cast<ScopeStatement>(ast_node);
+            res+="{\n"+generate(node->body())+"\n}";
+            break;
+        }
         case  KAstReturnStatement:{
             auto node = std::dynamic_pointer_cast<ReturnStatement>(ast_node);
             res+="return ";

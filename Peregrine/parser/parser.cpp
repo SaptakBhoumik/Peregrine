@@ -147,6 +147,10 @@ AstNodePtr Parser::ParseStatement() {
             stmt = ParseReturn();
             break;
         }
+        case tk_scope: {
+            stmt=ParseScope();
+            break;
+        }
         case tk_cppcode:{
             advance();
             stmt = std::make_shared<CppStatement>(m_current_token.keyword);
@@ -281,6 +285,15 @@ AstNodePtr Parser::ParseIf() {
 
     return std::make_shared<IfStatement>(condition, if_body, else_body, elifs);
 }
+
+AstNodePtr Parser::ParseScope() {
+    expect(tk_colon);
+    //TODO:  support single-line scope
+    expect(tk_ident);
+    AstNodePtr scope_body = ParseBlockStatement();
+    return std::make_shared<ScopeStatement>(scope_body);
+}
+
 
 AstNodePtr Parser::ParseWhile() {
     advance(); // skip the while token

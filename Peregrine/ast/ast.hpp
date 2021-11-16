@@ -28,6 +28,7 @@ enum AstKind {
     KAstReturnStatement,
     KAstFunctionCall,
     KAstIfStmt,
+    KAstScopeStmt,
     KAstWhileStmt,
     KAstForStatement,
     KAstBreakStatement,
@@ -359,6 +360,14 @@ class CppStatement : public AstNode {
   public:
     CppStatement(std::string cpp);
     std::string value();
+    AstKind type();
+    std::string stringify();
+};
+class ScopeStatement : public AstNode {
+    AstNodePtr m_scope_body;
+  public:
+    ScopeStatement(AstNodePtr body);
+    AstNodePtr body();
     AstKind type();
     std::string stringify();
 };
