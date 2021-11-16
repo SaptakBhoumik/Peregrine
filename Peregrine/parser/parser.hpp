@@ -47,6 +47,7 @@ class Parser {
     AstNodePtr parseBool();
     AstNodePtr parseNone();
     AstNodePtr parseIdentifier();
+    AstNodePtr parseType();
     AstNodePtr parseList();
     AstNodePtr ParseDict();
     AstNodePtr parseCpp();

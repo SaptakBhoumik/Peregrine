@@ -80,6 +80,16 @@ AstKind IdentifierExpression::type() { return KAstIdentifier; }
 
 std::string IdentifierExpression::stringify() { return m_value; }
 
+TypeExpression::TypeExpression(std::string_view value) {
+    m_value = value;
+}
+
+std::string TypeExpression::value() { return m_value; }
+
+AstKind TypeExpression::type() { return KAstTypeExpr; }
+
+std::string TypeExpression::stringify() { return m_value; }
+
 ListLiteral::ListLiteral(AstNodePtr type, std::vector<AstNodePtr> elements) {
     m_type = type;
     m_elements = elements;
@@ -133,7 +143,7 @@ std::string DictLiteral::stringify() {
     return res;
 }
 
-BinaryOperation::BinaryOperation(AstNodePtr left, std::string_view op,
+BinaryOperation::BinaryOperation(AstNodePtr left, Token op,
                                  AstNodePtr right) {
     m_left = left;
     m_operator = op;
@@ -142,7 +152,7 @@ BinaryOperation::BinaryOperation(AstNodePtr left, std::string_view op,
 
 AstNodePtr BinaryOperation::left() { return m_left; }
 
-std::string BinaryOperation::op() { return m_operator; }
+Token BinaryOperation::op() { return m_operator; }
 
 AstNodePtr BinaryOperation::right() { return m_right; }
 
@@ -154,7 +164,7 @@ std::string BinaryOperation::stringify() {
 
     res += m_left->stringify();
     res += " ";
-    res += m_operator;
+    res += m_operator.keyword;
     res += " ";
     res += m_right->stringify();
     res += ")";
@@ -162,19 +172,19 @@ std::string BinaryOperation::stringify() {
     return res;
 }
 
-PrefixExpression::PrefixExpression(std::string_view prefix, AstNodePtr right) {
+PrefixExpression::PrefixExpression(Token prefix, AstNodePtr right) {
     m_prefix = prefix;
     m_right = right;
 }
 
-std::string PrefixExpression::prefix() { return m_prefix; }
+Token PrefixExpression::prefix() { return m_prefix; }
 
 AstNodePtr PrefixExpression::right() { return m_right; }
 
 AstKind PrefixExpression::type() { return KAstPrefixExpr; }
 
 std::string PrefixExpression::stringify() {
-    std::string res = m_prefix;
+    std::string res = m_prefix.keyword;
 
     res += m_right->stringify();
 

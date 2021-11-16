@@ -46,7 +46,7 @@ std::string Codegen::generate(AstNodePtr ast_node) {
 
         case KAstBinaryOp: {
             auto node = std::dynamic_pointer_cast<BinaryOperation>(ast_node);
-            res += "(" + generate(node->left()) + node->op() +
+            res += "(" + generate(node->left()) + node->op().keyword +
                    generate(node->right()) + ")";
             break;
         }

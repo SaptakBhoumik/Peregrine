@@ -196,7 +196,7 @@ AstNodePtr Parser::parseVariableStatement() {
     AstNodePtr varType = std::make_shared<NoneLiteral>();
 
     if (next().tkType == tk_identifier) {
-        varType = parseIdentifier();
+        varType = parseType();
         advance();
     }
 
@@ -222,7 +222,7 @@ AstNodePtr Parser::parseConstDeclaration() {
     AstNodePtr constType = std::make_shared<NoneLiteral>();
 
     if (next().tkType == tk_identifier) {
-        constType = parseIdentifier();
+        constType = parseType();
         advance();
     }
 
@@ -312,7 +312,7 @@ AstNodePtr Parser::parseFunctionDef() {
                                   " instead");
             }
 
-            AstNodePtr paramType = parseIdentifier();
+            AstNodePtr paramType = parseType();
             expect(tk_identifier);
             AstNodePtr paramName = parseIdentifier();
 
@@ -335,7 +335,7 @@ AstNodePtr Parser::parseFunctionDef() {
         advance();
         expect(tk_identifier);
 
-        returnType = parseIdentifier();
+        returnType = parseType();
     }
 
     expect(tk_colon);
@@ -455,7 +455,7 @@ AstNodePtr Parser::parseExpression(PrecedenceType curr_precedence) {
 }
 
 AstNodePtr Parser::parseBinaryOperation(AstNodePtr left) {
-    std::string op = m_currentToken.keyword;
+    Token op = m_currentToken;
     PrecedenceType precedence = precedenceMap[m_currentToken.tkType];
 
     advance();
@@ -489,7 +489,7 @@ AstNodePtr Parser::parseFunctionCall(AstNodePtr left) {
 }
 
 AstNodePtr Parser::ParsePrefixExpression() {
-    std::string prefix = m_currentToken.keyword;
+    Token prefix = m_currentToken;
     PrecedenceType precedence = precedenceMap[m_currentToken.tkType];
 
     advance();
@@ -511,4 +511,8 @@ AstNodePtr Parser::parseGroupedExpr() {
 
 AstNodePtr Parser::parseIdentifier() {
     return std::make_shared<IdentifierExpression>(m_currentToken.keyword);
+}
+
+AstNodePtr Parser::parseType() {
+    return std::make_shared<TypeExpression>(m_currentToken.keyword);
 }

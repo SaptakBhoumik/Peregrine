@@ -2,6 +2,7 @@
 #include "lexer/tokens.hpp"
 #include "parser/parser.hpp"
 #include "codegen/codegen.hpp"
+#include "analyzer/typeChecker.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -21,6 +22,9 @@ int main() {
 
     Parser parser(tokens);
     AstNodePtr program = parser.parse();
+
+    TypeChecker typeChecker;
+    typeChecker.check(program);
 
     std::cout << program->stringify() << "\n";
 

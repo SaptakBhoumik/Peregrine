@@ -15,6 +15,7 @@ enum AstKind {
     KAstBool,
     KAstNone,
     KAstIdentifier,
+    KAstTypeExpr,
     KAstList,
     KAstDict,
     KAstCpp,
@@ -125,6 +126,18 @@ class IdentifierExpression : public AstNode {
     std::string stringify();
 };
 
+class TypeExpression : public AstNode {
+    std::string m_value;
+
+  public:
+    TypeExpression(std::string_view value);
+
+    std::string value();
+
+    AstKind type();
+    std::string stringify();
+};
+
 class ListLiteral : public AstNode {
     AstNodePtr m_type;
     std::vector<AstNodePtr> m_elements;
@@ -154,14 +167,14 @@ class DictLiteral : public AstNode {
 
 class BinaryOperation : public AstNode {
     AstNodePtr m_left;
-    std::string m_operator;
+    Token m_operator;
     AstNodePtr m_right;
 
   public:
-    BinaryOperation(AstNodePtr left, std::string_view op, AstNodePtr right);
+    BinaryOperation(AstNodePtr left, Token op, AstNodePtr right);
 
     AstNodePtr left();
-    std::string op();
+    Token op();
     AstNodePtr right();
 
     AstKind type();
@@ -169,13 +182,13 @@ class BinaryOperation : public AstNode {
 };
 
 class PrefixExpression : public AstNode {
-    std::string m_prefix;
+    Token m_prefix;
     AstNodePtr m_right;
 
   public:
-    PrefixExpression(std::string_view prefix, AstNodePtr right);
+    PrefixExpression(Token prefix, AstNodePtr right);
 
-    std::string prefix();
+    Token prefix();
     AstNodePtr right();
 
     AstKind type();

@@ -130,4 +130,16 @@ struct Token {
     TokenType tkType;
 };
 
+namespace TokenUtils {
+
+    // +, -, *, etc
+    bool isArithmeticToken(Token tok);
+
+    // ==, <=, etc
+    bool isComparisonToken(Token tok);
+
+    // |, &, ^, etc
+    bool isBitwiseToken(Token tok);
+}
+
 #endif
