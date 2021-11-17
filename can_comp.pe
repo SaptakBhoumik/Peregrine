@@ -1,4 +1,4 @@
-def test(int x)->int:
+def test(int x)->int:#this is comment
     return x
 def main():
     Cppcode(#ifdef _WIN32)

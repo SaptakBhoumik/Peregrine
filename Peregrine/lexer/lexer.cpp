@@ -259,41 +259,39 @@ LEXEME lexer(std::string src, std::string filename) {
         else if (item==")" && !is_comment && !is_string && !is_cpp_string) {
             first_bracket_count--;
         }
-        if (is_comment == false && is_array == false &&
+        if (is_array == false &&
             is_dictionary == false && is_cpp == false && is_string == false && first_bracket_count==0) {
             if (item == " " && is_tab == true) {
                 curr_identation_level += 1;
             } else if (item != " " && is_tab == true && !(item == "\n"||item == "\r\n"||item == "\r")) {
                 is_tab = false;
-                if (item == "#") {
-                    curr_identation_level -= 4;
-                } else {
-                    previous_identation = 0;
-                }
-                if (identation_level.size() != 0) {
-                    previous_identation =
-                        identation_level.at(identation_level.size() - 1);
-                }
-                if (curr_identation_level > previous_identation) {
-                    token = token_init(statement, "", tk_ident, current_index,
-                                       current_index, line);
-                    tokens.emplace_back(token);
-                    identation_level.emplace_back(curr_identation_level);
-                }
-                while (curr_identation_level < previous_identation) {
-                    identation_level.pop_back();
-                    token = token_init(statement, "", tk_dedent, current_index,
-                                       current_index, line);
-                    tokens.emplace_back(token);
+                previous_identation = 0;
+                if (item!="#"){
                     if (identation_level.size() != 0) {
-                        if (curr_identation_level >=
-                            identation_level.at(identation_level.size() - 1)) {
-                            break;
-                        }
                         previous_identation =
                             identation_level.at(identation_level.size() - 1);
-                    } else {
-                        previous_identation = 0;
+                    }
+                    if (curr_identation_level > previous_identation) {
+                        token = token_init(statement, "", tk_ident, current_index,
+                                        current_index, line);
+                        tokens.emplace_back(token);
+                        identation_level.emplace_back(curr_identation_level);
+                    }
+                    while (curr_identation_level < previous_identation) {
+                        identation_level.pop_back();
+                        token = token_init(statement, "", tk_dedent, current_index,
+                                        current_index, line);
+                        tokens.emplace_back(token);
+                        if (identation_level.size() != 0) {
+                            if (curr_identation_level >=
+                                identation_level.at(identation_level.size() - 1)) {
+                                break;
+                            }
+                            previous_identation =
+                                identation_level.at(identation_level.size() - 1);
+                        } else {
+                            previous_identation = 0;
+                        }
                     }
                 }
             } else if (item == "\n"||item == "\r\n"||item == "\r"){

@@ -153,7 +153,7 @@ AstNodePtr Parser::ParseStatement() {
         }
         case tk_cppcode:{
             advance();
-            stmt = std::make_shared<CppStatement>(m_current_token.keyword);
+            stmt = ParseCpp();
             advanceOnNewLine();
             break;
         }
