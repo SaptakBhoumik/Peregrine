@@ -200,10 +200,11 @@ AstNodePtr Parser::ParseVariableStatement() {
 
 <<<<<<< HEAD
     }
-    else if ((next().tk_type == tk_int || next().tk_type == tk_char || next().tk_type == tk_float || next().tk_type == tk_double) &&  m_current_token.tk_type == tk_const){
+    else if (next().tk_type == tk_int){
 
         var_type = ParseIdentifier();
         advance();
+<<<<<<< HEAD
         advance();
 
         if (m_current_token.tk_type == tk_assign){
@@ -218,6 +219,8 @@ AstNodePtr Parser::ParseVariableStatement() {
             advance();
             advance();
 >>>>>>> parent of daaf824 (Variable declaration parsing)
+=======
+>>>>>>> parent of 28a0130 (Updated the code for ParseVariable with few checks)
 
             value = ParseExpression(pr_lowest);
         } else {
@@ -225,7 +228,10 @@ AstNodePtr Parser::ParseVariableStatement() {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
+=======
+>>>>>>> parent of 28a0130 (Updated the code for ParseVariable with few checks)
     AstNodePtr name = ParseIdentifier();
 =======
     else if (m_current_token.tk_type == tk_const ){
@@ -258,6 +264,7 @@ AstNodePtr Parser::ParseVariableStatement() {
     
 <<<<<<< HEAD
     return std::make_shared<VariableStatement>(var_type, name, value); 
+<<<<<<< HEAD
 =======
     }
 
@@ -267,7 +274,13 @@ AstNodePtr Parser::ParseVariableStatement() {
 
     
 >>>>>>> parent of daaf824 (Variable declaration parsing)
+=======
+
+
     
+>>>>>>> parent of 28a0130 (Updated the code for ParseVariable with few checks)
+    
+    return std::make_shared<VariableStatement>(var_type, name, value);    
 }
 
 AstNodePtr Parser::ParseConstDeclaration() {
