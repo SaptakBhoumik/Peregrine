@@ -27,7 +27,6 @@ enum TokenType {
     tk_dot,       // .
     tk_l_paren,   // (
     tk_r_paren,   // )
-    tk_hashtag,   // //
     tk_comma,     // ,
     tk_list_close, // ]
     tk_list_open,  // [
@@ -103,6 +102,8 @@ enum TokenType {
     tk_not,       // not
     tk_is,        // is
     tk_in,        // in
+    tk_not_in,    //not in
+    tk_is_not,    //is not
     tk_cppcode,   // Cppcode
     tk_class,     // class
     tk_struct,    // struct

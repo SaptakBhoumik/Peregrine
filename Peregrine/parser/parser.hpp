@@ -13,8 +13,11 @@ enum Precedence_type {
     pr_and_or,         // and,or
     pr_not,            // not
     pr_compare,        // ==, !=, <, >, <=, >=
+    pr_bit_and_or,     // &,|,^
+    pr_bit_shift,      // >> , <<
     pr_sum_minus,      // +, -
     pr_mul_div,        // *, /, %, //
+    pr_expo,           // **
     pr_prefix,         // -x
     pr_call            // x()
 };

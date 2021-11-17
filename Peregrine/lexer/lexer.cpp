@@ -377,7 +377,17 @@ LEXEME lexer(std::string src, std::string filename) {
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, line);
-                    tokens.emplace_back(token);
+                    if (token.tk_type==tk_not && tokens[tokens.size()-1].tk_type==tk_is){
+                        tokens[tokens.size()-1].tk_type=tk_is_not;
+                        tokens[tokens.size()-1].keyword="is not";
+                    }
+                    else if (token.tk_type==tk_in && tokens[tokens.size()-1].tk_type==tk_not){
+                        tokens[tokens.size()-1].tk_type=tk_not_in;
+                        tokens[tokens.size()-1].keyword="not in";
+                    }
+                    else{
+                        tokens.emplace_back(token);
+                    }
                     token = Token();
                     keyword = "";
             }
@@ -403,7 +413,17 @@ LEXEME lexer(std::string src, std::string filename) {
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, line);
-                tokens.emplace_back(token);
+                if (token.tk_type==tk_not && tokens[tokens.size()-1].tk_type==tk_is){
+                        tokens[tokens.size()-1].tk_type=tk_is_not;
+                        tokens[tokens.size()-1].keyword="is not";
+                    }
+                else if (token.tk_type==tk_in && tokens[tokens.size()-1].tk_type==tk_not){
+                    tokens[tokens.size()-1].tk_type=tk_not_in;
+                    tokens[tokens.size()-1].keyword="not in";
+                    }
+                else{
+                    tokens.emplace_back(token);
+                    }
                 token = Token();
                 keyword = "";
             }
@@ -419,7 +439,17 @@ LEXEME lexer(std::string src, std::string filename) {
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, line);
-                tokens.emplace_back(token);
+                    if (token.tk_type==tk_not && tokens[tokens.size()-1].tk_type==tk_is){
+                        tokens[tokens.size()-1].tk_type=tk_is_not;
+                        tokens[tokens.size()-1].keyword="is not";
+                    }
+                    else if (token.tk_type==tk_in && tokens[tokens.size()-1].tk_type==tk_not){
+                        tokens[tokens.size()-1].tk_type=tk_not_in;
+                        tokens[tokens.size()-1].keyword="not in";
+                    }
+                    else{
+                        tokens.emplace_back(token);
+                    }
                 token = Token();
                 keyword = "";
             }
@@ -455,7 +485,17 @@ LEXEME lexer(std::string src, std::string filename) {
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, line);
-                tokens.emplace_back(token);
+                    if (token.tk_type==tk_not && tokens[tokens.size()-1].tk_type==tk_is){
+                        tokens[tokens.size()-1].tk_type=tk_is_not;
+                        tokens[tokens.size()-1].keyword="is not";
+                    }
+                    else if (token.tk_type==tk_in && tokens[tokens.size()-1].tk_type==tk_not){
+                        tokens[tokens.size()-1].tk_type=tk_not_in;
+                        tokens[tokens.size()-1].keyword="not in";
+                    }
+                    else{
+                        tokens.emplace_back(token);
+                    }
                 token = Token();
                 keyword = "";
             }
@@ -592,7 +632,17 @@ LEXEME lexer(std::string src, std::string filename) {
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, line);
-                tokens.emplace_back(token);
+                    if (token.tk_type==tk_not && tokens[tokens.size()-1].tk_type==tk_is){
+                        tokens[tokens.size()-1].tk_type=tk_is_not;
+                        tokens[tokens.size()-1].keyword="is not";
+                    }
+                    else if (token.tk_type==tk_in && tokens[tokens.size()-1].tk_type==tk_not){
+                        tokens[tokens.size()-1].tk_type=tk_not_in;
+                        tokens[tokens.size()-1].keyword="not in";
+                    }
+                    else{
+                        tokens.emplace_back(token);
+                    }
                 token = Token();
                 keyword = "";
             }
@@ -726,7 +776,17 @@ LEXEME lexer(std::string src, std::string filename) {
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, line);
-                tokens.emplace_back(token);
+                    if (token.tk_type==tk_not && tokens[tokens.size()-1].tk_type==tk_is){
+                        tokens[tokens.size()-1].tk_type=tk_is_not;
+                        tokens[tokens.size()-1].keyword="is not";
+                    }
+                    else if (token.tk_type==tk_in && tokens[tokens.size()-1].tk_type==tk_not){
+                        tokens[tokens.size()-1].tk_type=tk_not_in;
+                        tokens[tokens.size()-1].keyword="not in";
+                    }
+                    else{
+                        tokens.emplace_back(token);
+                    }
                 token = Token();
                 keyword = "";
             }
@@ -781,7 +841,17 @@ LEXEME lexer(std::string src, std::string filename) {
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, line);
-                tokens.emplace_back(token);
+                    if (token.tk_type==tk_not && tokens[tokens.size()-1].tk_type==tk_is){
+                        tokens[tokens.size()-1].tk_type=tk_is_not;
+                        tokens[tokens.size()-1].keyword="is not";
+                    }
+                    else if (token.tk_type==tk_in && tokens[tokens.size()-1].tk_type==tk_not){
+                        tokens[tokens.size()-1].tk_type=tk_not_in;
+                        tokens[tokens.size()-1].keyword="not in";
+                    }
+                    else{
+                        tokens.emplace_back(token);
+                    }
                 token = Token();
                 keyword = "";
             }
@@ -824,7 +894,17 @@ LEXEME lexer(std::string src, std::string filename) {
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, line);
-                tokens.emplace_back(token);
+                    if (token.tk_type==tk_not && tokens[tokens.size()-1].tk_type==tk_is){
+                        tokens[tokens.size()-1].tk_type=tk_is_not;
+                        tokens[tokens.size()-1].keyword="is not";
+                    }
+                    else if (token.tk_type==tk_in && tokens[tokens.size()-1].tk_type==tk_not){
+                        tokens[tokens.size()-1].tk_type=tk_not_in;
+                        tokens[tokens.size()-1].keyword="not in";
+                    }
+                    else{
+                        tokens.emplace_back(token);
+                    }
                 token = Token();
                 keyword = "";
             }

@@ -13,21 +13,32 @@ std::map<TokenType, Precedence_type> create_map() {
 
     precedence_map[tk_negative] = pr_prefix;
     precedence_map[tk_bit_not] = pr_prefix;
-    precedence_map[tk_not] = pr_prefix;
     precedence_map[tk_and] = pr_and_or;
     precedence_map[tk_or] = pr_and_or;
     precedence_map[tk_not] = pr_not;
     precedence_map[tk_not_equal] = pr_compare;
+    precedence_map[tk_is_not] = pr_compare;
+    precedence_map[tk_is] = pr_compare;
+    precedence_map[tk_not_in] = pr_compare;
+    precedence_map[tk_in] = pr_compare;
     precedence_map[tk_greater] = pr_compare;
     precedence_map[tk_less] = pr_compare;
     precedence_map[tk_gr_or_equ] = pr_compare;
     precedence_map[tk_less_or_equ] = pr_compare;
+    precedence_map[tk_equal] = pr_compare;
+    precedence_map[tk_bit_and] = pr_bit_and_or;
+    precedence_map[tk_bit_or]  = pr_bit_and_or;
+    precedence_map[tk_xor] = pr_bit_and_or;
+    precedence_map[tk_shift_left]  = pr_bit_shift;
+    precedence_map[tk_shift_right]  = pr_bit_shift;
     precedence_map[tk_plus] = pr_sum_minus;
     precedence_map[tk_minus] = pr_sum_minus;
     precedence_map[tk_multiply] = pr_mul_div;
     precedence_map[tk_divide] = pr_mul_div;
+    precedence_map[tk_modulo] = pr_mul_div;
+    precedence_map[tk_floor] = pr_mul_div;
+    precedence_map[tk_exponent] = pr_expo;
     precedence_map[tk_l_paren] = pr_call;
-
     return precedence_map;
 }
 

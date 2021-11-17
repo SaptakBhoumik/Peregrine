@@ -55,10 +55,14 @@ std::string Codegen::generate(AstNodePtr ast_node) {
             res+=((node->value() == "True") ? "true" : "false");
             break;
         }
-
+        case KAstPrefixExpr:{
+            auto node = std::dynamic_pointer_cast<PrefixExpression>(ast_node);
+            res+="("+node->prefix()+" "+generate(node->right())+")";
+            break;
+        }
         case KAstBinaryOp: {
             auto node = std::dynamic_pointer_cast<BinaryOperation>(ast_node);
-            res+="("+generate(node->left())+node->op()+generate(node->right())+")";
+            res+="("+generate(node->left())+" "+node->op()+" "+generate(node->right())+")";
             break;
         }
         case KAstBlockStmt:{
