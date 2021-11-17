@@ -40,7 +40,7 @@ class Parser {
 
     void advance();
     void advanceOnNewLine();
-    bool expect(TokenType expected_type);
+    void expect(TokenType expected_type);
     Token next();
     Precedence_type next_precedence();
 

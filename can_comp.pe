@@ -8,4 +8,4 @@ def main():
     Cppcode(#endif)
     scope:
         printf("Hello from new scope\n")
-    printf("%d",not test(0)+8)
+    printf("%d",test(0))

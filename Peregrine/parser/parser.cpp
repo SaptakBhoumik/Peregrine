@@ -90,7 +90,7 @@ void Parser::error(Token tok, std::string_view msg) {
     m_errors.push_back(err);
 }
 
-bool Parser::expect(TokenType expected_type) {
+void Parser::expect(TokenType expected_type) {
     if (next().tk_type != expected_type) {
         error(next(), "expected token of type " +
                           std::to_string(expected_type) + ", got " +
