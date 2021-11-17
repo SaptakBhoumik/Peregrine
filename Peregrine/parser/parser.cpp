@@ -26,9 +26,9 @@ std::map<TokenType, Precedence_type> create_map() {
     precedence_map[tk_gr_or_equ] = pr_compare;
     precedence_map[tk_less_or_equ] = pr_compare;
     precedence_map[tk_equal] = pr_compare;
-    precedence_map[tk_bit_and] = pr_bit_and_or;
-    precedence_map[tk_bit_or]  = pr_bit_and_or;
-    precedence_map[tk_xor] = pr_bit_and_or;
+    precedence_map[tk_bit_or]  = pr_bit_or;
+    precedence_map[tk_xor] = pr_bit_xor;
+    precedence_map[tk_bit_and] = pr_bit_and;
     precedence_map[tk_shift_left]  = pr_bit_shift;
     precedence_map[tk_shift_right]  = pr_bit_shift;
     precedence_map[tk_plus] = pr_sum_minus;
