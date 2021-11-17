@@ -200,7 +200,6 @@ AstNodePtr Parser::ParseVariableStatement() {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
-<<<<<<< HEAD
     }
     else if ((next().tk_type == tk_int || next().tk_type == tk_char || next().tk_type == tk_float || next().tk_type == tk_double) &&  m_current_token.tk_type == tk_const){
 
@@ -224,45 +223,12 @@ AstNodePtr Parser::ParseVariableStatement() {
 =======
         AstNodePtr name = ParseIdentifier();
 
-=======
-        AstNodePtr name = ParseIdentifier();
-
         AstNodePtr value = std::make_shared<NoneLiteral>();
     
         if (next().tk_type == tk_assign) {
             advance();
             advance();
 
-            value = ParseExpression(pr_lowest);
-        } else {
-        advanceOnNewLine();
-    }
-
-    else if (m_current_token.tk_type == tk_const ){
-
-        AstNodePtr const_keyword = std::make_shared<NoneLiteral>();
-        const_keyword = ParseConstDeclaration();
-        
-
-        if (next().tk_type == tk_identifier){
-            var_type = ParseIdentifier();
-            advance();
-        }
-        else if (next().tk_type == tk_assign)
-        {
-            error(m_current_token, "expected variable name or data type, instead got an assignment operator");
-        }
-
-        AstNodePtr name = ParseIdentifier();
-
->>>>>>> parent of daaf824 (Variable declaration parsing)
-        AstNodePtr value = std::make_shared<NoneLiteral>();
-    
-        if (next().tk_type == tk_assign) {
-            advance();
-            advance();
-
-<<<<<<< HEAD
 >>>>>>> parent of daaf824 (Variable declaration parsing)
             value = ParseExpression(pr_lowest);
         } else {
@@ -303,13 +269,10 @@ AstNodePtr Parser::ParseVariableStatement() {
             advance();
             advance();
 
-=======
->>>>>>> parent of daaf824 (Variable declaration parsing)
             value = ParseExpression(pr_lowest);
         } else {
         advanceOnNewLine();    
     
-<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     return std::make_shared<VariableStatement>(var_type, name, value); 
@@ -317,9 +280,6 @@ AstNodePtr Parser::ParseVariableStatement() {
     }
 
 
-=======
-    }
->>>>>>> parent of daaf824 (Variable declaration parsing)
 
 =======
     }
@@ -327,9 +287,6 @@ AstNodePtr Parser::ParseVariableStatement() {
 
 
 >>>>>>> parent of daaf824 (Variable declaration parsing)
-}
-
-
 }
 
     
