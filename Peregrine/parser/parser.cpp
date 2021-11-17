@@ -191,22 +191,14 @@ AstNodePtr Parser::ParseBlockStatement() {
 }
 
 // TODO: make this invalid: int = 43
-// TODO: Handle all cases of declaration - a = 7, const a = 7 , int a = 7, const int a = 7
-
 AstNodePtr Parser::ParseVariableStatement() {
-    
     AstNodePtr var_type = std::make_shared<NoneLiteral>();
 
     if (next().tk_type == tk_identifier) {
         var_type = ParseIdentifier();
         advance();
-    }
-    else if (next().tk_type == tk_assign){
-        
-        if (m_current_token.tk_type == tk_int || m_current_token.tk_type == tk_char || m_current_token.tk_type == tk_float || m_current_token.tk_type == tk_double){
-            error(m_current_token, "expected a identifier instead got only a data-type declaration");    
-        }
 
+<<<<<<< HEAD
     }
     else if ((next().tk_type == tk_int || next().tk_type == tk_char || next().tk_type == tk_float || next().tk_type == tk_double) &&  m_current_token.tk_type == tk_const){
 
@@ -217,24 +209,64 @@ AstNodePtr Parser::ParseVariableStatement() {
         if (m_current_token.tk_type == tk_assign){
             error(m_current_token, "expected a identifier instead got only a data-type declaration");  
         }
+=======
+        AstNodePtr name = ParseIdentifier();
 
-    }
-
-
-    AstNodePtr name = ParseIdentifier();
-
-    AstNodePtr value = std::make_shared<NoneLiteral>();
+        AstNodePtr value = std::make_shared<NoneLiteral>();
     
-    if (next().tk_type == tk_assign) {
-        advance();
-        advance();
+        if (next().tk_type == tk_assign) {
+            advance();
+            advance();
+>>>>>>> parent of daaf824 (Variable declaration parsing)
 
-        value = ParseExpression(pr_lowest);
-    } else {
+            value = ParseExpression(pr_lowest);
+        } else {
         advanceOnNewLine();
     }
+
+<<<<<<< HEAD
+
+    AstNodePtr name = ParseIdentifier();
+=======
+    else if (m_current_token.tk_type == tk_const ){
+
+        AstNodePtr const_keyword = std::make_shared<NoneLiteral>();
+        const_keyword = ParseConstDeclaration();
+        
+>>>>>>> parent of daaf824 (Variable declaration parsing)
+
+        if (next().tk_type == tk_identifier){
+            var_type = ParseIdentifier();
+            advance();
+        }
+        else if (next().tk_type == tk_assign)
+        {
+            error(m_current_token, "expected variable name or data type, instead got an assignment operator");
+        }
+
+        AstNodePtr name = ParseIdentifier();
+
+        AstNodePtr value = std::make_shared<NoneLiteral>();
     
+        if (next().tk_type == tk_assign) {
+            advance();
+            advance();
+
+            value = ParseExpression(pr_lowest);
+        } else {
+        advanceOnNewLine();    
+    
+<<<<<<< HEAD
     return std::make_shared<VariableStatement>(var_type, name, value); 
+=======
+    }
+
+
+
+}
+
+    
+>>>>>>> parent of daaf824 (Variable declaration parsing)
     
 }
 
