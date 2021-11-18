@@ -9,14 +9,21 @@
 #include <vector>
 
 class TypeChecker {
-    std::unique_ptr<SymbolTable<TypePtr>> m_env;
+    std::shared_ptr<SymbolTable<TypePtr>> m_env;
 
+    // the function whose body is being currently checked
+    std::shared_ptr<FunctionType> m_currentFunction; 
 public:
     TypeChecker();
 
     void error(std::string_view msg);
     void expectType(TypePtr type1, TypePtr type2);
     TypePtr check(AstNodePtr astNode);
+
+    void enterLocalEnv();
+    void exitLocalEnv();
+
+    std::string identifierName(AstNodePtr identifier);
 };
 
 #endif

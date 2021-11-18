@@ -4,9 +4,11 @@
 
 #include <iostream>
 #include <memory>
+#include <assert.h>
 
 TypeChecker::TypeChecker() {
-    m_env = std::make_unique<SymbolTable<TypePtr>>(nullptr);
+    m_env = std::make_shared<SymbolTable<TypePtr>>(nullptr);
+    m_currentFunction = nullptr;
 }
 
 void TypeChecker::error(std::string_view msg) {
@@ -26,6 +28,22 @@ void TypeChecker::expectType(TypePtr expected, TypePtr obtained) {
             error("expected type " + expected->stringify() + ", got " + obtained->stringify() + " instead");
         }
     }
+}
+
+void TypeChecker::enterLocalEnv() {
+    m_env = std::make_shared<SymbolTable<TypePtr>>(m_env);
+}
+
+void TypeChecker::exitLocalEnv() {
+    if (!m_env->parent())
+        std::cerr << "no parent bruh" << "\n";
+    m_env = m_env->parent();
+}
+
+std::string TypeChecker::identifierName(AstNodePtr identifier) {
+    assert(identifier->type() == KAstIdentifier);
+
+    return std::dynamic_pointer_cast<IdentifierExpression>(identifier)->value();
 }
 
 TypePtr TypeChecker::check(AstNodePtr astNode) {
@@ -77,6 +95,10 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
 
         case KAstDecimal: {
             return TypeList::decimal();
+        }
+
+        case KAstNone: {
+            return TypeList::none();
         }
 
         case KAstPrefixExpr: {
@@ -157,18 +179,27 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
         case KAstFunctionDef: {
             auto node = std::dynamic_pointer_cast<FunctionDefinition>(astNode);
 
-            check(node->body());
-
             std::vector<TypePtr> parameterTypes;
             parameterTypes.reserve(node->parameters().size());
 
+            enterLocalEnv();
+
             for (auto& param : node->parameters()) {
-                parameterTypes.push_back(check(param.p_type));
+                TypePtr paramType = check(param.p_type);
+                parameterTypes.push_back(paramType);
+                m_env->set(identifierName(param.p_name), paramType);
             }
 
             TypePtr returnType = check(node->returnType());
 
             auto functionType = std::make_shared<FunctionType>(parameterTypes, returnType);
+
+            m_currentFunction = functionType;
+            check(node->body());
+            m_currentFunction = nullptr;
+
+            exitLocalEnv();
+
             m_env->set(std::dynamic_pointer_cast<IdentifierExpression>(node->name())->value(), 
                         functionType);
 
@@ -204,6 +235,20 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             }
 
             return functionType->returnType();
+        }
+
+        case KAstReturnStatement: {
+            auto node = std::dynamic_pointer_cast<ReturnStatement>(astNode);
+
+            if (!m_currentFunction) {
+                error("can not use return outside of a function");
+            }
+
+            TypePtr returnType = check(node->returnValue());
+
+            expectType(m_currentFunction->returnType(), returnType);
+
+            break;
         }
 
         default:

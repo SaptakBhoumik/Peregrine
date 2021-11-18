@@ -212,6 +212,21 @@ TypePtr BoolType::infixOperatorResult(Token op, const TypePtr type) const {
     return nullptr;
 }
 
+NoneType::NoneType() {
+}
+
+TypeCategory NoneType::category() const {
+    return TypeCategory::None;
+}
+
+bool NoneType::isConvertibleTo(const TypePtr type) const {
+    return false;
+}
+
+std::string NoneType::stringify() const {
+    return "None";
+}
+
 ListType::ListType(TypePtr baseType) {
     m_baseType = baseType;
 }
@@ -277,6 +292,7 @@ std::map<std::string, TypePtr> identifierToTypeMap = {
     { "i64", std::make_shared<IntType>(IntType::IntSizes::Int64) }, 
     { "str", std::make_shared<StringType>() },
     { "bool", std::make_shared<BoolType>() },
+    { "None", std::make_shared<NoneType>() }
 };
 
 //TODO: not ideal
@@ -307,5 +323,9 @@ namespace TypeList {
 
     TypePtr decimal() {
         return std::make_shared<DecimalType>(DecimalType::DecimalSize::Float);
+    }
+
+    TypePtr none() {
+        return std::make_shared<NoneType>();
     }
 }

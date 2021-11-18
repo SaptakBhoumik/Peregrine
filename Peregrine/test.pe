@@ -1,4 +1,4 @@
 def test(int a, str b) -> int:
-    return a
+    return b
 
-test("a", "hey")
+test(34, "hey")

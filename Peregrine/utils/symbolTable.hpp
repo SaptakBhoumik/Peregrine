@@ -11,7 +11,7 @@
 template<typename T>
 class SymbolTable {
     std::map<std::string, T> m_symbols;
-    std::shared_ptr<SymbolTable> m_parent;
+    std::shared_ptr<SymbolTable<T>> m_parent;
 
   public:
     SymbolTable(std::shared_ptr<SymbolTable> parent) {
@@ -51,6 +51,10 @@ class SymbolTable {
 
         m_symbols[name] = value;
         return true;
+    }
+
+    std::shared_ptr<SymbolTable<T>> parent() {
+        return m_parent;
     }
 };
 

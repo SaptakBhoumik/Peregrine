@@ -12,7 +12,8 @@
 enum class TypeCategory {
     Integer, Decimal, String,
     Bool, List, Dict, 
-    UserDefined, Function, Class
+    UserDefined, Function, Class,
+    None
 };
 
 class Type;
@@ -120,6 +121,15 @@ public:
     TypePtr infixOperatorResult(Token op, const TypePtr type) const;
 };
 
+class NoneType : public Type {
+public:
+    NoneType();
+
+    TypeCategory category() const;
+    bool isConvertibleTo(const TypePtr type) const;
+    std::string stringify() const;
+};
+
 class ListType : public Type {
     TypePtr m_baseType;
 public:
@@ -169,6 +179,8 @@ namespace TypeList {
     TypePtr string();
 
     TypePtr decimal();
+
+    TypePtr none();
 }
 
 extern std::map<std::string, TypePtr> identifierToTypeMap;
