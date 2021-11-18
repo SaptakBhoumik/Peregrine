@@ -6,27 +6,13 @@
 
 #include <map>
 #include <string>
+#include <vector>
 #include <memory>
 
-enum TypeCategory {
-    Integer,
-    Uint8,
-    Uint16,
-    Uint32,
-    Uint64,
-    Float,
-    Double,
-    String,
-    Bool,
-    List,
-    UserDefined
-};
-
-enum IntSizes {
-    Int8,
-    Int16,
-    Int32,
-    Int64
+enum class TypeCategory {
+    Integer, Decimal, String,
+    Bool, List, Dict, 
+    UserDefined, Function, Class
 };
 
 class Type;
@@ -35,17 +21,20 @@ typedef std::shared_ptr<Type> TypePtr;
 
 class Type {
 public:
-    virtual TypeCategory category() = 0;
-    virtual bool isConvertibleTo(const TypePtr type) = 0;
-    virtual std::string stringify() { return ""; }
+    virtual TypeCategory category() const = 0;
+
+    // returns true if the type can be converted to the other IMPLICITLY
+    virtual bool isConvertibleTo(const TypePtr type) const = 0;
+
+    virtual std::string stringify() const { return ""; }
 
     // returns the type obtained after applying the given operator to this type
     // e.g. -34 -> Integer
-    virtual TypePtr prefixOperatorResult(Token op) { return nullptr; }
+    virtual TypePtr prefixOperatorResult(Token op) const { return nullptr; }
 
     // returns the type obtained after applying the given operator to both types
     // e.g. false == false -> Bool
-    virtual TypePtr infixOperatorResult(Token op, const TypePtr type) { return nullptr; }
+    virtual TypePtr infixOperatorResult(Token op, const TypePtr type) const { return nullptr; }
 
     bool operator==(const TypePtr type) {
         return category() == type->category();
@@ -57,50 +46,78 @@ public:
 };
 
 class IntType : public Type {
-    IntSizes m_intSize;
 public:
-    IntType(IntSizes intSize = IntSizes::Int32);
+    enum IntSizes {
+        Int8,
+        Int16,
+        Int32,
+        Int64
+    };
 
-    TypeCategory category();
-    IntSizes size();
-    bool isConvertibleTo(const TypePtr type);
+    enum class Modifier {
+        Signed,
+        Unsigned
+    };
 
-    TypePtr prefixOperatorResult(Token op);
-    TypePtr infixOperatorResult(Token op, const TypePtr type);
+    IntType(IntSizes intSize = IntSizes::Int32, Modifier modifier = Modifier::Signed);
+
+    TypeCategory category() const;
+    IntSizes size() const;
+    Modifier modifier() const;
+    bool isConvertibleTo(const TypePtr type) const;
+    std::string stringify() const;
+
+    TypePtr prefixOperatorResult(Token op) const;
+    TypePtr infixOperatorResult(Token op, const TypePtr type) const;
+private:
+    IntSizes m_intSize;
+    Modifier m_modifier;
 };
 
 class DecimalType : public Type {
-    TypeCategory m_category;
 public:
-    DecimalType(TypeCategory decimalSize = TypeCategory::Float);
+    enum class DecimalSize {
+        Float,
+        Double
+    };
 
-    TypeCategory category();
-    bool isConvertibleTo(const TypePtr type);
+    DecimalType(DecimalSize decimalSize = DecimalSize::Float);
 
-    TypePtr prefixOperatorResult(Token op);
-    TypePtr infixOperatorResult(Token op, const TypePtr type);
+    TypeCategory category() const;
+    DecimalSize size() const;
+    bool isConvertibleTo(const TypePtr type) const;
+    std::string stringify() const;
+
+    bool isFloat() const;
+
+    TypePtr prefixOperatorResult(Token op) const;
+    TypePtr infixOperatorResult(Token op, const TypePtr type) const;
+private:
+    DecimalSize m_decimalSize;
 };
 
 class StringType : public Type {
 public:
     StringType();
 
-    TypeCategory category();
-    bool isConvertibleTo(const TypePtr type);
+    TypeCategory category() const;
+    bool isConvertibleTo(const TypePtr type) const;
+    std::string stringify() const;
 
-    TypePtr prefixOperatorResult(Token op);
-    TypePtr infixOperatorResult(Token op, const TypePtr type);
+    TypePtr prefixOperatorResult(Token op) const;
+    TypePtr infixOperatorResult(Token op, const TypePtr type) const;
 };
 
 class BoolType : public Type {
 public:
     BoolType();
 
-    TypeCategory category();
-    bool isConvertibleTo(const TypePtr type);
+    TypeCategory category() const;
+    bool isConvertibleTo(const TypePtr type) const;
+    std::string stringify() const;
 
-    TypePtr prefixOperatorResult(Token op);
-    TypePtr infixOperatorResult(Token op, const TypePtr type);
+    TypePtr prefixOperatorResult(Token op) const;
+    TypePtr infixOperatorResult(Token op, const TypePtr type) const;
 };
 
 class ListType : public Type {
@@ -108,8 +125,9 @@ class ListType : public Type {
 public:
     ListType(TypePtr baseType);
 
-    TypeCategory category();
-    bool isConvertibleTo(const TypePtr type);
+    TypeCategory category() const;
+    bool isConvertibleTo(const TypePtr type) const;
+    std::string stringify() const;
 };
 
 class UserDefinedType : public Type {
@@ -117,9 +135,23 @@ class UserDefinedType : public Type {
 public:
     UserDefinedType(const TypePtr baseType);
 
-    TypeCategory category();
-    TypePtr baseType();
-    bool isConvertibleTo(const TypePtr type);
+    TypeCategory category() const;
+    TypePtr baseType() const;
+    bool isConvertibleTo(const TypePtr type) const;
+    std::string stringify() const;
+};
+
+class FunctionType : public Type {
+    std::vector<TypePtr> m_parameterTypes;
+    TypePtr m_returnType;
+public:
+    FunctionType(std::vector<TypePtr> parameterTypes, TypePtr returnType);
+
+    TypeCategory category() const;
+    std::vector<TypePtr> parameterTypes() const;
+    TypePtr returnType() const;
+    bool isConvertibleTo(const TypePtr type) const;
+    std::string stringify() const;
 };
 
 //TODO: not ideal

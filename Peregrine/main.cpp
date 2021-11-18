@@ -23,10 +23,10 @@ int main() {
     Parser parser(tokens);
     AstNodePtr program = parser.parse();
 
+    std::cout << program->stringify() << "\n";
+
     TypeChecker typeChecker;
     typeChecker.check(program);
-
-    std::cout << program->stringify() << "\n";
 
     Codegen codegen("temp.cc");
     auto res=codegen.generate(program);

@@ -184,9 +184,11 @@ AstNodePtr PrefixExpression::right() { return m_right; }
 AstKind PrefixExpression::type() { return KAstPrefixExpr; }
 
 std::string PrefixExpression::stringify() {
-    std::string res = m_prefix.keyword;
+    std::string res = "(" + m_prefix.keyword;
 
     res += m_right->stringify();
+
+    res += ")";
 
     return res;
 }

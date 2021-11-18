@@ -53,10 +53,11 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
 
         case KAstIdentifier: {
             auto node = std::dynamic_pointer_cast<IdentifierExpression>(astNode);
+            std::cout << node->value() << "\n";
             auto type = m_env->get(node->value());
-
+           
             if (!type) 
-                //panic, undefined identifier
+                std::cerr << "no type found err" << "\n";
 
             return *type;
         }
@@ -78,16 +79,30 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             return TypeList::decimal();
         }
 
+        case KAstPrefixExpr: {
+            auto node = std::dynamic_pointer_cast<PrefixExpression>(astNode);
+
+            TypePtr type = check(node->right());
+
+            TypePtr result = type->prefixOperatorResult(node->prefix());
+
+            if (!result) {
+                error(node->prefix().keyword + " can not be used with type " + type->stringify());
+            }
+
+            return result;
+        }
+
         case KAstBinaryOp: {
             auto node = std::dynamic_pointer_cast<BinaryOperation>(astNode);
 
             TypePtr type1 = check(node->left());
             TypePtr type2 = check(node->right());
-
+            
             TypePtr result = type1->infixOperatorResult(node->op(), type2);
 
             if (!result) {
-                error(node->op().keyword + " can not be used with types " + type1->stringify() + " and" + type2->stringify());
+                error(node->op().keyword + " can not be used with types " + type1->stringify() + " and " + type2->stringify());
             }
 
             return result;
@@ -137,6 +152,58 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             expectType(check(node->condition()), std::make_shared<BoolType>()); //TODO: improve
 
             break;
+        }
+
+        case KAstFunctionDef: {
+            auto node = std::dynamic_pointer_cast<FunctionDefinition>(astNode);
+
+            check(node->body());
+
+            std::vector<TypePtr> parameterTypes;
+            parameterTypes.reserve(node->parameters().size());
+
+            for (auto& param : node->parameters()) {
+                parameterTypes.push_back(check(param.p_type));
+            }
+
+            TypePtr returnType = check(node->returnType());
+
+            auto functionType = std::make_shared<FunctionType>(parameterTypes, returnType);
+            m_env->set(std::dynamic_pointer_cast<IdentifierExpression>(node->name())->value(), 
+                        functionType);
+
+            break;
+        }
+
+        case KAstFunctionCall: {
+            auto node = std::dynamic_pointer_cast<FunctionCall>(astNode);
+
+            TypePtr nameType = check(node->name());
+
+            if (nameType->category() != TypeCategory::Function) {
+                //panic, the name is not a function
+                std::cerr << "identifier is not a function" << "\n";
+            }
+
+            auto functionType = std::dynamic_pointer_cast<FunctionType>(nameType);
+
+            std::vector<TypePtr> argumentTypes;
+            argumentTypes.reserve(node->arguments().size());
+
+            for (auto& arg : node->arguments()) {
+                argumentTypes.push_back(check(arg));
+            }
+
+            if (functionType->parameterTypes().size() != argumentTypes.size()) {
+                //panic, invalid number of arguments passed
+                std::cerr << "invalid number of args passed" << "\n";
+            }
+
+            for (size_t i = 0; i < argumentTypes.size(); i++) {
+                expectType(functionType->parameterTypes()[i], argumentTypes[i]);
+            }
+
+            return functionType->returnType();
         }
 
         default:
