@@ -13,19 +13,31 @@ std::map<TokenType, PrecedenceType> createMap() {
 
     precedenceMap[tk_negative] = pr_prefix;
     precedenceMap[tk_bit_not] = pr_prefix;
-    precedenceMap[tk_not] = pr_prefix;
     precedenceMap[tk_and] = pr_and_or;
     precedenceMap[tk_or] = pr_and_or;
     precedenceMap[tk_not] = pr_not;
     precedenceMap[tk_not_equal] = pr_compare;
+    precedenceMap[tk_is_not] = pr_compare;
+    precedenceMap[tk_is] = pr_compare;
+    precedenceMap[tk_not_in] = pr_compare;
+    precedenceMap[tk_in] = pr_compare;
     precedenceMap[tk_greater] = pr_compare;
     precedenceMap[tk_less] = pr_compare;
     precedenceMap[tk_gr_or_equ] = pr_compare;
     precedenceMap[tk_less_or_equ] = pr_compare;
+    precedenceMap[tk_equal] = pr_compare;
+    precedenceMap[tk_bit_or] = pr_bit_or;
+    precedenceMap[tk_xor] = pr_bit_xor;
+    precedenceMap[tk_bit_and] = pr_bit_and;
+    precedenceMap[tk_shift_left] = pr_bit_shift;
+    precedenceMap[tk_shift_right] = pr_bit_shift;
     precedenceMap[tk_plus] = pr_sum_minus;
     precedenceMap[tk_minus] = pr_sum_minus;
     precedenceMap[tk_multiply] = pr_mul_div;
     precedenceMap[tk_divide] = pr_mul_div;
+    precedenceMap[tk_modulo] = pr_mul_div;
+    precedenceMap[tk_floor] = pr_mul_div;
+    precedenceMap[tk_exponent] = pr_expo;
     precedenceMap[tk_l_paren] = pr_call;
 
     return precedenceMap;
@@ -79,7 +91,7 @@ void Parser::error(Token tok, std::string_view msg) {
     m_errors.push_back(err);
 }
 
-bool Parser::expect(TokenType expectedType) {
+void Parser::expect(TokenType expectedType) {
     if (next().tkType != expectedType) {
         error(next(), "expected token of type " + std::to_string(expectedType) +
                           ", got " + std::to_string(next().tkType) +
@@ -147,7 +159,16 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseReturn();
             break;
         }
-
+        case tk_scope: {
+            stmt = parseScope();
+            break;
+        }
+        case tk_cppcode: {
+            advance();
+            stmt = parseCpp();
+            advanceOnNewLine();
+            break;
+        }
         case tk_identifier: {
             if (next().tkType == tk_identifier || next().tkType == tk_assign) {
                 // variable
@@ -193,7 +214,7 @@ AstNodePtr Parser::parseBlockStatement() {
 
 // TODO: make this invalid: int = 43
 AstNodePtr Parser::parseVariableStatement() {
-    AstNodePtr varType = std::make_shared<NoneLiteral>();
+    AstNodePtr varType = std::make_shared<NoLiteral>();
 
     if (next().tkType == tk_identifier) {
         varType = parseType();
@@ -202,7 +223,7 @@ AstNodePtr Parser::parseVariableStatement() {
 
     AstNodePtr name = parseIdentifier();
 
-    AstNodePtr value = std::make_shared<NoneLiteral>();
+    AstNodePtr value = std::make_shared<NoLiteral>();
 
     if (next().tkType == tk_assign) {
         advance();
@@ -219,7 +240,7 @@ AstNodePtr Parser::parseVariableStatement() {
 AstNodePtr Parser::parseConstDeclaration() {
     expect(tk_identifier);
 
-    AstNodePtr constType = std::make_shared<NoneLiteral>();
+    AstNodePtr constType = std::make_shared<NoLiteral>();
 
     if (next().tkType == tk_identifier) {
         constType = parseType();
@@ -276,6 +297,14 @@ AstNodePtr Parser::parseIf() {
     }
 
     return std::make_shared<IfStatement>(condition, ifBody, elseBody, elifs);
+}
+
+AstNodePtr Parser::parseScope() {
+    expect(tk_colon);
+    // TODO:  support single-line scope
+    expect(tk_ident);
+    AstNodePtr scope_body = parseBlockStatement();
+    return std::make_shared<ScopeStatement>(scope_body);
 }
 
 AstNodePtr Parser::parseWhile() {
@@ -348,7 +377,7 @@ AstNodePtr Parser::parseFunctionDef() {
 }
 
 AstNodePtr Parser::parseReturn() {
-    AstNodePtr returnValue = std::make_shared<NoneLiteral>();
+    AstNodePtr returnValue = std::make_shared<NoLiteral>();
 
     if (next().tkType != tk_new_line) {
         advance();
@@ -415,14 +444,14 @@ AstNodePtr Parser::parseExpression(PrecedenceType curr_precedence) {
         }
 
         case tk_dict_open: {
-            left = ParseDict();
+            left = parseDict();
             break;
         }
 
         case tk_negative:
         case tk_not:
         case tk_bit_not: {
-            left = ParsePrefixExpression();
+            left = parsePrefixExpression();
             break;
         }
 
@@ -488,7 +517,7 @@ AstNodePtr Parser::parseFunctionCall(AstNodePtr left) {
     return std::make_shared<FunctionCall>(left, arguments);
 }
 
-AstNodePtr Parser::ParsePrefixExpression() {
+AstNodePtr Parser::parsePrefixExpression() {
     Token prefix = m_currentToken;
     PrecedenceType precedence = precedenceMap[m_currentToken.tkType];
 

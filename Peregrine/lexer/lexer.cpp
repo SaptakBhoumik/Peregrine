@@ -41,7 +41,7 @@ std::vector<std::string> split_ln(std::string code) {
     uint64_t index = 0;
     while (index < code.length()) {
         character = code.at(index);
-        if (character == "\n"||character == "\r\n"||character == "\r") {
+        if (character == "\n" || character == "\r\n" || character == "\r") {
             split_code.push_back(temp);
             temp = "";
         } else {
@@ -244,8 +244,8 @@ LEXEME lexer(std::string src, std::string filename) {
                      // is that it will reduce the time it takes to run
     while (current_index < src.size()) {
         item = src.at(current_index);
-        if ((item == "\n"||item == "\r\n"||item == "\r")
-               && next(current_index,src)!=""//dont want it to be the end of file
+        if ((item == "\n" || item == "\r\n" || item == "\r") &&
+            next(current_index, src) != "" // dont want it to be the end of file
         ) {
             last_line = current_index;
             line++;
@@ -253,70 +253,67 @@ LEXEME lexer(std::string src, std::string filename) {
                 statement = seperate_lines.at(line - 1);
             }
         }
-        if (item=="(" && !is_comment && !is_string && !is_cpp_string) {
+        if (item == "(" && !is_comment && !is_string && !is_cpp_string) {
             first_bracket_count++;
-        }
-        else if (item==")" && !is_comment && !is_string && !is_cpp_string) {
+        } else if (item == ")" && !is_comment && !is_string && !is_cpp_string) {
             first_bracket_count--;
         }
-        if (is_comment == false && is_array == false &&
-            is_dictionary == false && is_cpp == false && is_string == false) {
+        if (is_array == false && is_dictionary == false && is_cpp == false &&
+            is_string == false && first_bracket_count == 0) {
             if (item == " " && is_tab == true) {
                 curr_identation_level += 1;
-            } else if (item != " " && is_tab == true && !(item == "\n"||item == "\r\n"||item == "\r")) {
+            } else if (item != " " && is_tab == true &&
+                       !(item == "\n" || item == "\r\n" || item == "\r")) {
                 is_tab = false;
-                if (item == "#") {
-                    curr_identation_level -= 4;
-                } else {
-                    previous_identation = 0;
-                }
-                if (identation_level.size() != 0) {
-                    previous_identation =
-                        identation_level.at(identation_level.size() - 1);
-                }
-                if (curr_identation_level > previous_identation) {
-                    token = token_init(statement, "", tk_ident, current_index,
-                                       current_index, line);
-                    tokens.emplace_back(token);
-                    identation_level.emplace_back(curr_identation_level);
-                }
-                while (curr_identation_level < previous_identation) {
-                    identation_level.pop_back();
-                    token = token_init(statement, "", tk_dedent, current_index,
-                                       current_index, line);
-                    tokens.emplace_back(token);
+                previous_identation = 0;
+                if (item != "#") {
                     if (identation_level.size() != 0) {
-                        if (curr_identation_level >=
-                            identation_level.at(identation_level.size() - 1)) {
-                            break;
-                        }
                         previous_identation =
                             identation_level.at(identation_level.size() - 1);
-                    } else {
-                        previous_identation = 0;
+                    }
+                    if (curr_identation_level > previous_identation) {
+                        token = token_init(statement, "", tk_ident,
+                                           current_index, current_index, line);
+                        tokens.emplace_back(token);
+                        identation_level.emplace_back(curr_identation_level);
+                    }
+                    while (curr_identation_level < previous_identation) {
+                        identation_level.pop_back();
+                        token = token_init(statement, "", tk_dedent,
+                                           current_index, current_index, line);
+                        tokens.emplace_back(token);
+                        if (identation_level.size() != 0) {
+                            if (curr_identation_level >=
+                                identation_level.at(identation_level.size() -
+                                                    1)) {
+                                break;
+                            }
+                            previous_identation = identation_level.at(
+                                identation_level.size() - 1);
+                        } else {
+                            previous_identation = 0;
+                        }
                     }
                 }
-            } else if (item == "\n"||item == "\r\n"||item == "\r"){
+            } else if (item == "\n" || item == "\r\n" || item == "\r") {
                 is_tab = true;
                 curr_identation_level = 0;
             }
         }
         // lexing starts here
         if (is_cpp == true) {
-            if (is_cpp_string==false && cpp_bracket_count==1 && item==")"){
-                //do nothing
-            }
-            else{
+            if (is_cpp_string == false && cpp_bracket_count == 1 &&
+                item == ")") {
+                // do nothing
+            } else {
                 keyword += item;
             }
             if (item == "(" && is_cpp_string == false) {
                 cpp_bracket_count += 1;
             } else if (item == "'" || item == "\"") {
-                if (is_cpp_string == true &&
-                    string_starter != item) {
+                if (is_cpp_string == true && string_starter != item) {
                     // do nothing
-                } else if (item == string_starter &&
-                           is_cpp_string == true) {
+                } else if (item == string_starter && is_cpp_string == true) {
                     is_cpp_string = false;
                     string_starter = "";
                 } else {
@@ -332,74 +329,15 @@ LEXEME lexer(std::string src, std::string filename) {
                 }
             }
         } else if (item == "#" && is_string == false &&
-                   is_cpp_string == false &&
-                   is_comment == false) {
+                   is_cpp_string == false && is_comment == false) {
             is_comment = true;
         } else if (is_comment == true) {
-            if (item == "\n"||item == "\r\n"||item == "\r") {
+            if (item == "\n" || item == "\r\n" || item == "\r") {
                 is_comment = false;
             }
         } else if (is_string == true && string_starter != item) {
             keyword += item;
         } else if (is_array == true && item == "]" && is_string == false) {
-                if (keyword != "") {
-                token = token_init(
-                    statement, keyword,
-                    token_type(keyword, next(current_index - 1, src)),
-                    start_index, current_index - 1, line);
-                    tokens.emplace_back(token);
-                    token = Token();
-                    keyword = "";
-                 }
-                second_bracket_count -= 1;
-                token = token_init(statement,item, tk_list_close, start_index,
-                                       current_index, line);
-                if (second_bracket_count == 0) {
-                    is_array = false;
-                }
-        } else if (is_dictionary == true && item=="}" && is_string == false) {
-                if (keyword != "") {
-                token = token_init(
-                    statement, keyword,
-                    token_type(keyword, next(current_index - 1, src)),
-                    start_index, current_index - 1, line);
-                    tokens.emplace_back(token);
-                    token = Token();
-                    keyword = "";
-                 }
-                third_bracket_count -= 1;
-                token = token_init(statement, item, tk_dict_close, current_index-1,
-                                       current_index, line);
-                if (third_bracket_count == 0) {
-                    is_dictionary = false;
-                }
-        } else if (item == " " || item == "\n"||item == "\r\n"||item == "\r") {
-            if (keyword != "") {
-                token = token_init(
-                    statement, keyword,
-                    token_type(keyword, next(current_index - 1, src)),
-                    start_index, current_index - 1, line);
-                    tokens.emplace_back(token);
-                    token = Token();
-                    keyword = "";
-            }
-        if ((item == "\n"||item == "\r\n"||item == "\r")&& tokens.size()>0 && first_bracket_count==0){ //we want the no of bracket count to be zero
-                                                                                    //because peregrine allows you to write code as follows
-                                                                                    // print(arg1,
-                                                                                    //       arg2)
-                                                                                    //to reduce the confusion while parsing 
-            if (tokens.back().tkType!=tk_new_line//we dont want to add 2 newline one after the other
-               && tokens.back().tkType!=tk_colon//again to reduce confusion
-                && is_dictionary == false 
-                && is_array == false
-                && is_string == false
-               ){
-                   token=token_init(statement,"<tk_new_line>",tk_new_line,current_index,current_index,line);
-                   tokens.emplace_back(token);
-                   token = Token();
-               }
-            }
-        } else if (item == "[" && is_string == false) {
             if (keyword != "") {
                 token = token_init(
                     statement, keyword,
@@ -409,7 +347,91 @@ LEXEME lexer(std::string src, std::string filename) {
                 token = Token();
                 keyword = "";
             }
-            start_index = current_index-1;
+            second_bracket_count -= 1;
+            token = token_init(statement, item, tk_list_close, start_index,
+                               current_index, line);
+            if (second_bracket_count == 0) {
+                is_array = false;
+            }
+        } else if (is_dictionary == true && item == "}" && is_string == false) {
+            if (keyword != "") {
+                token = token_init(
+                    statement, keyword,
+                    token_type(keyword, next(current_index - 1, src)),
+                    start_index, current_index - 1, line);
+                tokens.emplace_back(token);
+                token = Token();
+                keyword = "";
+            }
+            third_bracket_count -= 1;
+            token = token_init(statement, item, tk_dict_close,
+                               current_index - 1, current_index, line);
+            if (third_bracket_count == 0) {
+                is_dictionary = false;
+            }
+        } else if (item == " " || item == "\n" || item == "\r\n" ||
+                   item == "\r") {
+            if (keyword != "") {
+                token = token_init(
+                    statement, keyword,
+                    token_type(keyword, next(current_index - 1, src)),
+                    start_index, current_index - 1, line);
+                if (token.tkType == tk_not &&
+                    tokens[tokens.size() - 1].tkType == tk_is) {
+                    tokens[tokens.size() - 1].tkType = tk_is_not;
+                    tokens[tokens.size() - 1].keyword = "is not";
+                } else if (token.tkType == tk_in &&
+                           tokens[tokens.size() - 1].tkType == tk_not) {
+                    tokens[tokens.size() - 1].tkType = tk_not_in;
+                    tokens[tokens.size() - 1].keyword = "not in";
+                } else {
+                    tokens.emplace_back(token);
+                }
+                token = Token();
+                keyword = "";
+            }
+            if ((item == "\n" || item == "\r\n" || item == "\r") &&
+                tokens.size() > 0 &&
+                first_bracket_count ==
+                    0) { // we want the no of bracket count to be zero
+                // because peregrine allows you to write code as follows
+                // print(arg1,
+                //       arg2)
+                // to reduce the confusion while parsing
+                if (tokens.back().tkType !=
+                        tk_new_line // we dont want to add 2 newline one after
+                                    // the other
+                    && tokens.back().tkType !=
+                           tk_colon // again to reduce confusion
+                    && is_dictionary == false && is_array == false &&
+                    is_string == false) {
+                    token = token_init(statement, "<tk_new_line>", tk_new_line,
+                                       current_index, current_index, line);
+                    tokens.emplace_back(token);
+                    token = Token();
+                }
+            }
+        } else if (item == "[" && is_string == false) {
+            if (keyword != "") {
+                token = token_init(
+                    statement, keyword,
+                    token_type(keyword, next(current_index - 1, src)),
+                    start_index, current_index - 1, line);
+                if (token.tkType == tk_not &&
+                    tokens[tokens.size() - 1].tkType == tk_is) {
+                    tokens[tokens.size() - 1].tkType = tk_is_not;
+                    tokens[tokens.size() - 1].keyword = "is not";
+                } else if (token.tkType == tk_in &&
+                           tokens[tokens.size() - 1].tkType == tk_not) {
+                    tokens[tokens.size() - 1].tkType = tk_not_in;
+                    tokens[tokens.size() - 1].keyword = "not in";
+                } else {
+                    tokens.emplace_back(token);
+                }
+                token = Token();
+                keyword = "";
+            }
+            start_index = current_index - 1;
             keyword = item;
             is_array = true;
             token = token_init(statement, item, tk_list_open, start_index,
@@ -421,11 +443,21 @@ LEXEME lexer(std::string src, std::string filename) {
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, line);
-                tokens.emplace_back(token);
+                if (token.tkType == tk_not &&
+                    tokens[tokens.size() - 1].tkType == tk_is) {
+                    tokens[tokens.size() - 1].tkType = tk_is_not;
+                    tokens[tokens.size() - 1].keyword = "is not";
+                } else if (token.tkType == tk_in &&
+                           tokens[tokens.size() - 1].tkType == tk_not) {
+                    tokens[tokens.size() - 1].tkType = tk_not_in;
+                    tokens[tokens.size() - 1].keyword = "not in";
+                } else {
+                    tokens.emplace_back(token);
+                }
                 token = Token();
                 keyword = "";
             }
-            start_index = current_index-1;
+            start_index = current_index - 1;
             keyword = item;
             is_dictionary = true;
             token = token_init(statement, item, tk_dict_open, start_index,
@@ -457,7 +489,17 @@ LEXEME lexer(std::string src, std::string filename) {
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, line);
-                tokens.emplace_back(token);
+                if (token.tkType == tk_not &&
+                    tokens[tokens.size() - 1].tkType == tk_is) {
+                    tokens[tokens.size() - 1].tkType = tk_is_not;
+                    tokens[tokens.size() - 1].keyword = "is not";
+                } else if (token.tkType == tk_in &&
+                           tokens[tokens.size() - 1].tkType == tk_not) {
+                    tokens[tokens.size() - 1].tkType = tk_not_in;
+                    tokens[tokens.size() - 1].keyword = "not in";
+                } else {
+                    tokens.emplace_back(token);
+                }
                 token = Token();
                 keyword = "";
             }
@@ -594,7 +636,17 @@ LEXEME lexer(std::string src, std::string filename) {
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, line);
-                tokens.emplace_back(token);
+                if (token.tkType == tk_not &&
+                    tokens[tokens.size() - 1].tkType == tk_is) {
+                    tokens[tokens.size() - 1].tkType = tk_is_not;
+                    tokens[tokens.size() - 1].keyword = "is not";
+                } else if (token.tkType == tk_in &&
+                           tokens[tokens.size() - 1].tkType == tk_not) {
+                    tokens[tokens.size() - 1].tkType = tk_not_in;
+                    tokens[tokens.size() - 1].keyword = "not in";
+                } else {
+                    tokens.emplace_back(token);
+                }
                 token = Token();
                 keyword = "";
             }
@@ -728,7 +780,17 @@ LEXEME lexer(std::string src, std::string filename) {
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, line);
-                tokens.emplace_back(token);
+                if (token.tkType == tk_not &&
+                    tokens[tokens.size() - 1].tkType == tk_is) {
+                    tokens[tokens.size() - 1].tkType = tk_is_not;
+                    tokens[tokens.size() - 1].keyword = "is not";
+                } else if (token.tkType == tk_in &&
+                           tokens[tokens.size() - 1].tkType == tk_not) {
+                    tokens[tokens.size() - 1].tkType = tk_not_in;
+                    tokens[tokens.size() - 1].keyword = "not in";
+                } else {
+                    tokens.emplace_back(token);
+                }
                 token = Token();
                 keyword = "";
             }
@@ -738,8 +800,24 @@ LEXEME lexer(std::string src, std::string filename) {
             } else {
                 start_index = current_index - 1;
                 keyword = item;
-                token = token_init(statement, keyword, tk_ampersand,
-                                   start_index, current_index, line);
+                if (tokens.size() > 0) {
+                    if ((tokens.back().tkType == tk_true ||
+                         tokens.back().tkType == tk_false ||
+                         tokens.back().tkType == tk_integer ||
+                         tokens.back().tkType == tk_decimal ||
+                         tokens.back().tkType == tk_identifier ||
+                         tokens.back().tkType == tk_r_paren) &&
+                        line == tokens.back().line) {
+                        token = token_init(statement, keyword, tk_bit_and,
+                                           start_index, current_index, line);
+                    } else {
+                        token = token_init(statement, keyword, tk_ampersand,
+                                           start_index, current_index, line);
+                    }
+                } else {
+                    token = token_init(statement, keyword, tk_ampersand,
+                                       start_index, current_index, line);
+                }
             }
         } else if (item == "|") {
             if (keyword != "") {
@@ -766,7 +844,17 @@ LEXEME lexer(std::string src, std::string filename) {
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, line);
-                tokens.emplace_back(token);
+                if (token.tkType == tk_not &&
+                    tokens[tokens.size() - 1].tkType == tk_is) {
+                    tokens[tokens.size() - 1].tkType = tk_is_not;
+                    tokens[tokens.size() - 1].keyword = "is not";
+                } else if (token.tkType == tk_in &&
+                           tokens[tokens.size() - 1].tkType == tk_not) {
+                    tokens[tokens.size() - 1].tkType = tk_not_in;
+                    tokens[tokens.size() - 1].keyword = "not in";
+                } else {
+                    tokens.emplace_back(token);
+                }
                 token = Token();
                 keyword = "";
             }
@@ -809,7 +897,17 @@ LEXEME lexer(std::string src, std::string filename) {
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, line);
-                tokens.emplace_back(token);
+                if (token.tkType == tk_not &&
+                    tokens[tokens.size() - 1].tkType == tk_is) {
+                    tokens[tokens.size() - 1].tkType = tk_is_not;
+                    tokens[tokens.size() - 1].keyword = "is not";
+                } else if (token.tkType == tk_in &&
+                           tokens[tokens.size() - 1].tkType == tk_not) {
+                    tokens[tokens.size() - 1].tkType = tk_not_in;
+                    tokens[tokens.size() - 1].keyword = "not in";
+                } else {
+                    tokens.emplace_back(token);
+                }
                 token = Token();
                 keyword = "";
             }
@@ -891,7 +989,7 @@ LEXEME lexer(std::string src, std::string filename) {
                        start_index, current_index, line));
     }
     if (is_string == true || is_cpp_string == true) {
-        std::string temp = "Expecting a "+string_starter;
+        std::string temp = "Expecting a " + string_starter;
         display(PEError({.loc = Location({.line = line,
                                           .col = current_index - last_line,
                                           .file = filename,
@@ -933,8 +1031,7 @@ LEXEME lexer(std::string src, std::string filename) {
                          .submsg = temp,
                          .ecode = "e1"}));
         exit(1);
-    }
-    else if (first_bracket_count!=0){
+    } else if (first_bracket_count != 0) {
         std::string temp = "Expecting a )";
         display(PEError({.loc = Location({.line = line,
                                           .col = current_index - last_line,
@@ -946,24 +1043,24 @@ LEXEME lexer(std::string src, std::string filename) {
         exit(1);
     }
     if (tokens.size() > 0) {
-        uint64_t total_tab=0;
-        for (auto tok : tokens){
+        uint64_t total_tab = 0;
+        for (auto tok : tokens) {
             switch (tok.tkType) {
-                case tk_ident:{
+                case tk_ident: {
                     total_tab++;
                     break;
                 }
-                case tk_dedent:{
+                case tk_dedent: {
                     total_tab--;
                     break;
                 }
-                default:{
+                default: {
                 }
             }
         }
-        while (total_tab!=0){
-             token = token_init(statement, "", tk_dedent, current_index,
-                           current_index, line);
+        while (total_tab != 0) {
+            token = token_init(statement, "", tk_dedent, current_index,
+                               current_index, line);
             tokens.push_back(token);
             total_tab--;
         }

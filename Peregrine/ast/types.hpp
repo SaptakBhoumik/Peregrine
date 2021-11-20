@@ -4,16 +4,22 @@
 #include "ast.hpp"
 #include "lexer/tokens.hpp"
 
+#include <array>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
-#include <array>
-#include <memory>
 
 enum class TypeCategory {
-    Integer, Decimal, String,
-    Bool, List, Dict, 
-    UserDefined, Function, Class,
+    Integer,
+    Decimal,
+    String,
+    Bool,
+    List,
+    Dict,
+    UserDefined,
+    Function,
+    Class,
     None
 };
 
@@ -22,7 +28,7 @@ class Type;
 typedef std::shared_ptr<Type> TypePtr;
 
 class Type {
-public:
+  public:
     virtual TypeCategory category() const = 0;
 
     // returns true if the type can be converted to the other IMPLICITLY
@@ -36,7 +42,9 @@ public:
 
     // returns the type obtained after applying the given operator to both types
     // e.g. false == false -> Bool
-    virtual TypePtr infixOperatorResult(Token op, const TypePtr type) const { return nullptr; }
+    virtual TypePtr infixOperatorResult(Token op, const TypePtr type) const {
+        return nullptr;
+    }
 
     bool operator==(const TypePtr type) {
         return category() == type->category();
@@ -48,20 +56,13 @@ public:
 };
 
 class IntType : public Type {
-public:
-    enum IntSizes {
-        Int8,
-        Int16,
-        Int32,
-        Int64
-    };
+  public:
+    enum IntSizes { Int8, Int16, Int32, Int64 };
 
-    enum class Modifier {
-        Signed,
-        Unsigned
-    };
+    enum class Modifier { Signed, Unsigned };
 
-    IntType(IntSizes intSize = IntSizes::Int32, Modifier modifier = Modifier::Signed);
+    IntType(IntSizes intSize = IntSizes::Int32,
+            Modifier modifier = Modifier::Signed);
 
     TypeCategory category() const;
     IntSizes size() const;
@@ -71,17 +72,15 @@ public:
 
     TypePtr prefixOperatorResult(Token op) const;
     TypePtr infixOperatorResult(Token op, const TypePtr type) const;
-private:
+
+  private:
     IntSizes m_intSize;
     Modifier m_modifier;
 };
 
 class DecimalType : public Type {
-public:
-    enum DecimalSize {
-        Float,
-        Double
-    };
+  public:
+    enum DecimalSize { Float, Double };
 
     DecimalType(DecimalSize decimalSize = DecimalSize::Float);
 
@@ -94,12 +93,13 @@ public:
 
     TypePtr prefixOperatorResult(Token op) const;
     TypePtr infixOperatorResult(Token op, const TypePtr type) const;
-private:
+
+  private:
     DecimalSize m_decimalSize;
 };
 
 class StringType : public Type {
-public:
+  public:
     StringType();
 
     TypeCategory category() const;
@@ -111,7 +111,7 @@ public:
 };
 
 class BoolType : public Type {
-public:
+  public:
     BoolType();
 
     TypeCategory category() const;
@@ -123,7 +123,7 @@ public:
 };
 
 class NoneType : public Type {
-public:
+  public:
     NoneType();
 
     TypeCategory category() const;
@@ -133,7 +133,8 @@ public:
 
 class ListType : public Type {
     TypePtr m_baseType;
-public:
+
+  public:
     ListType(TypePtr baseType);
 
     TypeCategory category() const;
@@ -143,7 +144,8 @@ public:
 
 class UserDefinedType : public Type {
     TypePtr m_baseType;
-public:
+
+  public:
     UserDefinedType(const TypePtr baseType);
 
     TypeCategory category() const;
@@ -155,7 +157,8 @@ public:
 class FunctionType : public Type {
     std::vector<TypePtr> m_parameterTypes;
     TypePtr m_returnType;
-public:
+
+  public:
     FunctionType(std::vector<TypePtr> parameterTypes, TypePtr returnType);
 
     TypeCategory category() const;
@@ -172,10 +175,13 @@ class TypeProducer {
     static TypePtr m_bool;
     static TypePtr m_string;
     static TypePtr m_none;
-public:
-    static TypePtr integer(IntType::IntSizes intSize = IntType::IntSizes::Int32, 
-                            IntType::Modifier modifier = IntType::Modifier::Signed);
-    static TypePtr decimal(DecimalType::DecimalSize decimalSize = DecimalType::DecimalSize::Float);
+
+  public:
+    static TypePtr
+    integer(IntType::IntSizes intSize = IntType::IntSizes::Int32,
+            IntType::Modifier modifier = IntType::Modifier::Signed);
+    static TypePtr decimal(
+        DecimalType::DecimalSize decimalSize = DecimalType::DecimalSize::Float);
     static TypePtr string();
     static TypePtr boolean();
     static TypePtr none();

@@ -2,9 +2,9 @@
 #include "ast/ast.hpp"
 #include "ast/types.hpp"
 
+#include <assert.h>
 #include <iostream>
 #include <memory>
-#include <assert.h>
 
 TypeChecker::TypeChecker() {
     m_env = std::make_shared<SymbolTable<TypePtr>>(nullptr);
@@ -24,8 +24,10 @@ void TypeChecker::error(std::string_view msg) {
 
 void TypeChecker::expectType(TypePtr expected, TypePtr obtained) {
     if (expected->category() != obtained->category()) {
-        if (!expected->isConvertibleTo(obtained) && !obtained->isConvertibleTo(expected)) {
-            error("expected type " + expected->stringify() + ", got " + obtained->stringify() + " instead");
+        if (!expected->isConvertibleTo(obtained) &&
+            !obtained->isConvertibleTo(expected)) {
+            error("expected type " + expected->stringify() + ", got " +
+                  obtained->stringify() + " instead");
         }
     }
 }
@@ -36,7 +38,8 @@ void TypeChecker::enterLocalEnv() {
 
 void TypeChecker::exitLocalEnv() {
     if (!m_env->parent())
-        std::cerr << "no parent bruh" << "\n";
+        std::cerr << "no parent bruh"
+                  << "\n";
     m_env = m_env->parent();
 }
 
@@ -47,7 +50,8 @@ std::string TypeChecker::identifierName(AstNodePtr identifier) {
 }
 
 TypePtr TypeChecker::check(AstNodePtr astNode) {
-    std::cout << "check" << "\n";
+    std::cout << "check"
+              << "\n";
     switch (astNode->type()) {
         case KAstProgram: {
             auto node = std::dynamic_pointer_cast<Program>(astNode);
@@ -56,7 +60,7 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
                 check(stmt);
             }
 
-            break;    
+            break;
         }
 
         case KAstBlockStmt: {
@@ -66,16 +70,18 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
                 check(stmt);
             }
 
-            break;   
+            break;
         }
 
         case KAstIdentifier: {
-            auto node = std::dynamic_pointer_cast<IdentifierExpression>(astNode);
+            auto node =
+                std::dynamic_pointer_cast<IdentifierExpression>(astNode);
             std::cout << node->value() << "\n";
             auto type = m_env->get(node->value());
-           
-            if (!type) 
-                std::cerr << "no type found err" << "\n";
+
+            if (!type)
+                std::cerr << "no type found err"
+                          << "\n";
 
             return *type;
         }
@@ -109,7 +115,8 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             TypePtr result = type->prefixOperatorResult(node->prefix());
 
             if (!result) {
-                error(node->prefix().keyword + " can not be used with type " + type->stringify());
+                error(node->prefix().keyword + " can not be used with type " +
+                      type->stringify());
             }
 
             return result;
@@ -120,24 +127,25 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
 
             TypePtr type1 = check(node->left());
             TypePtr type2 = check(node->right());
-            
+
             TypePtr result = type1->infixOperatorResult(node->op(), type2);
 
             if (!result) {
-                error(node->op().keyword + " can not be used with types " + type1->stringify() + " and " + type2->stringify());
+                error(node->op().keyword + " can not be used with types " +
+                      type1->stringify() + " and " + type2->stringify());
             }
 
             return result;
-        } 
-        
+        }
+
         case KAstVariableStmt: {
             auto node = std::dynamic_pointer_cast<VariableStatement>(astNode);
 
-            if (node->value()->type() == KAstNone) 
+            if (node->value()->type() == KAstNone)
                 break;
 
             if (node->varType()->type() == KAstNone) {
-                //infer the type
+                // infer the type
             }
 
             TypePtr varType = check(node->varType());
@@ -145,8 +153,10 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
 
             expectType(varType, valueType);
 
-            m_env->set(std::dynamic_pointer_cast<IdentifierExpression>(node->name())->value(), 
-                        varType);
+            m_env->set(
+                std::dynamic_pointer_cast<IdentifierExpression>(node->name())
+                    ->value(),
+                varType);
 
             break;
         }
@@ -162,11 +172,11 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
 
             for (auto& elif : node->elifs()) {
                 expectType(check(elif.first), TypeProducer::boolean());
-                
+
                 enterLocalEnv();
                 check(elif.second);
                 exitLocalEnv();
-            } 
+            }
 
             enterLocalEnv();
             check(node->elseBody());
@@ -178,7 +188,7 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
         case KAstWhileStmt: {
             auto node = std::dynamic_pointer_cast<WhileStatement>(astNode);
 
-            expectType(check(node->condition()), TypeProducer::boolean()); 
+            expectType(check(node->condition()), TypeProducer::boolean());
 
             enterLocalEnv();
             check(node->body());
@@ -203,7 +213,8 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
 
             TypePtr returnType = check(node->returnType());
 
-            auto functionType = std::make_shared<FunctionType>(parameterTypes, returnType);
+            auto functionType =
+                std::make_shared<FunctionType>(parameterTypes, returnType);
 
             m_currentFunction = functionType;
             check(node->body());
@@ -211,8 +222,10 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
 
             exitLocalEnv();
 
-            m_env->set(std::dynamic_pointer_cast<IdentifierExpression>(node->name())->value(), 
-                        functionType);
+            m_env->set(
+                std::dynamic_pointer_cast<IdentifierExpression>(node->name())
+                    ->value(),
+                functionType);
 
             break;
         }
@@ -223,11 +236,13 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             TypePtr nameType = check(node->name());
 
             if (nameType->category() != TypeCategory::Function) {
-                //panic, the name is not a function
-                std::cerr << "identifier is not a function" << "\n";
+                // panic, the name is not a function
+                std::cerr << "identifier is not a function"
+                          << "\n";
             }
 
-            auto functionType = std::dynamic_pointer_cast<FunctionType>(nameType);
+            auto functionType =
+                std::dynamic_pointer_cast<FunctionType>(nameType);
 
             std::vector<TypePtr> argumentTypes;
             argumentTypes.reserve(node->arguments().size());
@@ -237,8 +252,9 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             }
 
             if (functionType->parameterTypes().size() != argumentTypes.size()) {
-                //panic, invalid number of arguments passed
-                std::cerr << "invalid number of args passed" << "\n";
+                // panic, invalid number of arguments passed
+                std::cerr << "invalid number of args passed"
+                          << "\n";
             }
 
             for (size_t i = 0; i < argumentTypes.size(); i++) {
@@ -263,6 +279,7 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
         }
 
         default:
+            std::cerr << "enjoy your segfault" << "\n";
             break;
     }
 

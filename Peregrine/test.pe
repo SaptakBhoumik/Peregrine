@@ -1,3 +1,32 @@
+a = [54, 2, 87]
+c = []
+b = {
+    12: 45,
+    25: 87,
+    7: 0
+}
+
+scope:
+    x+0
+
+int a
+b + 34
+
+const test = "hello"
+
+def test() -> int:
+    msg + "hey"
+    return
+
+test(12, 56, 34)
+
+while True:
+    continue
+
+5 + 3**7 - 8 ** -9/7 or 4+4 /9
+
+7&7|7
+
 def test(int a, str b) -> int:
     return b
 

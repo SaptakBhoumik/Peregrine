@@ -70,6 +70,12 @@ AstKind NoneLiteral::type() { return KAstNone; }
 
 std::string NoneLiteral::stringify() { return "None"; }
 
+NoLiteral::NoLiteral() {}
+
+AstKind NoLiteral::type() { return KAstNoLiteral; }
+
+std::string NoLiteral::stringify() { return ""; }
+
 IdentifierExpression::IdentifierExpression(std::string_view value) {
     m_value = value;
 }
@@ -80,9 +86,7 @@ AstKind IdentifierExpression::type() { return KAstIdentifier; }
 
 std::string IdentifierExpression::stringify() { return m_value; }
 
-TypeExpression::TypeExpression(std::string_view value) {
-    m_value = value;
-}
+TypeExpression::TypeExpression(std::string_view value) { m_value = value; }
 
 std::string TypeExpression::value() { return m_value; }
 
@@ -143,8 +147,7 @@ std::string DictLiteral::stringify() {
     return res;
 }
 
-BinaryOperation::BinaryOperation(AstNodePtr left, Token op,
-                                 AstNodePtr right) {
+BinaryOperation::BinaryOperation(AstNodePtr left, Token op, AstNodePtr right) {
     m_left = left;
     m_operator = op;
     m_right = right;
@@ -211,14 +214,14 @@ AstKind VariableStatement::type() { return KAstVariableStmt; }
 std::string VariableStatement::stringify() {
     std::string res = "";
 
-    if (m_type->type() != KAstNone) {
+    if (m_type->type() != KAstNoLiteral) {
         res += m_type->stringify();
         res += " ";
     }
 
     res += m_name->stringify();
 
-    if (m_value->type() != KAstNone) {
+    if (m_value->type() != KAstNoLiteral) {
         res += " = ";
         res += m_value->stringify();
     }
@@ -244,7 +247,7 @@ AstKind ConstDeclaration::type() { return KAstConstDecl; }
 std::string ConstDeclaration::stringify() {
     std::string res = "const ";
 
-    if (m_type->type() != KAstNone) {
+    if (m_type->type() != KAstNoLiteral) {
         res += m_type->stringify();
         res += " ";
     }
@@ -335,7 +338,7 @@ AstKind ReturnStatement::type() { return KAstReturnStatement; }
 std::string ReturnStatement::stringify() {
     std::string res = "return";
 
-    if (m_returnValue->type() != KAstNone) {
+    if (m_returnValue->type() != KAstNoLiteral) {
         res += " " + m_returnValue->stringify();
     }
 
@@ -410,7 +413,7 @@ std::string IfStatement::stringify() {
         res += "\n";
     }
 
-    if (m_elseBody->type() != KAstNone) {
+    if (m_elseBody->type() != KAstNoLiteral) {
         res += "else:\n";
         res += m_elseBody->stringify();
         res += "\n";
@@ -478,3 +481,30 @@ std::string BreakStatement::stringify() { return "break"; }
 AstKind ContinueStatement::type() { return KAstContinueStatement; }
 
 std::string ContinueStatement::stringify() { return "continue"; }
+
+CppStatement::CppStatement(std::string cpp_code) { m_cppCode = cpp_code; }
+
+std::string CppStatement::value() { return m_cppCode; }
+
+AstKind CppStatement::type() { return KAstCpp; }
+
+std::string CppStatement::stringify() {
+    std::string res = "Cppcode";
+
+    res += "(" + m_cppCode + ")";
+
+    return res;
+}
+
+ScopeStatement::ScopeStatement(AstNodePtr body) { m_scopeBody = body; }
+
+AstNodePtr ScopeStatement::body() { return m_scopeBody; }
+
+AstKind ScopeStatement::type() { return KAstScopeStmt; }
+
+std::string ScopeStatement::stringify() {
+    std::string res = "scope:\n ";
+    res += m_scopeBody->stringify();
+    res += "\n";
+    return res;
+}

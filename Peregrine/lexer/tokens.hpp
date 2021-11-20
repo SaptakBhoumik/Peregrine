@@ -6,33 +6,33 @@
 // Create a string variable
 enum TokenType {
     // Some operators
-    tk_plus,      // +
-    tk_at,        // @
-    tk_negative,  // negative number
-    tk_minus,     // -
-    tk_divide,    // /
-    tk_asterisk,  // *
-    tk_multiply,  // *
-    tk_xor,       // ^
-    tk_modulo,    // %
-    tk_greater,   // >
-    tk_less,      // <
-    tk_ampersand, // &
-    tk_bit_or,    // |
-    tk_bit_not,   // ~
-    tk_assign,    // =
-    tk_excl,      // !
-    tk_colon,     // :
-    tk_dot,       // .
-    tk_l_paren,   // (
-    tk_r_paren,   // )
-    tk_hashtag,   // //
-    tk_comma,     // ,
+    tk_plus,       // +
+    tk_at,         // @
+    tk_negative,   // negative number
+    tk_minus,      // -
+    tk_divide,     // /
+    tk_asterisk,   // *
+    tk_multiply,   // *
+    tk_xor,        // ^
+    tk_modulo,     // %
+    tk_greater,    // >
+    tk_less,       // <
+    tk_ampersand,  // &
+    tk_bit_and,    // &
+    tk_bit_or,     // |
+    tk_bit_not,    // ~
+    tk_assign,     // =
+    tk_excl,       // !
+    tk_colon,      // :
+    tk_dot,        // .
+    tk_l_paren,    // (
+    tk_r_paren,    // )
+    tk_comma,      // ,
     tk_list_close, // ]
     tk_list_open,  // [
     tk_dict_close, // }
     tk_dict_open,  // {
-    tk_new_line,     // \n
+    tk_new_line,   // \n
 
     tk_exponent,          //**
     tk_equal,             // ==
@@ -102,16 +102,18 @@ enum TokenType {
     tk_not,       // not
     tk_is,        // is
     tk_in,        // in
+    tk_not_in,    // not in
+    tk_is_not,    // is not
     tk_cppcode,   // Cppcode
     tk_class,     // class
     tk_struct,    // struct
-    tkType,      // type defination
+    tkType,       // type defination
 
     // value type
-    tk_decimal, 
-    tk_integer, 
-    tk_string,  
-    cpp,        
+    tk_decimal,
+    tk_integer,
+    tk_string,
+    cpp,
 
     tk_ident,  // beginning of identation
     tk_dedent, // end of identation
@@ -132,14 +134,14 @@ struct Token {
 
 namespace TokenUtils {
 
-    // +, -, *, etc
-    bool isArithmeticToken(Token tok);
+// +, -, *, etc
+bool isArithmeticToken(Token tok);
 
-    // ==, <=, etc
-    bool isComparisonToken(Token tok);
+// ==, <=, etc
+bool isComparisonToken(Token tok);
 
-    // |, &, ^, etc
-    bool isBitwiseToken(Token tok);
-}
+// |, &, ^, etc
+bool isBitwiseToken(Token tok);
+} // namespace TokenUtils
 
 #endif

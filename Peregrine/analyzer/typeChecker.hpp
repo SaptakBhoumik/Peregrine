@@ -12,8 +12,9 @@ class TypeChecker {
     std::shared_ptr<SymbolTable<TypePtr>> m_env;
 
     // the function whose body is being currently checked
-    std::shared_ptr<FunctionType> m_currentFunction; 
-public:
+    std::shared_ptr<FunctionType> m_currentFunction;
+
+  public:
     TypeChecker();
 
     void error(std::string_view msg);

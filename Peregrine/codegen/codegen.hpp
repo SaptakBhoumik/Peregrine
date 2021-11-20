@@ -12,9 +12,9 @@ class Codegen {
 
   public:
     void write(std::string_view code);
-    Codegen(std::string output_filename);
+    Codegen(std::string outputFilename);
 
-    std::string generate(AstNodePtr ast_node);
+    std::string generate(AstNodePtr astNode);
 };
 
 #endif

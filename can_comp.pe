@@ -1,0 +1,11 @@
+def test(int x)->int:#this is comment
+    return x
+def main():
+    Cppcode(#ifdef _WIN32)
+    printf("On windows\n")
+    Cppcode(#elif __linux__)
+    printf("On linux\n")
+    Cppcode(#endif)
+    scope:
+        printf("Hello from new scope\n")
+    printf("%d",test(0))

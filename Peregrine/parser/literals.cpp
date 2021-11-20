@@ -43,12 +43,12 @@ AstNodePtr Parser::parseList() {
     advanceOnNewLine();
 
     // TODO: remove the type member? im not sure
-    AstNodePtr type = std::make_shared<NoneLiteral>();
+    AstNodePtr type = std::make_shared<NoLiteral>();
 
     return std::make_shared<ListLiteral>(type, elements);
 }
 
-AstNodePtr Parser::ParseDict() {
+AstNodePtr Parser::parseDict() {
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elements;
 
     if (next().tkType != tk_dict_close) {
@@ -78,6 +78,8 @@ AstNodePtr Parser::ParseDict() {
     return std::make_shared<DictLiteral>(elements);
 }
 
-AstNodePtr Parser::parseCpp() {}
+AstNodePtr Parser::parseCpp() {
+    return std::make_shared<CppStatement>(m_currentToken.keyword);
+}
 
 AstNodePtr Parser::parseNone() { return std::make_shared<NoneLiteral>(); }

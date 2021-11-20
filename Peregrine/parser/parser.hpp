@@ -13,8 +13,13 @@ enum PrecedenceType {
     pr_and_or,    // and,or
     pr_not,       // not
     pr_compare,   // ==, !=, <, >, <=, >=
+    pr_bit_or,    // |
+    pr_bit_xor,   // ^
+    pr_bit_and,   // &
+    pr_bit_shift, // >> , <<
     pr_sum_minus, // +, -
     pr_mul_div,   // *, /, %, //
+    pr_expo,      // **
     pr_prefix,    // -x
     pr_call       // x()
 };
@@ -35,7 +40,7 @@ class Parser {
 
     void advance();
     void advanceOnNewLine();
-    bool expect(TokenType expectedType);
+    void expect(TokenType expectedType);
     Token next();
     PrecedenceType nextPrecedence();
 
@@ -49,11 +54,11 @@ class Parser {
     AstNodePtr parseIdentifier();
     AstNodePtr parseType();
     AstNodePtr parseList();
-    AstNodePtr ParseDict();
+    AstNodePtr parseDict();
     AstNodePtr parseCpp();
 
     AstNodePtr parseExpression(PrecedenceType type);
-    AstNodePtr ParsePrefixExpression();
+    AstNodePtr parsePrefixExpression();
     AstNodePtr parseGroupedExpr();
 
     AstNodePtr parseBinaryOperation(AstNodePtr left);
@@ -64,6 +69,7 @@ class Parser {
     AstNodePtr parseVariableStatement();
     AstNodePtr parseConstDeclaration();
     AstNodePtr parseIf();
+    AstNodePtr parseScope();
     AstNodePtr parseWhile();
     AstNodePtr parseFunctionDef();
     AstNodePtr parseReturn();

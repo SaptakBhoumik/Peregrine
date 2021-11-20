@@ -8,6 +8,7 @@
 #include <vector>
 
 enum AstKind {
+    KAstNoLiteral,
     KAstProgram,
     KAstInteger,
     KAstDecimal,
@@ -28,6 +29,7 @@ enum AstKind {
     KAstReturnStatement,
     KAstFunctionCall,
     KAstIfStmt,
+    KAstScopeStmt,
     KAstWhileStmt,
     KAstForStatement,
     KAstBreakStatement,
@@ -109,6 +111,14 @@ class BoolLiteral : public AstNode {
 class NoneLiteral : public AstNode {
   public:
     NoneLiteral();
+
+    AstKind type();
+    std::string stringify();
+};
+
+class NoLiteral : public AstNode {
+  public:
+    NoLiteral();
 
     AstKind type();
     std::string stringify();
@@ -358,4 +368,23 @@ class ContinueStatement : public AstNode {
     std::string stringify();
 };
 
+class CppStatement : public AstNode {
+    std::string m_cppCode;
+
+  public:
+    CppStatement(std::string cpp);
+    std::string value();
+    AstKind type();
+    std::string stringify();
+};
+
+class ScopeStatement : public AstNode {
+    AstNodePtr m_scopeBody;
+
+  public:
+    ScopeStatement(AstNodePtr body);
+    AstNodePtr body();
+    AstKind type();
+    std::string stringify();
+};
 #endif

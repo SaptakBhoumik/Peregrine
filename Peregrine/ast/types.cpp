@@ -8,17 +8,11 @@ IntType::IntType(IntSizes intSize, Modifier modifier) {
     m_modifier = modifier;
 }
 
-TypeCategory IntType::category() const {
-    return TypeCategory::Integer;
-}
+TypeCategory IntType::category() const { return TypeCategory::Integer; }
 
-IntType::IntSizes IntType::size() const {
-    return m_intSize;
-}
+IntType::IntSizes IntType::size() const { return m_intSize; }
 
-IntType::Modifier IntType::modifier() const {
-    return m_modifier;
-}
+IntType::Modifier IntType::modifier() const { return m_modifier; }
 
 bool IntType::isConvertibleTo(const TypePtr type) const {
     switch (type->category()) {
@@ -34,7 +28,7 @@ bool IntType::isConvertibleTo(const TypePtr type) const {
         auto typeInt = std::dynamic_pointer_cast<IntType>(type);
 
         // an Int32 can't be converted to a Int8
-        if (m_intSize > typeInt->size()) 
+        if (m_intSize > typeInt->size())
             return false;
     } else {
         auto typeDecimal = std::dynamic_pointer_cast<DecimalType>(type);
@@ -45,13 +39,11 @@ bool IntType::isConvertibleTo(const TypePtr type) const {
     }
 
     return true;
-} 
-
-std::string IntType::stringify() const {
-    return "integer";
 }
 
-//TODO: unsigned ints
+std::string IntType::stringify() const { return "integer"; }
+
+// TODO: unsigned ints
 TypePtr IntType::prefixOperatorResult(Token op) const {
     switch (op.tkType) {
         case tk_not:
@@ -59,7 +51,7 @@ TypePtr IntType::prefixOperatorResult(Token op) const {
 
         case tk_minus:
         case tk_bit_not:
-            return TypeProducer::integer(); //no
+            return TypeProducer::integer(); // no
 
         default:
             return nullptr;
@@ -76,13 +68,13 @@ TypePtr IntType::infixOperatorResult(Token op, const TypePtr type) const {
             return nullptr;
     }
 
-    if (TokenUtils::isArithmeticToken(op)) 
+    if (TokenUtils::isArithmeticToken(op))
         return type;
 
-    if (TokenUtils::isComparisonToken(op)) 
+    if (TokenUtils::isComparisonToken(op))
         return TypeProducer::boolean();
 
-    //TODO: handle bitwise operations
+    // TODO: handle bitwise operations
     return nullptr;
 }
 
@@ -90,21 +82,17 @@ DecimalType::DecimalType(DecimalSize decimalSize) {
     m_decimalSize = decimalSize;
 }
 
-TypeCategory DecimalType::category() const {
-    return TypeCategory::Decimal;
-}
+TypeCategory DecimalType::category() const { return TypeCategory::Decimal; }
 
-DecimalType::DecimalSize DecimalType::size() const {
-    return m_decimalSize;
-}
+DecimalType::DecimalSize DecimalType::size() const { return m_decimalSize; }
 
 bool DecimalType::isConvertibleTo(const TypePtr type) const {
     if (type->category() != TypeCategory::Decimal)
         return false;
 
     auto typeDecimal = std::dynamic_pointer_cast<DecimalType>(type);
-    
-    if (!isFloat() && typeDecimal->isFloat()) 
+
+    if (!isFloat() && typeDecimal->isFloat())
         return false;
 
     return true;
@@ -124,7 +112,7 @@ TypePtr DecimalType::prefixOperatorResult(Token op) const {
             return TypeProducer::boolean();
 
         case tk_minus:
-            return TypeProducer::decimal(); //no
+            return TypeProducer::decimal(); // no
 
         default:
             return nullptr;
@@ -136,13 +124,13 @@ TypePtr DecimalType::infixOperatorResult(Token op, const TypePtr type) const {
         case TypeCategory::Integer:
         case TypeCategory::Decimal:
             break;
-    
+
         default:
             return nullptr;
     }
 
-    if (TokenUtils::isArithmeticToken(op)) 
-        return TypeProducer::decimal(); 
+    if (TokenUtils::isArithmeticToken(op))
+        return TypeProducer::decimal();
 
     if (TokenUtils::isComparisonToken(op))
         return TypeProducer::boolean();
@@ -150,20 +138,15 @@ TypePtr DecimalType::infixOperatorResult(Token op, const TypePtr type) const {
     return nullptr;
 }
 
-StringType::StringType() {
-}
+StringType::StringType() {}
 
-TypeCategory StringType::category() const {
-    return TypeCategory::String;
-}
+TypeCategory StringType::category() const { return TypeCategory::String; }
 
 bool StringType::isConvertibleTo(const TypePtr type) const {
     return (type->category() != TypeCategory::String) ? false : true;
 }
 
-std::string StringType::stringify() const {
-    return "string";
-}
+std::string StringType::stringify() const { return "string"; }
 
 TypePtr StringType::prefixOperatorResult(Token op) const {
     if (op.tkType == tk_not)
@@ -177,75 +160,51 @@ TypePtr StringType::infixOperatorResult(Token op, const TypePtr type) const {
         return nullptr;
 
     switch (op.tkType) {
-        case tk_plus: 
+        case tk_plus:
             return type;
 
         case tk_equal:
         case tk_not_equal:
             return TypeProducer::boolean();
-        
+
         default:
             return nullptr;
     }
 }
 
-BoolType::BoolType() {
-}
+BoolType::BoolType() {}
 
-TypeCategory BoolType::category() const {
-    return TypeCategory::Bool;
-}
+TypeCategory BoolType::category() const { return TypeCategory::Bool; }
 
 bool BoolType::isConvertibleTo(const TypePtr type) const {
     return (type->category() == TypeCategory::Bool) ? true : false;
 }
 
-std::string BoolType::stringify() const {
-    return "bool";
-}
+std::string BoolType::stringify() const { return "bool"; }
 
-TypePtr BoolType::prefixOperatorResult(Token op) const {
-    return nullptr;
-}   
+TypePtr BoolType::prefixOperatorResult(Token op) const { return nullptr; }
 
 TypePtr BoolType::infixOperatorResult(Token op, const TypePtr type) const {
     return nullptr;
 }
 
-NoneType::NoneType() {
-}
+NoneType::NoneType() {}
 
-TypeCategory NoneType::category() const {
-    return TypeCategory::None;
-}
+TypeCategory NoneType::category() const { return TypeCategory::None; }
 
-bool NoneType::isConvertibleTo(const TypePtr type) const {
-    return false;
-}
+bool NoneType::isConvertibleTo(const TypePtr type) const { return false; }
 
-std::string NoneType::stringify() const {
-    return "None";
-}
+std::string NoneType::stringify() const { return "None"; }
 
-ListType::ListType(TypePtr baseType) {
-    m_baseType = baseType;
-}
+ListType::ListType(TypePtr baseType) { m_baseType = baseType; }
 
-TypeCategory ListType::category() const {
-    return TypeCategory::List;
-}
+TypeCategory ListType::category() const { return TypeCategory::List; }
 
-bool ListType::isConvertibleTo(const TypePtr type) const {
-    return false;
-}
+bool ListType::isConvertibleTo(const TypePtr type) const { return false; }
 
-std::string ListType::stringify() const {
-    return "";
-}
+std::string ListType::stringify() const { return ""; }
 
-UserDefinedType::UserDefinedType(TypePtr baseType) {
-    m_baseType = baseType;
-}
+UserDefinedType::UserDefinedType(TypePtr baseType) { m_baseType = baseType; }
 
 TypeCategory UserDefinedType::category() const {
     return TypeCategory::UserDefined;
@@ -255,56 +214,50 @@ bool UserDefinedType::isConvertibleTo(const TypePtr type) const {
     return m_baseType->isConvertibleTo(type);
 }
 
-std::string UserDefinedType::stringify() const {
-    return "";
-}
+std::string UserDefinedType::stringify() const { return ""; }
 
-FunctionType::FunctionType(std::vector<TypePtr> parameterTypes, TypePtr returnType) {
+FunctionType::FunctionType(std::vector<TypePtr> parameterTypes,
+                           TypePtr returnType) {
     m_parameterTypes = parameterTypes;
     m_returnType = returnType;
 }
 
-TypeCategory FunctionType::category() const {
-    return TypeCategory::Function;
-}
+TypeCategory FunctionType::category() const { return TypeCategory::Function; }
 
 std::vector<TypePtr> FunctionType::parameterTypes() const {
     return m_parameterTypes;
 }
 
-TypePtr FunctionType::returnType() const {
-    return m_returnType;
-}
+TypePtr FunctionType::returnType() const { return m_returnType; }
 
-bool FunctionType::isConvertibleTo(const TypePtr type) const {
-    return false;
-}
+bool FunctionType::isConvertibleTo(const TypePtr type) const { return false; }
 
-std::string FunctionType::stringify() const {
-    return "function";
-}
+std::string FunctionType::stringify() const { return "function"; }
 
 std::array<TypePtr, 8> TypeProducer::m_integer = {
     std::make_shared<IntType>(IntType::IntSizes::Int8),
     std::make_shared<IntType>(IntType::IntSizes::Int16),
     std::make_shared<IntType>(IntType::IntSizes::Int32),
     std::make_shared<IntType>(IntType::IntSizes::Int64),
-    std::make_shared<IntType>(IntType::IntSizes::Int8, IntType::Modifier::Unsigned),
-    std::make_shared<IntType>(IntType::IntSizes::Int16, IntType::Modifier::Unsigned),
-    std::make_shared<IntType>(IntType::IntSizes::Int32, IntType::Modifier::Unsigned),
-    std::make_shared<IntType>(IntType::IntSizes::Int64, IntType::Modifier::Unsigned)
-};
+    std::make_shared<IntType>(IntType::IntSizes::Int8,
+                              IntType::Modifier::Unsigned),
+    std::make_shared<IntType>(IntType::IntSizes::Int16,
+                              IntType::Modifier::Unsigned),
+    std::make_shared<IntType>(IntType::IntSizes::Int32,
+                              IntType::Modifier::Unsigned),
+    std::make_shared<IntType>(IntType::IntSizes::Int64,
+                              IntType::Modifier::Unsigned)};
 
 std::array<TypePtr, 2> TypeProducer::m_decimal = {
     std::make_shared<DecimalType>(DecimalType::DecimalSize::Float),
-    std::make_shared<DecimalType>(DecimalType::DecimalSize::Double)
-};
+    std::make_shared<DecimalType>(DecimalType::DecimalSize::Double)};
 
 TypePtr TypeProducer::m_bool = std::make_shared<BoolType>();
 TypePtr TypeProducer::m_string = std::make_shared<StringType>();
 TypePtr TypeProducer::m_none = std::make_shared<NoneType>();
 
-TypePtr TypeProducer::integer(IntType::IntSizes intSize, IntType::Modifier modifier) {
+TypePtr TypeProducer::integer(IntType::IntSizes intSize,
+                              IntType::Modifier modifier) {
     if (modifier == IntType::Modifier::Signed) {
         return m_integer[intSize];
     }
@@ -316,25 +269,18 @@ TypePtr TypeProducer::decimal(DecimalType::DecimalSize decimalSize) {
     return m_decimal[decimalSize];
 }
 
-TypePtr TypeProducer::boolean() {
-    return m_bool;
-}
+TypePtr TypeProducer::boolean() { return m_bool; }
 
-TypePtr TypeProducer::string() {
-    return m_string;
-}
+TypePtr TypeProducer::string() { return m_string; }
 
-TypePtr TypeProducer::none() {
-    return m_none;
-}
+TypePtr TypeProducer::none() { return m_none; }
 
 std::map<std::string, TypePtr> identifierToTypeMap = {
-    { "i8",   TypeProducer::integer(IntType::IntSizes::Int8) }, 
-    { "i16",  TypeProducer::integer(IntType::IntSizes::Int16) }, 
-    { "i32",  TypeProducer::integer() }, 
-    { "int",  TypeProducer::integer() }, 
-    { "i64",  TypeProducer::integer(IntType::IntSizes::Int64) }, 
-    { "str",  TypeProducer::string() },
-    { "bool", TypeProducer::boolean() },
-    { "None", TypeProducer::none() }
-};
+    {"i8", TypeProducer::integer(IntType::IntSizes::Int8)},
+    {"i16", TypeProducer::integer(IntType::IntSizes::Int16)},
+    {"i32", TypeProducer::integer()},
+    {"int", TypeProducer::integer()},
+    {"i64", TypeProducer::integer(IntType::IntSizes::Int64)},
+    {"str", TypeProducer::string()},
+    {"bool", TypeProducer::boolean()},
+    {"None", TypeProducer::none()}};
