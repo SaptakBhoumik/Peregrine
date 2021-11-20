@@ -7,6 +7,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <array>
 #include <memory>
 
 enum class TypeCategory {
@@ -77,7 +78,7 @@ private:
 
 class DecimalType : public Type {
 public:
-    enum class DecimalSize {
+    enum DecimalSize {
         Float,
         Double
     };
@@ -164,24 +165,21 @@ public:
     std::string stringify() const;
 };
 
-//TODO: not ideal
-namespace TypeList {
-    TypePtr integer8();
+class TypeProducer {
+    static std::array<TypePtr, 8> m_integer;
+    static std::array<TypePtr, 2> m_decimal;
 
-    TypePtr integer16();
-
-    TypePtr integer32();
-
-    TypePtr integer64();
-
-    TypePtr boolean();
-
-    TypePtr string();
-
-    TypePtr decimal();
-
-    TypePtr none();
-}
+    static TypePtr m_bool;
+    static TypePtr m_string;
+    static TypePtr m_none;
+public:
+    static TypePtr integer(IntType::IntSizes intSize = IntType::IntSizes::Int32, 
+                            IntType::Modifier modifier = IntType::Modifier::Signed);
+    static TypePtr decimal(DecimalType::DecimalSize decimalSize = DecimalType::DecimalSize::Float);
+    static TypePtr string();
+    static TypePtr boolean();
+    static TypePtr none();
+};
 
 extern std::map<std::string, TypePtr> identifierToTypeMap;
 

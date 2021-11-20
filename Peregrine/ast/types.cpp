@@ -55,11 +55,11 @@ std::string IntType::stringify() const {
 TypePtr IntType::prefixOperatorResult(Token op) const {
     switch (op.tkType) {
         case tk_not:
-            return TypeList::boolean();
+            return TypeProducer::boolean();
 
         case tk_minus:
         case tk_bit_not:
-            return TypeList::integer32(); //no
+            return TypeProducer::integer(); //no
 
         default:
             return nullptr;
@@ -80,7 +80,7 @@ TypePtr IntType::infixOperatorResult(Token op, const TypePtr type) const {
         return type;
 
     if (TokenUtils::isComparisonToken(op)) 
-        return TypeList::boolean();
+        return TypeProducer::boolean();
 
     //TODO: handle bitwise operations
     return nullptr;
@@ -121,10 +121,10 @@ bool DecimalType::isFloat() const {
 TypePtr DecimalType::prefixOperatorResult(Token op) const {
     switch (op.tkType) {
         case tk_not:
-            return TypeList::boolean();
+            return TypeProducer::boolean();
 
         case tk_minus:
-            return TypeList::decimal(); //no
+            return TypeProducer::decimal(); //no
 
         default:
             return nullptr;
@@ -142,10 +142,10 @@ TypePtr DecimalType::infixOperatorResult(Token op, const TypePtr type) const {
     }
 
     if (TokenUtils::isArithmeticToken(op)) 
-        return TypeList::decimal(); //TODO: improve
+        return TypeProducer::decimal(); 
 
     if (TokenUtils::isComparisonToken(op))
-        return TypeList::boolean();
+        return TypeProducer::boolean();
 
     return nullptr;
 }
@@ -167,7 +167,7 @@ std::string StringType::stringify() const {
 
 TypePtr StringType::prefixOperatorResult(Token op) const {
     if (op.tkType == tk_not)
-        return TypeList::boolean();
+        return TypeProducer::boolean();
 
     return nullptr;
 }
@@ -182,7 +182,7 @@ TypePtr StringType::infixOperatorResult(Token op, const TypePtr type) const {
 
         case tk_equal:
         case tk_not_equal:
-            return TypeList::boolean();
+            return TypeProducer::boolean();
         
         default:
             return nullptr;
@@ -284,48 +284,57 @@ std::string FunctionType::stringify() const {
     return "function";
 }
 
-std::map<std::string, TypePtr> identifierToTypeMap = {
-    { "i8", std::make_shared<IntType>(IntType::IntSizes::Int8) }, 
-    { "i16", std::make_shared<IntType>(IntType::IntSizes::Int16) }, 
-    { "i32", std::make_shared<IntType>() }, 
-    { "int", std::make_shared<IntType>() }, 
-    { "i64", std::make_shared<IntType>(IntType::IntSizes::Int64) }, 
-    { "str", std::make_shared<StringType>() },
-    { "bool", std::make_shared<BoolType>() },
-    { "None", std::make_shared<NoneType>() }
+std::array<TypePtr, 8> TypeProducer::m_integer = {
+    std::make_shared<IntType>(IntType::IntSizes::Int8),
+    std::make_shared<IntType>(IntType::IntSizes::Int16),
+    std::make_shared<IntType>(IntType::IntSizes::Int32),
+    std::make_shared<IntType>(IntType::IntSizes::Int64),
+    std::make_shared<IntType>(IntType::IntSizes::Int8, IntType::Modifier::Unsigned),
+    std::make_shared<IntType>(IntType::IntSizes::Int16, IntType::Modifier::Unsigned),
+    std::make_shared<IntType>(IntType::IntSizes::Int32, IntType::Modifier::Unsigned),
+    std::make_shared<IntType>(IntType::IntSizes::Int64, IntType::Modifier::Unsigned)
 };
 
-//TODO: not ideal
-namespace TypeList {
-    TypePtr integer8() {
-        return std::make_shared<IntType>(IntType::IntSizes::Int8);
+std::array<TypePtr, 2> TypeProducer::m_decimal = {
+    std::make_shared<DecimalType>(DecimalType::DecimalSize::Float),
+    std::make_shared<DecimalType>(DecimalType::DecimalSize::Double)
+};
+
+TypePtr TypeProducer::m_bool = std::make_shared<BoolType>();
+TypePtr TypeProducer::m_string = std::make_shared<StringType>();
+TypePtr TypeProducer::m_none = std::make_shared<NoneType>();
+
+TypePtr TypeProducer::integer(IntType::IntSizes intSize, IntType::Modifier modifier) {
+    if (modifier == IntType::Modifier::Signed) {
+        return m_integer[intSize];
     }
 
-    TypePtr integer16() {
-        return std::make_shared<IntType>(IntType::IntSizes::Int16);
-    }
-
-    TypePtr integer32() {
-        return std::make_shared<IntType>(IntType::IntSizes::Int32);
-    }
-
-    TypePtr integer64() {
-        return std::make_shared<IntType>(IntType::IntSizes::Int64);
-    }
-
-    TypePtr boolean() {
-        return std::make_shared<BoolType>();
-    }
-
-    TypePtr string() {
-        return std::make_shared<StringType>();
-    }
-
-    TypePtr decimal() {
-        return std::make_shared<DecimalType>(DecimalType::DecimalSize::Float);
-    }
-
-    TypePtr none() {
-        return std::make_shared<NoneType>();
-    }
+    return m_integer[intSize + 4];
 }
+
+TypePtr TypeProducer::decimal(DecimalType::DecimalSize decimalSize) {
+    return m_decimal[decimalSize];
+}
+
+TypePtr TypeProducer::boolean() {
+    return m_bool;
+}
+
+TypePtr TypeProducer::string() {
+    return m_string;
+}
+
+TypePtr TypeProducer::none() {
+    return m_none;
+}
+
+std::map<std::string, TypePtr> identifierToTypeMap = {
+    { "i8",   TypeProducer::integer(IntType::IntSizes::Int8) }, 
+    { "i16",  TypeProducer::integer(IntType::IntSizes::Int16) }, 
+    { "i32",  TypeProducer::integer() }, 
+    { "int",  TypeProducer::integer() }, 
+    { "i64",  TypeProducer::integer(IntType::IntSizes::Int64) }, 
+    { "str",  TypeProducer::string() },
+    { "bool", TypeProducer::boolean() },
+    { "None", TypeProducer::none() }
+};

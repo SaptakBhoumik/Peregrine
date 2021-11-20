@@ -86,19 +86,19 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
         }
 
         case KAstInteger: {
-            return TypeList::integer32();
+            return TypeProducer::integer();
         }
 
         case KAstString: {
-            return TypeList::string();
+            return TypeProducer::string();
         }
 
         case KAstDecimal: {
-            return TypeList::decimal();
+            return TypeProducer::decimal();
         }
 
         case KAstNone: {
-            return TypeList::none();
+            return TypeProducer::none();
         }
 
         case KAstPrefixExpr: {
@@ -154,16 +154,23 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
         case KAstIfStmt: {
             auto node = std::dynamic_pointer_cast<IfStatement>(astNode);
 
-            expectType(check(node->condition()), std::make_shared<BoolType>()); //TODO: improve
+            expectType(check(node->condition()), TypeProducer::boolean());
 
+            enterLocalEnv();
             check(node->ifBody());
+            exitLocalEnv();
 
             for (auto& elif : node->elifs()) {
-                expectType(check(elif.first), std::make_shared<BoolType>()); //TODO: improve
+                expectType(check(elif.first), TypeProducer::boolean());
+                
+                enterLocalEnv();
                 check(elif.second);
+                exitLocalEnv();
             } 
 
+            enterLocalEnv();
             check(node->elseBody());
+            exitLocalEnv();
 
             break;
         }
@@ -171,7 +178,11 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
         case KAstWhileStmt: {
             auto node = std::dynamic_pointer_cast<WhileStatement>(astNode);
 
-            expectType(check(node->condition()), std::make_shared<BoolType>()); //TODO: improve
+            expectType(check(node->condition()), TypeProducer::boolean()); 
+
+            enterLocalEnv();
+            check(node->body());
+            exitLocalEnv();
 
             break;
         }
