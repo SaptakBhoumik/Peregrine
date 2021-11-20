@@ -169,6 +169,12 @@ AstNodePtr Parser::parseStatement() {
             advanceOnNewLine();
             break;
         }
+
+        case tk_type: {
+            stmt = parseTypeDef();
+            break;
+        }
+
         case tk_identifier: {
             if (next().tkType == tk_identifier || next().tkType == tk_assign) {
                 // variable
@@ -387,6 +393,19 @@ AstNodePtr Parser::parseReturn() {
     }
 
     return std::make_shared<ReturnStatement>(returnValue);
+}
+
+AstNodePtr Parser::parseTypeDef() {
+    advance();
+
+    AstNodePtr name = parseIdentifier(); //TODO: check
+
+    expect(tk_assign);
+    advance();
+
+    AstNodePtr type = parseType();
+
+    return std::make_shared<TypeDefinition>(name, type);
 }
 
 AstNodePtr Parser::parseExpression(PrecedenceType curr_precedence) {

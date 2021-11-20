@@ -73,6 +73,7 @@ class Parser {
     AstNodePtr parseWhile();
     AstNodePtr parseFunctionDef();
     AstNodePtr parseReturn();
+    AstNodePtr parseTypeDef();
 
   public:
     Parser(const std::vector<Token>& tokens);

@@ -33,7 +33,8 @@ enum AstKind {
     KAstWhileStmt,
     KAstForStatement,
     KAstBreakStatement,
-    KAstContinueStatement
+    KAstContinueStatement,
+    KAstTypeDefinition
 };
 
 class AstNode {
@@ -387,4 +388,18 @@ class ScopeStatement : public AstNode {
     AstKind type();
     std::string stringify();
 };
+
+class TypeDefinition : public AstNode {
+    AstNodePtr m_name;
+    AstNodePtr m_type;
+public:
+    TypeDefinition(AstNodePtr name, AstNodePtr type);
+
+    AstNodePtr name();
+    AstNodePtr baseType();
+
+    AstKind type();
+    std::string stringify();
+};
+
 #endif

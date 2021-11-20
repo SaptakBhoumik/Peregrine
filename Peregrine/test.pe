@@ -31,3 +31,5 @@ def test(int a, str b) -> int:
     return b
 
 test(34, "hey")
+
+type a = int

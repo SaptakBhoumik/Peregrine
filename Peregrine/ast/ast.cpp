@@ -508,3 +508,30 @@ std::string ScopeStatement::stringify() {
     res += "\n";
     return res;
 }
+
+TypeDefinition::TypeDefinition(AstNodePtr name, AstNodePtr type) {
+    m_name = name;
+    m_type = type;
+}
+
+AstNodePtr TypeDefinition::name() {
+    return m_name;
+}
+
+AstNodePtr TypeDefinition::baseType() {
+    return m_type;
+}
+
+AstKind TypeDefinition::type() {
+    return KAstTypeDefinition;
+}
+
+std::string TypeDefinition::stringify() {
+    std::string res = "type " + m_name->stringify();
+
+    res += " = ";
+
+    res += m_type->stringify();
+    
+    return res;
+}

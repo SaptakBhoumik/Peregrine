@@ -107,7 +107,7 @@ enum TokenType {
     tk_cppcode,   // Cppcode
     tk_class,     // class
     tk_struct,    // struct
-    tkType,       // type defination
+    tk_type,       // type defination
 
     // value type
     tk_decimal,
