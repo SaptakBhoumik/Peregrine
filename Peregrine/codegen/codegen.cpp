@@ -164,6 +164,11 @@ std::string Codegen::generate(AstNodePtr astNode) {
             res += funcName + "(" + arg + ")";
             break;
         }
+        case KAstTypeExpr:{
+            auto node = std::dynamic_pointer_cast<TypeExpression>(astNode);
+            res+=node->value();
+            break;
+        }
         case KAstFunctionDef: {
             auto node = std::dynamic_pointer_cast<FunctionDefinition>(astNode);
             auto functionName = generate(node->name());
@@ -192,6 +197,7 @@ std::string Codegen::generate(AstNodePtr astNode) {
             break;
         }
         default: {
+            std::cout<<astNode->type()<<"\n";
             std::cerr << fg(style("Error: invalid ast node passed to "
                                   "generate(). This should never happen.",
                                   bold),

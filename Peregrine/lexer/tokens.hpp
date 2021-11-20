@@ -5,6 +5,7 @@
 
 // Create a string variable
 enum TokenType {
+    tk_eof,     // end of file
     // Some operators
     tk_plus,       // +
     tk_at,         // @
@@ -120,7 +121,6 @@ enum TokenType {
 
     tk_raw,    // raw string i.e. r
     tk_format, // formatted string i.e. f
-    tk_eof     // end of file
 };
 
 struct Token {

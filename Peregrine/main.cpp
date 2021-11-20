@@ -46,8 +46,8 @@ int main(int argc, char** argv) {
 
         // std::cout << program->stringify() << "\n";
 
-        TypeChecker typeChecker;
-        typeChecker.check(program);
+        // TypeChecker typeChecker;
+        // typeChecker.check(program);
 
         Codegen codegen("temp.cc");
         auto res = "#include  <cstdio>\n"+codegen.generate(program);

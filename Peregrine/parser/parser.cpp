@@ -285,7 +285,7 @@ AstNodePtr Parser::parseIf() {
         elifs.push_back(std::pair(condition, body));
     }
 
-    AstNodePtr elseBody = std::make_shared<NoneLiteral>();
+    AstNodePtr elseBody = std::make_shared<NoLiteral>();
 
     if (next().tkType == tk_else) {
         advance();
@@ -357,8 +357,8 @@ AstNodePtr Parser::parseFunctionDef() {
               "expected ), got " + m_currentToken.keyword + " instead");
     }
 
-    // returns None by default
-    AstNodePtr returnType = std::make_shared<IdentifierExpression>("None");
+    // returns void by default
+    AstNodePtr returnType = std::make_shared<IdentifierExpression>("void");
 
     if (next().tkType == tk_arrow) {
         advance();
