@@ -104,9 +104,7 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_union;
     } else if (item == "unknown") {
         return tk_unknown;
-    } else if (item == "enum") {
-        return tk_enum;
-    } else if (item == "scope") {
+    }  else if (item == "scope") {
         return tk_scope;
     } else if (item == "elif") {
         return tk_elif;
@@ -174,8 +172,6 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_cppimport;
     } else if (item == "class") {
         return tk_class;
-    } else if (item == "struct") {
-        return tk_struct;
     } else if (item == "flags") {
         return tk_flags;
     } else {

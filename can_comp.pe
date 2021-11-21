@@ -8,4 +8,5 @@ def main():
     Cppcode(#endif)
     scope:
         printf("Hello from new scope\n")
+    bool x=False
     printf("%d",test(0))

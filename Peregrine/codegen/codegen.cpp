@@ -110,7 +110,17 @@ std::string Codegen::generate(AstNodePtr astNode) {
             break;
         }
         case KAstVariableStmt: {
-            // Todo
+            auto node = std::dynamic_pointer_cast<VariableStatement>(astNode);
+            std::string type;
+            if (node->varType()->type()!=KAstNoLiteral){
+                type=generate(node->varType())+" ";
+            }
+            std::string name = generate(node->name());
+            std::string value;
+            if (node->value()->type()!=KAstNoLiteral){
+                value=" = "+generate(node->value());
+            }
+            res+=type+name+value;
             break;
         }
         case KAstCpp: {

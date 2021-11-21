@@ -64,7 +64,6 @@ enum TokenType {
     tk_static,  // static
     tk_scope,   // scope
     tk_union,   // union
-    tk_enum,    // enum
     tk_unknown, // unknown type
     tk_assert,  // assert
     tk_try,     // try
@@ -107,7 +106,6 @@ enum TokenType {
     tk_is_not,    // is not
     tk_cppcode,   // Cppcode
     tk_class,     // class
-    tk_struct,    // struct
     tkType,       // type defination
 
     // value type
