@@ -146,8 +146,11 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_return;
     } else if (item == "as") {
         return tk_as;
-    }
-    else if (item == "and") {
+    }else if (item == "_") {
+        return tk_underscore;
+    }else if (item == "enum") {
+        return tk_enum;
+    }else if (item == "and") {
         return tk_and;
     } else if (item == "or") {
         return tk_or;

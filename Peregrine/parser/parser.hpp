@@ -69,6 +69,7 @@ class Parser {
     AstNodePtr parseVariableStatement();
     AstNodePtr parseConstDeclaration();
     AstNodePtr parseIf();
+    AstNodePtr parseMatch();
     AstNodePtr parseScope();
     AstNodePtr parseWhile();
     AstNodePtr parseFunctionDef();

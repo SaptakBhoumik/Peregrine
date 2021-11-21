@@ -109,6 +109,10 @@ std::string Codegen::generate(AstNodePtr astNode) {
             res += "break";
             break;
         }
+        case KAstNone: {
+            res += "NULL";
+            break;
+        }
         case KAstPassStatement: {
             res += "\n//pass";// we are making it a comment because ; is added to
                            // each node at the end. we dont want that to happen

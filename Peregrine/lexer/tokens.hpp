@@ -8,6 +8,7 @@ enum TokenType {
     tk_eof,     // end of file
     // Some operators
     tk_plus,       // +
+    tk_underscore, // _
     tk_at,         // @
     tk_negative,   // negative number
     tk_minus,      // -
@@ -102,6 +103,7 @@ enum TokenType {
     tk_is_not,    // is not
     tk_cppcode,   // Cppcode
     tk_class,     // class
+    tk_enum,      // enum
     tkType,       // type defination
 
     // value type

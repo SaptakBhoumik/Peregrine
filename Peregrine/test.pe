@@ -34,3 +34,9 @@ test(34, "hey")
 
 if True:
     pass
+
+match x,y:
+    case y,c:
+        printf(C)
+    default:
+        pass
