@@ -147,13 +147,6 @@ static inline TokenType token_type(std::string item, std::string next_item) {
     } else if (item == "as") {
         return tk_as;
     }
-    // This is not necessary because peregrine has special library for
-    // multithreading
-    // else if (item == "async") {
-    //   return tk_async;
-    // } else if (item == "await") {
-    //   return tk_await;
-    // }
     else if (item == "and") {
         return tk_and;
     } else if (item == "or") {

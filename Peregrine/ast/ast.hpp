@@ -33,6 +33,7 @@ enum AstKind {
     KAstWhileStmt,
     KAstForStatement,
     KAstBreakStatement,
+    KAstPassStatement,
     KAstContinueStatement
 };
 
@@ -357,6 +358,12 @@ class ForStatement : public AstNode {
 };
 
 class BreakStatement : public AstNode {
+  public:
+    AstKind type();
+    std::string stringify();
+};
+
+class PassStatement : public AstNode {
   public:
     AstKind type();
     std::string stringify();

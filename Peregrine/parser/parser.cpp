@@ -149,6 +149,12 @@ AstNodePtr Parser::parseStatement() {
             break;
         }
 
+        case tk_pass: {
+            stmt = std::make_shared<PassStatement>();
+            advanceOnNewLine();
+            break;
+        }
+
         case tk_continue: {
             stmt = std::make_shared<ContinueStatement>();
             advanceOnNewLine();

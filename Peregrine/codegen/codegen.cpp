@@ -109,6 +109,12 @@ std::string Codegen::generate(AstNodePtr astNode) {
             res += "break";
             break;
         }
+        case KAstPassStatement: {
+            res += "\n//pass";// we are making it a comment because ; is added to
+                           // each node at the end. we dont want that to happen
+                           // because it will result in ;; which is an error
+            break;
+        }
         case KAstVariableStmt: {
             auto node = std::dynamic_pointer_cast<VariableStatement>(astNode);
             std::string type;

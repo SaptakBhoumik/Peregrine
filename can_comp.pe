@@ -9,4 +9,9 @@ def main():
     scope:
         printf("Hello from new scope\n")
     bool x=False
+    x=True
+    bool y
+    y=True
+    if x==y:
+        pass
     printf("%d",test(0))

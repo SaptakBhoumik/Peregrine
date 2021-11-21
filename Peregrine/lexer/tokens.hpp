@@ -73,10 +73,6 @@ enum TokenType {
     tk_false,   // False
     tk_with,    // with
     tk_as,      // as
-    // This is not necessary because peregrine has special library for
-    // multithreading
-    // tk_async,     // async
-    // tk_await,     // await
     tk_flags,     // flags
     tk_none,      // None
     tk_const,     // const

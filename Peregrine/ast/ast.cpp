@@ -478,6 +478,10 @@ AstKind BreakStatement::type() { return KAstBreakStatement; }
 
 std::string BreakStatement::stringify() { return "break"; }
 
+AstKind PassStatement::type() { return KAstPassStatement; }
+
+std::string PassStatement::stringify() { return "pass"; }
+
 AstKind ContinueStatement::type() { return KAstContinueStatement; }
 
 std::string ContinueStatement::stringify() { return "continue"; }

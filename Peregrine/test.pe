@@ -31,3 +31,6 @@ def test(int a, str b) -> int:
     return b
 
 test(34, "hey")
+
+if True:
+    pass
