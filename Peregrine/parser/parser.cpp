@@ -585,7 +585,6 @@ AstNodePtr Parser::parseMatch(){
             }
         }
         expect(tk_ident);
-        advance();
         AstNodePtr body = parseBlockStatement();
         cases.push_back(std::pair<std::vector<AstNodePtr>, AstNodePtr>(cases_arg,body));
     }

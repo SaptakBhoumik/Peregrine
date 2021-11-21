@@ -74,7 +74,7 @@ NoLiteral::NoLiteral() {}
 
 AstKind NoLiteral::type() { return KAstNoLiteral; }
 
-std::string NoLiteral::stringify() { return ""; }
+std::string NoLiteral::stringify() { return "None"; }
 
 IdentifierExpression::IdentifierExpression(std::string_view value) {
     m_value = value;

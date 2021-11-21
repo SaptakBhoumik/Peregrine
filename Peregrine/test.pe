@@ -35,8 +35,12 @@ test(34, "hey")
 if True:
     pass
 
-match x,y:
-    case y,c:
+match x,y,z:
+    case y,c,_:#z can be anything
         printf(C)
-    default:
+    case y,_:#z and x can be anything
+        printf(C)
+    case _:
+        printf(C)
+    default:#will be executed at the end if no break
         pass
