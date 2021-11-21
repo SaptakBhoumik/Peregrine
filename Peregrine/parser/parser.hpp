@@ -52,6 +52,7 @@ class Parser {
     AstNodePtr parseBool();
     AstNodePtr parseNone();
     AstNodePtr parseIdentifier();
+    AstNodePtr parseName();
     AstNodePtr parseType();
     AstNodePtr parseList();
     AstNodePtr parseDict();
@@ -63,14 +64,17 @@ class Parser {
 
     AstNodePtr parseBinaryOperation(AstNodePtr left);
     AstNodePtr parseFunctionCall(AstNodePtr left);
+    AstNodePtr parseArrayOrDictAccess(AstNodePtr left);
 
     AstNodePtr parseStatement();
     AstNodePtr parseBlockStatement();
+    AstNodePtr parseImport();
     AstNodePtr parseVariableStatement();
     AstNodePtr parseConstDeclaration();
     AstNodePtr parseIf();
     AstNodePtr parseScope();
     AstNodePtr parseWhile();
+    AstNodePtr parseFor();
     AstNodePtr parseFunctionDef();
     AstNodePtr parseReturn();
     AstNodePtr parseTypeDef();

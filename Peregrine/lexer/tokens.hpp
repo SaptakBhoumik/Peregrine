@@ -81,6 +81,7 @@ enum TokenType {
     tk_none,      // None
     tk_const,     // const
     tk_import,    // import
+    tk_from,      // from
     tk_cppimport, // cppimport
     tk_himport,   // himport
     tk_if,        // if

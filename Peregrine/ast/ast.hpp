@@ -22,6 +22,7 @@ enum AstKind {
     KAstCpp,
     KAstBinaryOp,
     KAstPrefixExpr,
+    KAstImportStmt,
     KAstVariableStmt,
     KAstConstDecl,
     KAstBlockStmt,
@@ -201,6 +202,24 @@ class PrefixExpression : public AstNode {
 
     Token prefix();
     AstNodePtr right();
+
+    AstKind type();
+    std::string stringify();
+};
+
+class ImportStatement : public AstNode {
+    // first is the module name and the second is the alias
+    std::pair<AstNodePtr, AstNodePtr> m_moduleName;
+
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> m_importedSymbols;
+
+  public:
+    ImportStatement(
+        std::pair<AstNodePtr, AstNodePtr> moduleName,
+        std::vector<std::pair<AstNodePtr, AstNodePtr>> importedSymbols);
+
+    std::pair<AstNodePtr, AstNodePtr> moduleName();
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> importedSymbols();
 
     AstKind type();
     std::string stringify();
@@ -392,7 +411,8 @@ class ScopeStatement : public AstNode {
 class TypeDefinition : public AstNode {
     AstNodePtr m_name;
     AstNodePtr m_type;
-public:
+
+  public:
     TypeDefinition(AstNodePtr name, AstNodePtr type);
 
     AstNodePtr name();

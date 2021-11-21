@@ -33,3 +33,8 @@ def test(int a, str b) -> int:
 test(34, "hey")
 
 type a = int
+
+from os import getuid
+
+for i in [4, 2, 65]:
+    print(i)

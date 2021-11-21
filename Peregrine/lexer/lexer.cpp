@@ -94,12 +94,14 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_none;
     } else if (item == "import") {
         return tk_import;
+    } else if (item == "from") {
+        return tk_from;
     } else if (item == "const") {
         return tk_const;
     } else if (item == "if") {
         return tk_if;
     } else if (item == "type") {
-        return tkType;
+        return tk_type;
     } else if (item == "union") {
         return tk_union;
     } else if (item == "unknown") {

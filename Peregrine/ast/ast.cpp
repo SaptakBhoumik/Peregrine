@@ -196,6 +196,55 @@ std::string PrefixExpression::stringify() {
     return res;
 }
 
+ImportStatement::ImportStatement(
+        std::pair<AstNodePtr, AstNodePtr> moduleName,
+        std::vector<std::pair<AstNodePtr, AstNodePtr>> importedSymbols) {
+            m_moduleName = moduleName;
+            m_importedSymbols = importedSymbols;
+        }
+
+std::pair<AstNodePtr, AstNodePtr> ImportStatement::moduleName() {
+    return m_moduleName;
+}
+
+std::vector<std::pair<AstNodePtr, AstNodePtr>> ImportStatement::importedSymbols() {
+    return m_importedSymbols;
+}
+
+AstKind ImportStatement::type() {
+    return KAstImportStmt;
+}
+
+std::string ImportStatement::stringify() {
+    std::string res = "";
+
+    res += (!m_importedSymbols.size()) ? "import " : "from ";
+
+    res += m_moduleName.first->stringify();
+    //hmm
+    if (m_moduleName.second) {
+        res += " as " + m_moduleName.second->stringify();
+    }
+
+    if (!m_importedSymbols.size())
+        return res;
+
+    res += " import ";
+
+    for (size_t i = 0; i < m_importedSymbols.size(); i++) {
+        if (i)
+            res += ", ";
+
+        res += m_importedSymbols[i].first->stringify();
+
+        if (m_importedSymbols[i].second) {
+            res += " as " + m_importedSymbols[i].second->stringify();
+        }
+    }
+
+    return res;
+}
+
 VariableStatement::VariableStatement(AstNodePtr type, AstNodePtr name,
                                      AstNodePtr value) {
     m_type = type;
@@ -514,17 +563,11 @@ TypeDefinition::TypeDefinition(AstNodePtr name, AstNodePtr type) {
     m_type = type;
 }
 
-AstNodePtr TypeDefinition::name() {
-    return m_name;
-}
+AstNodePtr TypeDefinition::name() { return m_name; }
 
-AstNodePtr TypeDefinition::baseType() {
-    return m_type;
-}
+AstNodePtr TypeDefinition::baseType() { return m_type; }
 
-AstKind TypeDefinition::type() {
-    return KAstTypeDefinition;
-}
+AstKind TypeDefinition::type() { return KAstTypeDefinition; }
 
 std::string TypeDefinition::stringify() {
     std::string res = "type " + m_name->stringify();
@@ -532,6 +575,6 @@ std::string TypeDefinition::stringify() {
     res += " = ";
 
     res += m_type->stringify();
-    
+
     return res;
 }
