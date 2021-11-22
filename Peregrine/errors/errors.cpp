@@ -40,7 +40,7 @@ void display(PEError e) {
                   << "\n";
     }
     if (e.ecode==""){
-        std::cout << "  ╰----------------------------------------- ";
+        std::cout << "  ╰-----------------------------------------\n";
     }
     else{
         std::cout << "  ╰- " << fg(style("Hint: ", bold), cyan)

@@ -74,7 +74,7 @@ NoLiteral::NoLiteral() {}
 
 AstKind NoLiteral::type() { return KAstNoLiteral; }
 
-std::string NoLiteral::stringify() { return ""; }
+std::string NoLiteral::stringify() { return "None"; }
 
 IdentifierExpression::IdentifierExpression(std::string_view value) {
     m_value = value;
@@ -527,6 +527,10 @@ AstKind BreakStatement::type() { return KAstBreakStatement; }
 
 std::string BreakStatement::stringify() { return "break"; }
 
+AstKind PassStatement::type() { return KAstPassStatement; }
+
+std::string PassStatement::stringify() { return "pass"; }
+
 AstKind ContinueStatement::type() { return KAstContinueStatement; }
 
 std::string ContinueStatement::stringify() { return "continue"; }
@@ -578,3 +582,49 @@ std::string TypeDefinition::stringify() {
 
     return res;
 }
+
+MatchStatement::MatchStatement(std::vector<AstNodePtr> to_match,
+                std::vector<std::pair<std::vector<AstNodePtr>, AstNodePtr>> cases,
+                AstNodePtr defaultbody) {
+    m_to_match=to_match;
+    m_cases=cases;
+    m_default=defaultbody;
+}
+
+std::vector<AstNodePtr> MatchStatement::matchItem() { return m_to_match; }
+
+std::vector<std::pair<std::vector<AstNodePtr>, AstNodePtr>> MatchStatement::caseBody() { return m_cases; }
+
+AstNodePtr MatchStatement::defaultBody() {
+    return m_default;
+}
+
+AstKind MatchStatement::type() { return KAstMatchStmt; }
+
+std::string MatchStatement::stringify() {
+    std::string res = "match ";
+    for(auto& temp:m_to_match){
+        res+=temp->stringify()+",";
+    }
+    res += ":\n";
+    for (auto& elif : m_cases) {
+        res += "case ";
+        auto temp= elif.first;
+        for (auto& x : temp){
+            res+=x->stringify()+",";
+        }
+        res += ":\n";
+
+        res += elif.second->stringify();
+        res += "\n";
+    }
+
+    if (m_default->type() != KAstNoLiteral) {
+        res += "default:\n";
+        res += m_default->stringify();
+        res += "\n";
+    }
+
+    return res;
+}
+

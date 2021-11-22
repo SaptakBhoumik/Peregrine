@@ -5,8 +5,10 @@
 
 // Create a string variable
 enum TokenType {
+    tk_eof,     // end of file
     // Some operators
     tk_plus,       // +
+    tk_underscore, // _
     tk_at,         // @
     tk_negative,   // negative number
     tk_minus,      // -
@@ -63,7 +65,6 @@ enum TokenType {
     tk_static,  // static
     tk_scope,   // scope
     tk_union,   // union
-    tk_enum,    // enum
     tk_unknown, // unknown type
     tk_assert,  // assert
     tk_try,     // try
@@ -73,10 +74,6 @@ enum TokenType {
     tk_false,   // False
     tk_with,    // with
     tk_as,      // as
-    // This is not necessary because peregrine has special library for
-    // multithreading
-    // tk_async,     // async
-    // tk_await,     // await
     tk_flags,     // flags
     tk_none,      // None
     tk_const,     // const
@@ -107,8 +104,8 @@ enum TokenType {
     tk_is_not,    // is not
     tk_cppcode,   // Cppcode
     tk_class,     // class
-    tk_struct,    // struct
     tk_type,       // type defination
+    tk_enum,      // enum
 
     // value type
     tk_decimal,
@@ -121,7 +118,6 @@ enum TokenType {
 
     tk_raw,    // raw string i.e. r
     tk_format, // formatted string i.e. f
-    tk_eof     // end of file
 };
 
 struct Token {

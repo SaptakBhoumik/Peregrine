@@ -30,12 +30,14 @@ enum AstKind {
     KAstReturnStatement,
     KAstFunctionCall,
     KAstIfStmt,
+    KAstMatchStmt,
     KAstScopeStmt,
     KAstWhileStmt,
     KAstForStatement,
     KAstBreakStatement,
     KAstContinueStatement,
-    KAstTypeDefinition
+    KAstTypeDefinition,
+    KAstPassStatement
 };
 
 class AstNode {
@@ -382,6 +384,12 @@ class BreakStatement : public AstNode {
     std::string stringify();
 };
 
+class PassStatement : public AstNode {
+  public:
+    AstKind type();
+    std::string stringify();
+};
+
 class ContinueStatement : public AstNode {
   public:
     AstKind type();
@@ -417,6 +425,24 @@ class TypeDefinition : public AstNode {
 
     AstNodePtr name();
     AstNodePtr baseType();
+  
+    AstKind type();
+    std::string stringify();
+};
+
+class MatchStatement : public AstNode {
+    std::vector<AstNodePtr> m_to_match;
+    std::vector<std::pair<std::vector<AstNodePtr>, AstNodePtr>> m_cases;
+    AstNodePtr m_default;
+
+  public:
+    MatchStatement(std::vector<AstNodePtr> to_match,
+                std::vector<std::pair<std::vector<AstNodePtr>, AstNodePtr>> cases,
+                AstNodePtr defaultbody);
+
+    std::vector<AstNodePtr> matchItem();
+    std::vector<std::pair<std::vector<AstNodePtr>, AstNodePtr>> caseBody();
+    AstNodePtr defaultBody();
 
     AstKind type();
     std::string stringify();

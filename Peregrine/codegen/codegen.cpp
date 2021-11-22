@@ -109,8 +109,28 @@ std::string Codegen::generate(AstNodePtr astNode) {
             res += "break";
             break;
         }
+        case KAstNone: {
+            res += "NULL";
+            break;
+        }
+        case KAstPassStatement: {
+            res += "\n//pass";// we are making it a comment because ; is added to
+                           // each node at the end. we dont want that to happen
+                           // because it will result in ;; which is an error
+            break;
+        }
         case KAstVariableStmt: {
-            // Todo
+            auto node = std::dynamic_pointer_cast<VariableStatement>(astNode);
+            std::string type;
+            if (node->varType()->type()!=KAstNoLiteral){
+                type=generate(node->varType())+" ";
+            }
+            std::string name = generate(node->name());
+            std::string value;
+            if (node->value()->type()!=KAstNoLiteral){
+                value=" = "+generate(node->value());
+            }
+            res+=type+name+value;
             break;
         }
         case KAstCpp: {
@@ -164,6 +184,11 @@ std::string Codegen::generate(AstNodePtr astNode) {
             res += funcName + "(" + arg + ")";
             break;
         }
+        case KAstTypeExpr:{
+            auto node = std::dynamic_pointer_cast<TypeExpression>(astNode);
+            res+=node->value();
+            break;
+        }
         case KAstFunctionDef: {
             auto node = std::dynamic_pointer_cast<FunctionDefinition>(astNode);
             auto functionName = generate(node->name());
@@ -191,7 +216,37 @@ std::string Codegen::generate(AstNodePtr astNode) {
 
             break;
         }
+        case KAstMatchStmt:{
+            auto node = std::dynamic_pointer_cast<MatchStatement>(astNode);
+            auto to_match=node->matchItem();
+            auto cases=node->caseBody();
+            auto defaultbody=node->defaultBody();
+            res+="\nwhile (true){\n";
+            for (uint64_t i=0;i<cases.size();++i){
+                auto x=cases[i];
+                if (x.first.size()==1 && x.first[0]->type()==KAstNoLiteral){
+                    if (i==0){
+                        res+=generate(x.second)+"\n";
+                    }
+                    else{
+                        res+="else{\n"+generate(x.second)+"\n}\n";
+                    }
+                }
+                else if (i==0){
+                    res+="if ("+match_arg(to_match,x.first)+"){\n"+generate(x.second)+"\n}\n";
+                }
+                else{
+                    res+="else if ("+match_arg(to_match,x.first)+"){\n"+generate(x.second)+"\n}\n";
+                }
+            }
+            if (defaultbody->type()!=KAstNoLiteral){
+                res+=generate(defaultbody);
+            }
+            res+="\nbreak;\n}";
+            break;
+        }
         default: {
+            std::cout<<astNode->type()<<"\n";
             std::cerr << fg(style("Error: invalid ast node passed to "
                                   "generate(). This should never happen.",
                                   bold),

@@ -106,9 +106,7 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_union;
     } else if (item == "unknown") {
         return tk_unknown;
-    } else if (item == "enum") {
-        return tk_enum;
-    } else if (item == "scope") {
+    }  else if (item == "scope") {
         return tk_scope;
     } else if (item == "elif") {
         return tk_elif;
@@ -150,15 +148,11 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_return;
     } else if (item == "as") {
         return tk_as;
-    }
-    // This is not necessary because peregrine has special library for
-    // multithreading
-    // else if (item == "async") {
-    //   return tk_async;
-    // } else if (item == "await") {
-    //   return tk_await;
-    // }
-    else if (item == "and") {
+    }else if (item == "_") {
+        return tk_underscore;
+    }else if (item == "enum") {
+        return tk_enum;
+    }else if (item == "and") {
         return tk_and;
     } else if (item == "or") {
         return tk_or;
@@ -176,8 +170,6 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_cppimport;
     } else if (item == "class") {
         return tk_class;
-    } else if (item == "struct") {
-        return tk_struct;
     } else if (item == "flags") {
         return tk_flags;
     } else {
