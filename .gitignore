@@ -11,6 +11,6 @@ temp.cc
 *.so
 *.o
 temp
-/objs
+/builddir
 *.elf
 doctest.h

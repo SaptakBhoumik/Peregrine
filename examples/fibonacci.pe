@@ -1,0 +1,9 @@
+def fib(int n) -> int:
+    match n:
+        case 0, 1:
+            return 1
+        case _:
+            return fib(n - 2) + fib(n - 1)
+
+def main():
+    printf("%d\n", fib(10))

@@ -11,7 +11,7 @@
 
 int main(int argc, char** argv) {
     if (argc != 3) {//the cli is still not complete
-        std::ifstream file("./Peregrine/test.pe");
+        std::ifstream file("../Peregrine/test.pe");
         std::stringstream buf;
         buf << file.rdbuf();
 
