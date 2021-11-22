@@ -216,6 +216,35 @@ std::string Codegen::generate(AstNodePtr astNode) {
 
             break;
         }
+        case KAstMatchStmt:{
+            auto node = std::dynamic_pointer_cast<MatchStatement>(astNode);
+            auto to_match=node->matchItem();
+            auto cases=node->caseBody();
+            auto defaultbody=node->defaultBody();
+            res+="\nwhile (true){\n";
+            for (uint64_t i=0;i<cases.size();++i){
+                auto x=cases[i];
+                if (x.first.size()==1 && x.first[0]->type()==KAstNoLiteral){
+                    if (i==0){
+                        res+=generate(x.second)+"\n";
+                    }
+                    else{
+                        res+="else{\n"+generate(x.second)+"\n}\n";
+                    }
+                }
+                else if (i==0){
+                    res+="if ("+match_arg(to_match,x.first)+"){\n"+generate(x.second)+"\n}\n";
+                }
+                else{
+                    res+="else if ("+match_arg(to_match,x.first)+"){\n"+generate(x.second)+"\n}\n";
+                }
+            }
+            if (defaultbody->type()!=KAstNoLiteral){
+                res+=generate(defaultbody);
+            }
+            res+="\nbreak;\n}";
+            break;
+        }
         default: {
             std::cout<<astNode->type()<<"\n";
             std::cerr << fg(style("Error: invalid ast node passed to "
