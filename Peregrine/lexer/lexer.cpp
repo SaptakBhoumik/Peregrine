@@ -203,6 +203,12 @@ static inline TokenType equal(std::string keyword) {
     } else if (keyword == "^=") {
         result = tk_bit_xor_equal;
     }
+    else if (keyword == "<=") {
+        result = tk_less_or_equ;
+    }
+    else if (keyword == ">=") {
+        result = tk_gr_or_equ;
+    }
     return result;
 }
 LEXEME lexer(std::string src, std::string filename) {
@@ -211,7 +217,7 @@ LEXEME lexer(std::string src, std::string filename) {
     std::vector<Token> tokens;
     std::vector<uint64_t> identation_level;
     const std::vector<std::string> operators(
-        {"!", "/", "//", "+", "-", "*", "%", "<<", ">>", "&", "|", "^", "="});
+        {">","<","!", "/", "//", "+", "-", "*", "%", "<<", ">>", "&", "|", "^", "="});
     std::string string_starter;
     std::string statement = seperate_lines.at(0);
     std::string item;
