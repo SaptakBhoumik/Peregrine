@@ -6,23 +6,24 @@
 using namespace ast;
 
 AstNodePtr Parser::parseInteger() {
-    return std::make_shared<IntegerLiteral>(m_currentToken.keyword);
+    return std::make_shared<IntegerLiteral>(m_currentToken, m_currentToken.keyword);
 }
 
 AstNodePtr Parser::parseDecimal() {
-    return std::make_shared<DecimalLiteral>(m_currentToken.keyword);
+    return std::make_shared<DecimalLiteral>(m_currentToken, m_currentToken.keyword);
 }
 
 AstNodePtr Parser::parseString(bool isFormatted, bool isRaw) {
-    return std::make_shared<StringLiteral>(m_currentToken.keyword, isFormatted,
+    return std::make_shared<StringLiteral>(m_currentToken, m_currentToken.keyword, isFormatted,
                                            isRaw);
 }
 
 AstNodePtr Parser::parseBool() {
-    return std::make_shared<BoolLiteral>(m_currentToken.keyword);
+    return std::make_shared<BoolLiteral>(m_currentToken, m_currentToken.keyword);
 }
 
 AstNodePtr Parser::parseList() {
+    Token tok = m_currentToken;
     std::vector<AstNodePtr> elements;
 
     if (next().tkType != tk_list_close) {
@@ -47,10 +48,11 @@ AstNodePtr Parser::parseList() {
     // TODO: remove the type member? im not sure
     AstNodePtr type = std::make_shared<NoLiteral>();
 
-    return std::make_shared<ListLiteral>(type, elements);
+    return std::make_shared<ListLiteral>(tok, type, elements);
 }
 
 AstNodePtr Parser::parseDict() {
+    Token tok = m_currentToken;
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elements;
 
     if (next().tkType != tk_dict_close) {
@@ -77,11 +79,11 @@ AstNodePtr Parser::parseDict() {
 
     advanceOnNewLine();
 
-    return std::make_shared<DictLiteral>(elements);
+    return std::make_shared<DictLiteral>(tok, elements);
 }
 
 AstNodePtr Parser::parseCpp() {
-    return std::make_shared<CppStatement>(m_currentToken.keyword);
+    return std::make_shared<CppStatement>(m_currentToken, m_currentToken.keyword);
 }
 
-AstNodePtr Parser::parseNone() { return std::make_shared<NoneLiteral>(); }
+AstNodePtr Parser::parseNone() { return std::make_shared<NoneLiteral>(m_currentToken); }

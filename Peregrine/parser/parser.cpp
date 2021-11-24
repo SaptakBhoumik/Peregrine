@@ -2,7 +2,6 @@
 #include "lexer/lexer.hpp"
 #include "lexer/tokens.hpp"
 
-#include <algorithm>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -159,13 +158,13 @@ AstNodePtr Parser::parseStatement() {
         }
 
         case tk_break: {
-            stmt = std::make_shared<BreakStatement>();
+            stmt = std::make_shared<BreakStatement>(m_currentToken);
             advanceOnNewLine();
             break;
         }
 
         case tk_pass: {
-            stmt = std::make_shared<PassStatement>();
+            stmt = std::make_shared<PassStatement>(m_currentToken);
             advanceOnNewLine();
             break;
         }
@@ -174,7 +173,7 @@ AstNodePtr Parser::parseStatement() {
             break;
         }
         case tk_continue: {
-            stmt = std::make_shared<ContinueStatement>();
+            stmt = std::make_shared<ContinueStatement>(m_currentToken);
             advanceOnNewLine();
             break;
         }
@@ -243,6 +242,7 @@ AstNodePtr Parser::parseBlockStatement() {
 }
 
 AstNodePtr Parser::parseImport() {
+    Token tok = m_currentToken;
     bool hasFrom = m_currentToken.tkType == tk_from;
 
     advance(); // skip from or import token 
@@ -260,7 +260,7 @@ AstNodePtr Parser::parseImport() {
             moduleName.second = parseName();
         }
         //advance on new line?
-        return std::make_shared<ImportStatement>(moduleName, importedSymbols);
+        return std::make_shared<ImportStatement>(tok, moduleName, importedSymbols);
     }
 
     expect(tk_import);
@@ -287,11 +287,12 @@ AstNodePtr Parser::parseImport() {
     } while (m_currentToken.tkType == tk_comma);
 
     advanceOnNewLine();
-    return std::make_shared<ImportStatement>(moduleName, importedSymbols);
+    return std::make_shared<ImportStatement>(tok, moduleName, importedSymbols);
 }
 
 // TODO: make this invalid: int = 43
 AstNodePtr Parser::parseVariableStatement() {
+    Token tok = m_currentToken;
     AstNodePtr varType = std::make_shared<NoLiteral>();
 
     if (next().tkType == tk_identifier) {
@@ -312,10 +313,11 @@ AstNodePtr Parser::parseVariableStatement() {
         advanceOnNewLine();
     }
 
-    return std::make_shared<VariableStatement>(varType, name, value);
+    return std::make_shared<VariableStatement>(tok, varType, name, value);
 }
 
 AstNodePtr Parser::parseConstDeclaration() {
+    Token tok = m_currentToken;
     expect(tk_identifier);
 
     AstNodePtr constType = std::make_shared<NoLiteral>();
@@ -332,10 +334,11 @@ AstNodePtr Parser::parseConstDeclaration() {
 
     AstNodePtr value = parseExpression();
 
-    return std::make_shared<ConstDeclaration>(constType, name, value);
+    return std::make_shared<ConstDeclaration>(tok, constType, name, value);
 }
 
 AstNodePtr Parser::parseIf() {
+    Token tok = m_currentToken;
     advance(); // skip the if token
 
     AstNodePtr condition = parseExpression();
@@ -374,18 +377,22 @@ AstNodePtr Parser::parseIf() {
         elseBody = parseBlockStatement();
     }
 
-    return std::make_shared<IfStatement>(condition, ifBody, elseBody, elifs);
+    return std::make_shared<IfStatement>(tok, condition, ifBody, elseBody, elifs);
 }
 
 AstNodePtr Parser::parseScope() {
+    Token tok = m_currentToken;
     expect(tk_colon);
+
     // TODO:  support single-line scope
     expect(tk_ident);
+
     AstNodePtr scope_body = parseBlockStatement();
-    return std::make_shared<ScopeStatement>(scope_body);
+    return std::make_shared<ScopeStatement>(tok, scope_body);
 }
 
 AstNodePtr Parser::parseWhile() {
+    Token tok = m_currentToken;
     advance(); // skip the while token
 
     AstNodePtr condition = parseExpression();
@@ -395,10 +402,11 @@ AstNodePtr Parser::parseWhile() {
 
     AstNodePtr body = parseBlockStatement();
 
-    return std::make_shared<WhileStatement>(condition, body);
+    return std::make_shared<WhileStatement>(tok, condition, body);
 }
 
 AstNodePtr Parser::parseFor() {
+    Token tok = m_currentToken;
     advance();
 
     AstNodePtr variable = parseName();
@@ -413,10 +421,11 @@ AstNodePtr Parser::parseFor() {
 
     AstNodePtr body = parseBlockStatement();
 
-    return std::make_shared<ForStatement>(variable, sequence, body);
+    return std::make_shared<ForStatement>(tok, variable, sequence, body);
 }
 
 AstNodePtr Parser::parseFunctionDef() {
+    Token tok = m_currentToken;
     expect(tk_identifier);
 
     AstNodePtr name = parseName();
@@ -454,7 +463,7 @@ AstNodePtr Parser::parseFunctionDef() {
     }
 
     // returns void by default
-    AstNodePtr returnType = std::make_shared<IdentifierExpression>("void");
+    AstNodePtr returnType = std::make_shared<IdentifierExpression>(m_currentToken, "void");
 
     if (next().tkType == tk_arrow) {
         advance();
@@ -468,11 +477,12 @@ AstNodePtr Parser::parseFunctionDef() {
 
     AstNodePtr body = parseBlockStatement();
 
-    return std::make_shared<FunctionDefinition>(returnType, name, parameters,
+    return std::make_shared<FunctionDefinition>(tok, returnType, name, parameters,
                                                 body);
 }
 
 AstNodePtr Parser::parseReturn() {
+    Token tok = m_currentToken;
     AstNodePtr returnValue = std::make_shared<NoLiteral>();
 
     if (next().tkType != tk_new_line) {
@@ -482,10 +492,11 @@ AstNodePtr Parser::parseReturn() {
         advance();
     }
 
-    return std::make_shared<ReturnStatement>(returnValue);
+    return std::make_shared<ReturnStatement>(tok, returnValue);
 }
 
 AstNodePtr Parser::parseTypeDef() {
+    Token tok = m_currentToken;
     advance();
 
     AstNodePtr name = parseName(); 
@@ -496,7 +507,7 @@ AstNodePtr Parser::parseTypeDef() {
     AstNodePtr type = parseType();
 
     advanceOnNewLine();
-    return std::make_shared<TypeDefinition>(name, type);
+    return std::make_shared<TypeDefinition>(tok, name, type);
 }
 
 AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
@@ -609,10 +620,11 @@ AstNodePtr Parser::parseBinaryOperation(AstNodePtr left) {
 
     advance();
     AstNodePtr right = parseExpression(precedence);
-    return std::make_shared<BinaryOperation>(left, op, right);
+    return std::make_shared<BinaryOperation>(op, left, op, right);
 }
 
 AstNodePtr Parser::parseFunctionCall(AstNodePtr left) {
+    Token tok = m_currentToken;
     std::vector<AstNodePtr> arguments;
 
     if (next().tkType != tk_r_paren) {
@@ -634,17 +646,18 @@ AstNodePtr Parser::parseFunctionCall(AstNodePtr left) {
 
     advanceOnNewLine();
 
-    return std::make_shared<FunctionCall>(left, arguments);
+    return std::make_shared<FunctionCall>(tok, left, arguments);
 }
 
 AstNodePtr Parser::parseListOrDictAccess(AstNodePtr left) {
+    Token tok = m_currentToken;
     advance();
 
     AstNodePtr keyOrIndex = parseExpression();
 
     expect(tk_list_close);
 
-    AstNodePtr node = std::make_shared<ListOrDictAccess>(left, keyOrIndex);
+    AstNodePtr node = std::make_shared<ListOrDictAccess>(tok, left, keyOrIndex);
 
     if (next().tkType != tk_assign)
         return node;
@@ -657,16 +670,17 @@ AstNodePtr Parser::parseListOrDictAccess(AstNodePtr left) {
     AstNodePtr newValue = parseExpression();
     advanceOnNewLine();
 
-    return std::make_shared<VariableStatement>(std::make_shared<NoLiteral>(), node, newValue);
+    return std::make_shared<VariableStatement>(tok, std::make_shared<NoLiteral>(), node, newValue);
 }
 
 AstNodePtr Parser::parseDotExpression(AstNodePtr left) {
+    Token tok = m_currentToken;
     advance();
 
     //TODO: validate output of parseExpression
     AstNodePtr referenced = parseExpression();
 
-    return std::make_shared<DotExpression>(left, referenced);
+    return std::make_shared<DotExpression>(tok, left, referenced);
 }
 
 AstNodePtr Parser::parsePrefixExpression() {
@@ -677,7 +691,7 @@ AstNodePtr Parser::parsePrefixExpression() {
 
     AstNodePtr right = parseExpression(precedence);
 
-    return std::make_shared<PrefixExpression>(prefix, right);
+    return std::make_shared<PrefixExpression>(prefix, prefix, right);
 }
 
 AstNodePtr Parser::parseGroupedExpr() {
@@ -691,11 +705,11 @@ AstNodePtr Parser::parseGroupedExpr() {
 }
 
 AstNodePtr Parser::parseIdentifier() {
-    return std::make_shared<IdentifierExpression>(m_currentToken.keyword);
+    return std::make_shared<IdentifierExpression>(m_currentToken, m_currentToken.keyword);
 }
 
 AstNodePtr Parser::parseType() {
-    return std::make_shared<TypeExpression>(m_currentToken.keyword);
+    return std::make_shared<TypeExpression>(m_currentToken, m_currentToken.keyword);
 }
 
 AstNodePtr Parser::parseName() {
@@ -706,7 +720,8 @@ AstNodePtr Parser::parseName() {
     return parseIdentifier();
 }
 
-AstNodePtr Parser::parseMatch(){
+AstNodePtr Parser::parseMatch() {
+    Token tok = m_currentToken;
     //TODO: implement errors
     advance();
     std::vector<AstNodePtr> to_match;
@@ -749,5 +764,5 @@ AstNodePtr Parser::parseMatch(){
         default_body = parseBlockStatement();
     }
     expect(tk_dedent);
-    return std::make_shared<MatchStatement>(to_match,cases,default_body);
+    return std::make_shared<MatchStatement>(tok, to_match,cases,default_body);
 }
