@@ -32,6 +32,7 @@ enum AstKind {
     KAstFunctionDef,
     KAstReturnStatement,
     KAstFunctionCall,
+    KAstDotExpression,
     KAstIfStmt,
     KAstMatchStmt,
     KAstScopeStmt,
@@ -336,6 +337,21 @@ class FunctionCall : public AstNode {
 
     AstNodePtr name();
     std::vector<AstNodePtr> arguments();
+
+    AstKind type();
+    std::string stringify();
+};
+
+// test.hello(), obj.prop, etc
+class DotExpression : public AstNode {
+    AstNodePtr m_owner; // the node that comes before the .
+    AstNodePtr m_referenced; // the node that comes after the .
+
+  public:
+    DotExpression(AstNodePtr owner, AstNodePtr referenced);
+
+    AstNodePtr owner();
+    AstNodePtr referenced();
 
     AstKind type();
     std::string stringify();

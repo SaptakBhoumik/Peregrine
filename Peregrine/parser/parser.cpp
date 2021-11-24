@@ -40,6 +40,8 @@ std::map<TokenType, PrecedenceType> createMap() {
     precedenceMap[tk_modulo] = pr_mul_div;
     precedenceMap[tk_floor] = pr_mul_div;
     precedenceMap[tk_exponent] = pr_expo;
+    precedenceMap[tk_dot] = pr_dot_ref;
+    precedenceMap[tk_list_open] = pr_list_access;
     precedenceMap[tk_l_paren] = pr_call;
 
     return precedenceMap;
@@ -584,6 +586,11 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
                 break;
             }
 
+            case tk_dot: {
+                left = parseDotExpression(left);
+                break;
+            }
+
             default: {
                 left = parseBinaryOperation(left);
                 break;
@@ -651,6 +658,15 @@ AstNodePtr Parser::parseListOrDictAccess(AstNodePtr left) {
     advanceOnNewLine();
 
     return std::make_shared<VariableStatement>(std::make_shared<NoLiteral>(), node, newValue);
+}
+
+AstNodePtr Parser::parseDotExpression(AstNodePtr left) {
+    advance();
+
+    //TODO: validate output of parseExpression
+    AstNodePtr referenced = parseExpression();
+
+    return std::make_shared<DotExpression>(left, referenced);
 }
 
 AstNodePtr Parser::parsePrefixExpression() {

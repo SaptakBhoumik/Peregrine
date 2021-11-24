@@ -451,6 +451,32 @@ std::string FunctionCall::stringify() {
     return res;
 }
 
+DotExpression::DotExpression(AstNodePtr owner, AstNodePtr referenced) {
+    m_owner = owner;
+    m_referenced = referenced;
+}
+
+AstNodePtr DotExpression::owner() {
+    return m_owner;
+}
+
+AstNodePtr DotExpression::referenced() {
+    return m_referenced;
+}
+
+AstKind DotExpression::type() {
+    return KAstDotExpression;
+}
+
+std::string DotExpression::stringify() {
+    std::string res = "";
+
+    res += m_owner->stringify() + ".";
+    res += m_referenced->stringify();
+
+    return res;
+}
+
 IfStatement::IfStatement(AstNodePtr condition, AstNodePtr ifBody,
                          AstNodePtr elseBody,
                          std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs) {

@@ -11,19 +11,21 @@
 using namespace ast;
 
 enum PrecedenceType {
-    pr_lowest,    // lowest possible precedence
-    pr_and_or,    // and,or
-    pr_not,       // not
-    pr_compare,   // ==, !=, <, >, <=, >=
-    pr_bit_or,    // |
-    pr_bit_xor,   // ^
-    pr_bit_and,   // &
-    pr_bit_shift, // >> , <<
-    pr_sum_minus, // +, -
-    pr_mul_div,   // *, /, %, //
-    pr_expo,      // **
-    pr_prefix,    // -x
-    pr_call       // x()
+    pr_lowest,      // lowest possible precedence
+    pr_and_or,      // and,or
+    pr_not,         // not
+    pr_compare,     // ==, !=, <, >, <=, >=
+    pr_bit_or,      // |
+    pr_bit_xor,     // ^
+    pr_bit_and,     // &
+    pr_bit_shift,   // >> , <<
+    pr_sum_minus,   // +, -
+    pr_mul_div,     // *, /, %, //
+    pr_expo,        // **
+    pr_prefix,      // -x
+    pr_dot_ref,     // x.test(), x.prop
+    pr_list_access, // x[0], x["test"]
+    pr_call         // x()
 };
 
 std::map<TokenType, PrecedenceType> createMap();
@@ -67,6 +69,7 @@ class Parser {
     AstNodePtr parseBinaryOperation(AstNodePtr left);
     AstNodePtr parseFunctionCall(AstNodePtr left);
     AstNodePtr parseListOrDictAccess(AstNodePtr left);
+    AstNodePtr parseDotExpression(AstNodePtr left);
 
     AstNodePtr parseStatement();
     AstNodePtr parseBlockStatement();
