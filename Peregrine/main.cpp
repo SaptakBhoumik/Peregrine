@@ -1,4 +1,4 @@
-#include "codegen/codegen.hpp"
+#include "codegen/cpp/codegen.hpp"
 #include "lexer/lexer.hpp"
 #include "lexer/tokens.hpp"
 #include "parser/parser.hpp"
@@ -30,10 +30,10 @@ int main(int argc, char** argv) {
         TypeChecker typeChecker;
         typeChecker.check(program);
 
-        Codegen codegen("temp.cc");
-        auto res = codegen.generate(program);
+        cpp::Codegen codegen("temp.cc");
+        auto res = codegen.generate(program, codegen.createEnv());
         std::cout << res << "\n";
-        codegen.write(res);
+        codegen.flush(res);
     }
     else{
         std::ifstream file(argv[2]);
@@ -49,9 +49,9 @@ int main(int argc, char** argv) {
         // TypeChecker typeChecker;
         // typeChecker.check(program);
 
-        Codegen codegen("temp.cc");
-        auto res = "#include  <cstdio>\n"+codegen.generate(program);
-        codegen.write(res);
+        cpp::Codegen codegen("temp.cc");
+        auto res = "#include  <cstdio>\n"+codegen.generate(program, codegen.createEnv());
+        codegen.flush(res);
         system("g++ temp.cc");
     }
     return 0;

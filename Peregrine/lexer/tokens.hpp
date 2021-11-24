@@ -111,7 +111,7 @@ enum TokenType {
     tk_decimal,
     tk_integer,
     tk_string,
-    cpp,
+    tk_cpp,
 
     tk_ident,  // beginning of identation
     tk_dedent, // end of identation

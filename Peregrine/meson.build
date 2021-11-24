@@ -18,8 +18,8 @@ analyzer_src = [
 ]
 
 codegen_src = [
-    'codegen/codegen.cpp',
-    'codegen/utils.cpp'
+    'codegen/cpp/codegen.cpp',
+    'codegen/cpp/utils.cpp'
 ]
 
 lexer = static_library('lexer', sources: lexer_src)

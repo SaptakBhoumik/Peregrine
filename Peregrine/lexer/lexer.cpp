@@ -318,7 +318,7 @@ LEXEME lexer(std::string src, std::string filename) {
                 cpp_bracket_count -= 1;
                 if (cpp_bracket_count == 0) {
                     is_cpp = false;
-                    token = token_init(statement, keyword, cpp, start_index,
+                    token = token_init(statement, keyword, tk_cpp, start_index,
                                        current_index, line);
                 }
             }

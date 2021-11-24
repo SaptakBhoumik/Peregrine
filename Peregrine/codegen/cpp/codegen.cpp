@@ -9,21 +9,32 @@
 #include <string>
 #include <string_view>
 
+namespace cpp {
+
 Codegen::Codegen(std::string outputFilename) { m_file.open(outputFilename); }
 
-void Codegen::write(std::string_view code) {
+std::shared_ptr<SymbolTable<ast::AstNodePtr>> Codegen::createEnv(std::shared_ptr<SymbolTable<ast::AstNodePtr>> parent) {
+    return std::make_shared<SymbolTable<ast::AstNodePtr>>(parent);
+}
+
+void Codegen::flush(std::string_view code) {
     m_file << code;
     m_file.close(); // this will be used only once so we can close it
 }
 
-std::string Codegen::generate(ast::AstNodePtr astNode) {
+std::string Codegen::mangleName(ast::AstNodePtr astNode) {
+    return std::string("");
+}
+
+std::string Codegen::generate(ast::AstNodePtr astNode, std::shared_ptr<SymbolTable<ast::AstNodePtr>> env) {
     std::string res;
+    
     switch (astNode->type()) {
         case ast::KAstProgram: {
             auto node = std::dynamic_pointer_cast<ast::Program>(astNode);
 
             for (auto& stmt : node->statements()) {
-                res += generate(stmt) + ";\n";
+                res += generate(stmt, env) + ";\n";
             }
             break;
         }
@@ -56,21 +67,21 @@ std::string Codegen::generate(ast::AstNodePtr astNode) {
         case ast::KAstPrefixExpr: {
             auto node = std::dynamic_pointer_cast<ast::PrefixExpression>(astNode);
             res += "(" + node->prefix().keyword + " " +
-                   generate(node->right()) + ")";
+                   generate(node->right(), env) + ")";
             break;
         }
         case ast::KAstBinaryOp: {
             auto node = std::dynamic_pointer_cast<ast::BinaryOperation>(astNode);
             auto operation = node->op();
             if (operation.keyword == "**") {
-                res += "_PEREGRINE_POWER(" + generate(node->left()) + "," +
-                       generate(node->right()) + ")";
+                res += "_PEREGRINE_POWER(" + generate(node->left(), env) + "," +
+                       generate(node->right(), env) + ")";
             } else if (operation.keyword == "//") {
-                res += "_PEREGRINE_FLOOR(" + generate(node->left()) + "/" +
-                       generate(node->right()) + ")";
+                res += "_PEREGRINE_FLOOR(" + generate(node->left(), env) + "/" +
+                       generate(node->right(), env) + ")";
             } else {
-                res += "(" + generate(node->left()) + " " + node->op().keyword +
-                       " " + generate(node->right()) + ")";
+                res += "(" + generate(node->left(), env) + " " + node->op().keyword +
+                       " " + generate(node->right(), env) + ")";
             }
             break;
         }
@@ -78,26 +89,28 @@ std::string Codegen::generate(ast::AstNodePtr astNode) {
             auto node = std::dynamic_pointer_cast<ast::BlockStatement>(astNode);
             auto body = node->statements();
             for (auto& stmp : body) {
-                res += generate(stmp) + ";\n";
+                res += generate(stmp, env) + ";\n";
             }
             break;
         }
         case ast::KAstIfStmt: {
             auto node = std::dynamic_pointer_cast<ast::IfStatement>(astNode);
-            res += "if(" + generate(node->condition()) + "){\n" +
-                   generate(node->ifBody()) + "}";
+
+            res += "if(" + generate(node->condition(), env) + "){\n" +
+                   generate(node->ifBody(), createEnv(env)) + "}";
+
             auto elifNode = node->elifs();
             if (elifNode.size() != 0) {
                 res += "\n";
                 for (auto& body : elifNode) { // making sure that elif exists
-                    res += "else if(" + generate(body.first) + "){\n" +
-                           generate(body.second) + "}";
+                    res += "else if(" + generate(body.first, env) + "){\n" +
+                           generate(body.second, createEnv(env)) + "}";
                 }
             }
             auto elseNode = node->elseBody();
             if (elseNode->type() ==
                 ast::KAstBlockStmt) { // making sure that else exists
-                res += "\nelse{\n" + generate(elseNode) + "}";
+                res += "\nelse{\n" + generate(elseNode, createEnv(env)) + "}";
             }
             break;
         }
@@ -123,12 +136,12 @@ std::string Codegen::generate(ast::AstNodePtr astNode) {
             auto node = std::dynamic_pointer_cast<ast::VariableStatement>(astNode);
             std::string type;
             if (node->varType()->type() != ast::KAstNoLiteral){
-                type=generate(node->varType())+" ";
+                type=generate(node->varType(), env)+" ";
             }
-            std::string name = generate(node->name());
+            std::string name = generate(node->name(), env);
             std::string value;
             if (node->value()->type() != ast::KAstNoLiteral){
-                value=" = "+generate(node->value());
+                value=" = "+generate(node->value(), env);
             }
             res+=type+name+value;
             break;
@@ -143,8 +156,8 @@ std::string Codegen::generate(ast::AstNodePtr astNode) {
         }
         case ast::KAstWhileStmt: {
             auto node = std::dynamic_pointer_cast<ast::WhileStatement>(astNode);
-            res += "while(" + generate(node->condition()) + "){\n" +
-                   generate(node->body()) + "}";
+            res += "while(" + generate(node->condition(), env) + "){\n" +
+                   generate(node->body(), createEnv(env)) + "}";
             break;
         }
         case ast::KAstIdentifier: {
@@ -155,7 +168,7 @@ std::string Codegen::generate(ast::AstNodePtr astNode) {
         }
         case ast::KAstScopeStmt: {
             auto node = std::dynamic_pointer_cast<ast::ScopeStatement>(astNode);
-            res += "{\n" + generate(node->body()) + "\n}";
+            res += "{\n" + generate(node->body(), createEnv(env)) + "\n}";
             break;
         }
         case ast::KAstReturnStatement: {
@@ -163,18 +176,18 @@ std::string Codegen::generate(ast::AstNodePtr astNode) {
             res += "return ";
             auto value = node->returnValue();
             if (value->type() != ast::KAstNoLiteral) {
-                res += generate(value);
+                res += generate(value, env);
             }
             break;
         }
         case ast::KAstFunctionCall: {
             auto node = std::dynamic_pointer_cast<ast::FunctionCall>(astNode);
-            auto funcName = generate(node->name());
+            auto funcName = generate(node->name(), env);
             std::string arg;
             auto x = node->arguments();
             if (x.size() != 0) {
-                for (uint64_t i = 0; i < x.size(); ++i) {
-                    arg += generate(x[i]) + " ";
+                for (size_t i = 0; i < x.size(); ++i) {
+                    arg += generate(x[i], env) + " ";
                     if (i == x.size() - 1) {
                     } else {
                         arg += ",";
@@ -191,14 +204,14 @@ std::string Codegen::generate(ast::AstNodePtr astNode) {
         }
         case ast::KAstFunctionDef: {
             auto node = std::dynamic_pointer_cast<ast::FunctionDefinition>(astNode);
-            auto functionName = generate(node->name());
-            auto returnType = generate(node->returnType());
+            auto functionName = generate(node->name(), env);
+            auto returnType = generate(node->returnType(), env);
             std::string param;
             if (node->parameters().size() > 0) {
                 auto x = node->parameters();
-                for (uint64_t i = 0; i < x.size(); ++i) {
+                for (size_t i = 0; i < x.size(); ++i) {
                     param +=
-                        generate(x[i].p_type) + " " + generate(x[i].p_name);
+                        generate(x[i].p_type, env) + " " + generate(x[i].p_name, env);
                     if (i == x.size() - 1) {
                     } else {
                         param += ",";
@@ -207,40 +220,42 @@ std::string Codegen::generate(ast::AstNodePtr astNode) {
             }
             if (functionName == "main" && returnType == "void") {
                 // we want the main function to always return 0 if success
-                res += "int main(" + param + "){\n" + generate(node->body()) +
+                res += "int main(" + param + "){\n" + generate(node->body(), createEnv(env)) +
                        "return 0;\n}";
             } else {
                 res += returnType + " " + functionName + "(" + param + "){\n" +
-                       generate(node->body()) + "\n}";
+                       generate(node->body(), createEnv(env)) + "\n}";
             }
 
             break;
         }
+
+        //TODO: check if we need to createEnv() at some point
         case ast::KAstMatchStmt:{
             auto node = std::dynamic_pointer_cast<ast::MatchStatement>(astNode);
             auto to_match=node->matchItem();
             auto cases=node->caseBody();
             auto defaultbody=node->defaultBody();
             res+="\nwhile (true){\n";
-            for (uint64_t i=0;i<cases.size();++i){
+            for (size_t i=0;i<cases.size();++i){
                 auto x=cases[i];
                 if (x.first.size()==1 && x.first[0]->type() == ast::KAstNoLiteral){
                     if (i==0){
-                        res+=generate(x.second)+"\n";
+                        res+=generate(x.second, env)+"\n";
                     }
                     else{
-                        res+="else{\n"+generate(x.second)+"\n}\n";
+                        res+="else{\n"+generate(x.second, env)+"\n}\n";
                     }
                 }
                 else if (i==0){
-                    res+="if ("+match_arg(to_match,x.first)+"){\n"+generate(x.second)+"\n}\n";
+                    res+="if ("+matchArg(to_match,x.first)+"){\n"+generate(x.second, env)+"\n}\n";
                 }
                 else{
-                    res+="else if ("+match_arg(to_match,x.first)+"){\n"+generate(x.second)+"\n}\n";
+                    res+="else if ("+matchArg(to_match,x.first)+"){\n"+generate(x.second, env)+"\n}\n";
                 }
             }
             if (defaultbody->type() != ast::KAstNoLiteral){
-                res+=generate(defaultbody);
+                res+=generate(defaultbody, env);
             }
             res+="\nbreak;\n}";
             break;
@@ -260,4 +275,6 @@ std::string Codegen::generate(ast::AstNodePtr astNode) {
         }
     }
     return res;
+}
+
 }
