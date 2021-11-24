@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+namespace ast {
+
 Program::Program(std::vector<AstNodePtr> statements) {
     m_statements = statements;
 }
@@ -193,6 +195,32 @@ std::string PrefixExpression::stringify() {
 
     res += ")";
 
+    return res;
+}
+
+ListOrDictAccess::ListOrDictAccess(AstNodePtr container, AstNodePtr keyOrIndex) {
+    m_container = container;
+    m_keyOrIndex = keyOrIndex;
+}
+
+AstNodePtr ListOrDictAccess::container() {
+    return m_container;
+}
+
+AstNodePtr ListOrDictAccess::keyOrIndex() {
+    return m_keyOrIndex;
+}
+
+AstKind ListOrDictAccess::type() {
+    return KAstListOrDictAccess;
+}
+
+std::string ListOrDictAccess::stringify() {
+    std::string res = "";
+
+    res += m_container->stringify() + "[";
+    res += m_keyOrIndex->stringify() + "]";
+    
     return res;
 }
 
@@ -628,3 +656,4 @@ std::string MatchStatement::stringify() {
     return res;
 }
 
+}

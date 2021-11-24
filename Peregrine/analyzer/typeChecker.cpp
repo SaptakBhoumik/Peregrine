@@ -6,6 +6,8 @@
 #include <iostream>
 #include <memory>
 
+using namespace types;
+
 TypeChecker::TypeChecker() {
     m_env = std::make_shared<SymbolTable<TypePtr>>(nullptr);
     m_currentFunction = nullptr;
@@ -43,18 +45,18 @@ void TypeChecker::exitLocalEnv() {
     m_env = m_env->parent();
 }
 
-std::string TypeChecker::identifierName(AstNodePtr identifier) {
-    assert(identifier->type() == KAstIdentifier);
+std::string TypeChecker::identifierName(ast::AstNodePtr identifier) {
+    assert(identifier->type() == ast::KAstIdentifier);
 
-    return std::dynamic_pointer_cast<IdentifierExpression>(identifier)->value();
+    return std::dynamic_pointer_cast<ast::IdentifierExpression>(identifier)->value();
 }
 
-TypePtr TypeChecker::check(AstNodePtr astNode) {
+TypePtr TypeChecker::check(ast::AstNodePtr astNode) {
     std::cout << "check"
               << "\n";
     switch (astNode->type()) {
-        case KAstProgram: {
-            auto node = std::dynamic_pointer_cast<Program>(astNode);
+        case ast::KAstProgram: {
+            auto node = std::dynamic_pointer_cast<ast::Program>(astNode);
 
             for (auto& stmt : node->statements()) {
                 check(stmt);
@@ -63,8 +65,8 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             break;
         }
 
-        case KAstBlockStmt: {
-            auto node = std::dynamic_pointer_cast<BlockStatement>(astNode);
+        case ast::KAstBlockStmt: {
+            auto node = std::dynamic_pointer_cast<ast::BlockStatement>(astNode);
 
             for (auto& stmt : node->statements()) {
                 check(stmt);
@@ -73,9 +75,9 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             break;
         }
 
-        case KAstIdentifier: {
+        case ast::KAstIdentifier: {
             auto node =
-                std::dynamic_pointer_cast<IdentifierExpression>(astNode);
+                std::dynamic_pointer_cast<ast::IdentifierExpression>(astNode);
             std::cout << node->value() << "\n";
             auto type = m_env->get(node->value());
 
@@ -86,29 +88,29 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             return *type;
         }
 
-        case KAstTypeExpr: {
-            auto node = std::dynamic_pointer_cast<TypeExpression>(astNode);
+        case ast::KAstTypeExpr: {
+            auto node = std::dynamic_pointer_cast<ast::TypeExpression>(astNode);
             return identifierToTypeMap[node->value()];
         }
 
-        case KAstInteger: {
+        case ast::KAstInteger: {
             return TypeProducer::integer();
         }
 
-        case KAstString: {
+        case ast::KAstString: {
             return TypeProducer::string();
         }
 
-        case KAstDecimal: {
+        case ast::KAstDecimal: {
             return TypeProducer::decimal();
         }
 
-        case KAstNone: {
+        case ast::KAstNone: {
             return TypeProducer::none();
         }
 
-        case KAstPrefixExpr: {
-            auto node = std::dynamic_pointer_cast<PrefixExpression>(astNode);
+        case ast::KAstPrefixExpr: {
+            auto node = std::dynamic_pointer_cast<ast::PrefixExpression>(astNode);
 
             TypePtr type = check(node->right());
 
@@ -122,8 +124,8 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             return result;
         }
 
-        case KAstBinaryOp: {
-            auto node = std::dynamic_pointer_cast<BinaryOperation>(astNode);
+        case ast::KAstBinaryOp: {
+            auto node = std::dynamic_pointer_cast<ast::BinaryOperation>(astNode);
 
             TypePtr type1 = check(node->left());
             TypePtr type2 = check(node->right());
@@ -138,13 +140,13 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             return result;
         }
 
-        case KAstVariableStmt: {
-            auto node = std::dynamic_pointer_cast<VariableStatement>(astNode);
+        case ast::KAstVariableStmt: {
+            auto node = std::dynamic_pointer_cast<ast::VariableStatement>(astNode);
 
-            if (node->value()->type() == KAstNone)
+            if (node->value()->type() == ast::KAstNone)
                 break;
 
-            if (node->varType()->type() == KAstNone) {
+            if (node->varType()->type() == ast::KAstNone) {
                 // infer the type
             }
 
@@ -154,15 +156,15 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             expectType(varType, valueType);
 
             m_env->set(
-                std::dynamic_pointer_cast<IdentifierExpression>(node->name())
+                std::dynamic_pointer_cast<ast::IdentifierExpression>(node->name())
                     ->value(),
                 varType);
 
             break;
         }
 
-        case KAstIfStmt: {
-            auto node = std::dynamic_pointer_cast<IfStatement>(astNode);
+        case ast::KAstIfStmt: {
+            auto node = std::dynamic_pointer_cast<ast::IfStatement>(astNode);
 
             expectType(check(node->condition()), TypeProducer::boolean());
 
@@ -185,8 +187,8 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             break;
         }
 
-        case KAstWhileStmt: {
-            auto node = std::dynamic_pointer_cast<WhileStatement>(astNode);
+        case ast::KAstWhileStmt: {
+            auto node = std::dynamic_pointer_cast<ast::WhileStatement>(astNode);
 
             expectType(check(node->condition()), TypeProducer::boolean());
 
@@ -197,8 +199,8 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             break;
         }
 
-        case KAstFunctionDef: {
-            auto node = std::dynamic_pointer_cast<FunctionDefinition>(astNode);
+        case ast::KAstFunctionDef: {
+            auto node = std::dynamic_pointer_cast<ast::FunctionDefinition>(astNode);
 
             std::vector<TypePtr> parameterTypes;
             parameterTypes.reserve(node->parameters().size());
@@ -223,15 +225,15 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             exitLocalEnv();
 
             m_env->set(
-                std::dynamic_pointer_cast<IdentifierExpression>(node->name())
+                std::dynamic_pointer_cast<ast::IdentifierExpression>(node->name())
                     ->value(),
                 functionType);
 
             break;
         }
 
-        case KAstFunctionCall: {
-            auto node = std::dynamic_pointer_cast<FunctionCall>(astNode);
+        case ast::KAstFunctionCall: {
+            auto node = std::dynamic_pointer_cast<ast::FunctionCall>(astNode);
 
             TypePtr nameType = check(node->name());
 
@@ -264,8 +266,8 @@ TypePtr TypeChecker::check(AstNodePtr astNode) {
             return functionType->returnType();
         }
 
-        case KAstReturnStatement: {
-            auto node = std::dynamic_pointer_cast<ReturnStatement>(astNode);
+        case ast::KAstReturnStatement: {
+            auto node = std::dynamic_pointer_cast<ast::ReturnStatement>(astNode);
 
             if (!m_currentFunction) {
                 error("can not use return outside of a function");

@@ -3,6 +3,8 @@
 
 #include <memory>
 
+using namespace ast;
+
 AstNodePtr Parser::parseInteger() {
     return std::make_shared<IntegerLiteral>(m_currentToken.keyword);
 }

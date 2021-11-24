@@ -3,6 +3,8 @@
 
 #include <memory>
 
+namespace types {
+
 IntType::IntType(IntSizes intSize, Modifier modifier) {
     m_intSize = intSize;
     m_modifier = modifier;
@@ -103,7 +105,7 @@ std::string DecimalType::stringify() const {
 }
 
 bool DecimalType::isFloat() const {
-    return (m_decimalSize == DecimalSize::Float) ? true : false;
+    return (m_decimalSize == DecimalSize::Float);
 }
 
 TypePtr DecimalType::prefixOperatorResult(Token op) const {
@@ -177,7 +179,7 @@ BoolType::BoolType() {}
 TypeCategory BoolType::category() const { return TypeCategory::Bool; }
 
 bool BoolType::isConvertibleTo(const TypePtr type) const {
-    return (type->category() == TypeCategory::Bool) ? true : false;
+    return (type->category() == TypeCategory::Bool);
 }
 
 std::string BoolType::stringify() const { return "bool"; }
@@ -284,3 +286,5 @@ std::map<std::string, TypePtr> identifierToTypeMap = {
     {"str", TypeProducer::string()},
     {"bool", TypeProducer::boolean()},
     {"None", TypeProducer::none()}};
+
+}

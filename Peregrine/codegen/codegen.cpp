@@ -16,11 +16,11 @@ void Codegen::write(std::string_view code) {
     m_file.close(); // this will be used only once so we can close it
 }
 
-std::string Codegen::generate(AstNodePtr astNode) {
+std::string Codegen::generate(ast::AstNodePtr astNode) {
     std::string res;
     switch (astNode->type()) {
-        case KAstProgram: {
-            auto node = std::dynamic_pointer_cast<Program>(astNode);
+        case ast::KAstProgram: {
+            auto node = std::dynamic_pointer_cast<ast::Program>(astNode);
 
             for (auto& stmt : node->statements()) {
                 res += generate(stmt) + ";\n";
@@ -28,19 +28,19 @@ std::string Codegen::generate(AstNodePtr astNode) {
             break;
         }
 
-        case KAstInteger: {
-            auto node = std::dynamic_pointer_cast<IntegerLiteral>(astNode);
+        case ast::KAstInteger: {
+            auto node = std::dynamic_pointer_cast<ast::IntegerLiteral>(astNode);
             res += node->value();
             break;
         }
 
-        case KAstDecimal: {
-            auto node = std::dynamic_pointer_cast<DecimalLiteral>(astNode);
+        case ast::KAstDecimal: {
+            auto node = std::dynamic_pointer_cast<ast::DecimalLiteral>(astNode);
             res += node->value();
             break;
         }
-        case KAstString: {
-            auto node = std::dynamic_pointer_cast<StringLiteral>(astNode);
+        case ast::KAstString: {
+            auto node = std::dynamic_pointer_cast<ast::StringLiteral>(astNode);
             // todo- do this in type check
 
             res += "\"";
@@ -48,19 +48,19 @@ std::string Codegen::generate(AstNodePtr astNode) {
             res += "\"";
             break;
         }
-        case KAstBool: {
-            auto node = std::dynamic_pointer_cast<BoolLiteral>(astNode);
+        case ast::KAstBool: {
+            auto node = std::dynamic_pointer_cast<ast::BoolLiteral>(astNode);
             res += ((node->value() == "True") ? "true" : "false");
             break;
         }
-        case KAstPrefixExpr: {
-            auto node = std::dynamic_pointer_cast<PrefixExpression>(astNode);
+        case ast::KAstPrefixExpr: {
+            auto node = std::dynamic_pointer_cast<ast::PrefixExpression>(astNode);
             res += "(" + node->prefix().keyword + " " +
                    generate(node->right()) + ")";
             break;
         }
-        case KAstBinaryOp: {
-            auto node = std::dynamic_pointer_cast<BinaryOperation>(astNode);
+        case ast::KAstBinaryOp: {
+            auto node = std::dynamic_pointer_cast<ast::BinaryOperation>(astNode);
             auto operation = node->op();
             if (operation.keyword == "**") {
                 res += "_PEREGRINE_POWER(" + generate(node->left()) + "," +
@@ -74,16 +74,16 @@ std::string Codegen::generate(AstNodePtr astNode) {
             }
             break;
         }
-        case KAstBlockStmt: {
-            auto node = std::dynamic_pointer_cast<BlockStatement>(astNode);
+        case ast::KAstBlockStmt: {
+            auto node = std::dynamic_pointer_cast<ast::BlockStatement>(astNode);
             auto body = node->statements();
             for (auto& stmp : body) {
                 res += generate(stmp) + ";\n";
             }
             break;
         }
-        case KAstIfStmt: {
-            auto node = std::dynamic_pointer_cast<IfStatement>(astNode);
+        case ast::KAstIfStmt: {
+            auto node = std::dynamic_pointer_cast<ast::IfStatement>(astNode);
             res += "if(" + generate(node->condition()) + "){\n" +
                    generate(node->ifBody()) + "}";
             auto elifNode = node->elifs();
@@ -96,79 +96,79 @@ std::string Codegen::generate(AstNodePtr astNode) {
             }
             auto elseNode = node->elseBody();
             if (elseNode->type() ==
-                KAstBlockStmt) { // making sure that else exists
+                ast::KAstBlockStmt) { // making sure that else exists
                 res += "\nelse{\n" + generate(elseNode) + "}";
             }
             break;
         }
-        case KAstContinueStatement: {
+        case ast::KAstContinueStatement: {
             res += "continue";
             break;
         }
-        case KAstBreakStatement: {
+        case ast::KAstBreakStatement: {
             res += "break";
             break;
         }
-        case KAstNone: {
+        case ast::KAstNone: {
             res += "NULL";
             break;
         }
-        case KAstPassStatement: {
+        case ast::KAstPassStatement: {
             res += "\n//pass";// we are making it a comment because ; is added to
                            // each node at the end. we dont want that to happen
                            // because it will result in ;; which is an error
             break;
         }
-        case KAstVariableStmt: {
-            auto node = std::dynamic_pointer_cast<VariableStatement>(astNode);
+        case ast::KAstVariableStmt: {
+            auto node = std::dynamic_pointer_cast<ast::VariableStatement>(astNode);
             std::string type;
-            if (node->varType()->type()!=KAstNoLiteral){
+            if (node->varType()->type() != ast::KAstNoLiteral){
                 type=generate(node->varType())+" ";
             }
             std::string name = generate(node->name());
             std::string value;
-            if (node->value()->type()!=KAstNoLiteral){
+            if (node->value()->type() != ast::KAstNoLiteral){
                 value=" = "+generate(node->value());
             }
             res+=type+name+value;
             break;
         }
-        case KAstCpp: {
-            auto node = std::dynamic_pointer_cast<CppStatement>(astNode);
+        case ast::KAstCpp: {
+            auto node = std::dynamic_pointer_cast<ast::CppStatement>(astNode);
             res += node->value() +
                    "\n//"; // we are making it a comment because ; is added to
                            // each node at the end. we dont want that to happen
                            // because it will result in ;; which is an error
             break;
         }
-        case KAstWhileStmt: {
-            auto node = std::dynamic_pointer_cast<WhileStatement>(astNode);
+        case ast::KAstWhileStmt: {
+            auto node = std::dynamic_pointer_cast<ast::WhileStatement>(astNode);
             res += "while(" + generate(node->condition()) + "){\n" +
                    generate(node->body()) + "}";
             break;
         }
-        case KAstIdentifier: {
+        case ast::KAstIdentifier: {
             auto node =
-                std::dynamic_pointer_cast<IdentifierExpression>(astNode);
+                std::dynamic_pointer_cast<ast::IdentifierExpression>(astNode);
             res += node->value();
             break;
         }
-        case KAstScopeStmt: {
-            auto node = std::dynamic_pointer_cast<ScopeStatement>(astNode);
+        case ast::KAstScopeStmt: {
+            auto node = std::dynamic_pointer_cast<ast::ScopeStatement>(astNode);
             res += "{\n" + generate(node->body()) + "\n}";
             break;
         }
-        case KAstReturnStatement: {
-            auto node = std::dynamic_pointer_cast<ReturnStatement>(astNode);
+        case ast::KAstReturnStatement: {
+            auto node = std::dynamic_pointer_cast<ast::ReturnStatement>(astNode);
             res += "return ";
             auto value = node->returnValue();
-            if (value->type() != KAstNoLiteral) {
+            if (value->type() != ast::KAstNoLiteral) {
                 res += generate(value);
             }
             break;
         }
-        case KAstFunctionCall: {
-            auto node = std::dynamic_pointer_cast<FunctionCall>(astNode);
+        case ast::KAstFunctionCall: {
+            auto node = std::dynamic_pointer_cast<ast::FunctionCall>(astNode);
             auto funcName = generate(node->name());
             std::string arg;
             auto x = node->arguments();
@@ -184,13 +184,13 @@ std::string Codegen::generate(AstNodePtr astNode) {
             res += funcName + "(" + arg + ")";
             break;
         }
-        case KAstTypeExpr:{
-            auto node = std::dynamic_pointer_cast<TypeExpression>(astNode);
+        case ast::KAstTypeExpr:{
+            auto node = std::dynamic_pointer_cast<ast::TypeExpression>(astNode);
             res+=node->value();
             break;
         }
-        case KAstFunctionDef: {
-            auto node = std::dynamic_pointer_cast<FunctionDefinition>(astNode);
+        case ast::KAstFunctionDef: {
+            auto node = std::dynamic_pointer_cast<ast::FunctionDefinition>(astNode);
             auto functionName = generate(node->name());
             auto returnType = generate(node->returnType());
             std::string param;
@@ -216,15 +216,15 @@ std::string Codegen::generate(AstNodePtr astNode) {
 
             break;
         }
-        case KAstMatchStmt:{
-            auto node = std::dynamic_pointer_cast<MatchStatement>(astNode);
+        case ast::KAstMatchStmt:{
+            auto node = std::dynamic_pointer_cast<ast::MatchStatement>(astNode);
             auto to_match=node->matchItem();
             auto cases=node->caseBody();
             auto defaultbody=node->defaultBody();
             res+="\nwhile (true){\n";
             for (uint64_t i=0;i<cases.size();++i){
                 auto x=cases[i];
-                if (x.first.size()==1 && x.first[0]->type()==KAstNoLiteral){
+                if (x.first.size()==1 && x.first[0]->type() == ast::KAstNoLiteral){
                     if (i==0){
                         res+=generate(x.second)+"\n";
                     }
@@ -239,7 +239,7 @@ std::string Codegen::generate(AstNodePtr astNode) {
                     res+="else if ("+match_arg(to_match,x.first)+"){\n"+generate(x.second)+"\n}\n";
                 }
             }
-            if (defaultbody->type()!=KAstNoLiteral){
+            if (defaultbody->type() != ast::KAstNoLiteral){
                 res+=generate(defaultbody);
             }
             res+="\nbreak;\n}";

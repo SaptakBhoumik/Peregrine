@@ -9,12 +9,12 @@
 
 class Codegen {
     std::ofstream m_file;
-    std::string match_arg(std::vector<AstNodePtr> match_item,std::vector<AstNodePtr> case_item);
+    std::string match_arg(std::vector<ast::AstNodePtr> match_item,std::vector<ast::AstNodePtr> case_item);
   public:
     void write(std::string_view code);
     Codegen(std::string outputFilename);
 
-    std::string generate(AstNodePtr astNode);
+    std::string generate(ast::AstNodePtr astNode);
 };
 
 #endif

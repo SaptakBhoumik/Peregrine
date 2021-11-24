@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+namespace types {
+
 enum class TypeCategory {
     Integer,
     Decimal,
@@ -188,5 +190,7 @@ class TypeProducer {
 };
 
 extern std::map<std::string, TypePtr> identifierToTypeMap;
+
+}
 
 #endif

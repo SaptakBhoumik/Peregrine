@@ -8,6 +8,8 @@
 #include <memory>
 #include <vector>
 
+using namespace ast;
+
 std::map<TokenType, PrecedenceType> createMap() {
     std::map<TokenType, PrecedenceType> precedenceMap;
 
@@ -203,7 +205,7 @@ AstNodePtr Parser::parseStatement() {
             }
 
             // if it got here, it will go down the cases and match the default
-            // case DO NOT add another case below this one
+            // case. DO NOT add another case below this one
         }
 
         default: {
@@ -212,7 +214,7 @@ AstNodePtr Parser::parseStatement() {
                 either an expression or invalid
             */
 
-            stmt = parseExpression(pr_lowest);
+            stmt = parseExpression();
             break;
         }
     }
@@ -239,7 +241,7 @@ AstNodePtr Parser::parseBlockStatement() {
 }
 
 AstNodePtr Parser::parseImport() {
-    bool hasFrom = (m_currentToken.tkType == tk_from) ? true : false;
+    bool hasFrom = m_currentToken.tkType == tk_from;
 
     advance(); // skip from or import token 
 
@@ -303,7 +305,7 @@ AstNodePtr Parser::parseVariableStatement() {
         advance();
         advance();
 
-        value = parseExpression(pr_lowest);
+        value = parseExpression();
     } else {
         advanceOnNewLine();
     }
@@ -326,7 +328,7 @@ AstNodePtr Parser::parseConstDeclaration() {
     expect(tk_assign);
     advance();
 
-    AstNodePtr value = parseExpression(pr_lowest);
+    AstNodePtr value = parseExpression();
 
     return std::make_shared<ConstDeclaration>(constType, name, value);
 }
@@ -334,7 +336,7 @@ AstNodePtr Parser::parseConstDeclaration() {
 AstNodePtr Parser::parseIf() {
     advance(); // skip the if token
 
-    AstNodePtr condition = parseExpression(pr_lowest);
+    AstNodePtr condition = parseExpression();
 
     expect(tk_colon);
 
@@ -349,7 +351,7 @@ AstNodePtr Parser::parseIf() {
         advance();
         advance();
 
-        AstNodePtr condition = parseExpression(pr_lowest);
+        AstNodePtr condition = parseExpression();
 
         expect(tk_colon);
         expect(tk_ident);
@@ -384,7 +386,7 @@ AstNodePtr Parser::parseScope() {
 AstNodePtr Parser::parseWhile() {
     advance(); // skip the while token
 
-    AstNodePtr condition = parseExpression(pr_lowest);
+    AstNodePtr condition = parseExpression();
 
     expect(tk_colon);
     expect(tk_ident);
@@ -402,7 +404,7 @@ AstNodePtr Parser::parseFor() {
     expect(tk_in);
     advance();
 
-    AstNodePtr sequence = parseExpression(pr_lowest);
+    AstNodePtr sequence = parseExpression();
 
     expect(tk_colon);
     expect(tk_ident);
@@ -473,7 +475,7 @@ AstNodePtr Parser::parseReturn() {
 
     if (next().tkType != tk_new_line) {
         advance();
-        returnValue = parseExpression(pr_lowest);
+        returnValue = parseExpression();
     } else {
         advance();
     }
@@ -578,7 +580,7 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
             }
 
             case tk_list_open: {
-                left = parseArrayOrDictAccess(left);
+                left = parseListOrDictAccess(left);
                 break;
             }
 
@@ -610,7 +612,7 @@ AstNodePtr Parser::parseFunctionCall(AstNodePtr left) {
         do {
             advance();
 
-            arguments.push_back(parseExpression(pr_lowest));
+            arguments.push_back(parseExpression());
 
             advance();
         } while (m_currentToken.tkType == tk_comma);
@@ -628,12 +630,27 @@ AstNodePtr Parser::parseFunctionCall(AstNodePtr left) {
     return std::make_shared<FunctionCall>(left, arguments);
 }
 
-AstNodePtr Parser::parseArrayOrDictAccess(AstNodePtr left) {
+AstNodePtr Parser::parseListOrDictAccess(AstNodePtr left) {
     advance();
 
-    AstNodePtr keyOrIndex = parseExpression(pr_lowest);
+    AstNodePtr keyOrIndex = parseExpression();
 
     expect(tk_list_close);
+
+    AstNodePtr node = std::make_shared<ListOrDictAccess>(left, keyOrIndex);
+
+    if (next().tkType != tk_assign)
+        return node;
+
+    // parsing variable statements in 2 different places, is this really ideal?
+
+    advance();
+    advance();
+
+    AstNodePtr newValue = parseExpression();
+    advanceOnNewLine();
+
+    return std::make_shared<VariableStatement>(std::make_shared<NoLiteral>(), node, newValue);
 }
 
 AstNodePtr Parser::parsePrefixExpression() {
@@ -650,7 +667,7 @@ AstNodePtr Parser::parsePrefixExpression() {
 AstNodePtr Parser::parseGroupedExpr() {
     advance();
 
-    AstNodePtr expr = parseExpression(pr_lowest);
+    AstNodePtr expr = parseExpression();
 
     expect(tk_r_paren);
 
@@ -678,7 +695,7 @@ AstNodePtr Parser::parseMatch(){
     advance();
     std::vector<AstNodePtr> to_match;
     while (m_currentToken.tkType!=tk_colon){
-        to_match.push_back(parseExpression(pr_lowest));
+        to_match.push_back(parseExpression());
         advance();
         if (m_currentToken.tkType!=tk_colon){
             advance();
@@ -695,7 +712,7 @@ AstNodePtr Parser::parseMatch(){
                 cases_arg.push_back(std::make_shared<NoLiteral>());
             }
             else{
-                cases_arg.push_back(parseExpression(pr_lowest));
+                cases_arg.push_back(parseExpression());
             }
             advance();
             if (m_currentToken.tkType!=tk_colon){

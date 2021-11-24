@@ -8,6 +8,8 @@
 #include <map>
 #include <vector>
 
+using namespace ast;
+
 enum PrecedenceType {
     pr_lowest,    // lowest possible precedence
     pr_and_or,    // and,or
@@ -58,13 +60,13 @@ class Parser {
     AstNodePtr parseDict();
     AstNodePtr parseCpp();
 
-    AstNodePtr parseExpression(PrecedenceType type);
+    AstNodePtr parseExpression(PrecedenceType type = pr_lowest);
     AstNodePtr parsePrefixExpression();
     AstNodePtr parseGroupedExpr();
 
     AstNodePtr parseBinaryOperation(AstNodePtr left);
     AstNodePtr parseFunctionCall(AstNodePtr left);
-    AstNodePtr parseArrayOrDictAccess(AstNodePtr left);
+    AstNodePtr parseListOrDictAccess(AstNodePtr left);
 
     AstNodePtr parseStatement();
     AstNodePtr parseBlockStatement();

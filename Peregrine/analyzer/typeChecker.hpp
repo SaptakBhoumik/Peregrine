@@ -8,6 +8,8 @@
 #include <memory>
 #include <vector>
 
+using namespace types;
+
 class TypeChecker {
     std::shared_ptr<SymbolTable<TypePtr>> m_env;
 
@@ -19,12 +21,12 @@ class TypeChecker {
 
     void error(std::string_view msg);
     void expectType(TypePtr type1, TypePtr type2);
-    TypePtr check(AstNodePtr astNode);
+    TypePtr check(ast::AstNodePtr astNode);
 
     void enterLocalEnv();
     void exitLocalEnv();
 
-    std::string identifierName(AstNodePtr identifier);
+    std::string identifierName(ast::AstNodePtr identifier);
 };
 
 #endif

@@ -7,6 +7,8 @@
 #include <string_view>
 #include <vector>
 
+namespace ast {
+
 enum AstKind {
     KAstNoLiteral,
     KAstProgram,
@@ -22,6 +24,7 @@ enum AstKind {
     KAstCpp,
     KAstBinaryOp,
     KAstPrefixExpr,
+    KAstListOrDictAccess,
     KAstImportStmt,
     KAstVariableStmt,
     KAstConstDecl,
@@ -204,6 +207,20 @@ class PrefixExpression : public AstNode {
 
     Token prefix();
     AstNodePtr right();
+
+    AstKind type();
+    std::string stringify();
+};
+
+class ListOrDictAccess : public AstNode {
+    AstNodePtr m_container;
+    AstNodePtr m_keyOrIndex;
+
+  public:
+    ListOrDictAccess(AstNodePtr container, AstNodePtr keyOrIndex);
+
+    AstNodePtr container();
+    AstNodePtr keyOrIndex();
 
     AstKind type();
     std::string stringify();
@@ -447,5 +464,7 @@ class MatchStatement : public AstNode {
     AstKind type();
     std::string stringify();
 };
+
+}
 
 #endif
