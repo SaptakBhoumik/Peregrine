@@ -35,7 +35,6 @@ def test(int a, str b) -> int:
 test(34, "hey")
 
 type a = int
-
 from os import getuid
 
 for i in [4, 2, 65]:
@@ -53,3 +52,6 @@ match x,y,z:
         printf(C)
     default:#will be executed at the end if no break
         pass
+type x = def(int , char)->char
+type x = def()->char
+type x = def()

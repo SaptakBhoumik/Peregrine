@@ -44,7 +44,32 @@ std::string Codegen::generate(ast::AstNodePtr astNode, std::shared_ptr<SymbolTab
             res += node->value();
             break;
         }
-
+        case ast::KAstLamda:{
+            auto node = std::dynamic_pointer_cast<ast::LamdaDefine>(astNode);
+            res+="std::function<";
+            if (node->fn_return_types().size()==0){
+                res+="void(";
+            }
+            else{
+                res+=generate(node->fn_return_types()[0], env)+"(";
+            }
+            auto x=node->fn_arg_types();
+            if(x.size()>0){
+                for(size_t i=0;i<x.size();++i){
+                    res+=generate(x[i], env);
+                    if (i!=x.size()-1){
+                        res+=",";
+                    }
+                }
+            }
+            res+=")>";
+            break;
+        }
+        case ast::KAstTypeDefinition:{
+            auto node = std::dynamic_pointer_cast<ast::TypeDefinition>(astNode);
+            res+="typedef "+generate(node->baseType(),env)+" "+generate(node->name(),env);
+            break;
+        }
         case ast::KAstDecimal: {
             auto node = std::dynamic_pointer_cast<ast::DecimalLiteral>(astNode);
             res += node->value();

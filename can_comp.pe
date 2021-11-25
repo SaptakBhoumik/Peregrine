@@ -1,5 +1,11 @@
+type a = def(int)->int
+
 def test(int x)->int:#this is comment
     return x
+def lamda_test(a x):
+    printf("The value is %d\n",x(5))
+def func(int g)->int:
+    return g
 def main():
     Cppcode(#ifdef _WIN32)
     printf("On windows\n")
@@ -33,4 +39,5 @@ def main():
             printf("idk")
         #optional
         default:#will be executed at the end if no break
-            printf("\nHello")
+            printf("\nHello\n")
+    lamda_test(func)

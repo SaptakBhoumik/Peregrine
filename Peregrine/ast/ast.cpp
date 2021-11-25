@@ -858,4 +858,37 @@ std::string MatchStatement::stringify() {
     return res;
 }
 
+LamdaDefine::LamdaDefine(Token tok, std::vector<AstNodePtr> arg_types,std::vector<AstNodePtr> return_types){
+    m_token=tok;
+    m_arg_types=arg_types;
+    m_return_types=return_types;
+}
+AstKind LamdaDefine::type(){
+    return KAstLamda;
+}
+Token LamdaDefine::token(){
+    return m_token;
+}
+std::vector<AstNodePtr> LamdaDefine::fn_arg_types(){
+    return m_arg_types;
+}
+std::vector<AstNodePtr> LamdaDefine::fn_return_types(){
+    return m_return_types;
+}
+std::string LamdaDefine::stringify(){
+    std::string res="def(";
+    if (m_arg_types.size()>0){
+        for (auto& x: m_arg_types){
+            res+=x->stringify()+",";
+        }
+    }
+    res+=")";
+    if (m_return_types.size()>0){
+        res+="->";
+        for (auto& x: m_return_types){
+            res+=x->stringify()+",";
+        }
+    }
+    return res;
+}
 }

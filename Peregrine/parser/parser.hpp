@@ -82,6 +82,7 @@ class Parser {
     AstNodePtr parseWhile();
     AstNodePtr parseFor();
     AstNodePtr parseFunctionDef();
+    AstNodePtr parseLamda();
     AstNodePtr parseReturn();
     AstNodePtr parseTypeDef();
 

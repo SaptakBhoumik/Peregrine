@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
         // typeChecker.check(program);
 
         cpp::Codegen codegen("temp.cc");
-        auto res = "#include  <cstdio>\n"+codegen.generate(program, codegen.createEnv());
+        auto res = "#include  <cstdio>\n#include <functional>\n"+codegen.generate(program, codegen.createEnv());
         codegen.flush(res);
         system("g++ temp.cc");
     }

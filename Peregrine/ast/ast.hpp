@@ -41,6 +41,7 @@ enum AstKind {
     KAstBreakStatement,
     KAstContinueStatement,
     KAstTypeDefinition,
+    KAstLamda,
     KAstPassStatement
 };
 
@@ -528,6 +529,20 @@ class TypeDefinition : public AstNode {
     AstNodePtr name();
     AstNodePtr baseType();
   
+    Token token();
+    AstKind type();
+    std::string stringify();
+};
+
+class LamdaDefine : public AstNode {
+    Token m_token;
+    std::vector<AstNodePtr> m_arg_types;
+    std::vector<AstNodePtr> m_return_types;
+
+  public:
+    LamdaDefine(Token tok, std::vector<AstNodePtr> arg_types,std::vector<AstNodePtr> return_types);
+    std::vector<AstNodePtr> fn_arg_types();
+    std::vector<AstNodePtr> fn_return_types();
     Token token();
     AstKind type();
     std::string stringify();

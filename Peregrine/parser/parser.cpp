@@ -130,7 +130,9 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseConstDeclaration();
             break;
         }
-
+        case tk_at:{
+            break;
+        }
         case tk_if: {
             stmt = parseIf();
             break;
@@ -503,13 +505,50 @@ AstNodePtr Parser::parseTypeDef() {
 
     expect(tk_assign);
     advance();
-
-    AstNodePtr type = parseType();
+    AstNodePtr type;
+    if (m_currentToken.tkType==tk_identifier){
+        type = parseType();
+    }
+    else if (m_currentToken.tkType==tk_def){
+        type = parseLamda();
+    }
+    else{
+        //TODO: throw error
+    }
 
     advanceOnNewLine();
     return std::make_shared<TypeDefinition>(tok, name, type);
 }
-
+AstNodePtr Parser::parseLamda() {
+    auto tok=m_currentToken;
+    expect(tk_l_paren);
+    std::vector<AstNodePtr> types;//arg types
+    std::vector<AstNodePtr> return_types;
+    while (m_currentToken.tkType!=tk_r_paren){
+        advance();
+        if (m_currentToken.tkType==tk_identifier){
+            types.push_back(parseName());
+        }
+        else if (m_currentToken.tkType==tk_comma) {
+            expect(tk_identifier);
+            types.push_back(parseName());
+        }
+        else if (m_currentToken.tkType==tk_r_paren){
+            break;
+        }
+        else{
+            //TODO: throw error
+        }
+        advance();
+    }
+    if (next().tkType==tk_arrow){
+        advance();
+        expect(tk_identifier);
+        //TODO: Implement multiple return
+        return_types.push_back(parseName());
+    }
+    return std::make_shared<LamdaDefine>(tok, types, return_types);
+}
 AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
     AstNodePtr left;
 
