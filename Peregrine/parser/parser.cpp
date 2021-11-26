@@ -200,6 +200,7 @@ AstNodePtr Parser::parseStatement() {
             break;
         }
 
+        //TODO: variables currently do not work with all the types, we need to fix this
         case tk_identifier: {
             if (next().tkType == tk_identifier || next().tkType == tk_assign) {
                 // variable
@@ -440,14 +441,6 @@ AstNodePtr Parser::parseFunctionDef() {
         do {
             advance();
 
-            // TODO: make this a separate function
-            if (m_currentToken.tkType != tk_identifier) {
-                error(next(), "expected token of type " +
-                                  std::to_string(tk_identifier) + ", got " +
-                                  std::to_string(m_currentToken.tkType) +
-                                  " instead");
-            }
-
             AstNodePtr paramType = parseType();
             expect(tk_identifier);
             AstNodePtr paramName = parseName();
@@ -469,7 +462,7 @@ AstNodePtr Parser::parseFunctionDef() {
 
     if (next().tkType == tk_arrow) {
         advance();
-        expect(tk_identifier);
+        advance();
 
         returnType = parseType();
     }
@@ -505,50 +498,13 @@ AstNodePtr Parser::parseTypeDef() {
 
     expect(tk_assign);
     advance();
-    AstNodePtr type;
-    if (m_currentToken.tkType==tk_identifier){
-        type = parseType();
-    }
-    else if (m_currentToken.tkType==tk_def){
-        type = parseLamda();
-    }
-    else{
-        //TODO: throw error
-    }
+
+    AstNodePtr type = parseType();
 
     advanceOnNewLine();
     return std::make_shared<TypeDefinition>(tok, name, type);
 }
-AstNodePtr Parser::parseLamda() {
-    auto tok=m_currentToken;
-    expect(tk_l_paren);
-    std::vector<AstNodePtr> types;//arg types
-    std::vector<AstNodePtr> return_types;
-    while (m_currentToken.tkType!=tk_r_paren){
-        advance();
-        if (m_currentToken.tkType==tk_identifier){
-            types.push_back(parseName());
-        }
-        else if (m_currentToken.tkType==tk_comma) {
-            expect(tk_identifier);
-            types.push_back(parseName());
-        }
-        else if (m_currentToken.tkType==tk_r_paren){
-            break;
-        }
-        else{
-            //TODO: throw error
-        }
-        advance();
-    }
-    if (next().tkType==tk_arrow){
-        advance();
-        expect(tk_identifier);
-        //TODO: Implement multiple return
-        return_types.push_back(parseName());
-    }
-    return std::make_shared<LamdaDefine>(tok, types, return_types);
-}
+
 AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
     AstNodePtr left;
 
@@ -748,7 +704,80 @@ AstNodePtr Parser::parseIdentifier() {
 }
 
 AstNodePtr Parser::parseType() {
-    return std::make_shared<TypeExpression>(m_currentToken, m_currentToken.keyword);
+    switch (m_currentToken.tkType) {
+        case tk_def: 
+            return parseFuncType();
+
+        case tk_dict: 
+            return parseDictType();
+
+        case tk_list_open:
+            return parseListType();
+
+        case tk_identifier: 
+            return std::make_shared<TypeExpression>(m_currentToken, m_currentToken.keyword);
+
+        default: {
+            error(m_currentToken, m_currentToken.keyword + " is not a type");
+        }
+    }
+
+    return nullptr;
+}
+
+AstNodePtr Parser::parseListType() {
+    Token tok = m_currentToken;
+
+    expect(tk_list_close);
+    advance(); 
+
+    AstNodePtr baseType = parseType();
+    return std::make_shared<ListTypeExpr>(tok, baseType);
+}
+
+AstNodePtr Parser::parseDictType() {
+    Token tok = m_currentToken;
+    expect(tk_list_open);
+    advance();
+
+    AstNodePtr keyType = parseType();
+
+    expect(tk_list_close);
+    advance();
+
+    AstNodePtr valueType = parseType();
+    return std::make_shared<DictTypeExpr>(tok, keyType, valueType);
+}
+
+AstNodePtr Parser::parseFuncType() {
+    auto tok=m_currentToken;
+    expect(tk_l_paren);
+    std::vector<AstNodePtr> types;//arg types
+    std::vector<AstNodePtr> returnTypes;
+    while (m_currentToken.tkType!=tk_r_paren){
+        advance();
+        if (m_currentToken.tkType==tk_identifier){
+            types.push_back(parseName());
+        }
+        else if (m_currentToken.tkType==tk_comma) {
+            expect(tk_identifier);
+            types.push_back(parseName());
+        }
+        else if (m_currentToken.tkType==tk_r_paren){
+            break;
+        }
+        else{
+            //TODO: throw error
+        }
+        advance();
+    }
+    if (next().tkType==tk_arrow){
+        advance();
+        expect(tk_identifier);
+        //TODO: Implement multiple return
+        returnTypes.push_back(parseName());
+    }
+    return std::make_shared<FunctionTypeExpr>(tok, types, returnTypes);
 }
 
 AstNodePtr Parser::parseName() {

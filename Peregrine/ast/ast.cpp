@@ -858,37 +858,93 @@ std::string MatchStatement::stringify() {
     return res;
 }
 
-LamdaDefine::LamdaDefine(Token tok, std::vector<AstNodePtr> arg_types,std::vector<AstNodePtr> return_types){
-    m_token=tok;
-    m_arg_types=arg_types;
-    m_return_types=return_types;
+ListTypeExpr::ListTypeExpr(Token tok, AstNodePtr baseType) {
+    m_token = tok;
+    m_baseType = baseType;
 }
-AstKind LamdaDefine::type(){
-    return KAstLamda;
+
+AstNodePtr ListTypeExpr::baseType() {
+    return m_baseType;
 }
-Token LamdaDefine::token(){
+
+Token ListTypeExpr::token() {
     return m_token;
 }
-std::vector<AstNodePtr> LamdaDefine::fn_arg_types(){
-    return m_arg_types;
+
+AstKind ListTypeExpr::type() {
+    return KAstListTypeExpr;
 }
-std::vector<AstNodePtr> LamdaDefine::fn_return_types(){
-    return m_return_types;
+
+std::string ListTypeExpr::stringify() {
+    std::string res = "[]";
+    res += m_baseType->stringify();
+    return res;
 }
-std::string LamdaDefine::stringify(){
+
+DictTypeExpr::DictTypeExpr(Token tok, AstNodePtr keyType, AstNodePtr valueType) {
+    m_token = tok;
+    m_keyType = keyType;
+    m_valueType = valueType;
+}
+
+AstNodePtr DictTypeExpr::keyType() {
+    return m_keyType;
+}
+
+AstNodePtr DictTypeExpr::valueType() {
+    return m_valueType;
+}
+
+Token DictTypeExpr::token() {
+    return m_token;
+}
+
+AstKind DictTypeExpr::type() {
+    return KAstDictTypeExpr;
+}
+
+//may change
+std::string DictTypeExpr::stringify() {
+    std::string res = "dict[" + m_keyType->stringify();
+
+    res += "]" + m_valueType->stringify();
+
+    return res; 
+}
+
+FunctionTypeExpr::FunctionTypeExpr(Token tok, std::vector<AstNodePtr> argTypes,std::vector<AstNodePtr> returnTypes){
+    m_token = tok;
+    m_argTypes = argTypes;
+    m_returnTypes = returnTypes;
+}
+AstKind FunctionTypeExpr::type(){
+    return KAstFuncTypeExpr;
+}
+Token FunctionTypeExpr::token(){
+    return m_token;
+}
+std::vector<AstNodePtr> FunctionTypeExpr::argTypes() {
+    return m_argTypes;
+}
+std::vector<AstNodePtr> FunctionTypeExpr::returnTypes() {
+    return m_returnTypes;
+}
+
+std::string FunctionTypeExpr::stringify(){
     std::string res="def(";
-    if (m_arg_types.size()>0){
-        for (auto& x: m_arg_types){
+    if (m_argTypes.size()>0){
+        for (auto& x: m_argTypes){
             res+=x->stringify()+",";
         }
     }
     res+=")";
-    if (m_return_types.size()>0){
+    if (m_returnTypes.size()>0){
         res+="->";
-        for (auto& x: m_return_types){
+        for (auto& x: m_returnTypes){
             res+=x->stringify()+",";
         }
     }
     return res;
 }
+
 }

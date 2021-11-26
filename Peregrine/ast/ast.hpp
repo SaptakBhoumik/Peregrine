@@ -19,6 +19,9 @@ enum AstKind {
     KAstNone,
     KAstIdentifier,
     KAstTypeExpr,
+    KAstListTypeExpr,
+    KAstDictTypeExpr,
+    KAstFuncTypeExpr,
     KAstList,
     KAstDict,
     KAstCpp,
@@ -41,7 +44,6 @@ enum AstKind {
     KAstBreakStatement,
     KAstContinueStatement,
     KAstTypeDefinition,
-    KAstLamda,
     KAstPassStatement
 };
 
@@ -160,6 +162,8 @@ class IdentifierExpression : public AstNode {
     std::string stringify();
 };
 
+// ------------ TYPES ------------
+
 class TypeExpression : public AstNode {
     Token m_token;
     std::string m_value;
@@ -173,6 +177,53 @@ class TypeExpression : public AstNode {
     AstKind type();
     std::string stringify();
 };
+
+class ListTypeExpr : public AstNode {
+    Token m_token;
+    AstNodePtr m_baseType;
+
+  public:
+    ListTypeExpr(Token tok, AstNodePtr baseType);
+
+    AstNodePtr baseType();
+
+    Token token();
+    AstKind type();
+    std::string stringify();
+};
+
+class DictTypeExpr : public AstNode {
+    Token m_token;
+    AstNodePtr m_keyType;
+    AstNodePtr m_valueType;
+
+  public:
+    DictTypeExpr(Token tok, AstNodePtr keyType, AstNodePtr valueType);
+
+    AstNodePtr keyType();
+    AstNodePtr valueType();
+
+    Token token();
+    AstKind type();
+    std::string stringify();
+};
+
+class FunctionTypeExpr : public AstNode {
+    Token m_token;
+    std::vector<AstNodePtr> m_argTypes;
+    std::vector<AstNodePtr> m_returnTypes;
+
+  public:
+    FunctionTypeExpr(Token tok, std::vector<AstNodePtr> argTypes,std::vector<AstNodePtr> returnTypes);
+    std::vector<AstNodePtr> argTypes();
+    std::vector<AstNodePtr> returnTypes();
+
+    Token token();
+    AstKind type();
+    std::string stringify();
+};
+
+// ------------------------------
 
 class ListLiteral : public AstNode {
     Token m_token;
@@ -529,20 +580,6 @@ class TypeDefinition : public AstNode {
     AstNodePtr name();
     AstNodePtr baseType();
   
-    Token token();
-    AstKind type();
-    std::string stringify();
-};
-
-class LamdaDefine : public AstNode {
-    Token m_token;
-    std::vector<AstNodePtr> m_arg_types;
-    std::vector<AstNodePtr> m_return_types;
-
-  public:
-    LamdaDefine(Token tok, std::vector<AstNodePtr> arg_types,std::vector<AstNodePtr> return_types);
-    std::vector<AstNodePtr> fn_arg_types();
-    std::vector<AstNodePtr> fn_return_types();
     Token token();
     AstKind type();
     std::string stringify();

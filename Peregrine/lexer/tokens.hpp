@@ -104,8 +104,9 @@ enum TokenType {
     tk_is_not,    // is not
     tk_cppcode,   // Cppcode
     tk_class,     // class
-    tk_type,       // type defination
+    tk_type,      // type defination
     tk_enum,      // enum
+    tk_dict,      // dict
 
     // value type
     tk_decimal,

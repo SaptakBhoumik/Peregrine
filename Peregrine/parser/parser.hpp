@@ -57,10 +57,14 @@ class Parser {
     AstNodePtr parseNone();
     AstNodePtr parseIdentifier();
     AstNodePtr parseName();
-    AstNodePtr parseType();
     AstNodePtr parseList();
     AstNodePtr parseDict();
     AstNodePtr parseCpp();
+
+    AstNodePtr parseType();
+    AstNodePtr parseListType();
+    AstNodePtr parseDictType();
+    AstNodePtr parseFuncType();
 
     AstNodePtr parseExpression(PrecedenceType type = pr_lowest);
     AstNodePtr parsePrefixExpression();
@@ -82,7 +86,6 @@ class Parser {
     AstNodePtr parseWhile();
     AstNodePtr parseFor();
     AstNodePtr parseFunctionDef();
-    AstNodePtr parseLamda();
     AstNodePtr parseReturn();
     AstNodePtr parseTypeDef();
 
