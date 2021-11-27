@@ -27,13 +27,11 @@ int main(int argc, char** argv) {
 
         std::cout << program->stringify() << "\n";
 
-        TypeChecker typeChecker;
-        typeChecker.check(program);
-
+        // TypeChecker typeChecker;
+        // typeChecker.check(program);
+        
         cpp::Codegen codegen("temp.cc");
-        auto res = codegen.generate(program, codegen.createEnv());
-        std::cout << res << "\n";
-        codegen.flush(res);
+        codegen.generate(program, codegen.createEnv());
     }
     else{
         std::ifstream file(argv[2]);
@@ -50,8 +48,7 @@ int main(int argc, char** argv) {
         // typeChecker.check(program);
 
         cpp::Codegen codegen("temp.cc");
-        auto res = "#include  <cstdio>\n#include <functional>\n"+codegen.generate(program, codegen.createEnv());
-        codegen.flush(res);
+        codegen.generate(program, codegen.createEnv());
         system("g++ temp.cc");
     }
     return 0;

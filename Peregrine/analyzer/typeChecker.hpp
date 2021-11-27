@@ -10,9 +10,9 @@
 
 using namespace types;
 
-class TypeChecker {
-    std::shared_ptr<SymbolTable<TypePtr>> m_env;
+typedef std::shared_ptr<SymbolTable<TypePtr>> EnvPtr;
 
+class TypeChecker {
     // the function whose body is being currently checked
     std::shared_ptr<FunctionType> m_currentFunction;
 
@@ -20,11 +20,9 @@ class TypeChecker {
     TypeChecker();
 
     void error(std::string_view msg);
-    void expectType(TypePtr type1, TypePtr type2);
-    TypePtr check(ast::AstNodePtr astNode);
 
-    void enterLocalEnv();
-    void exitLocalEnv();
+    void check(EnvPtr env, ast::AstNodePtr expr, TypePtr expectedType);
+    TypePtr infer(EnvPtr env, ast::AstNodePtr astNode);
 
     std::string identifierName(ast::AstNodePtr identifier);
 };

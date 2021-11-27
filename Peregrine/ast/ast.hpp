@@ -47,11 +47,14 @@ enum AstKind {
     KAstPassStatement
 };
 
+class AstVisitor;
+
 class AstNode {
   public:
     virtual Token token() = 0;
     virtual AstKind type() = 0;
     virtual std::string stringify() = 0;
+    virtual void accept(const AstVisitor& visitor) = 0;
 };
 
 typedef std::shared_ptr<AstNode> AstNodePtr;
@@ -67,6 +70,7 @@ class Program : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class IntegerLiteral : public AstNode {
@@ -81,6 +85,7 @@ class IntegerLiteral : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class DecimalLiteral : public AstNode {
@@ -95,6 +100,7 @@ class DecimalLiteral : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class StringLiteral : public AstNode {
@@ -113,6 +119,7 @@ class StringLiteral : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class BoolLiteral : public AstNode {
@@ -127,6 +134,7 @@ class BoolLiteral : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class NoneLiteral : public AstNode {
@@ -137,6 +145,7 @@ class NoneLiteral : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class NoLiteral : public AstNode {
@@ -146,6 +155,7 @@ class NoLiteral : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class IdentifierExpression : public AstNode {
@@ -160,6 +170,7 @@ class IdentifierExpression : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 // ------------ TYPES ------------
@@ -176,6 +187,7 @@ class TypeExpression : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class ListTypeExpr : public AstNode {
@@ -190,6 +202,7 @@ class ListTypeExpr : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class DictTypeExpr : public AstNode {
@@ -206,6 +219,7 @@ class DictTypeExpr : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class FunctionTypeExpr : public AstNode {
@@ -221,6 +235,7 @@ class FunctionTypeExpr : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 // ------------------------------
@@ -239,6 +254,7 @@ class ListLiteral : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class DictLiteral : public AstNode {
@@ -254,6 +270,7 @@ class DictLiteral : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class BinaryOperation : public AstNode {
@@ -272,6 +289,7 @@ class BinaryOperation : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class PrefixExpression : public AstNode {
@@ -288,6 +306,7 @@ class PrefixExpression : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class ListOrDictAccess : public AstNode {
@@ -304,6 +323,7 @@ class ListOrDictAccess : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class ImportStatement : public AstNode {
@@ -324,6 +344,7 @@ class ImportStatement : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 // variable declaration, assignment and reassignment
@@ -343,6 +364,7 @@ class VariableStatement : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class ConstDeclaration : public AstNode {
@@ -361,6 +383,7 @@ class ConstDeclaration : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class BlockStatement : public AstNode {
@@ -374,6 +397,7 @@ class BlockStatement : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 struct parameter {
@@ -402,6 +426,7 @@ class FunctionDefinition : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class ReturnStatement : public AstNode {
@@ -416,6 +441,7 @@ class ReturnStatement : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class FunctionCall : public AstNode {
@@ -432,6 +458,7 @@ class FunctionCall : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 // test.hello(), obj.prop, etc
@@ -449,6 +476,7 @@ class DotExpression : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class IfStatement : public AstNode {
@@ -474,6 +502,7 @@ class IfStatement : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class WhileStatement : public AstNode {
@@ -490,6 +519,7 @@ class WhileStatement : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class ForStatement : public AstNode {
@@ -511,6 +541,7 @@ class ForStatement : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class BreakStatement : public AstNode {
@@ -521,6 +552,7 @@ class BreakStatement : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class PassStatement : public AstNode {
@@ -531,6 +563,7 @@ public:
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class ContinueStatement : public AstNode {
@@ -541,6 +574,7 @@ class ContinueStatement : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class CppStatement : public AstNode {
@@ -554,6 +588,7 @@ class CppStatement : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class ScopeStatement : public AstNode {
@@ -567,6 +602,7 @@ class ScopeStatement : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class TypeDefinition : public AstNode {
@@ -583,6 +619,7 @@ class TypeDefinition : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 class MatchStatement : public AstNode {
@@ -603,6 +640,7 @@ class MatchStatement : public AstNode {
     Token token();
     AstKind type();
     std::string stringify();
+    void accept(const AstVisitor& visitor);
 };
 
 }

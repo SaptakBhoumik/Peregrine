@@ -10,7 +10,8 @@ parser_src = [
 
 ast_src = [
     'ast/ast.cpp',
-    'ast/types.cpp'
+    'ast/types.cpp',
+    'ast/visitor.cpp'
 ]
 
 analyzer_src = [

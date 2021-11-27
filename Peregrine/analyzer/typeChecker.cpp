@@ -9,7 +9,6 @@
 using namespace types;
 
 TypeChecker::TypeChecker() {
-    m_env = std::make_shared<SymbolTable<TypePtr>>(nullptr);
     m_currentFunction = nullptr;
 }
 
@@ -24,7 +23,7 @@ void TypeChecker::error(std::string_view msg) {
     std::cerr << "TypeError: " << msg << "\n";
 }
 
-void TypeChecker::expectType(TypePtr expected, TypePtr obtained) {
+void TypeChecker::check(EnvPtr env, ast::AstNodePtr expr, TypePtr expectedType) {
     if (expected->category() != obtained->category()) {
         if (!expected->isConvertibleTo(obtained) &&
             !obtained->isConvertibleTo(expected)) {

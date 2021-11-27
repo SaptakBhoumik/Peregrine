@@ -11,18 +11,24 @@
 
 namespace cpp {
 
+typedef std::shared_ptr<SymbolTable<ast::AstNodePtr>> EnvPtr;
+
 class Codegen {
     std::ofstream m_file;
     
-    std::string matchArg(std::vector<ast::AstNodePtr> matchItem,std::vector<ast::AstNodePtr> caseItem);
+    void write(std::string_view code);
+    std::string mangleName(ast::AstNodePtr astNode);
+
+    std::string searchDefaultModule(std::string path, std::string moduleName);
+    void codegenImport(std::shared_ptr<ast::ImportStatement> importNode);
+    void codegenFuncParams(std::vector<ast::parameter> parameters, EnvPtr env);
+
+    void matchArg(std::vector<ast::AstNodePtr> matchItem,std::vector<ast::AstNodePtr> caseItem);
   public:
     Codegen(std::string outputFilename);
 
-    std::shared_ptr<SymbolTable<ast::AstNodePtr>> createEnv(std::shared_ptr<SymbolTable<ast::AstNodePtr>> parent = nullptr);
-    void flush(std::string_view code);
-
-    std::string generate(ast::AstNodePtr astNode, std::shared_ptr<SymbolTable<ast::AstNodePtr>> env);
-    std::string mangleName(ast::AstNodePtr astNode);
+    void generate(ast::AstNodePtr astNode, EnvPtr env);
+    EnvPtr createEnv(EnvPtr parent = nullptr);
 };
 
 }

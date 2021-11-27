@@ -56,5 +56,5 @@ type x = def(int , char)->char
 type x = def()->char
 type x = def()
 
-def test(int[] a) -> str[]:
+def test([]int a) -> []str:
     return "??"
