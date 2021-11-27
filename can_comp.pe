@@ -7,6 +7,9 @@ def lamda_test(a x):
 def func(int g)->int:
     return g
 def main():
+    def z():
+        printf("hello\n")
+    z()
     Cppcode(#ifdef _WIN32)
     printf("On windows\n")
     Cppcode(#elif __linux__)

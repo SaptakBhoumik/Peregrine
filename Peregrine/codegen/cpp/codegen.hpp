@@ -13,7 +13,7 @@ namespace cpp {
 
 class Codegen {
     std::ofstream m_file;
-    
+    bool is_func_def;
     std::string matchArg(std::vector<ast::AstNodePtr> matchItem,std::vector<ast::AstNodePtr> caseItem);
   public:
     Codegen(std::string outputFilename);

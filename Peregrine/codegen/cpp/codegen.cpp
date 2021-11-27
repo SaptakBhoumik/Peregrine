@@ -99,10 +99,10 @@ std::string Codegen::generate(ast::AstNodePtr astNode, std::shared_ptr<SymbolTab
             auto node = std::dynamic_pointer_cast<ast::BinaryOperation>(astNode);
             auto operation = node->op();
             if (operation.keyword == "**") {
-                res += "_PEREGRINE_POWER(" + generate(node->left(), env) + "," +
+                res += "__PEREGRINE::_PEREGRINE_POWER(" + generate(node->left(), env) + "," +
                        generate(node->right(), env) + ")";
             } else if (operation.keyword == "//") {
-                res += "_PEREGRINE_FLOOR(" + generate(node->left(), env) + "/" +
+                res += "__PEREGRINE::_PEREGRINE_FLOOR(" + generate(node->left(), env) + "/" +
                        generate(node->right(), env) + ")";
             } else {
                 res += "(" + generate(node->left(), env) + " " + node->op().keyword +
@@ -243,15 +243,21 @@ std::string Codegen::generate(ast::AstNodePtr astNode, std::shared_ptr<SymbolTab
                     }
                 }
             }
-            if (functionName == "main" && returnType == "void") {
-                // we want the main function to always return 0 if success
-                res += "int main(" + param + "){\n" + generate(node->body(), createEnv(env)) +
-                       "return 0;\n}";
-            } else {
-                res += returnType + " " + functionName + "(" + param + "){\n" +
-                       generate(node->body(), createEnv(env)) + "\n}";
+            if (is_func_def==false){
+                is_func_def=true;
+                if (functionName == "main" && returnType == "void") {
+                    // we want the main function to always return 0 if success
+                    res += "int main(" + param + "){\n" + generate(node->body(), createEnv(env)) +
+                        "return 0;\n}";
+                } else {
+                    res += returnType + " " + functionName + "(" + param + "){\n" +
+                        generate(node->body(), createEnv(env)) + "\n}";
+                }
+                is_func_def=false;
             }
-
+            else{
+                res+="auto "+functionName+"="+"[]("+param+"){\n"+generate(node->body(), createEnv(env)) + "\n}";
+            }
             break;
         }
 
