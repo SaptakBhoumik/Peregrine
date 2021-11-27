@@ -227,6 +227,11 @@ std::string Codegen::generate(ast::AstNodePtr astNode, std::shared_ptr<SymbolTab
             res+=node->value();
             break;
         }
+        case ast::KAstConstDecl:{
+            auto node = std::dynamic_pointer_cast<ast::ConstDeclaration>(astNode);
+            res+="const "+generate(node->constType(),env)+" "+generate(node->name(),env)+"="+generate(node->value(),env);
+            break;
+        }
         case ast::KAstFunctionDef: {
             auto node = std::dynamic_pointer_cast<ast::FunctionDefinition>(astNode);
             auto functionName = generate(node->name(), env);

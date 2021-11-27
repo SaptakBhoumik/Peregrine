@@ -18,6 +18,7 @@ def main():
     scope:
         printf("Hello from new scope\n")
     bool x=False
+    const bool cc=False
     x=True
     bool y
     y=True

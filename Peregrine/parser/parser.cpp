@@ -131,6 +131,7 @@ AstNodePtr Parser::parseStatement() {
             break;
         }
         case tk_at:{
+            // stmt = parseConstDeclaration();
             break;
         }
         case tk_if: {
