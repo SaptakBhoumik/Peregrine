@@ -27,10 +27,12 @@ enum class TypeCategory {
 
 class Type;
 
-typedef std::shared_ptr<Type> TypePtr;
+using TypePtr = std::shared_ptr<Type>;
 
 class Type {
   public:
+    virtual ~Type() = default;
+
     virtual TypeCategory category() const = 0;
 
     // returns true if the type can be converted to the other IMPLICITLY
@@ -191,6 +193,6 @@ class TypeProducer {
 
 extern std::map<std::string, TypePtr> identifierToTypeMap;
 
-}
+} // namespace types
 
 #endif

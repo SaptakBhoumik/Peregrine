@@ -5,8 +5,8 @@
 #include "utils/symbolTable.hpp"
 
 #include <fstream>
-#include <string>
 #include <memory>
+#include <string>
 #include <string_view>
 
 namespace cpp {
@@ -15,7 +15,7 @@ typedef std::shared_ptr<SymbolTable<ast::AstNodePtr>> EnvPtr;
 
 class Codegen {
     std::ofstream m_file;
-    
+
     void write(std::string_view code);
     std::string mangleName(ast::AstNodePtr astNode);
 
@@ -23,7 +23,9 @@ class Codegen {
     void codegenImport(std::shared_ptr<ast::ImportStatement> importNode);
     void codegenFuncParams(std::vector<ast::parameter> parameters, EnvPtr env);
 
-    void matchArg(std::vector<ast::AstNodePtr> matchItem,std::vector<ast::AstNodePtr> caseItem);
+    void matchArg(std::vector<ast::AstNodePtr> matchItem,
+                  std::vector<ast::AstNodePtr> caseItem);
+
   public:
     Codegen(std::string outputFilename);
 
@@ -31,6 +33,6 @@ class Codegen {
     EnvPtr createEnv(EnvPtr parent = nullptr);
 };
 
-}
+} // namespace cpp
 
 #endif

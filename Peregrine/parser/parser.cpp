@@ -130,7 +130,7 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseConstDeclaration();
             break;
         }
-        case tk_at:{
+        case tk_at: {
             break;
         }
         case tk_if: {
@@ -170,7 +170,7 @@ AstNodePtr Parser::parseStatement() {
             advanceOnNewLine();
             break;
         }
-        case tk_match:{
+        case tk_match: {
             stmt = parseMatch();
             break;
         }
@@ -200,7 +200,8 @@ AstNodePtr Parser::parseStatement() {
             break;
         }
 
-        //TODO: variables currently do not work with all the types, we need to fix this
+        // TODO: variables currently do not work with all the types, we need to
+        // fix this
         case tk_identifier: {
             if (next().tkType == tk_identifier || next().tkType == tk_assign) {
                 // variable
@@ -248,7 +249,7 @@ AstNodePtr Parser::parseImport() {
     Token tok = m_currentToken;
     bool hasFrom = m_currentToken.tkType == tk_from;
 
-    advance(); // skip from or import token 
+    advance(); // skip from or import token
 
     std::pair<AstNodePtr, AstNodePtr> moduleName;
     std::vector<std::pair<AstNodePtr, AstNodePtr>> importedSymbols;
@@ -262,8 +263,9 @@ AstNodePtr Parser::parseImport() {
 
             moduleName.second = parseName();
         }
-        //advance on new line?
-        return std::make_shared<ImportStatement>(tok, moduleName, importedSymbols);
+        // advance on new line?
+        return std::make_shared<ImportStatement>(tok, moduleName,
+                                                 importedSymbols);
     }
 
     expect(tk_import);
@@ -380,7 +382,8 @@ AstNodePtr Parser::parseIf() {
         elseBody = parseBlockStatement();
     }
 
-    return std::make_shared<IfStatement>(tok, condition, ifBody, elseBody, elifs);
+    return std::make_shared<IfStatement>(tok, condition, ifBody, elseBody,
+                                         elifs);
 }
 
 AstNodePtr Parser::parseScope() {
@@ -458,7 +461,8 @@ AstNodePtr Parser::parseFunctionDef() {
     }
 
     // returns void by default
-    AstNodePtr returnType = std::make_shared<IdentifierExpression>(m_currentToken, "void");
+    AstNodePtr returnType =
+        std::make_shared<IdentifierExpression>(m_currentToken, "void");
 
     if (next().tkType == tk_arrow) {
         advance();
@@ -472,8 +476,8 @@ AstNodePtr Parser::parseFunctionDef() {
 
     AstNodePtr body = parseBlockStatement();
 
-    return std::make_shared<FunctionDefinition>(tok, returnType, name, parameters,
-                                                body);
+    return std::make_shared<FunctionDefinition>(tok, returnType, name,
+                                                parameters, body);
 }
 
 AstNodePtr Parser::parseReturn() {
@@ -494,7 +498,7 @@ AstNodePtr Parser::parseTypeDef() {
     Token tok = m_currentToken;
     advance();
 
-    AstNodePtr name = parseName(); 
+    AstNodePtr name = parseName();
 
     expect(tk_assign);
     advance();
@@ -665,14 +669,15 @@ AstNodePtr Parser::parseListOrDictAccess(AstNodePtr left) {
     AstNodePtr newValue = parseExpression();
     advanceOnNewLine();
 
-    return std::make_shared<VariableStatement>(tok, std::make_shared<NoLiteral>(), node, newValue);
+    return std::make_shared<VariableStatement>(
+        tok, std::make_shared<NoLiteral>(), node, newValue);
 }
 
 AstNodePtr Parser::parseDotExpression(AstNodePtr left) {
     Token tok = m_currentToken;
     advance();
 
-    //TODO: validate output of parseExpression
+    // TODO: validate output of parseExpression
     AstNodePtr referenced = parseExpression();
 
     return std::make_shared<DotExpression>(tok, left, referenced);
@@ -700,22 +705,24 @@ AstNodePtr Parser::parseGroupedExpr() {
 }
 
 AstNodePtr Parser::parseIdentifier() {
-    return std::make_shared<IdentifierExpression>(m_currentToken, m_currentToken.keyword);
+    return std::make_shared<IdentifierExpression>(m_currentToken,
+                                                  m_currentToken.keyword);
 }
 
 AstNodePtr Parser::parseType() {
     switch (m_currentToken.tkType) {
-        case tk_def: 
+        case tk_def:
             return parseFuncType();
 
-        case tk_dict: 
+        case tk_dict:
             return parseDictType();
 
         case tk_list_open:
             return parseListType();
 
-        case tk_identifier: 
-            return std::make_shared<TypeExpression>(m_currentToken, m_currentToken.keyword);
+        case tk_identifier:
+            return std::make_shared<TypeExpression>(m_currentToken,
+                                                    m_currentToken.keyword);
 
         default: {
             error(m_currentToken, m_currentToken.keyword + " is not a type");
@@ -729,7 +736,7 @@ AstNodePtr Parser::parseListType() {
     Token tok = m_currentToken;
 
     expect(tk_list_close);
-    advance(); 
+    advance();
 
     AstNodePtr baseType = parseType();
     return std::make_shared<ListTypeExpr>(tok, baseType);
@@ -750,31 +757,28 @@ AstNodePtr Parser::parseDictType() {
 }
 
 AstNodePtr Parser::parseFuncType() {
-    auto tok=m_currentToken;
+    auto tok = m_currentToken;
     expect(tk_l_paren);
-    std::vector<AstNodePtr> types;//arg types
+    std::vector<AstNodePtr> types; // arg types
     std::vector<AstNodePtr> returnTypes;
-    while (m_currentToken.tkType!=tk_r_paren){
+    while (m_currentToken.tkType != tk_r_paren) {
         advance();
-        if (m_currentToken.tkType==tk_identifier){
+        if (m_currentToken.tkType == tk_identifier) {
             types.push_back(parseName());
-        }
-        else if (m_currentToken.tkType==tk_comma) {
+        } else if (m_currentToken.tkType == tk_comma) {
             expect(tk_identifier);
             types.push_back(parseName());
-        }
-        else if (m_currentToken.tkType==tk_r_paren){
+        } else if (m_currentToken.tkType == tk_r_paren) {
             break;
-        }
-        else{
-            //TODO: throw error
+        } else {
+            // TODO: throw error
         }
         advance();
     }
-    if (next().tkType==tk_arrow){
+    if (next().tkType == tk_arrow) {
         advance();
         expect(tk_identifier);
-        //TODO: Implement multiple return
+        // TODO: Implement multiple return
         returnTypes.push_back(parseName());
     }
     return std::make_shared<FunctionTypeExpr>(tok, types, returnTypes);
@@ -782,7 +786,9 @@ AstNodePtr Parser::parseFuncType() {
 
 AstNodePtr Parser::parseName() {
     if (m_currentToken.tkType != tk_identifier) {
-        error(m_currentToken, "expected an identifier, got " + std::to_string(m_currentToken.tkType) + " instead");
+        error(m_currentToken, "expected an identifier, got " +
+                                  std::to_string(m_currentToken.tkType) +
+                                  " instead");
     }
 
     return parseIdentifier();
@@ -790,13 +796,13 @@ AstNodePtr Parser::parseName() {
 
 AstNodePtr Parser::parseMatch() {
     Token tok = m_currentToken;
-    //TODO: implement errors
+    // TODO: implement errors
     advance();
     std::vector<AstNodePtr> to_match;
-    while (m_currentToken.tkType!=tk_colon){
+    while (m_currentToken.tkType != tk_colon) {
         to_match.push_back(parseExpression());
         advance();
-        if (m_currentToken.tkType!=tk_colon){
+        if (m_currentToken.tkType != tk_colon) {
             advance();
         }
     }
@@ -806,21 +812,21 @@ AstNodePtr Parser::parseMatch() {
         advance();
         advance();
         std::vector<AstNodePtr> cases_arg;
-        while (m_currentToken.tkType!=tk_colon){
-            if (m_currentToken.tkType==tk_underscore){
+        while (m_currentToken.tkType != tk_colon) {
+            if (m_currentToken.tkType == tk_underscore) {
                 cases_arg.push_back(std::make_shared<NoLiteral>());
-            }
-            else{
+            } else {
                 cases_arg.push_back(parseExpression());
             }
             advance();
-            if (m_currentToken.tkType!=tk_colon){
+            if (m_currentToken.tkType != tk_colon) {
                 advance();
             }
         }
         expect(tk_ident);
         AstNodePtr body = parseBlockStatement();
-        cases.push_back(std::pair<std::vector<AstNodePtr>, AstNodePtr>(cases_arg,body));
+        cases.push_back(
+            std::pair<std::vector<AstNodePtr>, AstNodePtr>(cases_arg, body));
     }
     AstNodePtr default_body = std::make_shared<NoLiteral>();
 
@@ -832,5 +838,5 @@ AstNodePtr Parser::parseMatch() {
         default_body = parseBlockStatement();
     }
     expect(tk_dedent);
-    return std::make_shared<MatchStatement>(tok, to_match,cases,default_body);
+    return std::make_shared<MatchStatement>(tok, to_match, cases, default_body);
 }

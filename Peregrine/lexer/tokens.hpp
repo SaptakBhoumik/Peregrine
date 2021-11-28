@@ -5,7 +5,7 @@
 
 // Create a string variable
 enum TokenType {
-    tk_eof,     // end of file
+    tk_eof, // end of file
     // Some operators
     tk_plus,       // +
     tk_underscore, // _
@@ -62,18 +62,18 @@ enum TokenType {
     tk_identifier, // foo, bar
 
     // keywords tokens
-    tk_static,  // static
-    tk_scope,   // scope
-    tk_union,   // union
-    tk_unknown, // unknown type
-    tk_assert,  // assert
-    tk_try,     // try
-    tk_except,  // except
-    tk_raise,   // raise
-    tk_true,    // True
-    tk_false,   // False
-    tk_with,    // with
-    tk_as,      // as
+    tk_static,    // static
+    tk_scope,     // scope
+    tk_union,     // union
+    tk_unknown,   // unknown type
+    tk_assert,    // assert
+    tk_try,       // try
+    tk_except,    // except
+    tk_raise,     // raise
+    tk_true,      // True
+    tk_false,     // False
+    tk_with,      // with
+    tk_as,        // as
     tk_flags,     // flags
     tk_none,      // None
     tk_const,     // const

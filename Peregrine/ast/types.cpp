@@ -287,4 +287,4 @@ std::map<std::string, TypePtr> identifierToTypeMap = {
     {"bool", TypeProducer::boolean()},
     {"None", TypeProducer::none()}};
 
-}
+} // namespace types

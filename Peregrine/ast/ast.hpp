@@ -51,13 +51,15 @@ class AstVisitor;
 
 class AstNode {
   public:
-    virtual Token token() = 0;
-    virtual AstKind type() = 0;
-    virtual std::string stringify() = 0;
-    virtual void accept(const AstVisitor& visitor) = 0;
+    virtual ~AstNode() = default;
+
+    virtual Token token() const = 0;
+    virtual AstKind type() const = 0;
+    virtual std::string stringify() const = 0;
+    virtual void accept(AstVisitor& visitor) const = 0;
 };
 
-typedef std::shared_ptr<AstNode> AstNodePtr;
+using AstNodePtr = std::shared_ptr<AstNode>;
 
 class Program : public AstNode {
     std::vector<AstNodePtr> m_statements;
@@ -65,12 +67,12 @@ class Program : public AstNode {
   public:
     Program(std::vector<AstNodePtr> statements);
 
-    std::vector<AstNodePtr> statements();
+    std::vector<AstNodePtr> statements() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class IntegerLiteral : public AstNode {
@@ -80,12 +82,12 @@ class IntegerLiteral : public AstNode {
   public:
     IntegerLiteral(Token tok, std::string_view value);
 
-    std::string value();
+    std::string value() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class DecimalLiteral : public AstNode {
@@ -95,12 +97,12 @@ class DecimalLiteral : public AstNode {
   public:
     DecimalLiteral(Token tok, std::string_view value);
 
-    std::string value();
+    std::string value() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class StringLiteral : public AstNode {
@@ -112,14 +114,14 @@ class StringLiteral : public AstNode {
   public:
     StringLiteral(Token tok, std::string_view value, bool formatted, bool raw);
 
-    std::string value();
-    bool formatted();
-    bool raw();
+    std::string value() const;
+    bool formatted() const;
+    bool raw() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class BoolLiteral : public AstNode {
@@ -129,33 +131,34 @@ class BoolLiteral : public AstNode {
   public:
     BoolLiteral(Token tok, std::string_view value);
 
-    std::string value();
+    std::string value() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class NoneLiteral : public AstNode {
     Token m_token;
+
   public:
     NoneLiteral(Token tok);
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class NoLiteral : public AstNode {
   public:
     NoLiteral() = default;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class IdentifierExpression : public AstNode {
@@ -165,12 +168,12 @@ class IdentifierExpression : public AstNode {
   public:
     IdentifierExpression(Token tok, std::string_view value);
 
-    std::string value();
+    std::string value() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 // ------------ TYPES ------------
@@ -182,12 +185,12 @@ class TypeExpression : public AstNode {
   public:
     TypeExpression(Token tok, std::string_view value);
 
-    std::string value();
+    std::string value() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class ListTypeExpr : public AstNode {
@@ -197,12 +200,12 @@ class ListTypeExpr : public AstNode {
   public:
     ListTypeExpr(Token tok, AstNodePtr baseType);
 
-    AstNodePtr baseType();
+    AstNodePtr baseType() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class DictTypeExpr : public AstNode {
@@ -213,13 +216,13 @@ class DictTypeExpr : public AstNode {
   public:
     DictTypeExpr(Token tok, AstNodePtr keyType, AstNodePtr valueType);
 
-    AstNodePtr keyType();
-    AstNodePtr valueType();
+    AstNodePtr keyType() const;
+    AstNodePtr valueType() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class FunctionTypeExpr : public AstNode {
@@ -228,14 +231,16 @@ class FunctionTypeExpr : public AstNode {
     std::vector<AstNodePtr> m_returnTypes;
 
   public:
-    FunctionTypeExpr(Token tok, std::vector<AstNodePtr> argTypes,std::vector<AstNodePtr> returnTypes);
-    std::vector<AstNodePtr> argTypes();
-    std::vector<AstNodePtr> returnTypes();
+    FunctionTypeExpr(Token tok, std::vector<AstNodePtr> argTypes,
+                     std::vector<AstNodePtr> returnTypes);
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    std::vector<AstNodePtr> argTypes() const;
+    std::vector<AstNodePtr> returnTypes() const;
+
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 // ------------------------------
@@ -248,13 +253,13 @@ class ListLiteral : public AstNode {
   public:
     ListLiteral(Token tok, AstNodePtr type, std::vector<AstNodePtr> elements);
 
-    AstNodePtr listType();
-    std::vector<AstNodePtr> elements();
+    AstNodePtr listType() const;
+    std::vector<AstNodePtr> elements() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class DictLiteral : public AstNode {
@@ -263,14 +268,15 @@ class DictLiteral : public AstNode {
     std::vector<std::pair<AstNodePtr, AstNodePtr>> m_elements;
 
   public:
-    DictLiteral(Token tok, std::vector<std::pair<AstNodePtr, AstNodePtr>> elements);
+    DictLiteral(Token tok,
+                std::vector<std::pair<AstNodePtr, AstNodePtr>> elements);
 
-    std::vector<std::pair<AstNodePtr, AstNodePtr>> elements();
-    
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> elements() const;
+
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class BinaryOperation : public AstNode {
@@ -282,14 +288,14 @@ class BinaryOperation : public AstNode {
   public:
     BinaryOperation(Token tok, AstNodePtr left, Token op, AstNodePtr right);
 
-    AstNodePtr left();
-    Token op();
-    AstNodePtr right();
+    AstNodePtr left() const;
+    Token op() const;
+    AstNodePtr right() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class PrefixExpression : public AstNode {
@@ -300,13 +306,13 @@ class PrefixExpression : public AstNode {
   public:
     PrefixExpression(Token tok, Token prefix, AstNodePtr right);
 
-    Token prefix();
-    AstNodePtr right();
+    Token prefix() const;
+    AstNodePtr right() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class ListOrDictAccess : public AstNode {
@@ -317,13 +323,13 @@ class ListOrDictAccess : public AstNode {
   public:
     ListOrDictAccess(Token tok, AstNodePtr container, AstNodePtr keyOrIndex);
 
-    AstNodePtr container();
-    AstNodePtr keyOrIndex();
+    AstNodePtr container() const;
+    AstNodePtr keyOrIndex() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class ImportStatement : public AstNode {
@@ -334,17 +340,17 @@ class ImportStatement : public AstNode {
     std::vector<std::pair<AstNodePtr, AstNodePtr>> m_importedSymbols;
 
   public:
-    ImportStatement(Token tok,
-        std::pair<AstNodePtr, AstNodePtr> moduleName,
+    ImportStatement(
+        Token tok, std::pair<AstNodePtr, AstNodePtr> moduleName,
         std::vector<std::pair<AstNodePtr, AstNodePtr>> importedSymbols);
 
-    std::pair<AstNodePtr, AstNodePtr> moduleName();
-    std::vector<std::pair<AstNodePtr, AstNodePtr>> importedSymbols();
+    std::pair<AstNodePtr, AstNodePtr> moduleName() const;
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> importedSymbols() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 // variable declaration, assignment and reassignment
@@ -355,16 +361,17 @@ class VariableStatement : public AstNode {
     AstNodePtr m_value;
 
   public:
-    VariableStatement(Token tok, AstNodePtr type, AstNodePtr name, AstNodePtr value);
+    VariableStatement(Token tok, AstNodePtr type, AstNodePtr name,
+                      AstNodePtr value);
 
-    AstNodePtr varType();
-    AstNodePtr name();
-    AstNodePtr value();
+    AstNodePtr varType() const;
+    AstNodePtr name() const;
+    AstNodePtr value() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class ConstDeclaration : public AstNode {
@@ -374,16 +381,17 @@ class ConstDeclaration : public AstNode {
     AstNodePtr m_value;
 
   public:
-    ConstDeclaration(Token tok, AstNodePtr type, AstNodePtr name, AstNodePtr value);
+    ConstDeclaration(Token tok, AstNodePtr type, AstNodePtr name,
+                     AstNodePtr value);
 
-    AstNodePtr constType();
-    AstNodePtr name();
-    AstNodePtr value();
+    AstNodePtr constType() const;
+    AstNodePtr name() const;
+    AstNodePtr value() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class BlockStatement : public AstNode {
@@ -392,12 +400,12 @@ class BlockStatement : public AstNode {
   public:
     BlockStatement(std::vector<AstNodePtr> statements);
 
-    std::vector<AstNodePtr> statements();
+    std::vector<AstNodePtr> statements() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 struct parameter {
@@ -418,15 +426,15 @@ class FunctionDefinition : public AstNode {
     FunctionDefinition(Token tok, AstNodePtr returnType, AstNodePtr name,
                        std::vector<parameter> parameters, AstNodePtr body);
 
-    AstNodePtr returnType();
-    AstNodePtr name();
-    std::vector<parameter> parameters();
-    AstNodePtr body();
+    AstNodePtr returnType() const;
+    AstNodePtr name() const;
+    std::vector<parameter> parameters() const;
+    AstNodePtr body() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class ReturnStatement : public AstNode {
@@ -436,12 +444,12 @@ class ReturnStatement : public AstNode {
   public:
     ReturnStatement(Token tok, AstNodePtr returnValue);
 
-    AstNodePtr returnValue();
+    AstNodePtr returnValue() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class FunctionCall : public AstNode {
@@ -452,31 +460,31 @@ class FunctionCall : public AstNode {
   public:
     FunctionCall(Token tok, AstNodePtr name, std::vector<AstNodePtr> arguments);
 
-    AstNodePtr name();
-    std::vector<AstNodePtr> arguments();
+    AstNodePtr name() const;
+    std::vector<AstNodePtr> arguments() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 // test.hello(), obj.prop, etc
 class DotExpression : public AstNode {
     Token m_token;
-    AstNodePtr m_owner; // the node that comes before the .
+    AstNodePtr m_owner;      // the node that comes before the .
     AstNodePtr m_referenced; // the node that comes after the .
 
   public:
     DotExpression(Token tok, AstNodePtr owner, AstNodePtr referenced);
 
-    AstNodePtr owner();
-    AstNodePtr referenced();
+    AstNodePtr owner() const;
+    AstNodePtr referenced() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class IfStatement : public AstNode {
@@ -491,18 +499,19 @@ class IfStatement : public AstNode {
     AstNodePtr m_elseBody;
 
   public:
-    IfStatement(Token tok, AstNodePtr condition, AstNodePtr ifBody, AstNodePtr elseBody,
+    IfStatement(Token tok, AstNodePtr condition, AstNodePtr ifBody,
+                AstNodePtr elseBody,
                 std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs);
 
-    AstNodePtr condition();
-    AstNodePtr ifBody();
-    std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs();
-    AstNodePtr elseBody();
+    AstNodePtr condition() const;
+    AstNodePtr ifBody() const;
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs() const;
+    AstNodePtr elseBody() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class WhileStatement : public AstNode {
@@ -513,13 +522,13 @@ class WhileStatement : public AstNode {
   public:
     WhileStatement(Token tok, AstNodePtr condition, AstNodePtr body);
 
-    AstNodePtr condition();
-    AstNodePtr body();
+    AstNodePtr condition() const;
+    AstNodePtr body() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class ForStatement : public AstNode {
@@ -527,54 +536,58 @@ class ForStatement : public AstNode {
     AstNodePtr m_variable;
 
     // the object that we will iterate on the loop, like a list
-    AstNodePtr m_sequence; 
+    AstNodePtr m_sequence;
 
     AstNodePtr m_body;
 
   public:
-    ForStatement(Token tok, AstNodePtr variable, AstNodePtr sequence, AstNodePtr body);
+    ForStatement(Token tok, AstNodePtr variable, AstNodePtr sequence,
+                 AstNodePtr body);
 
-    AstNodePtr variable();
-    AstNodePtr sequence();
-    AstNodePtr body();
+    AstNodePtr variable() const;
+    AstNodePtr sequence() const;
+    AstNodePtr body() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class BreakStatement : public AstNode {
     Token m_token;
+
   public:
     BreakStatement(Token tok);
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class PassStatement : public AstNode {
     Token m_token;
-public:
+
+  public:
     PassStatement(Token tok);
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class ContinueStatement : public AstNode {
     Token m_token;
+
   public:
     ContinueStatement(Token tok);
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class CppStatement : public AstNode {
@@ -583,12 +596,13 @@ class CppStatement : public AstNode {
 
   public:
     CppStatement(Token tok, std::string cpp);
-    std::string value();
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    std::string value() const;
+
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class ScopeStatement : public AstNode {
@@ -597,12 +611,13 @@ class ScopeStatement : public AstNode {
 
   public:
     ScopeStatement(Token tok, AstNodePtr body);
-    AstNodePtr body();
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    AstNodePtr body() const;
+
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class TypeDefinition : public AstNode {
@@ -613,13 +628,13 @@ class TypeDefinition : public AstNode {
   public:
     TypeDefinition(Token tok, AstNodePtr name, AstNodePtr type);
 
-    AstNodePtr name();
-    AstNodePtr baseType();
-  
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    AstNodePtr name() const;
+    AstNodePtr baseType() const;
+
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 class MatchStatement : public AstNode {
@@ -629,20 +644,22 @@ class MatchStatement : public AstNode {
     AstNodePtr m_default;
 
   public:
-    MatchStatement(Token tok, std::vector<AstNodePtr> to_match,
-                std::vector<std::pair<std::vector<AstNodePtr>, AstNodePtr>> cases,
-                AstNodePtr defaultbody);
+    MatchStatement(
+        Token tok, std::vector<AstNodePtr> to_match,
+        std::vector<std::pair<std::vector<AstNodePtr>, AstNodePtr>> cases,
+        AstNodePtr defaultbody);
 
-    std::vector<AstNodePtr> matchItem();
-    std::vector<std::pair<std::vector<AstNodePtr>, AstNodePtr>> caseBody();
-    AstNodePtr defaultBody();
+    std::vector<AstNodePtr> matchItem() const;
+    std::vector<std::pair<std::vector<AstNodePtr>, AstNodePtr>>
+    caseBody() const;
+    AstNodePtr defaultBody() const;
 
-    Token token();
-    AstKind type();
-    std::string stringify();
-    void accept(const AstVisitor& visitor);
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
-}
+} // namespace ast
 
 #endif

@@ -108,7 +108,7 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_union;
     } else if (item == "unknown") {
         return tk_unknown;
-    }  else if (item == "scope") {
+    } else if (item == "scope") {
         return tk_scope;
     } else if (item == "elif") {
         return tk_elif;
@@ -150,11 +150,11 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_return;
     } else if (item == "as") {
         return tk_as;
-    }else if (item == "_") {
+    } else if (item == "_") {
         return tk_underscore;
-    }else if (item == "enum") {
+    } else if (item == "enum") {
         return tk_enum;
-    }else if (item == "and") {
+    } else if (item == "and") {
         return tk_and;
     } else if (item == "or") {
         return tk_or;
@@ -204,11 +204,9 @@ static inline TokenType equal(std::string keyword) {
         result = tk_bit_or_equal;
     } else if (keyword == "^=") {
         result = tk_bit_xor_equal;
-    }
-    else if (keyword == "<=") {
+    } else if (keyword == "<=") {
         result = tk_less_or_equ;
-    }
-    else if (keyword == ">=") {
+    } else if (keyword == ">=") {
         result = tk_gr_or_equ;
     }
     return result;
@@ -218,8 +216,9 @@ LEXEME lexer(std::string src, std::string filename) {
     Token token;
     std::vector<Token> tokens;
     std::vector<uint64_t> identation_level;
-    const std::vector<std::string> operators(
-        {">","<","!", "/", "//", "+", "-", "*", "%", "<<", ">>", "&", "|", "^", "="});
+    const std::vector<std::string> operators({">", "<", "!", "/", "//", "+",
+                                              "-", "*", "%", "<<", ">>", "&",
+                                              "|", "^", "="});
     std::string string_starter;
     std::string statement = seperate_lines.at(0);
     std::string item;

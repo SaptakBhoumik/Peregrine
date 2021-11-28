@@ -1,3 +1,6 @@
+int a = 45
+a + "hello"
+
 a = [54, 2, 87]
 a[0] = 2
 test.func()

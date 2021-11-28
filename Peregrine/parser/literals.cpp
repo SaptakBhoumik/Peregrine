@@ -6,20 +6,23 @@
 using namespace ast;
 
 AstNodePtr Parser::parseInteger() {
-    return std::make_shared<IntegerLiteral>(m_currentToken, m_currentToken.keyword);
+    return std::make_shared<IntegerLiteral>(m_currentToken,
+                                            m_currentToken.keyword);
 }
 
 AstNodePtr Parser::parseDecimal() {
-    return std::make_shared<DecimalLiteral>(m_currentToken, m_currentToken.keyword);
+    return std::make_shared<DecimalLiteral>(m_currentToken,
+                                            m_currentToken.keyword);
 }
 
 AstNodePtr Parser::parseString(bool isFormatted, bool isRaw) {
-    return std::make_shared<StringLiteral>(m_currentToken, m_currentToken.keyword, isFormatted,
-                                           isRaw);
+    return std::make_shared<StringLiteral>(
+        m_currentToken, m_currentToken.keyword, isFormatted, isRaw);
 }
 
 AstNodePtr Parser::parseBool() {
-    return std::make_shared<BoolLiteral>(m_currentToken, m_currentToken.keyword);
+    return std::make_shared<BoolLiteral>(m_currentToken,
+                                         m_currentToken.keyword);
 }
 
 AstNodePtr Parser::parseList() {
@@ -83,7 +86,10 @@ AstNodePtr Parser::parseDict() {
 }
 
 AstNodePtr Parser::parseCpp() {
-    return std::make_shared<CppStatement>(m_currentToken, m_currentToken.keyword);
+    return std::make_shared<CppStatement>(m_currentToken,
+                                          m_currentToken.keyword);
 }
 
-AstNodePtr Parser::parseNone() { return std::make_shared<NoneLiteral>(m_currentToken); }
+AstNodePtr Parser::parseNone() {
+    return std::make_shared<NoneLiteral>(m_currentToken);
+}
