@@ -131,7 +131,7 @@ AstNodePtr Parser::parseStatement() {
             break;
         }
         case tk_at:{
-            // stmt = parseConstDeclaration();
+            stmt = parseDecoratorCall();
             break;
         }
         case tk_if: {
@@ -805,4 +805,19 @@ AstNodePtr Parser::parseMatch() {
     }
     expect(tk_dedent);
     return std::make_shared<MatchStatement>(tok, to_match,cases,default_body);
+}
+
+AstNodePtr Parser::parseDecoratorCall(){
+    auto tok=m_currentToken;
+    std::vector<AstNodePtr> decorators;
+    AstNodePtr body;
+    while (m_currentToken.tkType==tk_at){
+        expect(tk_identifier);
+        parseExpression(pr_lowest);
+        advance();
+    }
+    if(m_currentToken.tkType==tk_def){
+        body=parseFunctionDef();
+    }
+    return std::make_shared<DecoratorStatement>(tok, decorators,body);
 }

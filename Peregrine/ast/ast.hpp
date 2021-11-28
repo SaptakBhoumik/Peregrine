@@ -42,6 +42,7 @@ enum AstKind {
     KAstContinueStatement,
     KAstTypeDefinition,
     KAstLamda,
+    KAstDecorator,
     KAstPassStatement
 };
 
@@ -567,7 +568,19 @@ class MatchStatement : public AstNode {
     AstKind type();
     std::string stringify();
 };
-
+class DecoratorStatement : public AstNode {
+  Token m_token;
+  std::vector<AstNodePtr> m_decorators;
+  AstNodePtr m_body;
+  public:
+    DecoratorStatement(Token tok, std::vector<AstNodePtr> decorators,
+                AstNodePtr body);
+    std::vector<AstNodePtr> decoratorItem();
+    AstNodePtr Body();
+    Token token();
+    AstKind type();
+    std::string stringify();
+};
 }
 
 #endif

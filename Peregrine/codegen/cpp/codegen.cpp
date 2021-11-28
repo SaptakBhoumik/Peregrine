@@ -261,7 +261,7 @@ std::string Codegen::generate(ast::AstNodePtr astNode, std::shared_ptr<SymbolTab
                 is_func_def=false;
             }
             else{
-                res+="auto "+functionName+"="+"[]("+param+"){\n"+generate(node->body(), createEnv(env)) + "\n}";
+                res+="auto "+functionName+"="+"[]("+param+")->"+returnType+"{\n"+generate(node->body(), createEnv(env)) + "\n}";
             }
             break;
         }

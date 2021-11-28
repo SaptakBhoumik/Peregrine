@@ -891,4 +891,31 @@ std::string LamdaDefine::stringify(){
     }
     return res;
 }
+
+DecoratorStatement::DecoratorStatement(Token tok, std::vector<AstNodePtr> decorators,
+                AstNodePtr body){
+    m_token=tok;
+    m_decorators=decorators;
+    m_body=body;
+}
+std::vector<AstNodePtr> DecoratorStatement::decoratorItem(){
+    return m_decorators;
+}
+AstNodePtr DecoratorStatement::Body(){
+    return m_body;
+}
+Token DecoratorStatement::token(){
+    return m_token;
+}
+AstKind DecoratorStatement::type(){
+    return KAstDecorator;
+}
+std::string DecoratorStatement::stringify(){
+    std::string res;
+    for (auto& x:m_decorators){
+        res+="@"+x->stringify()+"\n";
+    }
+    res+=m_body->stringify();
+    return res;
+}
 }
