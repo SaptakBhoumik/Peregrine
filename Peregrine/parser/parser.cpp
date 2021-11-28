@@ -813,7 +813,7 @@ AstNodePtr Parser::parseDecoratorCall(){
     AstNodePtr body;
     while (m_currentToken.tkType==tk_at){
         expect(tk_identifier);
-        parseExpression(pr_lowest);
+        decorators.push_back(parseExpression(pr_lowest));
         advance();
     }
     if(m_currentToken.tkType==tk_def){

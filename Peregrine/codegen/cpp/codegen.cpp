@@ -296,6 +296,23 @@ std::string Codegen::generate(ast::AstNodePtr astNode, std::shared_ptr<SymbolTab
             res+="\nbreak;\n}";
             break;
         }
+        case ast::KAstDecorator:{
+            auto node = std::dynamic_pointer_cast<ast::DecoratorStatement>(astNode);
+            auto items=node->decoratorItem();
+            auto body=node->Body()
+            if(body->Type()==KAstFunctionDef){
+                if (is_func_def==false){
+                is_func_def=true;
+                res+="auto "+functionName+"="+"[]("+param+")->"+returnType+"{\n"+generate(node->body(), createEnv(env)) + "\n}";
+                
+                is_func_def=false;
+            }
+            else{
+                res+="auto "+functionName+"="+"[]("+param+")->"+returnType+"{\n"+generate(node->body(), createEnv(env)) + "\n}";
+            }
+            }
+            break;
+        }
         default: {
             std::cout<<astNode->type()<<"\n";
             std::cerr << fg(style("Error: invalid ast node passed to "

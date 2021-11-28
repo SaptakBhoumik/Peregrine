@@ -914,6 +914,7 @@ std::string DecoratorStatement::stringify(){
     std::string res;
     for (auto& x:m_decorators){
         res+="@"+x->stringify()+"\n";
+        // std::cout<<res<<"\n";
     }
     res+=m_body->stringify();
     return res;

@@ -45,3 +45,8 @@ def main():
         default:#will be executed at the end if no break
             printf("\nHello\n")
     lamda_test(func)
+
+@x
+@x
+def test(int a, str b) -> int:
+    return b
