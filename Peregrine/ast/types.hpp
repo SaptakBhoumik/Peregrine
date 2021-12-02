@@ -22,7 +22,7 @@ enum class TypeCategory {
     UserDefined,
     Function,
     Class,
-    None
+    Void
 };
 
 class Type;
@@ -36,7 +36,7 @@ class Type {
     virtual TypeCategory category() const = 0;
 
     // returns true if the type can be converted to the other IMPLICITLY
-    virtual bool isConvertibleTo(const TypePtr type) const = 0;
+    virtual bool isConvertibleTo(const Type& type) const = 0;
 
     virtual std::string stringify() const { return ""; }
 
@@ -50,12 +50,12 @@ class Type {
         return nullptr;
     }
 
-    bool operator==(const TypePtr type) {
-        return category() == type->category();
+    virtual bool operator==(const Type& type) const {
+        return category() == type.category();
     }
 
-    bool operator!=(const TypePtr type) {
-        return category() != type->category();
+    virtual bool operator!=(const Type& type) const {
+        return !operator==(type);
     }
 };
 
@@ -71,7 +71,7 @@ class IntType : public Type {
     TypeCategory category() const;
     IntSizes size() const;
     Modifier modifier() const;
-    bool isConvertibleTo(const TypePtr type) const;
+    bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
 
     TypePtr prefixOperatorResult(Token op) const;
@@ -90,7 +90,7 @@ class DecimalType : public Type {
 
     TypeCategory category() const;
     DecimalSize size() const;
-    bool isConvertibleTo(const TypePtr type) const;
+    bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
 
     bool isFloat() const;
@@ -107,7 +107,7 @@ class StringType : public Type {
     StringType();
 
     TypeCategory category() const;
-    bool isConvertibleTo(const TypePtr type) const;
+    bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
 
     TypePtr prefixOperatorResult(Token op) const;
@@ -119,19 +119,19 @@ class BoolType : public Type {
     BoolType();
 
     TypeCategory category() const;
-    bool isConvertibleTo(const TypePtr type) const;
+    bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
 
     TypePtr prefixOperatorResult(Token op) const;
     TypePtr infixOperatorResult(Token op, const TypePtr type) const;
 };
 
-class NoneType : public Type {
+class VoidType : public Type {
   public:
-    NoneType();
+    VoidType();
 
     TypeCategory category() const;
-    bool isConvertibleTo(const TypePtr type) const;
+    bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
 };
 
@@ -142,7 +142,7 @@ class ListType : public Type {
     ListType(TypePtr baseType);
 
     TypeCategory category() const;
-    bool isConvertibleTo(const TypePtr type) const;
+    bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
 };
 
@@ -150,11 +150,11 @@ class UserDefinedType : public Type {
     TypePtr m_baseType;
 
   public:
-    UserDefinedType(const TypePtr baseType);
+    UserDefinedType(TypePtr baseType);
 
     TypeCategory category() const;
     TypePtr baseType() const;
-    bool isConvertibleTo(const TypePtr type) const;
+    bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
 };
 
@@ -168,7 +168,7 @@ class FunctionType : public Type {
     TypeCategory category() const;
     std::vector<TypePtr> parameterTypes() const;
     TypePtr returnType() const;
-    bool isConvertibleTo(const TypePtr type) const;
+    bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
 };
 
@@ -178,7 +178,7 @@ class TypeProducer {
 
     static TypePtr m_bool;
     static TypePtr m_string;
-    static TypePtr m_none;
+    static TypePtr m_void;
 
   public:
     static TypePtr
@@ -188,7 +188,7 @@ class TypeProducer {
         DecimalType::DecimalSize decimalSize = DecimalType::DecimalSize::Float);
     static TypePtr string();
     static TypePtr boolean();
-    static TypePtr none();
+    static TypePtr voidT();
 };
 
 extern std::map<std::string, TypePtr> identifierToTypeMap;

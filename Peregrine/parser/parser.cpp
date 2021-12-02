@@ -798,9 +798,9 @@ AstNodePtr Parser::parseMatch() {
     Token tok = m_currentToken;
     // TODO: implement errors
     advance();
-    std::vector<AstNodePtr> to_match;
+    std::vector<AstNodePtr> toMatch;
     while (m_currentToken.tkType != tk_colon) {
-        to_match.push_back(parseExpression());
+        toMatch.push_back(parseExpression());
         advance();
         if (m_currentToken.tkType != tk_colon) {
             advance();
@@ -838,5 +838,5 @@ AstNodePtr Parser::parseMatch() {
         default_body = parseBlockStatement();
     }
     expect(tk_dedent);
-    return std::make_shared<MatchStatement>(tok, to_match, cases, default_body);
+    return std::make_shared<MatchStatement>(tok, toMatch, cases, default_body);
 }

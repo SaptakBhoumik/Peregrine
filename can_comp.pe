@@ -2,7 +2,7 @@ type a = def(int)->int
 
 def test(int x)->int:#this is comment
     return x
-def lamda_test(a x):
+def lambda_test(a x):
     printf("The value is %d\n",x(5))
 def func(int g)->int:
     return g
@@ -40,4 +40,4 @@ def main():
         #optional
         default:#will be executed at the end if no break
             printf("\nHello\n")
-    lamda_test(func)
+    lambda_test(func)

@@ -22,9 +22,9 @@ void Codegen::matchArg(std::vector<ast::AstNodePtr> matchItem,
             }
 
             write("(");
-            generate(item, createEnv());
+            item->accept(*this);
             write("==");
-            generate(caseItem[i], createEnv());
+            caseItem[i]->accept(*this);
             write(")");
         }
     }

@@ -1,63 +1,8 @@
-int a = 45
-a + "hello"
+def test(int a) -> str:
+    return "hey"
 
-a = [54, 2, 87]
-a[0] = 2
-test.func()
-c = []
-b = {
-    12: 45,
-    25: 87,
-    7: 0
-}
+test(45)
 
-scope:
-    x+0
-
-int a
-b + 34
-
-const test = "hello"
-
-def test() -> int:
-    msg + "hey"
-    return
-
-test(12, 56, 34)
-
-while True:
-    continue
-
-5 + 3**7 - 8 ** -9/7 or 4+4 /9
-
-7&7|7
-
-def test(int a, str b) -> int:
-    return b
-
-test(34, "hey")
-
-type a = int
-from os import getuid
-
-for i in [4, 2, 65]:
-    print(i)
-    
-if True:
-    pass
-
-match x,y,z:
-    case y,c,_:#z can be anything
-        printf(C)
-    case y,_:#z and x can be anything
-        printf(C)
-    case _:
-        printf(C)
-    default:#will be executed at the end if no break
-        pass
-type x = def(int , char)->char
-type x = def()->char
-type x = def()
-
-def test([]int a) -> []str:
-    return "??"
+type potato = float
+potato t = 2.0
+potato b = "hey"

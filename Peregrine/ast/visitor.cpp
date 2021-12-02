@@ -1,14 +1,17 @@
 #include "visitor.hpp"
 #include "ast.hpp"
 
+#include <iostream>
+
 namespace ast {
 
 // TODO: have a default behaviour in case the visitor does not provide a visit
 // method for the node
 
 void Program::accept(AstVisitor& visitor) const {
-    for (auto& stmt : m_statements)
-        stmt->accept(visitor);
+    if (!visitor.visit(*this))
+        for (auto& stmt : m_statements)
+            stmt->accept(visitor);
 }
 
 void IntegerLiteral::accept(AstVisitor& visitor) const { visitor.visit(*this); }
@@ -25,7 +28,9 @@ void NoLiteral::accept(AstVisitor& visitor) const {
     visitor.visit(*this); // TODO: maybe we shouldnt do anything instead??
 }
 
-void IdentifierExpression::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+void IdentifierExpression::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
+}
 
 void TypeExpression::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
@@ -33,32 +38,51 @@ void ListTypeExpr::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void DictTypeExpr::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
-void FunctionTypeExpr::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+void FunctionTypeExpr::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
+}
 
 void ListLiteral::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void DictLiteral::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
-void BinaryOperation::accept(AstVisitor& visitor) const { visitor.visit(*this); }
-
-void PrefixExpression::accept(AstVisitor& visitor) const { visitor.visit(*this); }
-
-void ListOrDictAccess::accept(AstVisitor& visitor) const { visitor.visit(*this); }
-
-void ImportStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
-
-void VariableStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
-
-void ConstDeclaration::accept(AstVisitor& visitor) const { visitor.visit(*this); }
-
-void BlockStatement::accept(AstVisitor& visitor) const {
-    for (auto& stmt : m_statements)
-        stmt->accept(visitor);
+void BinaryOperation::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
 }
 
-void FunctionDefinition::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+void PrefixExpression::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
+}
 
-void ReturnStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+void ListOrDictAccess::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
+}
+
+void ImportStatement::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
+}
+
+void VariableStatement::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
+}
+
+void ConstDeclaration::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
+}
+
+void BlockStatement::accept(AstVisitor& visitor) const {
+    if (!visitor.visit(*this))
+        for (auto& stmt : m_statements)
+            stmt->accept(visitor);
+}
+
+void FunctionDefinition::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
+}
+
+void ReturnStatement::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
+}
 
 void FunctionCall::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
@@ -74,11 +98,11 @@ void BreakStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void PassStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
-void ContinueStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
-
-void CppStatement::accept(AstVisitor& visitor) const {
-    // visitor.visit(*this);
+void ContinueStatement::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
 }
+
+void CppStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void ScopeStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 

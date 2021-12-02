@@ -11,7 +11,12 @@
 
 using namespace types;
 
-using EnvPtr = std::shared_ptr<SymbolTable<TypePtr>>;
+struct TypeEnvVal {
+    TypePtr type;
+    bool isUserDefinedType;
+};
+
+using EnvPtr = std::shared_ptr<SymbolTable<TypeEnvVal>>;
 
 class TypeChecker : public ast::AstVisitor {
   public:
@@ -23,42 +28,38 @@ class TypeChecker : public ast::AstVisitor {
     std::string identifierName(ast::AstNodePtr identifier);
     void checkBody(ast::AstNodePtr body);
 
-    void check(ast::AstNodePtr expr, TypePtr expectedType);
+    void check(ast::AstNodePtr expr, const Type& expectedType);
 
-    void visit(const ast::Program& node);
-    void visit(const ast::BlockStatement& node);
-    void visit(const ast::ImportStatement& node);
-    void visit(const ast::FunctionDefinition& node);
-    void visit(const ast::VariableStatement& node);
-    void visit(const ast::ConstDeclaration& node);
-    void visit(const ast::TypeDefinition& node);
-    void visit(const ast::PassStatement& node);
-    void visit(const ast::IfStatement& node);
-    void visit(const ast::WhileStatement& node);
-    void visit(const ast::ForStatement& node);
-    void visit(const ast::MatchStatement& node);
-    void visit(const ast::ScopeStatement& node);
-    void visit(const ast::ReturnStatement& node);
-    void visit(const ast::ContinueStatement& node);
-    void visit(const ast::BreakStatement& node);
-    void visit(const ast::ListLiteral& node);
-    void visit(const ast::DictLiteral& node);
-    void visit(const ast::ListOrDictAccess& node);
-    void visit(const ast::BinaryOperation& node);
-    void visit(const ast::PrefixExpression& node);
-    void visit(const ast::FunctionCall& node);
-    void visit(const ast::DotExpression& node);
-    void visit(const ast::IdentifierExpression& node);
-    void visit(const ast::TypeExpression& node);
-    void visit(const ast::ListTypeExpr& node);
-    void visit(const ast::DictTypeExpr& node);
-    void visit(const ast::FunctionTypeExpr& node);
-    void visit(const ast::NoLiteral& node);
-    void visit(const ast::IntegerLiteral& node);
-    void visit(const ast::DecimalLiteral& node);
-    void visit(const ast::StringLiteral& node);
-    void visit(const ast::BoolLiteral& node);
-    void visit(const ast::NoneLiteral& node);
+    bool visit(const ast::ImportStatement& node);
+    bool visit(const ast::FunctionDefinition& node);
+    bool visit(const ast::VariableStatement& node);
+    bool visit(const ast::ConstDeclaration& node);
+    bool visit(const ast::TypeDefinition& node);
+    bool visit(const ast::PassStatement& node);
+    bool visit(const ast::IfStatement& node);
+    bool visit(const ast::WhileStatement& node);
+    bool visit(const ast::ForStatement& node);
+    bool visit(const ast::MatchStatement& node);
+    bool visit(const ast::ScopeStatement& node);
+    bool visit(const ast::ReturnStatement& node);
+    bool visit(const ast::ListLiteral& node);
+    bool visit(const ast::DictLiteral& node);
+    bool visit(const ast::ListOrDictAccess& node);
+    bool visit(const ast::BinaryOperation& node);
+    bool visit(const ast::PrefixExpression& node);
+    bool visit(const ast::FunctionCall& node);
+    bool visit(const ast::DotExpression& node);
+    bool visit(const ast::IdentifierExpression& node);
+    bool visit(const ast::TypeExpression& node);
+    bool visit(const ast::ListTypeExpr& node);
+    bool visit(const ast::DictTypeExpr& node);
+    bool visit(const ast::FunctionTypeExpr& node);
+    bool visit(const ast::NoLiteral& node);
+    bool visit(const ast::IntegerLiteral& node);
+    bool visit(const ast::DecimalLiteral& node);
+    bool visit(const ast::StringLiteral& node);
+    bool visit(const ast::BoolLiteral& node);
+    bool visit(const ast::NoneLiteral& node);
 
     TypePtr m_result;
     EnvPtr m_env;

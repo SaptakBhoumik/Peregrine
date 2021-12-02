@@ -26,7 +26,7 @@ void TypeChecker::error(std::string_view msg) {
 }
 
 EnvPtr TypeChecker::createEnv(EnvPtr parent) {
-    return std::make_shared<SymbolTable<TypePtr>>(parent);
+    return std::make_shared<SymbolTable<TypeEnvVal>>(parent);
 }
 
 void TypeChecker::checkBody(ast::AstNodePtr body) {
@@ -36,15 +36,15 @@ void TypeChecker::checkBody(ast::AstNodePtr body) {
     m_env = previousEnv;
 }
 
-void TypeChecker::check(ast::AstNodePtr expr, TypePtr expectedType) {
+void TypeChecker::check(ast::AstNodePtr expr, const Type& expectedType) {
     expr->accept(*this);
-    TypePtr exprType = m_result;
+    const Type& exprType = *m_result;
 
     if (exprType != expectedType) {
-        if (!exprType->isConvertibleTo(expectedType) &&
-            expectedType->isConvertibleTo(exprType)) {
-            error("expected type " + expectedType->stringify() + ", got " +
-                  exprType->stringify() + " instead");
+        if (!exprType.isConvertibleTo(expectedType) &&
+            !expectedType.isConvertibleTo(exprType)) {
+            error("expected type " + expectedType.stringify() + ", got " +
+                  exprType.stringify() + " instead");
         }
     }
 }
@@ -56,74 +56,118 @@ std::string TypeChecker::identifierName(ast::AstNodePtr identifier) {
         ->value();
 }
 
-void TypeChecker::visit(const ast::Program& node) {}
+bool TypeChecker::visit(const ast::ImportStatement& node) { return true; }
 
-void TypeChecker::visit(const ast::BlockStatement& node) {}
+bool TypeChecker::visit(const ast::FunctionDefinition& node) {
+    EnvPtr oldEnv = m_env;
+    m_env = createEnv();
 
-void TypeChecker::visit(const ast::ImportStatement& node) {}
+    std::vector<TypePtr> parameterTypes;
+    parameterTypes.reserve(node.parameters().size());
 
-void TypeChecker::visit(const ast::FunctionDefinition& node) {
-    // EnvPtr oldEnv = m_env;
-    // m_env = createEnv();
+    for (auto& param : node.parameters()) {
+        param.p_type->accept(*this);
+        parameterTypes.push_back(m_result);
+        m_env->set(identifierName(param.p_name), TypeEnvVal{m_result, false});
+    }
 
-    // std::vector<TypePtr> parameterTypes;
-    // parameterTypes.reserve(node.parameters().size());
+    node.returnType()->accept(*this);
+    std::cout << m_result->stringify() << "\n";
+    auto functionType =
+        std::make_shared<FunctionType>(parameterTypes, m_result);
 
-    // for (auto& param : node.parameters()) {
-    //     TypePtr paramType = infer(m_env, param.p_type);
-    //     parameterTypes.push_back(paramType);
-    //     m_env->set(identifierName(param.p_name()), paramType);
-    // }
+    m_currentFunction = functionType;
+    node.body()->accept(*this);
+    m_currentFunction = nullptr;
 
-    // auto functionType = std::make_shared<FunctionType>(parameterTypes,
-    // infer(m_env, node.returnType()); m_currentFunction = functionType;
-    // node.body()->accept(*this);
-    // m_currentFunction = nullptr;
-
-    // m_env->set(identifierName(node.name()), functionType);
+    m_env = oldEnv;
+    m_env->set(identifierName(node.name()), TypeEnvVal{functionType, false});
+    return true;
 }
 
-void TypeChecker::visit(const ast::VariableStatement& node) {
+bool TypeChecker::visit(const ast::VariableStatement& node) {
     node.varType()->accept(*this);
     TypePtr varType = m_result;
 
-    if (varType->category() == TypeCategory::None) {
+    if (varType->category() == TypeCategory::Void) {
         // infer it
     }
 
-    check(node.value(), varType);
-    m_env->set(identifierName(node.name()), varType);
+    check(node.value(), *varType);
+    m_env->set(identifierName(node.name()), TypeEnvVal{varType, false});
+    return true;
 }
 
-void TypeChecker::visit(const ast::ConstDeclaration& node) {}
+bool TypeChecker::visit(const ast::ConstDeclaration& node) { return true; }
 
-void TypeChecker::visit(const ast::TypeDefinition& node) {}
+bool TypeChecker::visit(const ast::TypeDefinition& node) {
+    node.baseType()->accept(*this);
 
-void TypeChecker::visit(const ast::PassStatement& node) {}
+    m_env->set(identifierName(node.name()), TypeEnvVal{m_result, true});
+    return true;
+}
 
-void TypeChecker::visit(const ast::IfStatement& node) {}
+bool TypeChecker::visit(const ast::PassStatement& node) { return true; }
 
-void TypeChecker::visit(const ast::WhileStatement& node) {}
+bool TypeChecker::visit(const ast::IfStatement& node) {
+    check(node.condition(), *TypeProducer::boolean());
+    checkBody(node.ifBody());
 
-void TypeChecker::visit(const ast::ForStatement& node) {}
+    for (auto& elif : node.elifs()) {
+        check(elif.first, *TypeProducer::boolean());
+        checkBody(elif.second);
+    }
 
-void TypeChecker::visit(const ast::MatchStatement& node) {}
+    if (node.elseBody()->type() != ast::KAstNoLiteral)
+        checkBody(node.elseBody());
+    return true;
+}
 
-void TypeChecker::visit(const ast::ScopeStatement& node) {}
+bool TypeChecker::visit(const ast::WhileStatement& node) {
+    check(node.condition(), *TypeProducer::boolean());
+    checkBody(node.body());
+    return true;
+}
 
-void TypeChecker::visit(const ast::ReturnStatement& node) {}
+bool TypeChecker::visit(const ast::ForStatement& node) {
+    // check(node.sequence(), *TypeProducer::list());
+    EnvPtr oldEnv = m_env;
+    m_env = createEnv();
+    // m_env->set(identifierName(node.variable()), m_result); // result may not
+    // be correct here
 
-void TypeChecker::visit(const ast::ContinueStatement& node) {}
+    node.body()->accept(*this);
+    return true;
+}
 
-void TypeChecker::visit(const ast::BreakStatement& node) {}
+bool TypeChecker::visit(const ast::MatchStatement& node) { return true; }
 
-void TypeChecker::visit(const ast::ListLiteral& node) {}
+bool TypeChecker::visit(const ast::ScopeStatement& node) {
+    checkBody(node.body());
+    return true;
+}
 
-void TypeChecker::visit(const ast::DictLiteral& node) {}
+bool TypeChecker::visit(const ast::ReturnStatement& node) {
+    std::cout << "at return"
+              << "\n";
+    node.returnValue()->accept(*this);
+    std::cout << m_result->stringify() << "\n";
+    std::cout << m_currentFunction->returnType()->stringify() << "\n";
+    if (!m_currentFunction) {
+        error("can not return outside of a function");
+    }
 
-void TypeChecker::visit(const ast::ListOrDictAccess& node) {}
+    check(node.returnValue(), *m_currentFunction->returnType());
+    return true;
+}
 
-void TypeChecker::visit(const ast::BinaryOperation& node) {
+bool TypeChecker::visit(const ast::ListLiteral& node) { return true; }
+
+bool TypeChecker::visit(const ast::DictLiteral& node) { return true; }
+
+bool TypeChecker::visit(const ast::ListOrDictAccess& node) { return true; }
+
+bool TypeChecker::visit(const ast::BinaryOperation& node) {
     node.left()->accept(*this);
     TypePtr leftType = m_result;
     node.right()->accept(*this);
@@ -135,9 +179,10 @@ void TypeChecker::visit(const ast::BinaryOperation& node) {
     }
 
     m_result = leftType;
+    return true;
 }
 
-void TypeChecker::visit(const ast::PrefixExpression& node) {
+bool TypeChecker::visit(const ast::PrefixExpression& node) {
     node.right()->accept(*this);
     TypePtr result = m_result->prefixOperatorResult(node.prefix());
     if (!result) {
@@ -146,51 +191,88 @@ void TypeChecker::visit(const ast::PrefixExpression& node) {
     }
 
     m_result = result;
+    return true;
 }
 
-void TypeChecker::visit(const ast::FunctionCall& node) {}
+bool TypeChecker::visit(const ast::FunctionCall& node) {
+    node.name()->accept(*this);
+    if (m_result->category() != TypeCategory::Function)
+        error(identifierName(node.name()) + " is not a function");
 
-void TypeChecker::visit(const ast::DotExpression& node) {}
+    auto functionType = std::dynamic_pointer_cast<FunctionType>(m_result);
 
-void TypeChecker::visit(const ast::IdentifierExpression& node) {
+    if (functionType->parameterTypes().size() != node.arguments().size())
+        error("invalid number of arguments passed to " +
+              identifierName(node.name()));
+
+    for (size_t i = 0; i < node.arguments().size(); i++) {
+        check(node.arguments()[i], *functionType->parameterTypes()[i]);
+    }
+
+    m_result = functionType->returnType();
+    return true;
+}
+
+bool TypeChecker::visit(const ast::DotExpression& node) { return true; }
+
+bool TypeChecker::visit(const ast::IdentifierExpression& node) {
     auto identifierType = m_env->get(node.value());
-    if (!identifierType) {
+    if (!identifierType || identifierType.value().isUserDefinedType) {
         error("undeclared identifier: " + node.value());
     }
 
-    m_result = *identifierType;
+    m_result = identifierType.value().type;
+    return true;
 }
 
-void TypeChecker::visit(const ast::TypeExpression& node) {
+bool TypeChecker::visit(const ast::TypeExpression& node) {
+    if (!identifierToTypeMap.count(node.value())) {
+        auto type = m_env->get(node.value());
+
+        if (!type || !type.value().isUserDefinedType) {
+            error(node.value() + " is not a type"); // return or not return?
+        }
+
+        m_result = type.value().type;
+        return true;
+    }
+
     m_result = identifierToTypeMap[node.value()];
+    return true;
 }
 
-void TypeChecker::visit(const ast::ListTypeExpr& node) {}
+bool TypeChecker::visit(const ast::ListTypeExpr& node) { return true; }
 
-void TypeChecker::visit(const ast::DictTypeExpr& node) {}
+bool TypeChecker::visit(const ast::DictTypeExpr& node) { return true; }
 
-void TypeChecker::visit(const ast::FunctionTypeExpr& node) {}
+bool TypeChecker::visit(const ast::FunctionTypeExpr& node) { return true; }
 
-void TypeChecker::visit(const ast::NoLiteral& node) {
-    m_result = TypeProducer::none();
+bool TypeChecker::visit(const ast::NoLiteral& node) {
+    m_result = TypeProducer::voidT();
+    return true;
 }
 
-void TypeChecker::visit(const ast::IntegerLiteral& node) {
+bool TypeChecker::visit(const ast::IntegerLiteral& node) {
     m_result = TypeProducer::integer();
+    return true;
 }
 
-void TypeChecker::visit(const ast::DecimalLiteral& node) {
+bool TypeChecker::visit(const ast::DecimalLiteral& node) {
     m_result = TypeProducer::decimal();
+    return true;
 }
 
-void TypeChecker::visit(const ast::StringLiteral& node) {
+bool TypeChecker::visit(const ast::StringLiteral& node) {
     m_result = TypeProducer::string();
+    return true;
 }
 
-void TypeChecker::visit(const ast::BoolLiteral& node) {
+bool TypeChecker::visit(const ast::BoolLiteral& node) {
     m_result = TypeProducer::boolean();
+    return true;
 }
 
-void TypeChecker::visit(const ast::NoneLiteral& node) {
-    m_result = TypeProducer::none();
+bool TypeChecker::visit(const ast::NoneLiteral& node) {
+    m_result = TypeProducer::voidT();
+    return true;
 }

@@ -645,7 +645,7 @@ class MatchStatement : public AstNode {
 
   public:
     MatchStatement(
-        Token tok, std::vector<AstNodePtr> to_match,
+        Token tok, std::vector<AstNodePtr> toMatch,
         std::vector<std::pair<std::vector<AstNodePtr>, AstNodePtr>> cases,
         AstNodePtr defaultbody);
 

@@ -36,7 +36,7 @@ enum TokenType {
     tk_dict_open,  // {
     tk_new_line,   // \n
 
-    tk_exponent,          //**
+    tk_exponent,          // **
     tk_equal,             // ==
     tk_not_equal,         // !=
     tk_floor,             // //
@@ -45,6 +45,7 @@ enum TokenType {
     tk_increment,         // ++
     tk_decrement,         // --
     tk_arrow,             // ->
+    tk_range,             // ..
     tk_shift_right,       // >>
     tk_shift_left,        // <<
     tk_floor_equal,       // //=

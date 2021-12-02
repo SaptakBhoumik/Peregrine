@@ -738,11 +738,11 @@ std::string TypeDefinition::stringify() const {
 }
 
 MatchStatement::MatchStatement(
-    Token tok, std::vector<AstNodePtr> to_match,
+    Token tok, std::vector<AstNodePtr> toMatch,
     std::vector<std::pair<std::vector<AstNodePtr>, AstNodePtr>> cases,
     AstNodePtr defaultbody) {
     m_token = tok;
-    m_toMatch = to_match;
+    m_toMatch = toMatch;
     m_cases = cases;
     m_default = defaultbody;
 }
