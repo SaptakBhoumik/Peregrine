@@ -194,6 +194,10 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseTypeDef();
             break;
         }
+        
+        case tk_class: {
+            stmt = parseClassDefinition();
+        }
 
         case tk_identifier: {
             if (next().tkType == tk_identifier || next().tkType == tk_assign) {
@@ -236,6 +240,38 @@ AstNodePtr Parser::parseBlockStatement() {
     }
 
     return std::make_shared<BlockStatement>(statements);
+}
+
+AstNodePtr Parser::parseClassDefinition(){
+    
+    std::vector<AstNodePtr> attributes;
+    std::vector<AstNodePtr> methods;
+
+    expect(tk_identifier);
+
+    AstNodePtr name = parseName();
+
+
+    expect(tk_colon);
+
+
+    while (next().tkType == tk_identifier || next().tkType == tk_assign){
+
+        attributes.push_back(parseVariableStatement());
+        advance();
+    }
+
+    while(m_currentToken.tkType == tk_def ){
+        methods.push_back(parseFunctionDef());
+        advance();
+    }
+
+    return std::make_shared<ClassDefinition>(name,attributes,methods);
+
+
+
+
+
 }
 
 AstNodePtr Parser::parseImport() {

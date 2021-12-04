@@ -328,6 +328,37 @@ std::string BlockStatement::stringify() {
     return res;
 }
 
+ClassDefinition::ClassDefinition(AstNodePtr name,std::vector<AstNodePtr> attributes,std::vector<FunctionDefinition> methods){
+    c_name = name;
+    c_attributes = attributes;
+    c_methods = methods;
+}
+
+AstNodePtr ClassDefinition::name() { return c_name; }
+
+AstNodePtr ClassDefinition::attributes() { return c_attributes; }
+
+AstNodePtr ClassDefinition::methods() { return c_methods; } 
+
+AstKind ClassDefinition::type() { return KAstClassDef; }
+
+std::string FunctionDefinition::stringify() {
+
+    std::string res = "class ";
+    res += c_name->stringify();
+    res += ":\n";
+
+    res += c_attributes -> stringify();
+    res += ":\n";
+    res += c_methods->stringify(); 
+
+    return res;
+
+}
+
+
+
+
 FunctionDefinition::FunctionDefinition(AstNodePtr returnType, AstNodePtr name,
                                        std::vector<parameter> parameters,
                                        AstNodePtr body) {

@@ -27,6 +27,7 @@ enum AstKind {
     KAstConstDecl,
     KAstBlockStmt,
     KAstFunctionDef,
+    KAstClassDef,
     KAstReturnStatement,
     KAstFunctionCall,
     KAstIfStmt,
@@ -276,6 +277,21 @@ struct parameter {
     AstNodePtr p_type;
     AstNodePtr p_name;
 };
+
+class ClassDefinition: public AstNode {
+
+  AstNodePtr c_name;
+  std::vector<AstNodePtr> c_attributes;
+  std::vector<FunctionDefinition> c_methods;
+  
+  public:
+    ClassDefinition(AstNodePtr c_name,std::vector<AstNodePtr> c_attributes,std::vector<FunctionDefinition> c_methods);
+    AstNodePtr name();
+    AstNodePtr attributes();
+    AstNodePtr methods();
+    AstKind type();
+}
+
 
 class FunctionDefinition : public AstNode {
     AstNodePtr m_returnType;
