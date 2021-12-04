@@ -1,6 +1,7 @@
 #include "typeChecker.hpp"
 #include "ast/ast.hpp"
 #include "ast/types.hpp"
+#include "errors/error.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -14,15 +15,14 @@ TypeChecker::TypeChecker(ast::AstNodePtr ast) {
     ast->accept(*this);
 }
 
-void TypeChecker::error(std::string_view msg) {
-    // PEError err = {{tok.line, tok.start, m_filename, tok.statement},
-    //                std::string(msg),
-    //                "TypeError",
-    //                "",
-    //                ""};
-
-    // m_errors.push_back(err);
-    std::cerr << "TypeError: " << msg << "\n";
+void TypeChecker::error(Token tok, std::string_view msg) {
+    PEError err = {{tok.line, tok.start, m_filename, tok.statement},
+                   std::string(msg),
+                   "TypeError",
+                   "",
+                   ""};
+    display(err);
+    exit(1);
 }
 
 EnvPtr TypeChecker::createEnv(EnvPtr parent) {
@@ -43,9 +43,11 @@ void TypeChecker::check(ast::AstNodePtr expr, const Type& expectedType) {
     if (exprType != expectedType) {
         if (!exprType.isConvertibleTo(expectedType) &&
             !expectedType.isConvertibleTo(exprType)) {
-            error("expected type " + expectedType.stringify() + ", got " +
+            error(expr->token(), "expected type " + expectedType.stringify() + ", got " +
                   exprType.stringify() + " instead");
         }
+
+        //TODO: convert one type to another
     }
 }
 
@@ -154,7 +156,7 @@ bool TypeChecker::visit(const ast::ReturnStatement& node) {
     std::cout << m_result->stringify() << "\n";
     std::cout << m_currentFunction->returnType()->stringify() << "\n";
     if (!m_currentFunction) {
-        error("can not return outside of a function");
+        error(node.token(), "can not return outside of a function");
     }
 
     check(node.returnValue(), *m_currentFunction->returnType());
@@ -174,7 +176,7 @@ bool TypeChecker::visit(const ast::BinaryOperation& node) {
     TypePtr result = leftType->infixOperatorResult(node.op(), m_result);
 
     if (!result) {
-        error("operator " + node.op().keyword + " can not be used with types " +
+        error(node.token(), "operator " + node.op().keyword + " can not be used with types " +
               leftType->stringify() + " and " + m_result->stringify());
     }
 
@@ -186,7 +188,7 @@ bool TypeChecker::visit(const ast::PrefixExpression& node) {
     node.right()->accept(*this);
     TypePtr result = m_result->prefixOperatorResult(node.prefix());
     if (!result) {
-        error("operator " + node.prefix().keyword +
+        error(node.token(), "operator " + node.prefix().keyword +
               " can not be used with type " + m_result->stringify());
     }
 
@@ -197,12 +199,12 @@ bool TypeChecker::visit(const ast::PrefixExpression& node) {
 bool TypeChecker::visit(const ast::FunctionCall& node) {
     node.name()->accept(*this);
     if (m_result->category() != TypeCategory::Function)
-        error(identifierName(node.name()) + " is not a function");
+        error(node.token(), identifierName(node.name()) + " is not a function");
 
     auto functionType = std::dynamic_pointer_cast<FunctionType>(m_result);
 
     if (functionType->parameterTypes().size() != node.arguments().size())
-        error("invalid number of arguments passed to " +
+        error(node.token(), "invalid number of arguments passed to " +
               identifierName(node.name()));
 
     for (size_t i = 0; i < node.arguments().size(); i++) {
@@ -218,7 +220,7 @@ bool TypeChecker::visit(const ast::DotExpression& node) { return true; }
 bool TypeChecker::visit(const ast::IdentifierExpression& node) {
     auto identifierType = m_env->get(node.value());
     if (!identifierType || identifierType.value().isUserDefinedType) {
-        error("undeclared identifier: " + node.value());
+        error(node.token(), "undeclared identifier: " + node.value());
     }
 
     m_result = identifierType.value().type;
@@ -230,7 +232,7 @@ bool TypeChecker::visit(const ast::TypeExpression& node) {
         auto type = m_env->get(node.value());
 
         if (!type || !type.value().isUserDefinedType) {
-            error(node.value() + " is not a type"); // return or not return?
+            error(node.token(), node.value() + " is not a type"); // return or not return?
         }
 
         m_result = type.value().type;

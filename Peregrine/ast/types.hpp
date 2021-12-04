@@ -54,7 +54,7 @@ class Type {
         return category() == type.category();
     }
 
-    virtual bool operator!=(const Type& type) const {
+    bool operator!=(const Type& type) const {
         return !operator==(type);
     }
 };
@@ -77,6 +77,8 @@ class IntType : public Type {
     TypePtr prefixOperatorResult(Token op) const;
     TypePtr infixOperatorResult(Token op, const TypePtr type) const;
 
+    bool operator==(const Type& type) const;
+
   private:
     IntSizes m_intSize;
     Modifier m_modifier;
@@ -98,13 +100,15 @@ class DecimalType : public Type {
     TypePtr prefixOperatorResult(Token op) const;
     TypePtr infixOperatorResult(Token op, const TypePtr type) const;
 
+    bool operator==(const Type& type) const;
+
   private:
     DecimalSize m_decimalSize;
 };
 
 class StringType : public Type {
   public:
-    StringType();
+    StringType() = default;
 
     TypeCategory category() const;
     bool isConvertibleTo(const Type& type) const;
@@ -116,7 +120,7 @@ class StringType : public Type {
 
 class BoolType : public Type {
   public:
-    BoolType();
+    BoolType() = default;
 
     TypeCategory category() const;
     bool isConvertibleTo(const Type& type) const;
@@ -128,7 +132,7 @@ class BoolType : public Type {
 
 class VoidType : public Type {
   public:
-    VoidType();
+    VoidType() = default;
 
     TypeCategory category() const;
     bool isConvertibleTo(const Type& type) const;
@@ -144,6 +148,8 @@ class ListType : public Type {
     TypeCategory category() const;
     bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
+
+    bool operator==(const Type& type) const;
 };
 
 class UserDefinedType : public Type {
@@ -156,6 +162,8 @@ class UserDefinedType : public Type {
     TypePtr baseType() const;
     bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
+
+    bool operator==(const Type& type) const;
 };
 
 class FunctionType : public Type {
@@ -170,6 +178,8 @@ class FunctionType : public Type {
     TypePtr returnType() const;
     bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
+
+    bool operator==(const Type& type) const;
 };
 
 class TypeProducer {

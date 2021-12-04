@@ -23,7 +23,7 @@ class TypeChecker : public ast::AstVisitor {
     TypeChecker(ast::AstNodePtr ast);
 
   private:
-    void error(std::string_view msg);
+    void error(Token tok, std::string_view msg);
     EnvPtr createEnv(EnvPtr parent = nullptr);
     std::string identifierName(ast::AstNodePtr identifier);
     void checkBody(ast::AstNodePtr body);
@@ -61,6 +61,7 @@ class TypeChecker : public ast::AstVisitor {
     bool visit(const ast::BoolLiteral& node);
     bool visit(const ast::NoneLiteral& node);
 
+    std::string m_filename; 
     TypePtr m_result;
     EnvPtr m_env;
 

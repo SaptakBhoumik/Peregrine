@@ -80,6 +80,16 @@ TypePtr IntType::infixOperatorResult(Token op, const TypePtr type) const {
     return nullptr;
 }
 
+bool IntType::operator==(const Type& type) const {
+    if (type.category() == TypeCategory::Integer) {
+        auto intType = dynamic_cast<const IntType&>(type);
+        if (intType.size() == size() && intType.modifier() == modifier())
+            return true;
+    }
+
+    return false;
+}
+
 DecimalType::DecimalType(DecimalSize decimalSize) {
     m_decimalSize = decimalSize;
 }
@@ -140,7 +150,15 @@ TypePtr DecimalType::infixOperatorResult(Token op, const TypePtr type) const {
     return nullptr;
 }
 
-StringType::StringType() {}
+bool DecimalType::operator==(const Type& type) const {
+    if (type.category() == TypeCategory::Decimal) {
+        auto decimalType = dynamic_cast<const DecimalType&>(type);
+        if (decimalType.size() == size())
+            return true;
+    }
+
+    return false;
+}
 
 TypeCategory StringType::category() const { return TypeCategory::String; }
 
@@ -174,8 +192,6 @@ TypePtr StringType::infixOperatorResult(Token op, const TypePtr type) const {
     }
 }
 
-BoolType::BoolType() {}
-
 TypeCategory BoolType::category() const { return TypeCategory::Bool; }
 
 bool BoolType::isConvertibleTo(const Type& type) const {
@@ -189,8 +205,6 @@ TypePtr BoolType::prefixOperatorResult(Token op) const { return nullptr; }
 TypePtr BoolType::infixOperatorResult(Token op, const TypePtr type) const {
     return nullptr;
 }
-
-VoidType::VoidType() {}
 
 TypeCategory VoidType::category() const { return TypeCategory::Void; }
 
