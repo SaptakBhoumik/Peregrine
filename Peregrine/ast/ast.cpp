@@ -860,4 +860,33 @@ std::string FunctionTypeExpr::stringify() const {
     return res;
 }
 
+DecoratorStatement::DecoratorStatement(Token tok, std::vector<AstNodePtr> decorators,
+                AstNodePtr body){
+    m_token=tok;
+    m_decorators=decorators;
+    m_body=body;
+}
+std::vector<AstNodePtr> DecoratorStatement::decoratorItem() const {
+    return m_decorators;
+}
+AstNodePtr DecoratorStatement::body() const {
+    return m_body;
+}
+Token DecoratorStatement::token() const {
+    return m_token;
+}
+AstKind DecoratorStatement::type() const {
+    return KAstDecorator;
+}
+std::string DecoratorStatement::stringify() const {
+    std::string res;
+    for (auto& x:m_decorators){
+        res+="@"+x->stringify()+"\n";
+        // std::cout<<res<<"\n";
+    }
+    res+=m_body->stringify();
+    return res;
+}
+
 } // namespace ast
+

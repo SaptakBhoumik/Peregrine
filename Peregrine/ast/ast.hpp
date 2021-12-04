@@ -44,6 +44,8 @@ enum AstKind {
     KAstBreakStatement,
     KAstContinueStatement,
     KAstTypeDefinition,
+    // KAstLamda,
+    KAstDecorator,
     KAstPassStatement
 };
 
@@ -653,6 +655,23 @@ class MatchStatement : public AstNode {
     std::vector<std::pair<std::vector<AstNodePtr>, AstNodePtr>>
     caseBody() const;
     AstNodePtr defaultBody() const;
+
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+class DecoratorStatement : public AstNode {
+  Token m_token;
+  std::vector<AstNodePtr> m_decorators;
+  AstNodePtr m_body;
+  public:
+    DecoratorStatement(Token tok, std::vector<AstNodePtr> decorators,
+                AstNodePtr body);
+
+    std::vector<AstNodePtr> decoratorItem() const;
+    AstNodePtr body() const;
 
     Token token() const;
     AstKind type() const;

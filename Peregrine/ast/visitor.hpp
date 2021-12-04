@@ -26,6 +26,7 @@ class AstVisitor {
     virtual bool visit(const ReturnStatement& node) { return false; };
     virtual bool visit(const ContinueStatement& node) { return false; };
     virtual bool visit(const BreakStatement& node) { return false; };
+    virtual bool visit(const DecoratorStatement& node) { return false; };
     virtual bool visit(const ListLiteral& node) { return false; };
     virtual bool visit(const DictLiteral& node) { return false; };
     virtual bool visit(const ListOrDictAccess& node) { return false; };

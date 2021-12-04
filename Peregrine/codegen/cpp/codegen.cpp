@@ -248,6 +248,12 @@ bool Codegen::visit(const ast::BreakStatement& node) {
     return true;
 }
 
+bool Codegen::visit(const ast::DecoratorStatement& node) {
+    auto items = node.decoratorItem();
+    auto body = node.body();
+    return true;
+}
+
 bool Codegen::visit(const ast::ListLiteral& node) { return true; }
 
 bool Codegen::visit(const ast::DictLiteral& node) { return true; }

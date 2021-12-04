@@ -96,6 +96,8 @@ void ForStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void BreakStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
+void DecoratorStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+
 void PassStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void ContinueStatement::accept(AstVisitor& visitor) const {

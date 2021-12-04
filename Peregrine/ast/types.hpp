@@ -149,7 +149,7 @@ class ListType : public Type {
     bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
 
-    bool operator==(const Type& type) const;
+    // bool operator==(const Type& type) const;
 };
 
 class UserDefinedType : public Type {
@@ -163,7 +163,7 @@ class UserDefinedType : public Type {
     bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
 
-    bool operator==(const Type& type) const;
+    // bool operator==(const Type& type) const;
 };
 
 class FunctionType : public Type {
@@ -179,7 +179,7 @@ class FunctionType : public Type {
     bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
 
-    bool operator==(const Type& type) const;
+    // bool operator==(const Type& type) const;
 };
 
 class TypeProducer {

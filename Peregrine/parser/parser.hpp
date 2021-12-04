@@ -76,6 +76,7 @@ class Parser {
     AstNodePtr parseDotExpression(AstNodePtr left);
 
     AstNodePtr parseStatement();
+    AstNodePtr parseDecoratorCall();
     AstNodePtr parseBlockStatement();
     AstNodePtr parseImport();
     AstNodePtr parseVariableStatement();

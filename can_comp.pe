@@ -7,6 +7,9 @@ def lambda_test(a x):
 def func(int g)->int:
     return g
 def main():
+    def z():
+        printf("hello\n")
+    z()
     Cppcode(#ifdef _WIN32)
     printf("On windows\n")
     Cppcode(#elif __linux__)
@@ -15,6 +18,7 @@ def main():
     scope:
         printf("Hello from new scope\n")
     bool x=False
+    const bool cc=False
     x=True
     bool y
     y=True
