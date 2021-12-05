@@ -593,6 +593,24 @@ std::string IfStatement::stringify() const {
     return res;
 }
 
+AssertStatement::AssertStatement(Token tok, AstNodePtr condition) {
+    m_token = tok;
+    m_condition = condition;
+}
+
+AstNodePtr AssertStatement::condition() const { return m_condition; }
+
+Token AssertStatement::token() const { return m_token; }
+
+AstKind AssertStatement::type() const { return KAstAssertStmt; }
+
+std::string AssertStatement::stringify() const {
+    std::string res = "assert ";
+    res+=m_condition->stringify();
+    return res;
+}
+
+
 WhileStatement::WhileStatement(Token tok, AstNodePtr condition,
                                AstNodePtr body) {
     m_token = tok;

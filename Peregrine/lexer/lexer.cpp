@@ -226,7 +226,7 @@ LEXEME lexer(std::string src, std::string filename) {
     uint64_t current_index = 0;
     uint64_t second_bracket_count = 0;
     uint64_t third_bracket_count = 0;
-    uint64_t line = 0;
+    uint64_t line = 1;
     uint64_t last_line = 0;
     uint64_t curr_identation_level = 0;
     uint64_t cpp_bracket_count = 0;

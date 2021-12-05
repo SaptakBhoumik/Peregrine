@@ -17,7 +17,7 @@ Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast,bool html) {
     if (html){
         m_file<<"<!DOCTYPE html><html><body><script>";
     }
-    m_file << "function render(code){document.write(code);}\n";
+    m_file << "function render(code){document.write(code);}AssertionError=0;\n";
     m_env = createEnv();
     ast->accept(*this);
     m_file<<"\nmain();";
@@ -429,5 +429,12 @@ bool Codegen::visit(const ast::NoneLiteral& node) {
     write("null");
     return true;
 }
-
+bool Codegen::visit(const ast::AssertStatement& node){
+    write("if(! ");
+    node.condition()->accept(*this);
+    write("){\n");
+    write("console.log(\"AssertionError : in line "+std::to_string(node.token().line)+"\\n   "+node.token().statement+"\");throw AssertionError;");
+    write("\n}");
+    return true;
+}
 } // namespace js

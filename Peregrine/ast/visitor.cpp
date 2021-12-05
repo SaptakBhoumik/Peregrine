@@ -89,6 +89,7 @@ void FunctionCall::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 void DotExpression::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void IfStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+void AssertStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void WhileStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 

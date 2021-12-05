@@ -130,6 +130,10 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseConstDeclaration();
             break;
         }
+        case tk_assert:{
+            stmt = parseAssert();
+            break;
+        }
         case tk_at:{
             stmt = parseDecoratorCall();
             break;
@@ -855,4 +859,11 @@ AstNodePtr Parser::parseDecoratorCall(){
         body=parseFunctionDef();
     }
     return std::make_shared<DecoratorStatement>(tok, decorators,body);
+}
+
+AstNodePtr Parser::parseAssert(){
+    auto tok=m_currentToken;
+    advance();
+    auto condition = parseExpression(precedenceMap[m_currentToken.tkType]);
+    return std::make_shared<AssertStatement>(tok,condition);
 }

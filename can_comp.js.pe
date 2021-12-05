@@ -48,3 +48,6 @@ def main():
         default:#will be executed at the end if no break
             printf("Hello")
     lambda_test(func)
+    assert 8==8
+    #should throw an error
+    #assert 8==6

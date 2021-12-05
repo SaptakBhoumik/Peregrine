@@ -37,6 +37,7 @@ enum AstKind {
     KAstFunctionCall,
     KAstDotExpression,
     KAstIfStmt,
+    KAstAssertStmt,
     KAstMatchStmt,
     KAstScopeStmt,
     KAstWhileStmt,
@@ -510,6 +511,19 @@ class IfStatement : public AstNode {
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs() const;
     AstNodePtr elseBody() const;
 
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+
+class AssertStatement : public AstNode {
+    Token m_token;
+    AstNodePtr m_condition;
+  public:
+    AssertStatement(Token tok, AstNodePtr condition);
+    AstNodePtr condition() const;
     Token token() const;
     AstKind type() const;
     std::string stringify() const;

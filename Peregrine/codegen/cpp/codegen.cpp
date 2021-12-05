@@ -14,7 +14,7 @@ namespace cpp {
 
 Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast) {
     m_file.open(outputFilename);
-    m_file << "#include <cstdio>\n#include <functional>\n";
+    m_file << "#include <cstdio>\n#include <functional>\nenum{AssertionError};\n";
     m_env = createEnv();
     ast->accept(*this);
     m_file.close();
@@ -402,5 +402,12 @@ bool Codegen::visit(const ast::NoneLiteral& node) {
     write("NULL");
     return true;
 }
-
+bool Codegen::visit(const ast::AssertStatement& node){
+    write("if(not ");
+    node.condition()->accept(*this);
+    write("){\n");
+    write("printf(\"AssertionError : in line "+std::to_string(node.token().line)+"\\n   "+node.token().statement+"\");throw AssertionError;");
+    write("\n}");
+    return true;
+}
 } // namespace cpp
