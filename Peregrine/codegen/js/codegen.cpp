@@ -10,13 +10,20 @@
 #include <string>
 #include <string_view>
 
-namespace cpp {
+namespace js {
 
-Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast) {
+Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast,bool html) {
     m_file.open(outputFilename);
-    m_file << "#include <cstdio>\n#include <functional>\n";
+    if (html){
+        m_file<<"<!DOCTYPE html><html><body><script>";
+    }
+    m_file << "function render(code){document.write(code);}\n";
     m_env = createEnv();
     ast->accept(*this);
+    m_file<<"\nmain();";
+    if(html){
+        m_file<<"</script></body></html>";
+    }
     m_file.close();
 }
 
@@ -54,9 +61,6 @@ void Codegen::codegenFuncParams(std::vector<ast::parameter> parameters) {
         for (size_t i = 0; i < parameters.size(); ++i) {
             if (i)
                 write(", ");
-
-            parameters[i].p_type->accept(*this);
-            write(" ");
             parameters[i].p_name->accept(*this);
         }
     }
@@ -66,6 +70,7 @@ bool Codegen::visit(const ast::Program& node) {
     for (auto& stmt : node.statements()) {
         stmt->accept(*this);
         write(";\n"); // TODO: will this break stuff later?
+                     // no 
     }
     return true;
 }
@@ -88,14 +93,13 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
         is_func_def=true;
         if (functionName == "main") {
             // we want the main function to always return 0 if success
-            write("int main (");
+            write("function main (");
             codegenFuncParams(node.parameters());
             write(") {\n");
             node.body()->accept(*this);
             write("return 0;\n}");
         } else {
-            node.returnType()->accept(*this);
-            write(" ");
+            write("function ");
             node.name()->accept(*this);
             write("(");
             codegenFuncParams(node.parameters());
@@ -106,12 +110,10 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
         is_func_def=false;
     }
     else{
-        write("auto ");
         node.name()->accept(*this);
-        write("=[](");
+        write("=function(");
         codegenFuncParams(node.parameters());
-        write(")->");
-        node.returnType()->accept(*this);
+        write(")");
         write("{\n");
         node.body()->accept(*this);
         write("\n}");
@@ -121,12 +123,9 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
 
 bool Codegen::visit(const ast::VariableStatement& node) {
     if (node.varType()->type() != ast::KAstNoLiteral) {
-        node.varType()->accept(*this);
-        write(" ");
+        write("let ");
     }
-
     node.name()->accept(*this);
-
     if (node.value()->type() != ast::KAstNoLiteral) {
         write(" = ");
         node.value()->accept(*this);
@@ -134,11 +133,8 @@ bool Codegen::visit(const ast::VariableStatement& node) {
     return true;
 }
 
-bool Codegen::visit(const ast::ConstDeclaration& node) {
+bool Codegen::visit(const ast::ConstDeclaration& node) { 
     write("const "); 
-    if (node.constType()->type()!=ast::KAstNoLiteral){
-        node.constType()->accept(*this);
-    }
     write(" ");
     node.name()->accept(*this);
     write("=");
@@ -147,10 +143,12 @@ bool Codegen::visit(const ast::ConstDeclaration& node) {
     }
 
 bool Codegen::visit(const ast::TypeDefinition& node) {
-    write("typedef ");
-    node.baseType()->accept(*this);
-    write(" ");
-    node.name()->accept(*this);
+    //no typedef in js
+    write("\n//");
+    // we are making it a comment because ; is added
+    // to each node at the end. we dont want that to
+    // happen because it will result in ;; which is
+    // an error
     return true;
 }
 
@@ -250,10 +248,7 @@ bool Codegen::visit(const ast::ScopeStatement& node) {
 }
 
 bool Codegen::visit(const ast::CppStatement& node) {
-    // we are making it a comment because ; is added to
-    // each node at the end. we dont want that to happen
-    // because it will result in ;; which is an error
-    write(node.value() + "\n//");
+    //not in js
     return true;
 }
 
@@ -279,11 +274,30 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
     return true;
 }
 
-bool Codegen::visit(const ast::ListLiteral& node) { return true; }
+bool Codegen::visit(const ast::ListLiteral& node) { 
+    write("[");
+    auto elements=node.elements();
+    if (elements.size()>0){
+        for (size_t i=0;i<elements.size();++i){
+            elements[i]->accept(*this);
+            if (i<elements.size()-1){
+                write(",");
+            }
+        }
+    }
+    write("]");
+    return true;
+}
 
 bool Codegen::visit(const ast::DictLiteral& node) { return true; }
 
-bool Codegen::visit(const ast::ListOrDictAccess& node) { return true; }
+bool Codegen::visit(const ast::ListOrDictAccess& node) { 
+    node.container()->accept(*this);
+    write("[");
+    node.keyOrIndex()->accept(*this);
+    write("]");
+    return true;
+}
 
 bool Codegen::visit(const ast::BinaryOperation& node) {
     if (node.op().keyword == "**") {
@@ -301,7 +315,12 @@ bool Codegen::visit(const ast::BinaryOperation& node) {
     } else {
         write("(");
         node.left()->accept(*this);
-        write(" " + node.op().keyword + " ");
+        if (node.op().keyword=="=="){
+            write(" === ");
+        }
+        else{
+            write(" " + node.op().keyword + " ");
+        }
         node.right()->accept(*this);
         write(")");
     }
@@ -316,7 +335,15 @@ bool Codegen::visit(const ast::PrefixExpression& node) {
 }
 
 bool Codegen::visit(const ast::FunctionCall& node) {
-    node.name()->accept(*this);
+    auto functionName =
+        std::dynamic_pointer_cast<ast::IdentifierExpression>(node.name())
+            ->value();
+    if (functionName=="print"||functionName=="printf"){
+        write("console.log");
+    }
+    else{
+        node.name()->accept(*this);
+    }
     write("(");
 
     auto args = node.arguments();
@@ -336,8 +363,8 @@ bool Codegen::visit(const ast::DotExpression& node) {
     node.owner()->accept(*this);
     write(".");
     node.referenced()->accept(*this);
-    return true; 
-    }
+    return true;
+}
 
 bool Codegen::visit(const ast::IdentifierExpression& node) {
     write(node.value());
@@ -345,7 +372,7 @@ bool Codegen::visit(const ast::IdentifierExpression& node) {
 }
 
 bool Codegen::visit(const ast::TypeExpression& node) {
-    write(node.value());
+    //no types in js
     return true;
 }
 
@@ -354,22 +381,7 @@ bool Codegen::visit(const ast::ListTypeExpr& node) { return true; }
 bool Codegen::visit(const ast::DictTypeExpr& node) { return true; }
 
 bool Codegen::visit(const ast::FunctionTypeExpr& node) {
-    write("std::function<");
-    if (node.returnTypes().size() == 0) {
-        write("void (");
-    } else {
-        node.returnTypes()[0]->accept(*this);
-        write("(");
-    }
-    auto argTypes = node.argTypes();
-    if (argTypes.size() > 0) {
-        for (size_t i = 0; i < argTypes.size(); ++i) {
-            if (i)
-                write(",");
-            argTypes[i]->accept(*this);
-        }
-    }
-    write(")>");
+    //no types in js
     return true;
 }
 
@@ -399,8 +411,8 @@ bool Codegen::visit(const ast::BoolLiteral& node) {
 }
 
 bool Codegen::visit(const ast::NoneLiteral& node) {
-    write("NULL");
+    write("null");
     return true;
 }
 
-} // namespace cpp
+} // namespace js

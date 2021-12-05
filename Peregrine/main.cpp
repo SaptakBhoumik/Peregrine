@@ -1,4 +1,5 @@
 #include "codegen/cpp/codegen.hpp"
+#include "codegen/js/codegen.hpp"
 #include "lexer/lexer.hpp"
 #include "lexer/tokens.hpp"
 #include "parser/parser.hpp"
@@ -8,9 +9,10 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <string.h>
 
 int main(int argc, char** argv) {
-    if (argc != 3) {//the cli is still not complete
+    if (argc < 3) {//the cli is still not complete
         std::ifstream file("../Peregrine/test.pe");
         std::stringstream buf;
         buf << file.rdbuf();
@@ -44,9 +46,22 @@ int main(int argc, char** argv) {
 
         // TypeChecker typeChecker;
         // typeChecker.check(program);
-
-        cpp::Codegen codegen("temp.cc", program);
-        system("g++ temp.cc");
+        if (argc>3){
+            if (strcmp(argv[3],"-js")==0){
+                js::Codegen codegen("index.js", program,false);
+            }
+            else if (strcmp(argv[3],"-html")==0){//embeds js in html
+                js::Codegen codegen("index.html", program,true);
+            }
+            else{
+               cpp::Codegen codegen("temp.cc", program);
+               system("g++ temp.cc");  
+            }
+        }
+        else{
+           cpp::Codegen codegen("temp.cc", program);
+           system("g++ temp.cc"); 
+        }
     }
     return 0;
 }

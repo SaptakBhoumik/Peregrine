@@ -1,0 +1,45 @@
+type a = def(int)->int
+
+def test(int x)->int:#this is comment
+    return x
+def lambda_test(a x):
+    printf("The value is %d",x(5))
+def func(int g)->int:
+    return g
+def main():
+    def z():
+        printf("hello")
+    z()
+    scope:
+        printf("Hello from new scope")
+    list bddd=[9,7]
+    printf(bddd)
+    printf(bddd[1])
+    bool x=False
+    const bool cc=False
+    x=True
+    bool y
+    y=True
+    if x==y:
+        pass
+    printf("%d",test(0))
+    int a=0
+    int b=7
+    int c=7
+    match a,b,c:
+        case 5,7,8:
+            printf("a is 5,b is 7 and c is 8")
+        case 4,7,_:#c can be anything
+            printf("a is 4 but b is 7")
+            break  #we dont want default to execute 
+        case 4,_,7:#b can be anything
+            printf("a is 4 but c is 7")
+            break  #we dont want default to execute 
+        case 8,_:#b and c can be anything
+            printf("a is 8")
+        case _:
+            printf("idk")
+        #optional
+        default:#will be executed at the end if no break
+            printf("Hello")
+    lambda_test(func)

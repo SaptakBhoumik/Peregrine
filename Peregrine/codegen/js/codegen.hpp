@@ -1,5 +1,5 @@
-#ifndef CPP_PEREGRINE_CODEGEN_HPP
-#define CPP_PEREGRINE_CODEGEN_HPP
+#ifndef JS_PEREGRINE_CODEGEN_HPP
+#define JS_PEREGRINE_CODEGEN_HPP
 
 #include "ast/ast.hpp"
 #include "ast/visitor.hpp"
@@ -10,13 +10,13 @@
 #include <string>
 #include <string_view>
 
-namespace cpp {
+namespace js {
 
 typedef std::shared_ptr<SymbolTable<ast::AstNodePtr>> EnvPtr;
 
 class Codegen : public ast::AstVisitor {
   public:
-    Codegen(std::string outputFilename, ast::AstNodePtr ast);
+    Codegen(std::string outputFilename, ast::AstNodePtr ast,bool html);
 
     EnvPtr createEnv(EnvPtr parent = nullptr);
 
@@ -72,6 +72,6 @@ class Codegen : public ast::AstVisitor {
     EnvPtr m_env;
 };
 
-} // namespace cpp
+} // namespace js
 
 #endif

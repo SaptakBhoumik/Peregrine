@@ -228,7 +228,7 @@ LEXEME lexer(std::string src, std::string filename) {
     uint64_t current_index = 0;
     uint64_t second_bracket_count = 0;
     uint64_t third_bracket_count = 0;
-    uint64_t line = 1;
+    uint64_t line = 0;
     uint64_t last_line = 0;
     uint64_t curr_identation_level = 0;
     uint64_t cpp_bracket_count = 0;
@@ -665,6 +665,7 @@ LEXEME lexer(std::string src, std::string filename) {
                 if (tokens.size() > 0) {
                     if ((tokens.back().tkType == tk_true ||
                          tokens.back().tkType == tk_false ||
+                         tokens.back().tkType == tk_string ||
                          tokens.back().tkType == tk_integer ||
                          tokens.back().tkType == tk_decimal ||
                          tokens.back().tkType == tk_identifier ||
@@ -804,6 +805,7 @@ LEXEME lexer(std::string src, std::string filename) {
                 if (tokens.size() > 0) {
                     if ((tokens.back().tkType == tk_true ||
                          tokens.back().tkType == tk_false ||
+                         tokens.back().tkType == tk_string ||
                          tokens.back().tkType == tk_integer ||
                          tokens.back().tkType == tk_decimal ||
                          tokens.back().tkType == tk_identifier ||
@@ -876,6 +878,7 @@ LEXEME lexer(std::string src, std::string filename) {
                 if (tokens.size() > 0) {
                     if ((tokens.back().tkType == tk_true ||
                          tokens.back().tkType == tk_false ||
+                         tokens.back().tkType == tk_string ||
                          tokens.back().tkType == tk_integer ||
                          tokens.back().tkType == tk_decimal ||
                          tokens.back().tkType == tk_identifier ||
