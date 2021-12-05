@@ -96,9 +96,7 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_import;
     } else if (item == "from") {
         return tk_from;
-    } else if (item == "dict") {
-        return tk_dict;
-    } else if (item == "const") {
+    }  else if (item == "const") {
         return tk_const;
     } else if (item == "if") {
         return tk_if;

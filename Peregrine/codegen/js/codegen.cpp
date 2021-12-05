@@ -289,7 +289,22 @@ bool Codegen::visit(const ast::ListLiteral& node) {
     return true;
 }
 
-bool Codegen::visit(const ast::DictLiteral& node) { return true; }
+bool Codegen::visit(const ast::DictLiteral& node) { 
+    auto elements=node.elements();
+    write("{");
+    if (elements.size()>0){
+        for (size_t i=0;i<elements.size();++i){
+            elements[i].first->accept(*this);
+            write(":");
+            elements[i].second->accept(*this);
+            if (i<elements.size()-1){
+                write(",");
+            }
+        }
+    }
+    write("}");
+    return true; 
+}
 
 bool Codegen::visit(const ast::ListOrDictAccess& node) { 
     node.container()->accept(*this);

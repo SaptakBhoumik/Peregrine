@@ -15,6 +15,11 @@ def main():
     list bddd=[9,7]
     printf(bddd)
     printf(bddd[1])
+    dict gg={
+        "k":154,
+        "t":1
+    }
+    printf(gg["k"])
     bool x=False
     const bool cc=False
     x=True
