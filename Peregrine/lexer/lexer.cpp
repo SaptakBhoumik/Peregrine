@@ -116,6 +116,8 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_while;
     } else if (item == "for") {
         return tk_for;
+    }else if (item == ".") {
+        return tk_dot;
     } else if (item == "break") {
         return tk_break;
     } else if (item == "assert") {
@@ -519,20 +521,36 @@ LEXEME lexer(std::string src, std::string filename) {
                 token = token_init(statement, keyword, tk_dot, start_index,
                                    current_index, line);
             } else {
-                if (is_number(keyword) == tk_integer) {
+                if (is_number(keyword) == tk_integer && next(current_index,src)!=".") {
                     keyword += item;
-                } else {
+                }
+                else if (next(current_index,src)=="."){
                     token = token_init(
                         statement, keyword,
                         token_type(keyword, next(current_index - 1, src)),
                         start_index, current_index - 1, line);
                     tokens.emplace_back(token);
                     token = Token();
-                    keyword = "";
-                    keyword = item;
-                    start_index = current_index - 1;
-                    token = token_init(statement, keyword, tk_dot, start_index,
+                    keyword=".";
+                    start_index = current_index;
+                }
+                else {
+                    if (keyword=="."){
+                        token = token_init(statement, "..", tk_double_dot, start_index,
                                        current_index, line);
+                    }
+                    else {
+                        token = token_init(
+                            statement, keyword,
+                            token_type(keyword, next(current_index - 1, src)),
+                            start_index, current_index - 1, line);
+                        tokens.emplace_back(token);
+                        token = Token();
+                        keyword = item;
+                        start_index = current_index - 1;
+                        token = token_init(statement, keyword, tk_dot, start_index,
+                                        current_index, line);
+                    }
                 }
             }
         } else if (item == ")") {

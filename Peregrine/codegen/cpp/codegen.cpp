@@ -403,10 +403,10 @@ bool Codegen::visit(const ast::NoneLiteral& node) {
     return true;
 }
 bool Codegen::visit(const ast::AssertStatement& node){
-    write("if(not ");
+    write("if(! ");
     node.condition()->accept(*this);
     write("){\n");
-    write("printf(\"AssertionError : in line "+std::to_string(node.token().line)+"\\n   "+node.token().statement+"\");throw AssertionError;");
+    write("printf(\"AssertionError : in line "+std::to_string(node.token().line)+"\\n   "+node.token().statement+"\\n\");throw AssertionError;fflush(stdout);");
     write("\n}");
     return true;
 }
