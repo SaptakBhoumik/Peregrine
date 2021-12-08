@@ -610,6 +610,23 @@ std::string AssertStatement::stringify() const {
     return res;
 }
 
+RaiseStatement::RaiseStatement(Token tok, AstNodePtr value) {
+    m_token = tok;
+    m_value = value;
+}
+
+AstNodePtr RaiseStatement::value() const { return m_value; }
+
+Token RaiseStatement::token() const { return m_token; }
+
+AstKind RaiseStatement::type() const { return KAstRaiseStmt; }
+
+std::string RaiseStatement::stringify() const {
+    std::string res = "raise ";
+    res+=m_value->stringify();
+    return res;
+}
+
 
 WhileStatement::WhileStatement(Token tok, AstNodePtr condition,
                                AstNodePtr body) {

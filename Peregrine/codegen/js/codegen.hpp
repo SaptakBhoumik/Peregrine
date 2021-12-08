@@ -16,12 +16,13 @@ typedef std::shared_ptr<SymbolTable<ast::AstNodePtr>> EnvPtr;
 
 class Codegen : public ast::AstVisitor {
   public:
-    Codegen(std::string outputFilename, ast::AstNodePtr ast,bool html);
+    Codegen(std::string outputFilename, ast::AstNodePtr ast,bool html,std::string filename);
 
     EnvPtr createEnv(EnvPtr parent = nullptr);
 
   private:
     std::ofstream m_file;
+    std::string m_filename;
     bool is_func_def;
     void write(std::string_view code);
     std::string mangleName(ast::AstNodePtr astNode);
@@ -69,6 +70,7 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::StringLiteral& node);
     bool visit(const ast::BoolLiteral& node);
     bool visit(const ast::NoneLiteral& node);
+    bool visit(const ast::RaiseStatement& node);
 
     EnvPtr m_env;
 };

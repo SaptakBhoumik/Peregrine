@@ -169,7 +169,11 @@ AstNodePtr Parser::parseStatement() {
             advanceOnNewLine();
             break;
         }
-
+        case tk_raise:{
+            stmt = parseRaise();
+            advanceOnNewLine();
+            break;
+        }
         case tk_pass: {
             stmt = std::make_shared<PassStatement>(m_currentToken);
             advanceOnNewLine();
@@ -866,4 +870,10 @@ AstNodePtr Parser::parseAssert(){
     advance();
     auto condition = parseExpression(precedenceMap[m_currentToken.tkType]);
     return std::make_shared<AssertStatement>(tok,condition);
+}
+AstNodePtr Parser::parseRaise(){
+    auto tok=m_currentToken;
+    advance();
+    AstNodePtr value = parseExpression(precedenceMap[m_currentToken.tkType]);
+    return std::make_shared<RaiseStatement>(tok,value);
 }

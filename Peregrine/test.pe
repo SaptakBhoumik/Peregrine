@@ -54,3 +54,4 @@ def test(int a, str b) -> int:
     return b
 assert 5==8
 assert 5==5
+raise ZeroDivisionError

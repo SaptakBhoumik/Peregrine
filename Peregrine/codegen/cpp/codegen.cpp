@@ -12,9 +12,10 @@
 
 namespace cpp {
 
-Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast) {
+Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast,std::string filename) {
+    m_filename=filename;
     m_file.open(outputFilename);
-    m_file << "#include <cstdio>\n#include <functional>\nenum{AssertionError};\n";
+    m_file << "#include <cstdio>\n#include <functional>\nenum{AssertionError,ZeroDivisionError};\n";
     m_env = createEnv();
     ast->accept(*this);
     m_file.close();
@@ -406,8 +407,13 @@ bool Codegen::visit(const ast::AssertStatement& node){
     write("if(! ");
     node.condition()->accept(*this);
     write("){\n");
-    write("printf(\"AssertionError : in line "+std::to_string(node.token().line)+"\\n   "+node.token().statement+"\\n\");throw AssertionError;fflush(stdout);");
+    write("printf(\"AssertionError : in line "+std::to_string(node.token().line)+" in file "+m_filename+"\\n   "+node.token().statement+"\\n\");fflush(stdout);throw AssertionError;");
     write("\n}");
+    return true;
+}
+bool Codegen::visit(const ast::RaiseStatement& node){
+    write("throw ");
+    node.value()->accept(*this);
     return true;
 }
 } // namespace cpp

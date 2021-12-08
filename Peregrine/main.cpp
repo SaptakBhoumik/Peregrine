@@ -31,7 +31,6 @@ int main(int argc, char** argv) {
 
         TypeChecker typeChecker(program);
         
-        cpp::Codegen codegen("temp.cc", program);
     }
     else{
         std::ifstream file(argv[2]);
@@ -46,20 +45,21 @@ int main(int argc, char** argv) {
 
         // TypeChecker typeChecker;
         // typeChecker.check(program);
+        std::string filename=argv[2];
         if (argc>3){
             if (strcmp(argv[3],"-js")==0){
-                js::Codegen codegen("index.js", program,false);
+                js::Codegen codegen("index.js", program,false,filename);
             }
             else if (strcmp(argv[3],"-html")==0){//embeds js in html
-                js::Codegen codegen("index.html", program,true);
+                js::Codegen codegen("index.html", program,true,filename);
             }
             else{
-               cpp::Codegen codegen("temp.cc", program);
+               cpp::Codegen codegen("temp.cc", program,filename);
                system("g++ temp.cc");  
             }
         }
         else{
-           cpp::Codegen codegen("temp.cc", program);
+           cpp::Codegen codegen("temp.cc", program,filename);
            system("g++ temp.cc"); 
         }
     }

@@ -1,5 +1,10 @@
 type a = def(int)->int
-
+def divide(int num1,int num2)->int:
+    match num2:
+        case 0:
+            raise ZeroDivisionError
+        case _:
+            return num1/num2
 def test(int x)->int:#this is comment
     return x
 def lambda_test(a x):
@@ -48,3 +53,6 @@ def main():
     assert 8==8
     #should throw an error
     #assert 8==6
+    printf("%d\n",divide(6,2))
+    #should terminate the program
+    #printf("%d",divide(6,0))
