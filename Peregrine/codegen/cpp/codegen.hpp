@@ -6,6 +6,7 @@
 #include "utils/symbolTable.hpp"
 
 #include <fstream>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -21,10 +22,12 @@ class Codegen : public ast::AstVisitor {
     EnvPtr createEnv(EnvPtr parent = nullptr);
 
   private:
+    std::string res;
+    bool save;
     std::string m_filename;
     std::ofstream m_file;
     bool is_func_def;
-    void write(std::string_view code);
+    std::string write(std::string_view code);
     std::string mangleName(ast::AstNodePtr astNode);
 
     std::string searchDefaultModule(std::string path, std::string moduleName);
@@ -32,7 +35,7 @@ class Codegen : public ast::AstVisitor {
 
     void matchArg(std::vector<ast::AstNodePtr> matchItem,
                   std::vector<ast::AstNodePtr> caseItem);
-
+    std::string wrap(ast::AstNodePtr item,std::string contains);
     bool visit(const ast::Program& node);
     bool visit(const ast::BlockStatement& node);
     bool visit(const ast::ImportStatement& node);

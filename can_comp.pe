@@ -1,10 +1,18 @@
 type a = def(int)->int
+type g = def()
 def divide(int num1,int num2)->int:
     match num2:
         case 0:
             raise ZeroDivisionError
         case _:
             return num1/num2
+def decorator(a func)->g:
+    def value():
+        printf("Hello world from decorator\n")
+    return value
+@decorator
+def dec_test(int x)->int:
+    return x*x
 def test(int x)->int:#this is comment
     return x
 def lambda_test(a x):
@@ -12,6 +20,7 @@ def lambda_test(a x):
 def func(int g)->int:
     return g
 def main():
+    dec_test()
     def z():
         printf("hello\n")
     z()
