@@ -295,7 +295,7 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
         write("=");
         x+=res;
         res="";
-        if(is_func){
+        if(is_func_def){
             write("[=](");
         }
         else{
