@@ -1,5 +1,5 @@
 type a = def(int)->int
-type g = def()
+type g = def(int)
 def divide(int num1,int num2)->int:
     match num2:
         case 0:
@@ -7,11 +7,13 @@ def divide(int num1,int num2)->int:
         case _:
             return num1/num2
 def decorator(a func)->g:
-    def value():
-        printf("Hello world from decorator\n")
+    def value(int c):
+        printf("Answer is %d\n",func(c))
     return value
+int ggggggg=9
 @decorator
 def dec_test(int x)->int:
+    printf("%d\n",ggggggg)
     return x*x
 def test(int x)->int:#this is comment
     return x
@@ -20,7 +22,7 @@ def lambda_test(a x):
 def func(int g)->int:
     return g
 def main():
-    dec_test()
+    dec_test(4)
     def z():
         printf("hello\n")
     z()

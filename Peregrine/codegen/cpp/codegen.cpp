@@ -115,10 +115,9 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
         is_func_def=false;
     }
     else{
-        //TODO:Cant capture value at global scope
         write("auto ");
         node.name()->accept(*this);
-        write("=[](");
+        write("=[=](");
         codegenFuncParams(node.parameters());
         write(")->");
         node.returnType()->accept(*this);
@@ -296,7 +295,12 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
         write("=");
         x+=res;
         res="";
-        write("[](");
+        if(is_func){
+            write("[=](");
+        }
+        else{
+            write("[](");
+        }
         codegenFuncParams(function->parameters());
         write(")->");
         function->returnType()->accept(*this);
