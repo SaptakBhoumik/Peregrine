@@ -119,9 +119,9 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
         node.name()->accept(*this);
         write("=[=](");
         codegenFuncParams(node.parameters());
-        write(")->");
+        write(")mutable->");
         node.returnType()->accept(*this);
-        write("{\n");
+        write(" {\n");
         node.body()->accept(*this);
         write("\n}");
     }
@@ -302,7 +302,7 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
             write("[](");
         }
         codegenFuncParams(function->parameters());
-        write(")->");
+        write(")mutable->");
         function->returnType()->accept(*this);
         write("{\n");
         function->body()->accept(*this);

@@ -7,12 +7,16 @@ def divide(int num1,int num2)->int:
         case _:
             return num1/num2
 def decorator(a func)->g:
+    int h=9
     def value(int c):
+        h=8
+        printf("%d\n",h)
         printf("Answer is %d\n",func(c))
     return value
 int ggggggg=9
 @decorator
 def dec_test(int x)->int:
+    ggggggg=7#mutability test
     printf("%d\n",ggggggg)
     return x*x
 def test(int x)->int:#this is comment
@@ -23,9 +27,10 @@ def func(int g)->int:
     return g
 def main():
     dec_test(4)
-    def z():
+    def z()->int:
         printf("hello\n")
-    z()
+        return 5
+    printf("value of z() is %d\n",z())
     Cppcode(#ifdef _WIN32)
     printf("On windows\n")
     Cppcode(#elif __linux__)
