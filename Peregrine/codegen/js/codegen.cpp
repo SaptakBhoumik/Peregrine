@@ -12,8 +12,8 @@
 
 namespace js {
 
-Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast,bool html,std::string  filename) {
-    m_filename=filename;
+Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast, bool html, std::string  filename) {
+    m_filename = filename;
     m_file.open(outputFilename);
     if (html){
         m_file<<"<!DOCTYPE html><html><body><script>";
@@ -91,7 +91,7 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
         std::dynamic_pointer_cast<ast::IdentifierExpression>(node.name())
             ->value();
     if (not is_func_def){
-        is_func_def=true;
+        is_func_def = true;
         if (functionName == "main") {
             // we want the main function to always return 0 if success
             write("function main (");
