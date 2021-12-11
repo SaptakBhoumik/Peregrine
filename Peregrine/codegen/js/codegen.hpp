@@ -21,15 +21,17 @@ class Codegen : public ast::AstVisitor {
     EnvPtr createEnv(EnvPtr parent = nullptr);
 
   private:
-    std::ofstream m_file;
+    std::string res;
+    bool save=false;
     std::string m_filename;
-    bool is_func_def;
-    void write(std::string_view code);
+    std::ofstream m_file;
+    bool is_func_def=false;
+    std::string write(std::string_view code);
     std::string mangleName(ast::AstNodePtr astNode);
 
     std::string searchDefaultModule(std::string path, std::string moduleName);
     void codegenFuncParams(std::vector<ast::parameter> parameters);
-
+    std::string wrap(ast::AstNodePtr item,std::string contains);
     void matchArg(std::vector<ast::AstNodePtr> matchItem,
                   std::vector<ast::AstNodePtr> caseItem);
 

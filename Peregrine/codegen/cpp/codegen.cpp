@@ -287,7 +287,12 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
     auto body = node.body();
     std::string contains;
     std::string x;
+    std::string prev;
     save=true;
+    if (res!=""){
+        prev=res;
+        res="";
+    }
     if(body->type()==ast::KAstFunctionDef){
         auto function = std::dynamic_pointer_cast<ast::FunctionDefinition>(body);
         write("auto ");
@@ -305,7 +310,14 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
         write(")mutable->");
         function->returnType()->accept(*this);
         write("{\n");
-        function->body()->accept(*this);
+        if(not is_func_def){
+            is_func_def=true;
+            function->body()->accept(*this);
+            is_func_def=false;
+        }
+        else{
+            function->body()->accept(*this);
+        }
         write("\n}");
         contains=res;
         res="";
@@ -314,8 +326,13 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
         ast::AstNodePtr item=items[i];
         contains=wrap(item,contains);
     }
-    save=false;
-    write(x+contains);
+    if (prev==""){
+        save=false;
+        write(x+contains);
+    }
+    else{
+        write(prev+x+contains);
+    }
     return true;
 }
 

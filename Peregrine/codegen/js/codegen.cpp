@@ -34,12 +34,15 @@ Codegen::createEnv(std::shared_ptr<SymbolTable<ast::AstNodePtr>> parent) {
 }
 
 // TODO: buffer it
-void Codegen::write(std::string_view code) { m_file << code; }
-
-std::string Codegen::mangleName(ast::AstNodePtr astNode) {
-    return std::string("");
+std::string Codegen::write(std::string_view code) {
+    if(save){
+        res+=code;
+    }
+    else{
+        m_file << code; 
+    }
+    return res;
 }
-
 std::string Codegen::searchDefaultModule(std::string path,
                                          std::string moduleName) {
     for (auto& entry : std::filesystem::directory_iterator(path)) {
@@ -272,8 +275,51 @@ bool Codegen::visit(const ast::BreakStatement& node) {
 bool Codegen::visit(const ast::DecoratorStatement& node) {
     auto items = node.decoratorItem();
     auto body = node.body();
+    std::string contains;
+    std::string x;
+    std::string prev;
+    save=true;
+    if (res!=""){
+        prev=res;
+        res="";
+    }
+    if(body->type()==ast::KAstFunctionDef){
+        auto function = std::dynamic_pointer_cast<ast::FunctionDefinition>(body);
+        write("let ");
+        function->name()->accept(*this);
+        write("=");
+        x+=res;
+        res="";
+        write("function(");
+        codegenFuncParams(function->parameters());
+        write(")");
+        write("{\n");
+        if(not is_func_def){
+            is_func_def=true;
+            function->body()->accept(*this);
+            is_func_def=false;
+        }
+        else{
+            function->body()->accept(*this);
+        }
+        write("\n}");
+        contains=res;
+        res="";
+    }
+    for (size_t i = items.size() - 1; i != (size_t)-1; i--){
+        ast::AstNodePtr item=items[i];
+        contains=wrap(item,contains);
+    }
+    if (prev==""){
+        save=false;
+        write(x+contains);
+    }
+    else{
+        write(prev+x+contains);
+    }
     return true;
 }
+
 
 bool Codegen::visit(const ast::ListLiteral& node) { 
     write("[");

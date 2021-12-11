@@ -23,10 +23,10 @@ class Codegen : public ast::AstVisitor {
 
   private:
     std::string res;
-    bool save;
+    bool save=false;
     std::string m_filename;
     std::ofstream m_file;
-    bool is_func_def;
+    bool is_func_def=false;
     std::string write(std::string_view code);
     std::string mangleName(ast::AstNodePtr astNode);
 

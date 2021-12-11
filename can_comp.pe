@@ -18,6 +18,17 @@ int ggggggg=9
 def dec_test(int x)->int:
     ggggggg=7#mutability test
     printf("%d\n",ggggggg)
+    @decorator
+    def nested_test(int x)->int:
+        ggggggg=7#mutability test
+        printf("%d\n",ggggggg)
+        def nested_test2(int x)->int:
+            ggggggg=7#mutability test
+            printf("%d\n",ggggggg)
+            return x*x
+        nested_test2(7)
+        return x*x
+    nested_test(7)
     return x*x
 def test(int x)->int:#this is comment
     return x

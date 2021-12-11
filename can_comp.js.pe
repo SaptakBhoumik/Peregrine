@@ -1,4 +1,5 @@
 type a = def(int)->int
+type g = def(int)
 
 def divide(int num1,int num2)->int:
     match num2:
@@ -6,7 +7,30 @@ def divide(int num1,int num2)->int:
             raise ZeroDivisionError
         case _:
             return num1/num2
-
+def decorator(a func)->g:
+    int h=9
+    def value(int c):
+        h=8
+        printf("%d",h)
+        printf("Answer is %d",func(c))
+    return value
+int ggggggg=9
+@decorator
+def dec_test(int x)->int:
+    ggggggg=7#mutability test
+    printf("%d",ggggggg)
+    @decorator
+    def nested_test(int x)->int:
+        ggggggg=7#mutability test
+        printf("%d",ggggggg)
+        def nested_test2(int x)->int:
+            ggggggg=7#mutability test
+            printf("%d",ggggggg)
+            return x*x
+        nested_test2(7)
+        return x*x
+    nested_test(7)
+    return x*x
 def test(int x)->int:#this is comment
     return x
 def lambda_test(a x):
@@ -14,6 +38,7 @@ def lambda_test(a x):
 def func(int g)->int:
     return g
 def main():
+    dec_test(4)
     def z():
         printf("hello")
     z()
@@ -58,6 +83,6 @@ def main():
     assert 8==8
     #should throw an error
     #assert 8==6
-    printf("%d\n",divide(6,2))
+    printf("%d",divide(6,2))
     #should terminate the program
     #printf("%d",divide(6,0))
