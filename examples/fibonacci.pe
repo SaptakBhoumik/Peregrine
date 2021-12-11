@@ -1,6 +1,6 @@
 def fib(int n) -> int:
     match n:
-        case 0, 1:
+        case 0:
             return 1
         case _:
             return fib(n - 2) + fib(n - 1)
