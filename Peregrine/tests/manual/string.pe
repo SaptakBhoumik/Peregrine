@@ -1,10 +1,10 @@
 def main():
-    if "a"==NULL:
+    if "a" == NULL:
         print("Not ok")
-    if "a"!=NULL:
+    if "a" != NULL:
         print("Ok\n")
-    str a=NULL
-    if a!=NULL:
+    str a = NULL
+    if a != NULL:
         print("Not Ok\n")
-    if a==NULL:
+    if a == NULL:
         print("All ok")
