@@ -1,3 +1,6 @@
+union gg:
+    int hi
+    bool y
 b.n=8
 c.g().n  = 8
 c.g().n[9]  = 8

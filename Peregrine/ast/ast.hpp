@@ -47,7 +47,8 @@ enum AstKind {
     KAstTypeDefinition,
     KAstRaiseStmt,
     KAstDecorator,
-    KAstPassStatement
+    KAstPassStatement,
+    KAstUnion
 };
 
 class AstVisitor;
@@ -275,6 +276,26 @@ class DictLiteral : public AstNode {
                 std::vector<std::pair<AstNodePtr, AstNodePtr>> elements);
 
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elements() const;
+
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+class UnionLiteral : public AstNode {
+    Token m_token;
+    // first is the key, second is the value
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> m_elements;
+    AstNodePtr m_name;
+
+  public:
+    UnionLiteral(Token tok,
+                std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,AstNodePtr name);
+
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> elements() const;
+
+    AstNodePtr name() const;
 
     Token token() const;
     AstKind type() const;

@@ -121,7 +121,10 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseTypeDef();
             break;
         }
-
+        case tk_union:{
+            stmt = parseUnion();
+            break;
+        }
         // TODO: variables currently do not work with all the types, we need to
         // fix this
         case tk_identifier: {
@@ -812,4 +815,23 @@ AstNodePtr Parser::parseRaise(){
     advance();
     AstNodePtr value = parseExpression(precedenceMap[m_currentToken.tkType]);
     return std::make_shared<RaiseStatement>(tok,value);
+}
+
+AstNodePtr Parser::parseUnion(){
+    auto tok=m_currentToken;
+    advance();
+    AstNodePtr union_name = parseName();
+    expect(tk_colon);
+    expect(tk_ident);
+    advance();
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> elements;
+    while (m_currentToken.tkType!=tk_dedent){
+        AstNodePtr type=parseType();
+        advance();
+        AstNodePtr name=parseName();
+        advance();
+        elements.push_back(std::pair(type, name));
+        if (m_currentToken.tkType==tk_new_line){advance();}
+    }
+    return std::make_shared<UnionLiteral>(tok,elements,union_name);
 }

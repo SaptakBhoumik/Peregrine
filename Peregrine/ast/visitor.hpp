@@ -47,6 +47,7 @@ class AstVisitor {
     virtual bool visit(const StringLiteral& node) { return false; };
     virtual bool visit(const BoolLiteral& node) { return false; };
     virtual bool visit(const NoneLiteral& node) { return false; };
+    virtual bool visit(const UnionLiteral& node) { return false; };
 };
 
 } // namespace ast

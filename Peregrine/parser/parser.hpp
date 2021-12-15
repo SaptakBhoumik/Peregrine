@@ -92,6 +92,7 @@ class Parser {
     AstNodePtr parseFor();
     AstNodePtr parseFunctionDef();
     AstNodePtr parseReturn();
+    AstNodePtr parseUnion();
     AstNodePtr parseTypeDef();
 
   public:

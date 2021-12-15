@@ -67,6 +67,7 @@ enum TokenType {
     tk_static,    // static
     tk_scope,     // scope
     tk_union,     // union
+    tk_cast,     // cast
     tk_unknown,   // unknown type
     tk_assert,    // assert
     tk_try,       // try

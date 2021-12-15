@@ -187,6 +187,38 @@ std::string DictLiteral::stringify() const {
     return res;
 }
 
+UnionLiteral::UnionLiteral(
+    Token tok, std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,AstNodePtr name) {
+    m_token = tok;
+    m_name = name;
+    m_elements = elements;
+}
+
+std::vector<std::pair<AstNodePtr, AstNodePtr>> UnionLiteral::elements() const {
+    return m_elements;
+}
+
+Token UnionLiteral::token() const { return m_token; }
+
+AstNodePtr UnionLiteral::name() const { return m_name; }
+
+AstKind UnionLiteral::type() const { return KAstUnion; }
+
+std::string UnionLiteral::stringify() const {
+    std::string res = "union ";
+    res+=m_name->stringify()+":\n";
+    for (size_t i = 0; i < m_elements.size(); i++) {
+        if (i)
+            res += "\n";
+        res += m_elements[i].first->stringify();
+        res += " ";
+        res += m_elements[i].second->stringify();
+    }
+
+    return res;
+}
+
+
 BinaryOperation::BinaryOperation(Token tok, AstNodePtr left, Token op,
                                  AstNodePtr right) {
     m_token = tok;

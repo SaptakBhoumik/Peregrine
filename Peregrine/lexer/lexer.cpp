@@ -136,6 +136,8 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_match;
     } else if (item == "extern") {
         return tk_extern;
+    } else if (item == "cast") {
+        return tk_cast;
     } else if (item == "case") {
         return tk_case;
     } else if (item == "default") {
