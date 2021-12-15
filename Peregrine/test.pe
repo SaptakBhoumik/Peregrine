@@ -1,3 +1,5 @@
+b.n=8
+c.g i =8
 def test(int a) -> str:
     return "hey"
 
@@ -8,7 +10,6 @@ potato t = 2.0
 potato b = "hey"
 int a
 b + 34
-
 const test = "hello"
 
 def test() -> int:

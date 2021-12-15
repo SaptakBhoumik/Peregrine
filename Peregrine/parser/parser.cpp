@@ -9,42 +9,6 @@
 
 using namespace ast;
 
-std::map<TokenType, PrecedenceType> createMap() {
-    std::map<TokenType, PrecedenceType> precedenceMap;
-
-    precedenceMap[tk_negative] = pr_prefix;
-    precedenceMap[tk_bit_not] = pr_prefix;
-    precedenceMap[tk_and] = pr_and_or;
-    precedenceMap[tk_or] = pr_and_or;
-    precedenceMap[tk_not] = pr_not;
-    precedenceMap[tk_not_equal] = pr_compare;
-    precedenceMap[tk_is_not] = pr_compare;
-    precedenceMap[tk_is] = pr_compare;
-    precedenceMap[tk_not_in] = pr_compare;
-    precedenceMap[tk_in] = pr_compare;
-    precedenceMap[tk_greater] = pr_compare;
-    precedenceMap[tk_less] = pr_compare;
-    precedenceMap[tk_gr_or_equ] = pr_compare;
-    precedenceMap[tk_less_or_equ] = pr_compare;
-    precedenceMap[tk_equal] = pr_compare;
-    precedenceMap[tk_bit_or] = pr_bit_or;
-    precedenceMap[tk_xor] = pr_bit_xor;
-    precedenceMap[tk_bit_and] = pr_bit_and;
-    precedenceMap[tk_shift_left] = pr_bit_shift;
-    precedenceMap[tk_shift_right] = pr_bit_shift;
-    precedenceMap[tk_plus] = pr_sum_minus;
-    precedenceMap[tk_minus] = pr_sum_minus;
-    precedenceMap[tk_multiply] = pr_mul_div;
-    precedenceMap[tk_divide] = pr_mul_div;
-    precedenceMap[tk_modulo] = pr_mul_div;
-    precedenceMap[tk_floor] = pr_mul_div;
-    precedenceMap[tk_exponent] = pr_expo;
-    precedenceMap[tk_dot] = pr_dot_ref;
-    precedenceMap[tk_list_open] = pr_list_access;
-    precedenceMap[tk_l_paren] = pr_call;
-
-    return precedenceMap;
-}
 
 Parser::Parser(const std::vector<Token>& tokens) : m_tokens(tokens) {
     m_currentToken = tokens[0];
@@ -52,57 +16,6 @@ Parser::Parser(const std::vector<Token>& tokens) : m_tokens(tokens) {
 
 Parser::~Parser() {}
 
-void Parser::advance() {
-    m_tokIndex++;
-
-    if (m_tokIndex < m_tokens.size()) {
-        m_currentToken = m_tokens[m_tokIndex];
-    }
-}
-
-void Parser::advanceOnNewLine() {
-    if (next().tkType == tk_new_line) {
-        advance();
-    }
-}
-
-Token Parser::next() {
-    Token token;
-
-    if (m_tokIndex + 1 < m_tokens.size()) {
-        token = m_tokens[m_tokIndex + 1];
-    }
-
-    return token;
-}
-
-PrecedenceType Parser::nextPrecedence() {
-    if (precedenceMap.count(next().tkType) > 0) {
-        return precedenceMap[next().tkType];
-    }
-
-    return pr_lowest;
-}
-
-void Parser::error(Token tok, std::string_view msg) {
-    PEError err = {{tok.line, tok.start, m_filename, tok.statement},
-                   std::string(msg),
-                   "",
-                   "",
-                   ""};
-
-    m_errors.push_back(err);
-}
-
-void Parser::expect(TokenType expectedType) {
-    if (next().tkType != expectedType) {
-        error(next(), "expected token of type " + std::to_string(expectedType) +
-                          ", got " + std::to_string(next().tkType) +
-                          " instead");
-    }
-
-    advance();
-}
 
 AstNodePtr Parser::parse() {
     std::vector<AstNodePtr> statements;
@@ -212,12 +125,23 @@ AstNodePtr Parser::parseStatement() {
         // TODO: variables currently do not work with all the types, we need to
         // fix this
         case tk_identifier: {
-            if (next().tkType == tk_identifier || next().tkType == tk_assign) {
+            if ((next().tkType == tk_identifier || next().tkType == tk_assign) || (next().tkType==tk_dot && is_imported_type())) {
                 // variable
                 stmt = parseVariableStatement();
                 break;
             }
-
+            else if(next().tkType==tk_dot && is_imported_var()){
+                AstNodePtr left = parseName();
+                advance();
+                AstNodePtr name = parseDotExpression(left);
+                advance();
+                auto tok=m_currentToken;
+                advance();
+                AstNodePtr value=parseExpression();
+                AstNodePtr type=std::make_shared<NoLiteral>();
+                stmt=std::make_shared<VariableStatement>(tok, type, name, value);
+                break;
+            }
             // if it got here, it will go down the cases and match the default
             // case. DO NOT add another case below this one
         }
@@ -309,7 +233,9 @@ AstNodePtr Parser::parseVariableStatement() {
     Token tok = m_currentToken;
     AstNodePtr varType = std::make_shared<NoLiteral>();
 
-    if (next().tkType == tk_identifier) {
+    if (next().tkType == tk_identifier||
+        next().tkType == tk_dot//it is not a var because we have checked it before
+        ) {
         varType = parseType();
         advance();
     }
@@ -722,17 +648,22 @@ AstNodePtr Parser::parseType() {
     switch (m_currentToken.tkType) {
         case tk_def:
             return parseFuncType();
-
+        /* TODO: Change in syntax
         case tk_dict:
-            return parseDictType();
+            return parseDictType();//treate this as generic
 
         case tk_list_open:
             return parseListType();
-
-        case tk_identifier:
+        */
+        case tk_identifier:{
+            if (next().tkType==tk_dot){
+                AstNodePtr left=parseName();
+                advance();
+                return parseDotExpression(left);
+            }
             return std::make_shared<TypeExpression>(m_currentToken,
                                                     m_currentToken.keyword);
-
+        }
         default: {
             error(m_currentToken, m_currentToken.keyword + " is not a type");
         }

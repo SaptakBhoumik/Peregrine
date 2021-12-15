@@ -42,6 +42,8 @@ class Parser {
 
     std::map<TokenType, PrecedenceType> precedenceMap = createMap();
 
+    bool is_imported_var();
+    bool is_imported_type();
     void advance();
     void advanceOnNewLine();
     void expect(TokenType expectedType);

@@ -166,10 +166,10 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_in;
     } else if (item == "Cppcode") {
         return tk_cppcode;
-    } else if (item == "himport") {
-        return tk_himport;
-    } else if (item == "cppimport") {
-        return tk_cppimport;
+    } else if (item == "inline") {
+        return tk_inline;
+    } else if (item == "virtual") {
+        return tk_virtual;
     } else if (item == "class") {
         return tk_class;
     } else if (item == "flags") {

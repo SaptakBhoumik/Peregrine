@@ -5,6 +5,7 @@ lexer_src = [
 
 parser_src = [
     'parser/parser.cpp',
+    'parser/utils.cpp',
     'parser/literals.cpp'
 ]
 
