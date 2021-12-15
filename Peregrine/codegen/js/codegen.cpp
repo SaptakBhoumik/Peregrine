@@ -16,7 +16,7 @@ Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast, bool html, std
     m_filename = filename;
     m_file.open(outputFilename);
     if (html){
-        m_file<<"<!DOCTYPE html><html><body><script>";
+        m_file<<"<!DOCTYPE html><html><body id='body'><script>";
     }
     m_file << "function render(code){document.write(code);}AssertionError=0;ZeroDivisionError=1\n";
     m_env = createEnv();
