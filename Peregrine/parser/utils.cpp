@@ -1,40 +1,44 @@
 #include "parser.hpp"
-bool Parser::is_imported_var(){
-    auto index=m_tokIndex;
+bool Parser::is_imported_var() {
+    auto index = m_tokIndex;
     auto tokens = m_tokens;
-    size_t brac_count=0;
-    size_t list_brac_count=0;
+    size_t brac_count = 0;
+    size_t list_brac_count = 0;
     Token curr_tok;
     Token prev_tok;
-    while (true){
-        curr_tok=tokens[index];
-        if (curr_tok.tkType==tk_identifier){
-            if (prev_tok.tkType==tk_identifier){return false;}//it is the type
+    while (true) {
+        curr_tok = tokens[index];
+        if (curr_tok.tkType == tk_identifier) {
+            if (prev_tok.tkType == tk_identifier) {
+                return false;//it is the type
+            }
         }
-        else if (curr_tok.tkType==tk_dot){}
-        else if (curr_tok.tkType==tk_l_paren){brac_count++;}
-        else if (curr_tok.tkType==tk_r_paren){brac_count--;}
-        else if (curr_tok.tkType==tk_list_open){list_brac_count++;}
-        else if (curr_tok.tkType==tk_list_close){list_brac_count--;}
-        else if(curr_tok.tkType==tk_assign){return true;}
-        else if (brac_count==0){return false;}
-        prev_tok=curr_tok;
+        else if (curr_tok.tkType == tk_dot) {}
+        else if (curr_tok.tkType == tk_l_paren) {brac_count++;}
+        else if (curr_tok.tkType == tk_r_paren) {brac_count--;}
+        else if (curr_tok.tkType == tk_list_open) {list_brac_count++;}
+        else if (curr_tok.tkType == tk_list_close) {list_brac_count--;}
+        else if (curr_tok.tkType == tk_assign) {return true;}
+        else if (brac_count == 0) {return false;}
+        prev_tok = curr_tok;
         index++;
     }
 }
-bool Parser::is_imported_type(){
-    auto index=m_tokIndex;
+bool Parser::is_imported_type() {
+    auto index = m_tokIndex;
     auto tokens = m_tokens;
     Token curr_tok;
     Token prev_tok;
-    while (true){
-        curr_tok=tokens[index];
-        if (curr_tok.tkType==tk_identifier){
-            if (prev_tok.tkType==tk_identifier){return true;}//it is the type
+    while (true) {
+        curr_tok = tokens[index];
+        if (curr_tok.tkType == tk_identifier) {
+            if (prev_tok.tkType == tk_identifier) {
+                return true;//it is the type
+            }
         }
-        else if (curr_tok.tkType==tk_dot){}
+        else if (curr_tok.tkType == tk_dot) {}
         else {return false;}
-        prev_tok=curr_tok;
+        prev_tok = curr_tok;
         index++;
     }
 }
