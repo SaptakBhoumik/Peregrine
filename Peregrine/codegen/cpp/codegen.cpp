@@ -472,4 +472,16 @@ bool Codegen::visit(const ast::RaiseStatement& node){
     node.value()->accept(*this);
     return true;
 }
+bool Codegen::visit(const ast::UnionLiteral& node){
+    write("typedef union{\n");
+    for (auto& element:node.elements()){
+        element.first->accept(*this);
+        write(" ");
+        element.second->accept(*this);
+        write(";\n");
+    }
+    write("\n}");
+    node.name()->accept(*this);
+    return true;
+}
 } // namespace cpp

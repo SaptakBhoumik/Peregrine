@@ -74,6 +74,7 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::BoolLiteral& node);
     bool visit(const ast::NoneLiteral& node);
     bool visit(const ast::RaiseStatement& node);
+    bool visit(const ast::UnionLiteral& node);
 
     EnvPtr m_env;
 };

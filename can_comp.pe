@@ -1,5 +1,8 @@
 type a = def(int)->int
 type g = def(int)
+union name:
+    int item1
+    float item2
 def divide(int num1,int num2)->int:
     match num2:
         case 0:
@@ -78,6 +81,11 @@ def main():
             printf("\nHello\n")
     lambda_test(func)
     assert 8==8
+    name var1
+    var1.item1=8
+    printf("item1 of var1 is %d\n",var1.item1)
+    var1.item2=6.8
+    printf("item2 of var1 is %f\n",var1.item2)
     #should throw an error
     #assert 8==6
     printf("%d\n",divide(6,2))
