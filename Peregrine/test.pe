@@ -1,4 +1,6 @@
 b.n=8
+c.g().n  = 8
+c.g().n[9]  = 8
 c.g i =8
 def test(int a) -> str:
     return "hey"

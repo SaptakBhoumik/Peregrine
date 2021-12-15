@@ -135,11 +135,16 @@ AstNodePtr Parser::parseStatement() {
                 advance();
                 AstNodePtr name = parseDotExpression(left);
                 advance();
-                auto tok=m_currentToken;
-                advance();
-                AstNodePtr value=parseExpression();
-                AstNodePtr type=std::make_shared<NoLiteral>();
-                stmt=std::make_shared<VariableStatement>(tok, type, name, value);
+                if (m_currentToken.tkType==tk_list_open){
+                    stmt = parseListOrDictAccess(name);
+                }
+                else{
+                    auto tok=m_currentToken;
+                    advance();
+                    AstNodePtr value=parseExpression();
+                    AstNodePtr type=std::make_shared<NoLiteral>();
+                    stmt=std::make_shared<VariableStatement>(tok, type, name, value);
+                }
                 break;
             }
             // if it got here, it will go down the cases and match the default
