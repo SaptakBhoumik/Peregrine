@@ -1,3 +1,5 @@
+"Multiline comment
+Hello"
 static inline def static_inline_func():
     printf("Hello from static inline function\n")
 inline def inline_func():

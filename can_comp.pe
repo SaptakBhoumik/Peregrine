@@ -1,3 +1,7 @@
+"Multiline comment
+Hello"
+"Another Multiline comment
+Hello"
 type a = def(int)->int
 type g = def(int)
 static int var_static = 8

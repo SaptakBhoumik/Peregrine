@@ -39,6 +39,13 @@ AstNodePtr Parser::parseStatement() {
     AstNodePtr stmt;
 
     switch (m_currentToken.tkType) {
+        case tk_string:{
+            while(m_currentToken.tkType==tk_string||m_currentToken.tkType==tk_new_line){
+                advance();
+            }
+            stmt=parseStatement();
+            break;
+        }
         case tk_static:{
             stmt = parseStatic();
             break;
