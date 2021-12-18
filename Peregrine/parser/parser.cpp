@@ -43,6 +43,10 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseStatic();
             break;
         }
+        case tk_inline:{
+            stmt = parseInline();
+            break;
+        }
         case tk_const: {
             stmt = parseConstDeclaration();
             break;
@@ -805,6 +809,9 @@ AstNodePtr Parser::parseDecoratorCall(){
     if(m_currentToken.tkType==tk_def){
         body=parseFunctionDef();
     }
+    else if (m_currentToken.tkType==tk_static){
+        body=parseStatic();
+    }
     return std::make_shared<DecoratorStatement>(tok, decorators,body);
 }
 
@@ -848,6 +855,10 @@ AstNodePtr Parser::parseStatic(){
             body=parseFunctionDef();
             break;
         }
+        case tk_inline:{
+            body=parseInline();
+            break;
+        }
         case tk_identifier:{
             if (next().tkType==tk_identifier || next().tkType==tk_assign || is_imported_type()){
                 body=parseVariableStatement();
@@ -861,4 +872,12 @@ AstNodePtr Parser::parseStatic(){
         }
     }
     return std::make_shared<StaticStatement>(tok,body);
+}
+
+AstNodePtr Parser::parseInline(){
+    auto tok = m_currentToken;
+    expect(tk_def);
+    AstNodePtr body;
+    body=parseFunctionDef();
+    return std::make_shared<InlineStatement>(tok,body);
 }

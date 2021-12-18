@@ -47,6 +47,7 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::IfStatement& node);
     bool visit(const ast::AssertStatement& node);
     bool visit(const ast::StaticStatement& node);
+    bool visit(const ast::InlineStatement& node);
     bool visit(const ast::WhileStatement& node);
     bool visit(const ast::ForStatement& node);
     bool visit(const ast::MatchStatement& node);

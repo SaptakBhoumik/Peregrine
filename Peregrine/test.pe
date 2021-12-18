@@ -1,3 +1,10 @@
+static inline def static_inline_func():
+    printf("Hello from static inline function\n")
+inline def inline_func():
+    printf("Hello from inline function\n")
+@x
+def static_test(int a, str b) -> int:
+    return b
 static def staticfunc():
     printf("Hello from static function")
 static v.b x=0

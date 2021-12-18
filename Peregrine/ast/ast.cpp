@@ -659,6 +659,24 @@ std::string StaticStatement::stringify() const {
     return res;
 }
 
+InlineStatement::InlineStatement(Token tok, AstNodePtr body) {
+    m_token = tok;
+    m_body = body;
+}
+
+AstNodePtr InlineStatement::body() const { return m_body; }
+
+Token InlineStatement::token() const { return m_token; }
+
+AstKind InlineStatement::type() const { return KAstInline; }
+
+std::string InlineStatement::stringify() const {
+    std::string res = "inline ";
+    res+=m_body->stringify();
+    return res;
+}
+
+
 RaiseStatement::RaiseStatement(Token tok, AstNodePtr value) {
     m_token = tok;
     m_value = value;

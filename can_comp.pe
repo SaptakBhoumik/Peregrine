@@ -37,15 +37,39 @@ def dec_test(int x)->int:
         return x*x
     nested_test(7)
     return x*x
+@decorator
+static def static_dec_test(int x)->int:
+    printf("Static decorator\n")
+    ggggggg=7#mutability test
+    printf("%d\n",ggggggg)
+    @decorator
+    def nested_test(int x)->int:
+        ggggggg=7#mutability test
+        printf("%d\n",ggggggg)
+        def nested_test2(int x)->int:
+            ggggggg=7#mutability test
+            printf("%d\n",ggggggg)
+            return x*x
+        nested_test2(7)
+        return x*x
+    nested_test(7)
+    return x*x
 def test(int x)->int:#this is comment
     return x
 def lambda_test(a x):
     printf("The value is %d\n",x(5))
 def func(int g)->int:
     return g
+static inline def static_inline_func():
+    printf("Hello from static inline function\n")
+inline def inline_func():
+    printf("Hello from inline function\n")
 def main():
+    static_inline_func()
+    inline_func()
     staticfunc()
     dec_test(4)
+    static_dec_test(4)
     def z()->int:
         printf("hello\n")
         return 5

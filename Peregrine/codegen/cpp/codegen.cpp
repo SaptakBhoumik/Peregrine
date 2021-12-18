@@ -293,8 +293,17 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
         prev=res;
         res="";
     }
-    if(body->type()==ast::KAstFunctionDef){
-        auto function = std::dynamic_pointer_cast<ast::FunctionDefinition>(body);
+    if(body->type()==ast::KAstFunctionDef || body->type()==ast::KAstStatic){
+        std::shared_ptr<ast::FunctionDefinition> function;
+        if (body->type()==ast::KAstStatic){
+            write("static ");
+            function = std::dynamic_pointer_cast<ast::FunctionDefinition>(
+                        std::dynamic_pointer_cast<ast::StaticStatement>(body)->body()
+                        );
+        }
+        else{
+            function = std::dynamic_pointer_cast<ast::FunctionDefinition>(body);
+        }
         write("auto ");
         function->name()->accept(*this);
         write("=");
@@ -469,6 +478,11 @@ bool Codegen::visit(const ast::AssertStatement& node){
 }
 bool Codegen::visit(const ast::StaticStatement& node){
     write("static ");
+    node.body()->accept(*this);
+    return true;
+}
+bool Codegen::visit(const ast::InlineStatement& node){
+    write("inline ");
     node.body()->accept(*this);
     return true;
 }
