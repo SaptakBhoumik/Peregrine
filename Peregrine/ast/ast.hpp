@@ -48,7 +48,8 @@ enum AstKind {
     KAstRaiseStmt,
     KAstDecorator,
     KAstPassStatement,
-    KAstUnion
+    KAstUnion,
+    KAstStatic
 };
 
 class AstVisitor;
@@ -545,6 +546,18 @@ class AssertStatement : public AstNode {
   public:
     AssertStatement(Token tok, AstNodePtr condition);
     AstNodePtr condition() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+class StaticStatement : public AstNode {
+    Token m_token;
+    AstNodePtr m_body;
+  public:
+    StaticStatement(Token tok, AstNodePtr body);
+    AstNodePtr body() const;
     Token token() const;
     AstKind type() const;
     std::string stringify() const;

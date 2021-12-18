@@ -82,6 +82,7 @@ class Parser {
     AstNodePtr parseBlockStatement();
     AstNodePtr parseImport();
     AstNodePtr parseRaise();
+    AstNodePtr parseStatic();
     AstNodePtr parseVariableStatement();
     AstNodePtr parseConstDeclaration();
     AstNodePtr parseIf();

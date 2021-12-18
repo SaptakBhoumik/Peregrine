@@ -642,6 +642,23 @@ std::string AssertStatement::stringify() const {
     return res;
 }
 
+StaticStatement::StaticStatement(Token tok, AstNodePtr body) {
+    m_token = tok;
+    m_body = body;
+}
+
+AstNodePtr StaticStatement::body() const { return m_body; }
+
+Token StaticStatement::token() const { return m_token; }
+
+AstKind StaticStatement::type() const { return KAstStatic; }
+
+std::string StaticStatement::stringify() const {
+    std::string res = "static ";
+    res+=m_body->stringify();
+    return res;
+}
+
 RaiseStatement::RaiseStatement(Token tok, AstNodePtr value) {
     m_token = tok;
     m_value = value;

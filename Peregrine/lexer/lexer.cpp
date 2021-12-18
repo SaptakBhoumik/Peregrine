@@ -1010,6 +1010,7 @@ LEXEME lexer(std::string src, std::string filename) {
                        token_type(keyword, next(current_index - 1, src)),
                        start_index, current_index, line));
     }
+    bool error=false;
     if (is_string == true || is_cpp_string == true) {
         std::string temp = "Expecting a " + string_starter;
         display(PEError({.loc = Location({.line = line,
@@ -1019,7 +1020,7 @@ LEXEME lexer(std::string src, std::string filename) {
                          .msg = "Unexpected end of file",
                          .submsg = temp,
                          .ecode = "e1"}));
-        exit(1);
+        error=true;
     }
     if (is_dictionary == true) {
         std::string temp = "Expecting a }";
@@ -1030,7 +1031,7 @@ LEXEME lexer(std::string src, std::string filename) {
                          .msg = "Unexpected end of file",
                          .submsg = temp,
                          .ecode = "e1"}));
-        exit(1);
+        error=true;
     }
     if (is_array == true) {
         std::string temp = "Expecting a ]";
@@ -1041,7 +1042,7 @@ LEXEME lexer(std::string src, std::string filename) {
                          .msg = "Unexpected end of file",
                          .submsg = temp,
                          .ecode = "e1"}));
-        exit(1);
+        error=true;
     }
     if (is_cpp == true) {
         std::string temp = "Expecting a )";
@@ -1052,7 +1053,7 @@ LEXEME lexer(std::string src, std::string filename) {
                          .msg = "Unexpected end of file",
                          .submsg = temp,
                          .ecode = "e1"}));
-        exit(1);
+        error=true;
     } else if (first_bracket_count != 0) {
         std::string temp = "Expecting a )";
         display(PEError({.loc = Location({.line = line,
@@ -1062,8 +1063,9 @@ LEXEME lexer(std::string src, std::string filename) {
                          .msg = "Unexpected end of file",
                          .submsg = temp,
                          .ecode = "e1"}));
-        exit(1);
+        error=true;
     }
+    if (error){exit(1);}
     if (tokens.size() > 0) {
         uint64_t total_tab = 0;
         for (auto tok : tokens) {

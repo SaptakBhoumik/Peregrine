@@ -39,6 +39,10 @@ AstNodePtr Parser::parseStatement() {
     AstNodePtr stmt;
 
     switch (m_currentToken.tkType) {
+        case tk_static:{
+            stmt = parseStatic();
+            break;
+        }
         case tk_const: {
             stmt = parseConstDeclaration();
             break;
@@ -65,7 +69,7 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseFor();
             break;
         }
-
+        
         case tk_from:
         case tk_import: {
             stmt = parseImport();
@@ -834,4 +838,27 @@ AstNodePtr Parser::parseUnion(){
         if (m_currentToken.tkType==tk_new_line){advance();}
     }
     return std::make_shared<UnionLiteral>(tok,elements,union_name);
+}
+AstNodePtr Parser::parseStatic(){
+    auto tok = m_currentToken;
+    advance();
+    AstNodePtr body;
+    switch (m_currentToken.tkType){
+        case tk_def:{
+            body=parseFunctionDef();
+            break;
+        }
+        case tk_identifier:{
+            if (next().tkType==tk_identifier || next().tkType==tk_assign || is_imported_type()){
+                body=parseVariableStatement();
+                break;
+            }
+             // if it got here, it will go down the cases and match the default
+            // case. DO NOT add another case below this one
+        }
+        default:{
+            //TODO: Show error
+        }
+    }
+    return std::make_shared<StaticStatement>(tok,body);
 }

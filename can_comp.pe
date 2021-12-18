@@ -1,5 +1,9 @@
 type a = def(int)->int
 type g = def(int)
+static int var_static = 8
+static def staticfunc():
+    printf("Hello from static function\n")
+    printf("Static var is %d\n",var_static)
 union name:
     int item1
     float item2
@@ -40,6 +44,7 @@ def lambda_test(a x):
 def func(int g)->int:
     return g
 def main():
+    staticfunc()
     dec_test(4)
     def z()->int:
         printf("hello\n")

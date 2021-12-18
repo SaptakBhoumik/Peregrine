@@ -467,6 +467,11 @@ bool Codegen::visit(const ast::AssertStatement& node){
     write("\n}");
     return true;
 }
+bool Codegen::visit(const ast::StaticStatement& node){
+    write("static ");
+    node.body()->accept(*this);
+    return true;
+}
 bool Codegen::visit(const ast::RaiseStatement& node){
     write("throw ");
     node.value()->accept(*this);
