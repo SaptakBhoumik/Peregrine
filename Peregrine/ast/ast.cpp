@@ -218,6 +218,39 @@ std::string UnionLiteral::stringify() const {
     return res;
 }
 
+EnumLiteral::EnumLiteral(Token tok, std::vector<std::pair<AstNodePtr, AstNodePtr>> fields, AstNodePtr name) {
+    m_token = tok;
+    m_fields = fields;
+    m_name = name;
+}
+
+std::vector<std::pair<AstNodePtr, AstNodePtr>> EnumLiteral::fields() const {
+    return m_fields;
+}
+
+Token EnumLiteral::token() const { return m_token; }
+
+AstNodePtr EnumLiteral::name() const { return m_name; }
+
+AstKind EnumLiteral::type() const { return KAstEnum; }
+
+std::string EnumLiteral::stringify() const {
+    std::string res = "enum ";
+    res += m_name->stringify() + ":\n";
+    for (size_t i = 0; i < m_fields.size(); i++) {
+        if (i)
+            res += "\n";
+        
+        res += m_fields[i].first->stringify();
+        if (m_fields[i].second->type() == KAstNoLiteral) {}
+        else{
+            res += " = ";
+            res += m_fields[i].second->stringify();
+        }
+    }
+
+    return res;
+}
 
 BinaryOperation::BinaryOperation(Token tok, AstNodePtr left, Token op,
                                  AstNodePtr right) {

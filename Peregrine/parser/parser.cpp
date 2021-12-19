@@ -5,6 +5,7 @@
 #include <iostream>
 #include <map>
 #include <memory>
+#include <string>
 #include <vector>
 
 using namespace ast;
@@ -138,6 +139,10 @@ AstNodePtr Parser::parseStatement() {
         }
         case tk_union:{
             stmt = parseUnion();
+            break;
+        }
+        case tk_enum: {
+            stmt = parseEnum();
             break;
         }
         // TODO: variables currently do not work with all the types, we need to
@@ -853,6 +858,36 @@ AstNodePtr Parser::parseUnion(){
     }
     return std::make_shared<UnionLiteral>(tok,elements,union_name);
 }
+
+AstNodePtr Parser::parseEnum() {
+    auto token = m_currentToken;
+    advance();
+    AstNodePtr enum_name = parseName();
+    expect(tk_colon);
+    expect(tk_ident);
+    advance();
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> fields;
+    AstNodePtr val;
+    
+    while (m_currentToken.tkType != tk_dedent) {
+        AstNodePtr name = parseName();
+        advance();
+        
+        if (m_currentToken.tkType == tk_assign) {
+            advance();
+            val = parseExpression();
+        } else {
+            val = std::make_shared<NoLiteral>();
+        }
+        advance();
+        fields.push_back(std::pair(name, val));
+        if (m_currentToken.tkType == tk_comma) { advance(); }
+        if (m_currentToken.tkType == tk_new_line) { advance(); }
+    }
+
+    return std::make_shared<EnumLiteral>(token, fields, enum_name);
+}
+
 AstNodePtr Parser::parseStatic(){
     auto tok = m_currentToken;
     advance();

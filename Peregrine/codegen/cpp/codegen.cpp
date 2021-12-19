@@ -503,4 +503,16 @@ bool Codegen::visit(const ast::UnionLiteral& node){
     node.name()->accept(*this);
     return true;
 }
+bool Codegen::visit(const ast::EnumLiteral& node){
+    write("typedef enum{\n");
+    for (auto& field:node.fields()) {
+        field.first->accept(*this);
+        write(" = ");
+        field.second->accept(*this);
+        write(";\n");
+    }
+    write("\n}");
+    node.name()->accept(*this);
+    return true;
+}
 } // namespace cpp

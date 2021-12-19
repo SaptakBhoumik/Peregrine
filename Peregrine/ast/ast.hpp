@@ -50,7 +50,8 @@ enum AstKind {
     KAstPassStatement,
     KAstUnion,
     KAstStatic,
-    KAstInline
+    KAstInline,
+    KAstEnum
 };
 
 class AstVisitor;
@@ -299,6 +300,25 @@ class UnionLiteral : public AstNode {
 
     AstNodePtr name() const;
 
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+class EnumLiteral : public AstNode {
+  Token m_token;
+
+  std::vector<std::pair<AstNodePtr, AstNodePtr>> m_fields;
+  AstNodePtr m_name;
+
+  public:
+    EnumLiteral(Token tok, std::vector<std::pair<AstNodePtr, AstNodePtr>> fields, AstNodePtr name);
+
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> fields() const;
+
+    AstNodePtr name() const;
+    
     Token token() const;
     AstKind type() const;
     std::string stringify() const;
