@@ -328,7 +328,7 @@ std::string BlockStatement::stringify() {
     return res;
 }
 
-ClassDefinition::ClassDefinition(AstNodePtr name,std::vector<AstNodePtr> attributes,std::vector<FunctionDefinition> methods){
+ClassDefinition::ClassDefinition(AstNodePtr name,std::vector<AstNodePtr> attributes,std::vector<AstNodePtr> methods){
     c_name = name;
     c_attributes = attributes;
     c_methods = methods;
@@ -336,21 +336,28 @@ ClassDefinition::ClassDefinition(AstNodePtr name,std::vector<AstNodePtr> attribu
 
 AstNodePtr ClassDefinition::name() { return c_name; }
 
-AstNodePtr ClassDefinition::attributes() { return c_attributes; }
+std::vector<AstNodePtr> ClassDefinition::attributes() { return c_attributes; }
 
-AstNodePtr ClassDefinition::methods() { return c_methods; } 
+std::vector<AstNodePtr> ClassDefinition::methods() { return c_methods; } 
 
 AstKind ClassDefinition::type() { return KAstClassDef; }
 
-std::string FunctionDefinition::stringify() {
+std::string ClassDefinition::stringify() {
 
     std::string res = "class ";
     res += c_name->stringify();
     res += ":\n";
-
-    res += c_attributes -> stringify();
+    
+    for (auto& stmt : c_attributes) {
+        res += stmt->stringify();
+        res += "\n";
+    }
     res += ":\n";
-    res += c_methods->stringify(); 
+    
+    for (auto& stmt : c_methods) {
+        res += stmt->stringify();
+        res += "\n";
+    } 
 
     return res;
 

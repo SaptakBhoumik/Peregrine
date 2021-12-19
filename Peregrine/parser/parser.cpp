@@ -194,9 +194,10 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseTypeDef();
             break;
         }
-        
+
         case tk_class: {
             stmt = parseClassDefinition();
+            break;
         }
 
         case tk_identifier: {
@@ -243,34 +244,34 @@ AstNodePtr Parser::parseBlockStatement() {
 }
 
 AstNodePtr Parser::parseClassDefinition(){
-    
+
     std::vector<AstNodePtr> attributes;
     std::vector<AstNodePtr> methods;
 
     expect(tk_identifier);
 
     AstNodePtr name = parseName();
-
-
+ 
     expect(tk_colon);
-
-
+    
+    advance(); // We are on tk_ident token
+   
     while (next().tkType == tk_identifier || next().tkType == tk_assign){
 
         attributes.push_back(parseVariableStatement());
-        advance();
+        advanceOnNewLine();
     }
 
+    while(next().tkType == tk_new_line) {
+       advanceOnNewLine();
+    } 	
+    
     while(m_currentToken.tkType == tk_def ){
         methods.push_back(parseFunctionDef());
-        advance();
+        advanceOnNewLine();
     }
 
     return std::make_shared<ClassDefinition>(name,attributes,methods);
-
-
-
-
 
 }
 

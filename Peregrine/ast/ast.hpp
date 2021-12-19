@@ -281,16 +281,18 @@ struct parameter {
 class ClassDefinition: public AstNode {
 
   AstNodePtr c_name;
+  AstNodePtr c_type;
   std::vector<AstNodePtr> c_attributes;
-  std::vector<FunctionDefinition> c_methods;
+  std::vector<AstNodePtr> c_methods;
   
   public:
-    ClassDefinition(AstNodePtr c_name,std::vector<AstNodePtr> c_attributes,std::vector<FunctionDefinition> c_methods);
+    ClassDefinition(AstNodePtr c_name,std::vector<AstNodePtr> c_attributes,std::vector<AstNodePtr> c_methods);
     AstNodePtr name();
-    AstNodePtr attributes();
-    AstNodePtr methods();
+    std::vector<AstNodePtr> attributes();
+    std::vector<AstNodePtr> methods();
     AstKind type();
-}
+    std::string stringify();
+};
 
 
 class FunctionDefinition : public AstNode {
