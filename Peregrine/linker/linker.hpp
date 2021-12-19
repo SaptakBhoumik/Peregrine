@@ -16,7 +16,7 @@ class linker{
     int argc=0;
     const char **argv;
     public:
-    void add_arg(std::string arg);
+    void add_arg( const char* arg);
     int link();//start linking
     void set_flavor(Flavor name);
     void auto_flavor();

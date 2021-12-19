@@ -151,7 +151,8 @@ static int lldMain(int argc, const char **argv, llvm::raw_ostream &stdoutOS,
   case Wasm:
     return !lld::wasm::link(args, exitEarly, stdoutOS, stderrOS);
   default:
-    return 1;
+    die("error");
+    // return 1;
   }
 }
 
@@ -244,9 +245,9 @@ void linker::set_flavor(Flavor name){
         }
     }
 }
-void linker::add_arg(std::string arg){
+void linker::add_arg(const char* arg){
     argc++;
-    argv[argc-1]=arg.c_str();
+    argv[argc-1]=arg;
 }
 void linker::auto_flavor(){
     #ifdef __unix__
@@ -262,3 +263,15 @@ void linker::auto_flavor(){
     set_flavor(WinLink);
     #endif
 }
+/*Example usage
+int main(int argc ,const char** argv){
+  auto y=argc;
+  linker g;
+  g.auto_flavor();
+  for (int i=1;i<y;++i){
+    g.add_arg(argv[i]);
+  }
+  g.link();
+  return 0;
+}
+*/

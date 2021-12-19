@@ -1,10 +1,13 @@
 type a = def(int)->int
 type g = def(int)
-
+enum colours:
+    RED = 144,
+    GREEN,
+    BLUE = 59,Other=9+GREEN
 def divide(int num1,int num2)->int:
     match num2:
         case 0:
-            raise ZeroDivisionError
+            raise error.ZeroDivisionError
         case _:
             return num1/num2
 def decorator(a func)->g:
@@ -86,3 +89,5 @@ def main():
     printf("%d",divide(6,2))
     #should terminate the program
     #printf("%d",divide(6,0))
+    colours color = colours.RED
+    print("Enum is " , color)

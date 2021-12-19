@@ -22,6 +22,9 @@ class Codegen : public ast::AstVisitor {
     EnvPtr createEnv(EnvPtr parent = nullptr);
 
   private:
+    bool is_dot_exp=false;
+    bool is_enum=false;
+    std::vector<std::string> enum_name={"error"};
     std::string res;
     bool save=false;
     std::string m_filename;
