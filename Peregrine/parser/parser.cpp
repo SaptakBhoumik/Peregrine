@@ -254,23 +254,19 @@ AstNodePtr Parser::parseClassDefinition(){
  
     expect(tk_colon);
     
-    advance(); // We are on tk_ident token
-   
-    while (next().tkType == tk_identifier || next().tkType == tk_assign){
-
-        attributes.push_back(parseVariableStatement());
-        advanceOnNewLine();
+    expect(tk_ident); // We are on tk_ident token
+    advance();
+    while (m_currentToken.tkType!=tk_dedent){
+        while (next().tkType == tk_identifier || next().tkType == tk_assign){
+            attributes.push_back(parseVariableStatement());
+        }
+        
+        while(m_currentToken.tkType == tk_def ){
+            methods.push_back(parseFunctionDef());
+            advanceOnNewLine();
+        }
+        if(m_currentToken.tkType==tk_newline){advance();}
     }
-
-    while(next().tkType == tk_new_line) {
-       advanceOnNewLine();
-    } 	
-    
-    while(m_currentToken.tkType == tk_def ){
-        methods.push_back(parseFunctionDef());
-        advanceOnNewLine();
-    }
-
     return std::make_shared<ClassDefinition>(name,attributes,methods);
 
 }
