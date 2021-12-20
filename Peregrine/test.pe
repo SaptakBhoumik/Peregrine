@@ -83,5 +83,7 @@ assert 5==8
 assert 5==5
 raise ZeroDivisionError
 
-with n,x as y,m:
+with x as m:
+    printf("Hello")
+with x as m,k as d:
     printf("Hello")

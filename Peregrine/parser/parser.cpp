@@ -933,16 +933,13 @@ AstNodePtr Parser::parseWith(){
     std::vector<AstNodePtr> variables;
     std::vector<AstNodePtr> values;
     AstNodePtr body;
-    while(m_currentToken.tkType!=tk_as){
-       values.push_back(parseStatement()); 
-       advance();
-       if (m_currentToken.tkType==tk_comma){advance();}
-    }
-    expect(tk_identifier);
-    while(m_currentToken.tkType!=tk_colon){
-       variables.push_back(parseName()); 
-       advance();
-       if (m_currentToken.tkType==tk_comma){expect(tk_identifier);}
+    while (m_currentToken.tkType!=tk_colon){
+        values.push_back(parseStatement()); 
+        expect(tk_as);
+        expect(tk_identifier);
+        variables.push_back(parseName()); 
+        advance();
+        if (m_currentToken.tkType==tk_comma){advance();}
     }
     advance();
     body=parseBlockStatement();

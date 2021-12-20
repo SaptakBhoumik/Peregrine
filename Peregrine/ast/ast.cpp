@@ -1051,14 +1051,9 @@ std::string WithStatement::stringify() const{
     std::string res="with ";
     for (size_t i=0;i<m_values.size();++i){
         res+=m_values[i]->stringify();
-        if (i<m_values.size()-1){
-            res+=",";
-        }
-    }
-    res+=" as ";
-    for (size_t i=0;i<m_variables.size();++i){
+        res+=" as ";
         res+=m_variables[i]->stringify();
-        if (i<m_variables.size()-1){
+        if (i<m_values.size()-1){
             res+=",";
         }
     }
