@@ -253,11 +253,11 @@ void linker::auto_flavor(){
     #ifdef __unix__
     set_flavor(Gnu);
     #endif
-    #ifdef __APPLE__
-    set_flavor(Darwin);
-    #endif
     #ifdef __MACH__
     set_flavor(DarwinOld);
+    #endif
+    #ifdef __APPLE__
+    set_flavor(Darwin); //If this is also true then it will overwrite the flavor as the new macos
     #endif
     #ifdef _WIN32
     set_flavor(WinLink);
