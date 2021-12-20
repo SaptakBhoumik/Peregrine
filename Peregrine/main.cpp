@@ -1,4 +1,5 @@
-#include "codegen/codegen.hpp"
+#include "codegen/cpp/codegen.hpp"
+#include "codegen/js/codegen.hpp"
 #include "lexer/lexer.hpp"
 #include "lexer/tokens.hpp"
 #include "parser/parser.hpp"
@@ -8,9 +9,10 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include <string.h>
 
 int main(int argc, char** argv) {
-    if (argc != 3) {//the cli is still not complete
+    if (argc < 3) {//the cli is still not complete
         std::ifstream file("../Peregrine/test.pe");
         std::stringstream buf;
         buf << file.rdbuf();
@@ -27,13 +29,8 @@ int main(int argc, char** argv) {
 
         std::cout << program->stringify() << "\n";
 
-        TypeChecker typeChecker;
-        typeChecker.check(program);
-
-        Codegen codegen("temp.cc");
-        auto res = codegen.generate(program);
-        std::cout << res << "\n";
-        codegen.write(res);
+        TypeChecker typeChecker(program);
+        
     }
     else{
         std::ifstream file(argv[2]);
@@ -48,11 +45,23 @@ int main(int argc, char** argv) {
 
         // TypeChecker typeChecker;
         // typeChecker.check(program);
-
-        Codegen codegen("temp.cc");
-        auto res = "#include  <cstdio>\n"+codegen.generate(program);
-        codegen.write(res);
-        system("g++ temp.cc");
+        std::string filename=argv[2];
+        if (argc>3){
+            if (strcmp(argv[3],"-js")==0){
+                js::Codegen codegen("index.js", program,false,filename);
+            }
+            else if (strcmp(argv[3],"-html")==0){//embeds js in html
+                js::Codegen codegen("index.html", program,true,filename);
+            }
+            else{
+               cpp::Codegen codegen("temp.cc", program,filename);
+               system("g++ temp.cc");  
+            }
+        }
+        else{
+           cpp::Codegen codegen("temp.cc", program,filename);
+           system("g++ temp.cc"); 
+        }
     }
     return 0;
 }

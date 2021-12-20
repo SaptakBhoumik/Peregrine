@@ -5,7 +5,7 @@
 
 // Create a string variable
 enum TokenType {
-    tk_eof,     // end of file
+    tk_eof, // end of file
     // Some operators
     tk_plus,       // +
     tk_underscore, // _
@@ -27,6 +27,7 @@ enum TokenType {
     tk_excl,       // !
     tk_colon,      // :
     tk_dot,        // .
+    tk_double_dot, // ..
     tk_l_paren,    // (
     tk_r_paren,    // )
     tk_comma,      // ,
@@ -36,7 +37,7 @@ enum TokenType {
     tk_dict_open,  // {
     tk_new_line,   // \n
 
-    tk_exponent,          //**
+    tk_exponent,          // **
     tk_equal,             // ==
     tk_not_equal,         // !=
     tk_floor,             // //
@@ -45,6 +46,7 @@ enum TokenType {
     tk_increment,         // ++
     tk_decrement,         // --
     tk_arrow,             // ->
+    tk_range,             // ..
     tk_shift_right,       // >>
     tk_shift_left,        // <<
     tk_floor_equal,       // //=
@@ -62,25 +64,24 @@ enum TokenType {
     tk_identifier, // foo, bar
 
     // keywords tokens
-    tk_static,  // static
-    tk_scope,   // scope
-    tk_union,   // union
-    tk_unknown, // unknown type
-    tk_assert,  // assert
-    tk_try,     // try
-    tk_except,  // except
-    tk_raise,   // raise
-    tk_true,    // True
-    tk_false,   // False
-    tk_with,    // with
-    tk_as,      // as
-    tk_flags,     // flags
+    tk_static,    // static
+    tk_scope,     // scope
+    tk_union,     // union
+    tk_cast,     // cast
+    tk_assert,    // assert
+    tk_try,       // try
+    tk_except,    // except
+    tk_raise,     // raise
+    tk_true,      // True
+    tk_false,     // False
+    tk_with,      // with
+    tk_as,        // as
     tk_none,      // None
     tk_const,     // const
     tk_import,    // import
     tk_from,      // from
-    tk_cppimport, // cppimport
-    tk_himport,   // himport
+    tk_inline, // inline
+    tk_virtual,   // virtual
     tk_if,        // if
     tk_else,      // else
     tk_elif,      // elif
@@ -104,14 +105,14 @@ enum TokenType {
     tk_is_not,    // is not
     tk_cppcode,   // Cppcode
     tk_class,     // class
-    tk_type,       // type defination
+    tk_type,      // type defination
     tk_enum,      // enum
 
     // value type
     tk_decimal,
     tk_integer,
     tk_string,
-    cpp,
+    tk_cpp,
 
     tk_ident,  // beginning of identation
     tk_dedent, // end of identation

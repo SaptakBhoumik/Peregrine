@@ -1,17 +1,41 @@
-a = [54, 2, 87]
-c = []
-b = {
-    12: 45,
-    25: 87,
-    7: 0
-}
+"Multiline comment
+Hello"
+static inline def static_inline_func():
+    printf("Hello from static inline function\n")
+inline def inline_func():
+    printf("Hello from inline function\n")
+@x
+def static_test(int a, str b) -> int:
+    return b
+static def staticfunc():
+    printf("Hello from static function")
+static v.b x=0
+static v.b y
+static int r
+static int b=9
+static m =9
+union gg:
+    int hi
+    bool y
+b.n=8
+c.g().n  = 8
+c.g().n[9]  = 8
+c.g i =8
+enum colours:
+    RED = 144,
+    GREEN,
+    BLUE = 59
 
-scope:
-    x+0
+def test(int a) -> str:
+    return "hey"
 
+test(45)
+
+type potato = float
+potato t = 2.0
+potato b = "hey"
 int a
 b + 34
-
 const test = "hello"
 
 def test() -> int:
@@ -27,13 +51,10 @@ while True:
 
 7&7|7
 
-def test(int a, str b) -> int:
-    return b
 
 test(34, "hey")
 
 type a = int
-
 from os import getuid
 
 for i in [4, 2, 65]:
@@ -58,3 +79,18 @@ class test:
 
     def addition(int a,int b) -> int:
         return a+b
+type x = def(int , char)->char
+type x = def()->char
+type x = def()
+@x
+@x
+def test(int a, str b) -> int:
+    return b
+assert 5==8
+assert 5==5
+raise ZeroDivisionError
+
+with x as m:
+    printf("Hello")
+with x as m,k as d:
+    printf("Hello")

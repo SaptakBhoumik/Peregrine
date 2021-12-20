@@ -1,287 +1,280 @@
 #include "typeChecker.hpp"
 #include "ast/ast.hpp"
 #include "ast/types.hpp"
+#include "errors/error.hpp"
 
-#include <assert.h>
+#include <cassert>
 #include <iostream>
 #include <memory>
 
-TypeChecker::TypeChecker() {
-    m_env = std::make_shared<SymbolTable<TypePtr>>(nullptr);
+using namespace types;
+
+TypeChecker::TypeChecker(ast::AstNodePtr ast) {
+    m_env = createEnv();
     m_currentFunction = nullptr;
+    ast->accept(*this);
 }
 
-void TypeChecker::error(std::string_view msg) {
-    // PEError err = {{tok.line, tok.start, m_filename, tok.statement},
-    //                std::string(msg),
-    //                "TypeError",
-    //                "",
-    //                ""};
-
-    // m_errors.push_back(err);
-    std::cerr << "TypeError: " << msg << "\n";
+void TypeChecker::error(Token tok, std::string_view msg) {
+    PEError err = {{tok.line, tok.start, m_filename, tok.statement},
+                   std::string(msg),
+                   "TypeError",
+                   "",
+                   ""};
+    display(err);
+    exit(1);
 }
 
-void TypeChecker::expectType(TypePtr expected, TypePtr obtained) {
-    if (expected->category() != obtained->category()) {
-        if (!expected->isConvertibleTo(obtained) &&
-            !obtained->isConvertibleTo(expected)) {
-            error("expected type " + expected->stringify() + ", got " +
-                  obtained->stringify() + " instead");
+EnvPtr TypeChecker::createEnv(EnvPtr parent) {
+    return std::make_shared<SymbolTable<TypeEnvVal>>(parent);
+}
+
+void TypeChecker::checkBody(ast::AstNodePtr body) {
+    EnvPtr previousEnv = m_env;
+    m_env = createEnv();
+    body->accept(*this);
+    m_env = previousEnv;
+}
+
+void TypeChecker::check(ast::AstNodePtr expr, const Type& expectedType) {
+    expr->accept(*this);
+    const Type& exprType = *m_result;
+
+    if (exprType != expectedType) {
+        if (!exprType.isConvertibleTo(expectedType) &&
+            !expectedType.isConvertibleTo(exprType)) {
+            error(expr->token(), "expected type " + expectedType.stringify() + ", got " +
+                  exprType.stringify() + " instead");
         }
+
+        //TODO: convert one type to another
     }
 }
 
-void TypeChecker::enterLocalEnv() {
-    m_env = std::make_shared<SymbolTable<TypePtr>>(m_env);
+std::string TypeChecker::identifierName(ast::AstNodePtr identifier) {
+    assert(identifier->type() == ast::KAstIdentifier);
+
+    return std::dynamic_pointer_cast<ast::IdentifierExpression>(identifier)
+        ->value();
 }
 
-void TypeChecker::exitLocalEnv() {
-    if (!m_env->parent())
-        std::cerr << "no parent bruh"
-                  << "\n";
-    m_env = m_env->parent();
+bool TypeChecker::visit(const ast::ImportStatement& node) { return true; }
+
+bool TypeChecker::visit(const ast::FunctionDefinition& node) {
+    EnvPtr oldEnv = m_env;
+    m_env = createEnv();
+
+    std::vector<TypePtr> parameterTypes;
+    parameterTypes.reserve(node.parameters().size());
+
+    for (auto& param : node.parameters()) {
+        param.p_type->accept(*this);
+        parameterTypes.push_back(m_result);
+        m_env->set(identifierName(param.p_name), TypeEnvVal{m_result, false});
+    }
+
+    node.returnType()->accept(*this);
+    std::cout << m_result->stringify() << "\n";
+    auto functionType =
+        std::make_shared<FunctionType>(parameterTypes, m_result);
+
+    m_currentFunction = functionType;
+    node.body()->accept(*this);
+    m_currentFunction = nullptr;
+
+    m_env = oldEnv;
+    m_env->set(identifierName(node.name()), TypeEnvVal{functionType, false});
+    return true;
 }
 
-std::string TypeChecker::identifierName(AstNodePtr identifier) {
-    assert(identifier->type() == KAstIdentifier);
+bool TypeChecker::visit(const ast::VariableStatement& node) {
+    node.varType()->accept(*this);
+    TypePtr varType = m_result;
 
-    return std::dynamic_pointer_cast<IdentifierExpression>(identifier)->value();
+    if (varType->category() == TypeCategory::Void) {
+        // infer it
+    }
+
+    check(node.value(), *varType);
+    m_env->set(identifierName(node.name()), TypeEnvVal{varType, false});
+    return true;
 }
 
-TypePtr TypeChecker::check(AstNodePtr astNode) {
-    std::cout << "check"
+bool TypeChecker::visit(const ast::ConstDeclaration& node) { return true; }
+
+bool TypeChecker::visit(const ast::TypeDefinition& node) {
+    node.baseType()->accept(*this);
+
+    m_env->set(identifierName(node.name()), TypeEnvVal{m_result, true});
+    return true;
+}
+
+bool TypeChecker::visit(const ast::PassStatement& node) { return true; }
+
+bool TypeChecker::visit(const ast::IfStatement& node) {
+    check(node.condition(), *TypeProducer::boolean());
+    checkBody(node.ifBody());
+
+    for (auto& elif : node.elifs()) {
+        check(elif.first, *TypeProducer::boolean());
+        checkBody(elif.second);
+    }
+
+    if (node.elseBody()->type() != ast::KAstNoLiteral)
+        checkBody(node.elseBody());
+    return true;
+}
+
+bool TypeChecker::visit(const ast::WhileStatement& node) {
+    check(node.condition(), *TypeProducer::boolean());
+    checkBody(node.body());
+    return true;
+}
+
+bool TypeChecker::visit(const ast::ForStatement& node) {
+    // check(node.sequence(), *TypeProducer::list());
+    EnvPtr oldEnv = m_env;
+    m_env = createEnv();
+    // m_env->set(identifierName(node.variable()), m_result); // result may not
+    // be correct here
+
+    node.body()->accept(*this);
+    return true;
+}
+
+bool TypeChecker::visit(const ast::MatchStatement& node) { return true; }
+
+bool TypeChecker::visit(const ast::ScopeStatement& node) {
+    checkBody(node.body());
+    return true;
+}
+
+bool TypeChecker::visit(const ast::ReturnStatement& node) {
+    std::cout << "at return"
               << "\n";
-    switch (astNode->type()) {
-        case KAstProgram: {
-            auto node = std::dynamic_pointer_cast<Program>(astNode);
-
-            for (auto& stmt : node->statements()) {
-                check(stmt);
-            }
-
-            break;
-        }
-
-        case KAstBlockStmt: {
-            auto node = std::dynamic_pointer_cast<BlockStatement>(astNode);
-
-            for (auto& stmt : node->statements()) {
-                check(stmt);
-            }
-
-            break;
-        }
-
-        case KAstIdentifier: {
-            auto node =
-                std::dynamic_pointer_cast<IdentifierExpression>(astNode);
-            std::cout << node->value() << "\n";
-            auto type = m_env->get(node->value());
-
-            if (!type)
-                std::cerr << "no type found err"
-                          << "\n";
-
-            return *type;
-        }
-
-        case KAstTypeExpr: {
-            auto node = std::dynamic_pointer_cast<TypeExpression>(astNode);
-            return identifierToTypeMap[node->value()];
-        }
-
-        case KAstInteger: {
-            return TypeProducer::integer();
-        }
-
-        case KAstString: {
-            return TypeProducer::string();
-        }
-
-        case KAstDecimal: {
-            return TypeProducer::decimal();
-        }
-
-        case KAstNone: {
-            return TypeProducer::none();
-        }
-
-        case KAstPrefixExpr: {
-            auto node = std::dynamic_pointer_cast<PrefixExpression>(astNode);
-
-            TypePtr type = check(node->right());
-
-            TypePtr result = type->prefixOperatorResult(node->prefix());
-
-            if (!result) {
-                error(node->prefix().keyword + " can not be used with type " +
-                      type->stringify());
-            }
-
-            return result;
-        }
-
-        case KAstBinaryOp: {
-            auto node = std::dynamic_pointer_cast<BinaryOperation>(astNode);
-
-            TypePtr type1 = check(node->left());
-            TypePtr type2 = check(node->right());
-
-            TypePtr result = type1->infixOperatorResult(node->op(), type2);
-
-            if (!result) {
-                error(node->op().keyword + " can not be used with types " +
-                      type1->stringify() + " and " + type2->stringify());
-            }
-
-            return result;
-        }
-
-        case KAstVariableStmt: {
-            auto node = std::dynamic_pointer_cast<VariableStatement>(astNode);
-
-            if (node->value()->type() == KAstNone)
-                break;
-
-            if (node->varType()->type() == KAstNone) {
-                // infer the type
-            }
-
-            TypePtr varType = check(node->varType());
-            TypePtr valueType = check(node->value());
-
-            expectType(varType, valueType);
-
-            m_env->set(
-                std::dynamic_pointer_cast<IdentifierExpression>(node->name())
-                    ->value(),
-                varType);
-
-            break;
-        }
-
-        case KAstIfStmt: {
-            auto node = std::dynamic_pointer_cast<IfStatement>(astNode);
-
-            expectType(check(node->condition()), TypeProducer::boolean());
-
-            enterLocalEnv();
-            check(node->ifBody());
-            exitLocalEnv();
-
-            for (auto& elif : node->elifs()) {
-                expectType(check(elif.first), TypeProducer::boolean());
-
-                enterLocalEnv();
-                check(elif.second);
-                exitLocalEnv();
-            }
-
-            enterLocalEnv();
-            check(node->elseBody());
-            exitLocalEnv();
-
-            break;
-        }
-
-        case KAstWhileStmt: {
-            auto node = std::dynamic_pointer_cast<WhileStatement>(astNode);
-
-            expectType(check(node->condition()), TypeProducer::boolean());
-
-            enterLocalEnv();
-            check(node->body());
-            exitLocalEnv();
-
-            break;
-        }
-
-        case KAstFunctionDef: {
-            auto node = std::dynamic_pointer_cast<FunctionDefinition>(astNode);
-
-            std::vector<TypePtr> parameterTypes;
-            parameterTypes.reserve(node->parameters().size());
-
-            enterLocalEnv();
-
-            for (auto& param : node->parameters()) {
-                TypePtr paramType = check(param.p_type);
-                parameterTypes.push_back(paramType);
-                m_env->set(identifierName(param.p_name), paramType);
-            }
-
-            TypePtr returnType = check(node->returnType());
-
-            auto functionType =
-                std::make_shared<FunctionType>(parameterTypes, returnType);
-
-            m_currentFunction = functionType;
-            check(node->body());
-            m_currentFunction = nullptr;
-
-            exitLocalEnv();
-
-            m_env->set(
-                std::dynamic_pointer_cast<IdentifierExpression>(node->name())
-                    ->value(),
-                functionType);
-
-            break;
-        }
-
-        case KAstFunctionCall: {
-            auto node = std::dynamic_pointer_cast<FunctionCall>(astNode);
-
-            TypePtr nameType = check(node->name());
-
-            if (nameType->category() != TypeCategory::Function) {
-                // panic, the name is not a function
-                std::cerr << "identifier is not a function"
-                          << "\n";
-            }
-
-            auto functionType =
-                std::dynamic_pointer_cast<FunctionType>(nameType);
-
-            std::vector<TypePtr> argumentTypes;
-            argumentTypes.reserve(node->arguments().size());
-
-            for (auto& arg : node->arguments()) {
-                argumentTypes.push_back(check(arg));
-            }
-
-            if (functionType->parameterTypes().size() != argumentTypes.size()) {
-                // panic, invalid number of arguments passed
-                std::cerr << "invalid number of args passed"
-                          << "\n";
-            }
-
-            for (size_t i = 0; i < argumentTypes.size(); i++) {
-                expectType(functionType->parameterTypes()[i], argumentTypes[i]);
-            }
-
-            return functionType->returnType();
-        }
-
-        case KAstReturnStatement: {
-            auto node = std::dynamic_pointer_cast<ReturnStatement>(astNode);
-
-            if (!m_currentFunction) {
-                error("can not use return outside of a function");
-            }
-
-            TypePtr returnType = check(node->returnValue());
-
-            expectType(m_currentFunction->returnType(), returnType);
-
-            break;
-        }
-
-        default:
-            std::cerr << "enjoy your segfault" << "\n";
-            break;
+    node.returnValue()->accept(*this);
+    std::cout << m_result->stringify() << "\n";
+    std::cout << m_currentFunction->returnType()->stringify() << "\n";
+    if (!m_currentFunction) {
+        error(node.token(), "can not return outside of a function");
     }
 
-    return nullptr;
+    check(node.returnValue(), *m_currentFunction->returnType());
+    return true;
+}
+
+bool TypeChecker::visit(const ast::ListLiteral& node) { return true; }
+
+bool TypeChecker::visit(const ast::DictLiteral& node) { return true; }
+
+bool TypeChecker::visit(const ast::ListOrDictAccess& node) { return true; }
+
+bool TypeChecker::visit(const ast::BinaryOperation& node) {
+    node.left()->accept(*this);
+    TypePtr leftType = m_result;
+    node.right()->accept(*this);
+    TypePtr result = leftType->infixOperatorResult(node.op(), m_result);
+
+    if (!result) {
+        error(node.token(), "operator " + node.op().keyword + " can not be used with types " +
+              leftType->stringify() + " and " + m_result->stringify());
+    }
+
+    m_result = leftType;
+    return true;
+}
+
+bool TypeChecker::visit(const ast::PrefixExpression& node) {
+    node.right()->accept(*this);
+    TypePtr result = m_result->prefixOperatorResult(node.prefix());
+    if (!result) {
+        error(node.token(), "operator " + node.prefix().keyword +
+              " can not be used with type " + m_result->stringify());
+    }
+
+    m_result = result;
+    return true;
+}
+
+bool TypeChecker::visit(const ast::FunctionCall& node) {
+    node.name()->accept(*this);
+    if (m_result->category() != TypeCategory::Function)
+        error(node.token(), identifierName(node.name()) + " is not a function");
+
+    auto functionType = std::dynamic_pointer_cast<FunctionType>(m_result);
+
+    if (functionType->parameterTypes().size() != node.arguments().size())
+        error(node.token(), "invalid number of arguments passed to " +
+              identifierName(node.name()));
+
+    for (size_t i = 0; i < node.arguments().size(); i++) {
+        check(node.arguments()[i], *functionType->parameterTypes()[i]);
+    }
+
+    m_result = functionType->returnType();
+    return true;
+}
+
+bool TypeChecker::visit(const ast::DotExpression& node) { return true; }
+
+bool TypeChecker::visit(const ast::IdentifierExpression& node) {
+    auto identifierType = m_env->get(node.value());
+    if (!identifierType || identifierType.value().isUserDefinedType) {
+        error(node.token(), "undeclared identifier: " + node.value());
+    }
+
+    m_result = identifierType.value().type;
+    return true;
+}
+
+bool TypeChecker::visit(const ast::TypeExpression& node) {
+    if (!identifierToTypeMap.count(node.value())) {
+        auto type = m_env->get(node.value());
+
+        if (!type || !type.value().isUserDefinedType) {
+            error(node.token(), node.value() + " is not a type"); // return or not return?
+        }
+
+        m_result = type.value().type;
+        return true;
+    }
+
+    m_result = identifierToTypeMap[node.value()];
+    return true;
+}
+
+bool TypeChecker::visit(const ast::ListTypeExpr& node) { return true; }
+
+bool TypeChecker::visit(const ast::DictTypeExpr& node) { return true; }
+
+bool TypeChecker::visit(const ast::FunctionTypeExpr& node) { return true; }
+
+bool TypeChecker::visit(const ast::NoLiteral& node) {
+    m_result = TypeProducer::voidT();
+    return true;
+}
+
+bool TypeChecker::visit(const ast::IntegerLiteral& node) {
+    m_result = TypeProducer::integer();
+    return true;
+}
+
+bool TypeChecker::visit(const ast::DecimalLiteral& node) {
+    m_result = TypeProducer::decimal();
+    return true;
+}
+
+bool TypeChecker::visit(const ast::StringLiteral& node) {
+    m_result = TypeProducer::string();
+    return true;
+}
+
+bool TypeChecker::visit(const ast::BoolLiteral& node) {
+    m_result = TypeProducer::boolean();
+    return true;
+}
+
+bool TypeChecker::visit(const ast::NoneLiteral& node) {
+    m_result = TypeProducer::voidT();
+    return true;
 }

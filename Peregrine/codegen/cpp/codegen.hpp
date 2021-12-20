@@ -1,35 +1,46 @@
-#ifndef PEREGRINE_TYPE_CHECKER_HPP
-#define PEREGRINE_TYPE_CHECKER_HPP
+#ifndef CPP_PEREGRINE_CODEGEN_HPP
+#define CPP_PEREGRINE_CODEGEN_HPP
 
 #include "ast/ast.hpp"
-#include "ast/types.hpp"
 #include "ast/visitor.hpp"
 #include "utils/symbolTable.hpp"
 
+#include <fstream>
+#include <iostream>
 #include <memory>
-#include <vector>
+#include <string>
+#include <string_view>
 
-using namespace types;
+namespace cpp {
 
-struct TypeEnvVal {
-    TypePtr type;
-    bool isUserDefinedType;
-};
+typedef std::shared_ptr<SymbolTable<ast::AstNodePtr>> EnvPtr;
 
-using EnvPtr = std::shared_ptr<SymbolTable<TypeEnvVal>>;
-
-class TypeChecker : public ast::AstVisitor {
+class Codegen : public ast::AstVisitor {
   public:
-    TypeChecker(ast::AstNodePtr ast);
+    Codegen(std::string outputFilename, ast::AstNodePtr ast,std::string filename);
+
+    EnvPtr createEnv(EnvPtr parent = nullptr);
 
   private:
-    void error(Token tok, std::string_view msg);
-    EnvPtr createEnv(EnvPtr parent = nullptr);
-    std::string identifierName(ast::AstNodePtr identifier);
-    void checkBody(ast::AstNodePtr body);
+    bool is_dot_exp=false;
+    bool is_enum=false;
+    std::vector<std::string> enum_name={"error"};
+    std::string res;
+    bool save=false;
+    std::string m_filename;
+    std::ofstream m_file;
+    bool is_func_def=false;
+    std::string write(std::string_view code);
+    std::string mangleName(ast::AstNodePtr astNode);
 
-    void check(ast::AstNodePtr expr, const Type& expectedType);
+    std::string searchDefaultModule(std::string path, std::string moduleName);
+    void codegenFuncParams(std::vector<ast::parameter> parameters);
 
+    void matchArg(std::vector<ast::AstNodePtr> matchItem,
+                  std::vector<ast::AstNodePtr> caseItem);
+    std::string wrap(ast::AstNodePtr item,std::string contains);
+    bool visit(const ast::Program& node);
+    bool visit(const ast::BlockStatement& node);
     bool visit(const ast::ImportStatement& node);
     bool visit(const ast::FunctionDefinition& node);
     bool visit(const ast::VariableStatement& node);
@@ -37,11 +48,18 @@ class TypeChecker : public ast::AstVisitor {
     bool visit(const ast::TypeDefinition& node);
     bool visit(const ast::PassStatement& node);
     bool visit(const ast::IfStatement& node);
+    bool visit(const ast::AssertStatement& node);
+    bool visit(const ast::StaticStatement& node);
+    bool visit(const ast::InlineStatement& node);
     bool visit(const ast::WhileStatement& node);
     bool visit(const ast::ForStatement& node);
     bool visit(const ast::MatchStatement& node);
     bool visit(const ast::ScopeStatement& node);
+    bool visit(const ast::CppStatement& node);
     bool visit(const ast::ReturnStatement& node);
+    bool visit(const ast::ContinueStatement& node);
+    bool visit(const ast::BreakStatement& node);
+    bool visit(const ast::DecoratorStatement& node);
     bool visit(const ast::ListLiteral& node);
     bool visit(const ast::DictLiteral& node);
     bool visit(const ast::ListOrDictAccess& node);
@@ -60,13 +78,13 @@ class TypeChecker : public ast::AstVisitor {
     bool visit(const ast::StringLiteral& node);
     bool visit(const ast::BoolLiteral& node);
     bool visit(const ast::NoneLiteral& node);
+    bool visit(const ast::RaiseStatement& node);
+    bool visit(const ast::UnionLiteral& node);
+    bool visit(const ast::EnumLiteral& node);
 
-    std::string m_filename; 
-    TypePtr m_result;
     EnvPtr m_env;
-
-    // the function whose body is being currently checked
-    std::shared_ptr<FunctionType> m_currentFunction;
 };
+
+} // namespace cpp
 
 #endif

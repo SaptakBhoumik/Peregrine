@@ -8,20 +8,24 @@
 #include <map>
 #include <vector>
 
+using namespace ast;
+
 enum PrecedenceType {
-    pr_lowest,    // lowest possible precedence
-    pr_and_or,    // and,or
-    pr_not,       // not
-    pr_compare,   // ==, !=, <, >, <=, >=
-    pr_bit_or,    // |
-    pr_bit_xor,   // ^
-    pr_bit_and,   // &
-    pr_bit_shift, // >> , <<
-    pr_sum_minus, // +, -
-    pr_mul_div,   // *, /, %, //
-    pr_expo,      // **
-    pr_prefix,    // -x
-    pr_call       // x()
+    pr_lowest,      // lowest possible precedence
+    pr_and_or,      // and,or
+    pr_not,         // not
+    pr_compare,     // ==, !=, <, >, <=, >=
+    pr_bit_or,      // |
+    pr_bit_xor,     // ^
+    pr_bit_and,     // &
+    pr_bit_shift,   // >> , <<
+    pr_sum_minus,   // +, -
+    pr_mul_div,     // *, /, %, //
+    pr_expo,        // **
+    pr_prefix,      // -x
+    pr_dot_ref,     // x.test(), x.prop
+    pr_list_access, // x[0], x["test"]
+    pr_call         // x()
 };
 
 std::map<TokenType, PrecedenceType> createMap();
@@ -38,6 +42,8 @@ class Parser {
 
     std::map<TokenType, PrecedenceType> precedenceMap = createMap();
 
+    bool is_imported_var();
+    bool is_imported_type();
     void advance();
     void advanceOnNewLine();
     void expect(TokenType expectedType);
@@ -53,25 +59,36 @@ class Parser {
     AstNodePtr parseNone();
     AstNodePtr parseIdentifier();
     AstNodePtr parseName();
-    AstNodePtr parseType();
     AstNodePtr parseList();
     AstNodePtr parseDict();
     AstNodePtr parseCpp();
 
-    AstNodePtr parseExpression(PrecedenceType type);
+    AstNodePtr parseType();
+    AstNodePtr parseListType();
+    AstNodePtr parseDictType();
+    AstNodePtr parseFuncType();
+
+    AstNodePtr parseExpression(PrecedenceType type = pr_lowest);
     AstNodePtr parsePrefixExpression();
     AstNodePtr parseGroupedExpr();
 
     AstNodePtr parseBinaryOperation(AstNodePtr left);
     AstNodePtr parseFunctionCall(AstNodePtr left);
-    AstNodePtr parseArrayOrDictAccess(AstNodePtr left);
+    AstNodePtr parseListOrDictAccess(AstNodePtr left);
+    AstNodePtr parseDotExpression(AstNodePtr left);
 
     AstNodePtr parseStatement();
+    AstNodePtr parseWith();
+    AstNodePtr parseDecoratorCall();
     AstNodePtr parseBlockStatement();
     AstNodePtr parseImport();
+    AstNodePtr parseRaise();
+    AstNodePtr parseStatic();
+    AstNodePtr parseInline();
     AstNodePtr parseVariableStatement();
     AstNodePtr parseConstDeclaration();
     AstNodePtr parseIf();
+    AstNodePtr parseAssert();
     AstNodePtr parseMatch();
     AstNodePtr parseScope();
     AstNodePtr parseWhile();
@@ -79,6 +96,8 @@ class Parser {
     AstNodePtr parseFunctionDef();
     AstNodePtr parseClassDefinition();
     AstNodePtr parseReturn();
+    AstNodePtr parseUnion();
+    AstNodePtr parseEnum();
     AstNodePtr parseTypeDef();
 
   public:
