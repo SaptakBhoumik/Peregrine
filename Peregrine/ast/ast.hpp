@@ -51,7 +51,8 @@ enum AstKind {
     KAstUnion,
     KAstStatic,
     KAstInline,
-    KAstEnum
+    KAstEnum,
+    KAstWith
 };
 
 class AstVisitor;
@@ -573,6 +574,8 @@ class AssertStatement : public AstNode {
     void accept(AstVisitor& visitor) const;
 };
 
+
+
 class StaticStatement : public AstNode {
     Token m_token;
     AstNodePtr m_body;
@@ -771,7 +774,25 @@ class DecoratorStatement : public AstNode {
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
 };
+class WithStatement : public AstNode {
+    Token m_token;
+    std::vector<AstNodePtr> m_variables;
+    std::vector<AstNodePtr> m_values;
+    AstNodePtr m_body;
+    public:
+    WithStatement(Token tok,
+                  std::vector<AstNodePtr> variables,
+                  std::vector<AstNodePtr> values,
+                  AstNodePtr body);
 
+    std::vector<AstNodePtr> variables() const;
+    std::vector<AstNodePtr> values() const;
+    AstNodePtr body() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
 } // namespace ast
 
 #endif

@@ -51,6 +51,10 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseStatic();
             break;
         }
+        case tk_with:{
+            stmt = parseWith();
+            break;
+        }
         case tk_inline:{
             stmt = parseInline();
             break;
@@ -922,4 +926,25 @@ AstNodePtr Parser::parseInline(){
     AstNodePtr body;
     body=parseFunctionDef();
     return std::make_shared<InlineStatement>(tok,body);
+}
+AstNodePtr Parser::parseWith(){
+    auto tok = m_currentToken;
+    advance();
+    std::vector<AstNodePtr> variables;
+    std::vector<AstNodePtr> values;
+    AstNodePtr body;
+    while(m_currentToken.tkType!=tk_as){
+       values.push_back(parseStatement()); 
+       advance();
+       if (m_currentToken.tkType==tk_comma){advance();}
+    }
+    expect(tk_identifier);
+    while(m_currentToken.tkType!=tk_colon){
+       variables.push_back(parseName()); 
+       advance();
+       if (m_currentToken.tkType==tk_comma){expect(tk_identifier);}
+    }
+    advance();
+    body=parseBlockStatement();
+    return std::make_shared<WithStatement>(tok,variables,values,body);
 }

@@ -116,5 +116,6 @@ void ScopeStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 void TypeDefinition::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void MatchStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+void WithStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 } // namespace ast

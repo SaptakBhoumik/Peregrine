@@ -68,7 +68,6 @@ enum TokenType {
     tk_scope,     // scope
     tk_union,     // union
     tk_cast,     // cast
-    tk_unknown,   // unknown type
     tk_assert,    // assert
     tk_try,       // try
     tk_except,    // except
@@ -77,7 +76,6 @@ enum TokenType {
     tk_false,     // False
     tk_with,      // with
     tk_as,        // as
-    tk_flags,     // flags
     tk_none,      // None
     tk_const,     // const
     tk_import,    // import
@@ -109,7 +107,6 @@ enum TokenType {
     tk_class,     // class
     tk_type,      // type defination
     tk_enum,      // enum
-    tk_dict,      // dict
 
     // value type
     tk_decimal,

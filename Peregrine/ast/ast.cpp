@@ -1023,5 +1023,48 @@ std::string DecoratorStatement::stringify() const {
     return res;
 }
 
+WithStatement::WithStatement(Token tok,
+                  std::vector<AstNodePtr> variables,
+                  std::vector<AstNodePtr> values,
+                  AstNodePtr body){
+    m_token=tok;
+    m_variables=variables;
+    m_values=values;
+    m_body=body;
+}
+std::vector<AstNodePtr> WithStatement::variables() const{
+    return m_variables;
+}
+std::vector<AstNodePtr> WithStatement::values() const{
+    return m_values;
+}
+AstNodePtr WithStatement::body() const{
+    return m_body;
+}
+Token WithStatement::token() const{
+    return m_token;
+}
+AstKind WithStatement::type() const{
+    return KAstWith;
+}
+std::string WithStatement::stringify() const{
+    std::string res="with ";
+    for (size_t i=0;i<m_values.size();++i){
+        res+=m_values[i]->stringify();
+        if (i<m_values.size()-1){
+            res+=",";
+        }
+    }
+    res+=" as ";
+    for (size_t i=0;i<m_variables.size();++i){
+        res+=m_variables[i]->stringify();
+        if (i<m_variables.size()-1){
+            res+=",";
+        }
+    }
+    res+=":\n";
+    res+=m_body->stringify();
+    return res;
+}
 } // namespace ast
 

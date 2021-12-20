@@ -104,8 +104,6 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_type;
     } else if (item == "union") {
         return tk_union;
-    } else if (item == "unknown") {
-        return tk_unknown;
     } else if (item == "scope") {
         return tk_scope;
     } else if (item == "elif") {
@@ -174,9 +172,7 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_virtual;
     } else if (item == "class") {
         return tk_class;
-    } else if (item == "flags") {
-        return tk_flags;
-    } else {
+    }else {
         return is_number(item);
     }
 }

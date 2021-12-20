@@ -82,3 +82,6 @@ def test(int a, str b) -> int:
 assert 5==8
 assert 5==5
 raise ZeroDivisionError
+
+with n,x as y,m:
+    printf("Hello")
