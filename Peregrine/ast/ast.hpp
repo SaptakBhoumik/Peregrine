@@ -470,11 +470,13 @@ class ClassDefinition: public AstNode {
   
   public:
     ClassDefinition(AstNodePtr c_name,std::vector<AstNodePtr> c_attributes,std::vector<AstNodePtr> c_methods);
-    AstNodePtr name();
-    std::vector<AstNodePtr> attributes();
-    std::vector<AstNodePtr> methods();
-    AstKind type();
-    std::string stringify();
+    Token token() const;
+    AstNodePtr name() const;
+    std::vector<AstNodePtr> attributes() const;
+    std::vector<AstNodePtr> methods() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 
 

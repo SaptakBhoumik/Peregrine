@@ -481,39 +481,37 @@ ClassDefinition::ClassDefinition(AstNodePtr name,std::vector<AstNodePtr> attribu
     c_methods = methods;
 }
 
-AstNodePtr ClassDefinition::name() { return c_name; }
+AstNodePtr ClassDefinition::name() const { return c_name; }
 
-std::vector<AstNodePtr> ClassDefinition::attributes() { return c_attributes; }
+std::vector<AstNodePtr> ClassDefinition::attributes() const { return c_attributes; }
 
-std::vector<AstNodePtr> ClassDefinition::methods() { return c_methods; } 
+std::vector<AstNodePtr> ClassDefinition::methods() const { return c_methods; } 
 
-AstKind ClassDefinition::type() { return KAstClassDef; }
+AstKind ClassDefinition::type() const { return KAstClassDef; }
 
-std::string ClassDefinition::stringify() {
+Token ClassDefinition::token() const { return Token{}; }
+
+std::string ClassDefinition::stringify() const {
 
     std::string res = "class ";
     res += c_name->stringify();
     res += ":\n";
-    
+
     for (auto& stmt : c_attributes) {
         res += stmt->stringify();
         res += "\n";
     }
     res += ":\n";
-    
+
     for (auto& stmt : c_methods) {
         res += stmt->stringify();
         res += "\n";
-    } 
+    }
 
     return res;
 
 }
 
-
-
-
-FunctionDefinition::FunctionDefinition(AstNodePtr returnType, AstNodePtr name,
 FunctionDefinition::FunctionDefinition(Token tok, AstNodePtr returnType,
                                        AstNodePtr name,
                                        std::vector<parameter> parameters,

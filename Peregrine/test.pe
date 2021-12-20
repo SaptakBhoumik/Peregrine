@@ -79,6 +79,7 @@ class test:
 
     def addition(int a,int b) -> int:
         return a+b
+
 type x = def(int , char)->char
 type x = def()->char
 type x = def()

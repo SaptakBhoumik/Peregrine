@@ -11,6 +11,7 @@ class AstVisitor {
 
     virtual bool visit(const Program& node) { return false; };
     virtual bool visit(const BlockStatement& node) { return false; };
+    virtual bool visit(const ClassDefinition& node){ return false; }
     virtual bool visit(const ImportStatement& node) { return false; };
     virtual bool visit(const FunctionDefinition& node) { return false; };
     virtual bool visit(const VariableStatement& node) { return false; };

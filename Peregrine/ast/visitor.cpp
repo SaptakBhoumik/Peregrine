@@ -77,6 +77,16 @@ void BlockStatement::accept(AstVisitor& visitor) const {
             stmt->accept(visitor);
 }
 
+void ClassDefinition::accept(AstVisitor& visitor) const {
+    if (!visitor.visit(*this)){
+        for (auto& stmt : c_attributes)
+            stmt->accept(visitor);
+        for (auto& stmt : c_methods) 
+            stmt->accept (visitor);
+    }
+
+}
+
 void FunctionDefinition::accept(AstVisitor& visitor) const {
     visitor.visit(*this);
 }

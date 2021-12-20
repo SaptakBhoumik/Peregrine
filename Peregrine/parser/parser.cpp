@@ -85,9 +85,10 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseFor();
             break;
         }
-        
-        case tk_from:
-        case tk_import: {
+        case tk_from: {
+            break;
+	}
+	case tk_import: {
             stmt = parseImport();
             break;
         }
@@ -238,7 +239,7 @@ AstNodePtr Parser::parseClassDefinition(){
             methods.push_back(parseFunctionDef());
             advanceOnNewLine();
         }
-        if(m_currentToken.tkType==tk_newline){advance();}
+        if(m_currentToken.tkType==tk_new_line){advance();}
     }
     return std::make_shared<ClassDefinition>(name,attributes,methods);
 
