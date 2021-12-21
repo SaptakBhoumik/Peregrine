@@ -606,7 +606,7 @@ AstKind AssertStatement::type() const { return KAstAssertStmt; }
 
 std::string AssertStatement::stringify() const {
     std::string res = "assert ";
-    res+=m_condition->stringify();
+    res += m_condition->stringify();
     return res;
 }
 
@@ -623,10 +623,9 @@ AstKind RaiseStatement::type() const { return KAstRaiseStmt; }
 
 std::string RaiseStatement::stringify() const {
     std::string res = "raise ";
-    res+=m_value->stringify();
+    res += m_value->stringify();
     return res;
 }
-
 
 WhileStatement::WhileStatement(Token tok, AstNodePtr condition,
                                AstNodePtr body) {
@@ -822,12 +821,12 @@ std::string MatchStatement::stringify() const {
     return res;
 }
 
-ListTypeExpr::ListTypeExpr(Token tok, AstNodePtr baseType) {
+ListTypeExpr::ListTypeExpr(Token tok, AstNodePtr elemType) {
     m_token = tok;
-    m_baseType = baseType;
+    m_elemType = elemType;
 }
 
-AstNodePtr ListTypeExpr::baseType() const { return m_baseType; }
+AstNodePtr ListTypeExpr::elemType() const { return m_elemType; }
 
 Token ListTypeExpr::token() const { return m_token; }
 
@@ -835,7 +834,7 @@ AstKind ListTypeExpr::type() const { return KAstListTypeExpr; }
 
 std::string ListTypeExpr::stringify() const {
     std::string res = "[]";
-    res += m_baseType->stringify();
+    res += m_elemType->stringify();
     return res;
 }
 
@@ -895,33 +894,27 @@ std::string FunctionTypeExpr::stringify() const {
     return res;
 }
 
-DecoratorStatement::DecoratorStatement(Token tok, std::vector<AstNodePtr> decorators,
-                AstNodePtr body){
-    m_token=tok;
-    m_decorators=decorators;
-    m_body=body;
+DecoratorStatement::DecoratorStatement(Token tok,
+                                       std::vector<AstNodePtr> decorators,
+                                       AstNodePtr body) {
+    m_token = tok;
+    m_decorators = decorators;
+    m_body = body;
 }
 std::vector<AstNodePtr> DecoratorStatement::decoratorItem() const {
     return m_decorators;
 }
-AstNodePtr DecoratorStatement::body() const {
-    return m_body;
-}
-Token DecoratorStatement::token() const {
-    return m_token;
-}
-AstKind DecoratorStatement::type() const {
-    return KAstDecorator;
-}
+AstNodePtr DecoratorStatement::body() const { return m_body; }
+Token DecoratorStatement::token() const { return m_token; }
+AstKind DecoratorStatement::type() const { return KAstDecorator; }
 std::string DecoratorStatement::stringify() const {
     std::string res;
-    for (auto& x:m_decorators){
-        res+="@"+x->stringify()+"\n";
+    for (auto& x : m_decorators) {
+        res += "@" + x->stringify() + "\n";
         // std::cout<<res<<"\n";
     }
-    res+=m_body->stringify();
+    res += m_body->stringify();
     return res;
 }
 
 } // namespace ast
-

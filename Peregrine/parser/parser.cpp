@@ -130,11 +130,11 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseConstDeclaration();
             break;
         }
-        case tk_assert:{
+        case tk_assert: {
             stmt = parseAssert();
             break;
         }
-        case tk_at:{
+        case tk_at: {
             stmt = parseDecoratorCall();
             break;
         }
@@ -169,7 +169,7 @@ AstNodePtr Parser::parseStatement() {
             advanceOnNewLine();
             break;
         }
-        case tk_raise:{
+        case tk_raise: {
             stmt = parseRaise();
             advanceOnNewLine();
             break;
@@ -747,8 +747,8 @@ AstNodePtr Parser::parseListType() {
     expect(tk_list_close);
     advance();
 
-    AstNodePtr baseType = parseType();
-    return std::make_shared<ListTypeExpr>(tok, baseType);
+    AstNodePtr elemType = parseType();
+    return std::make_shared<ListTypeExpr>(tok, elemType);
 }
 
 AstNodePtr Parser::parseDictType() {
@@ -847,33 +847,33 @@ AstNodePtr Parser::parseMatch() {
         default_body = parseBlockStatement();
     }
     expect(tk_dedent);
-    return std::make_shared<MatchStatement>(tok, toMatch,cases,default_body);
+    return std::make_shared<MatchStatement>(tok, toMatch, cases, default_body);
 }
 
-AstNodePtr Parser::parseDecoratorCall(){
-    auto tok=m_currentToken;
+AstNodePtr Parser::parseDecoratorCall() {
+    auto tok = m_currentToken;
     std::vector<AstNodePtr> decorators;
     AstNodePtr body;
-    while (m_currentToken.tkType==tk_at){
+    while (m_currentToken.tkType == tk_at) {
         expect(tk_identifier);
         decorators.push_back(parseExpression(pr_lowest));
         advance();
     }
-    if(m_currentToken.tkType==tk_def){
-        body=parseFunctionDef();
+    if (m_currentToken.tkType == tk_def) {
+        body = parseFunctionDef();
     }
-    return std::make_shared<DecoratorStatement>(tok, decorators,body);
+    return std::make_shared<DecoratorStatement>(tok, decorators, body);
 }
 
-AstNodePtr Parser::parseAssert(){
-    auto tok=m_currentToken;
+AstNodePtr Parser::parseAssert() {
+    auto tok = m_currentToken;
     advance();
     auto condition = parseExpression(precedenceMap[m_currentToken.tkType]);
-    return std::make_shared<AssertStatement>(tok,condition);
+    return std::make_shared<AssertStatement>(tok, condition);
 }
-AstNodePtr Parser::parseRaise(){
-    auto tok=m_currentToken;
+AstNodePtr Parser::parseRaise() {
+    auto tok = m_currentToken;
     advance();
     AstNodePtr value = parseExpression(precedenceMap[m_currentToken.tkType]);
-    return std::make_shared<RaiseStatement>(tok,value);
+    return std::make_shared<RaiseStatement>(tok, value);
 }

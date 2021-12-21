@@ -359,6 +359,10 @@ TypePtr TypeProducer::string() { return m_string; }
 
 TypePtr TypeProducer::voidT() { return m_void; }
 
+TypePtr TypeProducer::list(TypePtr elemType) {
+    return std::make_shared<ListType>(elemType);
+}
+
 std::map<std::string, TypePtr> identifierToTypeMap = {
     {"i8", TypeProducer::integer(IntType::IntSizes::Int8)},
     {"i16", TypeProducer::integer(IntType::IntSizes::Int16)},

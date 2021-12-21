@@ -259,7 +259,11 @@ bool TypeChecker::visit(const ast::TypeExpression& node) {
     return true;
 }
 
-bool TypeChecker::visit(const ast::ListTypeExpr& node) { return true; }
+bool TypeChecker::visit(const ast::ListTypeExpr& node) {
+    node.elemType()->accept(*this);
+    m_result = TypeProducer::list(m_result);
+    return true;
+}
 
 bool TypeChecker::visit(const ast::DictTypeExpr& node) { return true; }
 

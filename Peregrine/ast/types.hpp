@@ -198,6 +198,8 @@ class TypeProducer {
     static TypePtr string();
     static TypePtr boolean();
     static TypePtr voidT();
+
+    static TypePtr list(TypePtr elemType);
 };
 
 extern std::map<std::string, TypePtr> identifierToTypeMap;

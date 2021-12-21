@@ -198,12 +198,12 @@ class TypeExpression : public AstNode {
 
 class ListTypeExpr : public AstNode {
     Token m_token;
-    AstNodePtr m_baseType;
+    AstNodePtr m_elemType;
 
   public:
-    ListTypeExpr(Token tok, AstNodePtr baseType);
+    ListTypeExpr(Token tok, AstNodePtr elemType);
 
-    AstNodePtr baseType() const;
+    AstNodePtr elemType() const;
 
     Token token() const;
     AstKind type() const;
@@ -517,10 +517,10 @@ class IfStatement : public AstNode {
     void accept(AstVisitor& visitor) const;
 };
 
-
 class AssertStatement : public AstNode {
     Token m_token;
     AstNodePtr m_condition;
+
   public:
     AssertStatement(Token tok, AstNodePtr condition);
     AstNodePtr condition() const;
@@ -533,6 +533,7 @@ class AssertStatement : public AstNode {
 class RaiseStatement : public AstNode {
     Token m_token;
     AstNodePtr m_value;
+
   public:
     RaiseStatement(Token tok, AstNodePtr value);
     AstNodePtr value() const;
@@ -689,12 +690,13 @@ class MatchStatement : public AstNode {
 };
 
 class DecoratorStatement : public AstNode {
-  Token m_token;
-  std::vector<AstNodePtr> m_decorators;
-  AstNodePtr m_body;
+    Token m_token;
+    std::vector<AstNodePtr> m_decorators;
+    AstNodePtr m_body;
+
   public:
     DecoratorStatement(Token tok, std::vector<AstNodePtr> decorators,
-                AstNodePtr body);
+                       AstNodePtr body);
 
     std::vector<AstNodePtr> decoratorItem() const;
     AstNodePtr body() const;
