@@ -26,7 +26,7 @@ void TypeChecker::error(Token tok, std::string_view msg) {
 }
 
 EnvPtr TypeChecker::createEnv(EnvPtr parent) {
-    return std::make_shared<SymbolTable<TypeEnvVal>>(parent);
+    return std::make_shared<SymbolTable<TypePtr>>(parent);
 }
 
 void TypeChecker::checkBody(ast::AstNodePtr body) {
@@ -43,11 +43,12 @@ void TypeChecker::check(ast::AstNodePtr expr, const Type& expectedType) {
     if (exprType != expectedType) {
         if (!exprType.isConvertibleTo(expectedType) &&
             !expectedType.isConvertibleTo(exprType)) {
-            error(expr->token(), "expected type " + expectedType.stringify() + ", got " +
-                  exprType.stringify() + " instead");
+            error(expr->token(), "expected type " + expectedType.stringify() +
+                                     ", got " + exprType.stringify() +
+                                     " instead");
         }
 
-        //TODO: convert one type to another
+        // TODO: convert one type to another
     }
 }
 
@@ -70,20 +71,21 @@ bool TypeChecker::visit(const ast::FunctionDefinition& node) {
     for (auto& param : node.parameters()) {
         param.p_type->accept(*this);
         parameterTypes.push_back(m_result);
-        m_env->set(identifierName(param.p_name), TypeEnvVal{m_result, false});
+        m_env->set(identifierName(param.p_name), m_result);
     }
 
     node.returnType()->accept(*this);
-    std::cout << m_result->stringify() << "\n";
+
     auto functionType =
         std::make_shared<FunctionType>(parameterTypes, m_result);
 
+    auto oldFunction = m_currentFunction;
     m_currentFunction = functionType;
     node.body()->accept(*this);
-    m_currentFunction = nullptr;
+    m_currentFunction = oldFunction;
 
     m_env = oldEnv;
-    m_env->set(identifierName(node.name()), TypeEnvVal{functionType, false});
+    m_env->set(identifierName(node.name()), functionType);
     return true;
 }
 
@@ -96,16 +98,28 @@ bool TypeChecker::visit(const ast::VariableStatement& node) {
     }
 
     check(node.value(), *varType);
-    m_env->set(identifierName(node.name()), TypeEnvVal{varType, false});
+    m_env->set(identifierName(node.name()), varType);
     return true;
 }
 
-bool TypeChecker::visit(const ast::ConstDeclaration& node) { return true; }
+bool TypeChecker::visit(const ast::ConstDeclaration& node) {
+    node.constType()->accept(*this);
+    TypePtr constType = m_result;
+
+    if (constType->category() == TypeCategory::Void) {
+        // infer it
+    }
+
+    check(node.value(), *constType);
+    m_env->set(identifierName(node.name()), constType);
+    return true;
+}
 
 bool TypeChecker::visit(const ast::TypeDefinition& node) {
     node.baseType()->accept(*this);
+    TypePtr userDefinedType = std::make_shared<UserDefinedType>(m_result);
 
-    m_env->set(identifierName(node.name()), TypeEnvVal{m_result, true});
+    m_env->set(identifierName(node.name()), userDefinedType);
     return true;
 }
 
@@ -150,17 +164,13 @@ bool TypeChecker::visit(const ast::ScopeStatement& node) {
 }
 
 bool TypeChecker::visit(const ast::ReturnStatement& node) {
-    std::cout << "at return"
-              << "\n";
     node.returnValue()->accept(*this);
-    std::cout << m_result->stringify() << "\n";
-    std::cout << m_currentFunction->returnType()->stringify() << "\n";
+
     if (!m_currentFunction) {
         error(node.token(), "can not return outside of a function");
     }
 
-    check(node.returnValue(), *m_currentFunction->returnType());
-    return true;
+    check(node.returnValue(), *m_currentFunction->returnType()) return true;
 }
 
 bool TypeChecker::visit(const ast::ListLiteral& node) { return true; }
@@ -176,8 +186,9 @@ bool TypeChecker::visit(const ast::BinaryOperation& node) {
     TypePtr result = leftType->infixOperatorResult(node.op(), m_result);
 
     if (!result) {
-        error(node.token(), "operator " + node.op().keyword + " can not be used with types " +
-              leftType->stringify() + " and " + m_result->stringify());
+        error(node.token(),
+              "operator " + node.op().keyword + " can not be used with types " +
+                  leftType->stringify() + " and " + m_result->stringify());
     }
 
     m_result = leftType;
@@ -189,7 +200,8 @@ bool TypeChecker::visit(const ast::PrefixExpression& node) {
     TypePtr result = m_result->prefixOperatorResult(node.prefix());
     if (!result) {
         error(node.token(), "operator " + node.prefix().keyword +
-              " can not be used with type " + m_result->stringify());
+                                " can not be used with type " +
+                                m_result->stringify());
     }
 
     m_result = result;
@@ -198,6 +210,7 @@ bool TypeChecker::visit(const ast::PrefixExpression& node) {
 
 bool TypeChecker::visit(const ast::FunctionCall& node) {
     node.name()->accept(*this);
+
     if (m_result->category() != TypeCategory::Function)
         error(node.token(), identifierName(node.name()) + " is not a function");
 
@@ -205,7 +218,7 @@ bool TypeChecker::visit(const ast::FunctionCall& node) {
 
     if (functionType->parameterTypes().size() != node.arguments().size())
         error(node.token(), "invalid number of arguments passed to " +
-              identifierName(node.name()));
+                                identifierName(node.name()));
 
     for (size_t i = 0; i < node.arguments().size(); i++) {
         check(node.arguments()[i], *functionType->parameterTypes()[i]);
@@ -219,11 +232,13 @@ bool TypeChecker::visit(const ast::DotExpression& node) { return true; }
 
 bool TypeChecker::visit(const ast::IdentifierExpression& node) {
     auto identifierType = m_env->get(node.value());
-    if (!identifierType || identifierType.value().isUserDefinedType) {
+
+    if (!identifierType ||
+        identifierType.value()->category() == TypeCategory::UserDefined) {
         error(node.token(), "undeclared identifier: " + node.value());
     }
 
-    m_result = identifierType.value().type;
+    m_result = identifierType.value();
     return true;
 }
 
@@ -231,11 +246,12 @@ bool TypeChecker::visit(const ast::TypeExpression& node) {
     if (!identifierToTypeMap.count(node.value())) {
         auto type = m_env->get(node.value());
 
-        if (!type || !type.value().isUserDefinedType) {
-            error(node.token(), node.value() + " is not a type"); // return or not return?
+        if (!type || type.value()->category() != TypeCategory::UserDefined) {
+            error(node.token(),
+                  node.value() + " is not a type"); // return or not return?
         }
 
-        m_result = type.value().type;
+        m_result = type.value();
         return true;
     }
 

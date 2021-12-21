@@ -27,13 +27,13 @@ bool IntType::isConvertibleTo(const Type& type) const {
     }
 
     if (type.category() == TypeCategory::Integer) {
-        auto typeInt = dynamic_cast<const IntType&>(type);
+        auto& typeInt = dynamic_cast<const IntType&>(type);
 
         // an Int32 can't be converted to a Int8
         if (m_intSize > typeInt.size())
             return false;
     } else {
-        auto typeDecimal = dynamic_cast<const DecimalType&>(type);
+        auto& typeDecimal = dynamic_cast<const DecimalType&>(type);
 
         // if the integer has a value of 64 bits, it can only fit in doubles
         if (m_intSize == IntType::Int64 && typeDecimal.isFloat())
@@ -82,8 +82,8 @@ TypePtr IntType::infixOperatorResult(Token op, const TypePtr type) const {
 
 bool IntType::operator==(const Type& type) const {
     if (type.category() == TypeCategory::Integer) {
-        auto intType = dynamic_cast<const IntType&>(type);
-        if (intType.size() == size() && intType.modifier() == modifier())
+        auto& intType = dynamic_cast<const IntType&>(type);
+        if (intType.size() == m_intSize && intType.modifier() == m_modifier)
             return true;
     }
 
@@ -102,7 +102,7 @@ bool DecimalType::isConvertibleTo(const Type& type) const {
     if (type.category() != TypeCategory::Decimal)
         return false;
 
-    auto typeDecimal = dynamic_cast<const DecimalType&>(type);
+    auto& typeDecimal = dynamic_cast<const DecimalType&>(type);
 
     if (!isFloat() && typeDecimal.isFloat())
         return false;
@@ -152,7 +152,7 @@ TypePtr DecimalType::infixOperatorResult(Token op, const TypePtr type) const {
 
 bool DecimalType::operator==(const Type& type) const {
     if (type.category() == TypeCategory::Decimal) {
-        auto decimalType = dynamic_cast<const DecimalType&>(type);
+        auto& decimalType = dynamic_cast<const DecimalType&>(type);
         if (decimalType.size() == size())
             return true;
     }
@@ -212,13 +212,35 @@ bool VoidType::isConvertibleTo(const Type& type) const { return false; }
 
 std::string VoidType::stringify() const { return "void"; }
 
-ListType::ListType(TypePtr baseType) { m_baseType = baseType; }
+ListType::ListType(TypePtr elemType) { m_elemType = elemType; }
 
 TypeCategory ListType::category() const { return TypeCategory::List; }
 
-bool ListType::isConvertibleTo(const Type& type) const { return false; }
+TypePtr ListType::elemType() const { return m_elemType; }
+
+bool ListType::isConvertibleTo(const Type& type) const {
+    if (type.category() != TypeCategory::List)
+        return false;
+
+    auto listType = dynamic_cast<const ListType&>(type);
+    if (m_elemType->isConvertibleTo(*listType.elemType()))
+        return true;
+
+    return false;
+}
 
 std::string ListType::stringify() const { return ""; }
+
+bool ListType::operator==(const Type& type) const {
+    if (type.category() != TypeCategory::List)
+        return false;
+
+    auto listType = dynamic_cast<const ListType&>(type);
+    if (m_elemType->operator==(*listType.elemType()))
+        return true;
+
+    return false;
+}
 
 UserDefinedType::UserDefinedType(TypePtr baseType) { m_baseType = baseType; }
 
@@ -226,11 +248,20 @@ TypeCategory UserDefinedType::category() const {
     return TypeCategory::UserDefined;
 }
 
+TypePtr UserDefinedType::baseType() const { return m_baseType; }
+
 bool UserDefinedType::isConvertibleTo(const Type& type) const {
     return m_baseType->isConvertibleTo(type);
 }
 
+// TODO
 std::string UserDefinedType::stringify() const { return ""; }
+
+bool UserDefinedType::operator==(const Type& type) const {
+    if (m_baseType->operator==(type))
+        return true;
+    return false;
+}
 
 FunctionType::FunctionType(std::vector<TypePtr> parameterTypes,
                            TypePtr returnType) {
@@ -240,15 +271,52 @@ FunctionType::FunctionType(std::vector<TypePtr> parameterTypes,
 
 TypeCategory FunctionType::category() const { return TypeCategory::Function; }
 
-std::vector<TypePtr> FunctionType::parameterTypes() const {
+const std::vector<TypePtr>& FunctionType::parameterTypes() const {
     return m_parameterTypes;
 }
 
 TypePtr FunctionType::returnType() const { return m_returnType; }
 
-bool FunctionType::isConvertibleTo(const Type& type) const { return false; }
+bool FunctionType::isConvertibleTo(const Type& type) const {
+    if (type.category() != TypeCategory::Function)
+        return false;
+
+    auto& funcType = dynamic_cast<const FunctionType&>(type);
+
+    if (!m_returnType->isConvertibleTo(*funcType.returnType()) &&
+        !funcType.returnType()->isConvertibleTo(*m_returnType))
+        return false;
+
+    for (size_t i = 0; i < m_parameterTypes.size(); i++) {
+        auto& thisParamType = *m_parameterTypes[i];
+        auto& thatParamType = *funcType.parameterTypes()[i];
+
+        if (!thisParamType.isConvertibleTo(thatParamType) &&
+            !thatParamType.isConvertibleTo(thisParamType))
+            return false;
+    }
+
+    return true;
+}
 
 std::string FunctionType::stringify() const { return "function"; }
+
+bool FunctionType::operator==(const Type& type) const {
+    if (type.category() != TypeCategory::Function)
+        return false;
+
+    auto& funcType = dynamic_cast<const FunctionType&>(type);
+    if (funcType.returnType()->operator!=(*m_returnType) ||
+        funcType.parameterTypes().size() != m_parameterTypes.size())
+        return false;
+
+    for (size_t i = 0; i < m_parameterTypes.size(); i++) {
+        if (*m_parameterTypes[i] != *funcType.parameterTypes()[i])
+            return false;
+    }
+
+    return true;
+}
 
 std::array<TypePtr, 8> TypeProducer::m_integer = {
     std::make_shared<IntType>(IntType::IntSizes::Int8),

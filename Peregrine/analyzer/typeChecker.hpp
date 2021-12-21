@@ -11,12 +11,7 @@
 
 using namespace types;
 
-struct TypeEnvVal {
-    TypePtr type;
-    bool isUserDefinedType;
-};
-
-using EnvPtr = std::shared_ptr<SymbolTable<TypeEnvVal>>;
+using EnvPtr = std::shared_ptr<SymbolTable<TypePtr>>;
 
 class TypeChecker : public ast::AstVisitor {
   public:
@@ -61,7 +56,7 @@ class TypeChecker : public ast::AstVisitor {
     bool visit(const ast::BoolLiteral& node);
     bool visit(const ast::NoneLiteral& node);
 
-    std::string m_filename; 
+    std::string m_filename;
     TypePtr m_result;
     EnvPtr m_env;
 

@@ -12,7 +12,7 @@
 
 namespace types {
 
-enum class TypeCategory {
+enum TypeCategory {
     Integer,
     Decimal,
     String,
@@ -54,9 +54,7 @@ class Type {
         return category() == type.category();
     }
 
-    bool operator!=(const Type& type) const {
-        return !operator==(type);
-    }
+    bool operator!=(const Type& type) const { return !operator==(type); }
 };
 
 class IntType : public Type {
@@ -140,16 +138,17 @@ class VoidType : public Type {
 };
 
 class ListType : public Type {
-    TypePtr m_baseType;
+    TypePtr m_elemType;
 
   public:
-    ListType(TypePtr baseType);
+    ListType(TypePtr elemType);
 
     TypeCategory category() const;
+    TypePtr elemType() const;
     bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
 
-    // bool operator==(const Type& type) const;
+    bool operator==(const Type& type) const;
 };
 
 class UserDefinedType : public Type {
@@ -163,7 +162,7 @@ class UserDefinedType : public Type {
     bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
 
-    // bool operator==(const Type& type) const;
+    bool operator==(const Type& type) const;
 };
 
 class FunctionType : public Type {
@@ -174,12 +173,12 @@ class FunctionType : public Type {
     FunctionType(std::vector<TypePtr> parameterTypes, TypePtr returnType);
 
     TypeCategory category() const;
-    std::vector<TypePtr> parameterTypes() const;
+    const std::vector<TypePtr>& parameterTypes() const;
     TypePtr returnType() const;
     bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
 
-    // bool operator==(const Type& type) const;
+    bool operator==(const Type& type) const;
 };
 
 class TypeProducer {
