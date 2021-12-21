@@ -53,7 +53,8 @@ enum AstKind {
     KAstStatic,
     KAstInline,
     KAstEnum,
-    KAstWith
+    KAstWith,
+    KAstVirtual
 };
 
 class AstVisitor;
@@ -467,17 +468,17 @@ struct parameter {
 class ClassDefinition : public AstNode {
     Token m_token;
     AstNodePtr m_name;
-    AstNodePtr m_parent;
+    std::vector<AstNodePtr> m_parent;//NOTE:class test(parent1,parent2)
     std::vector<AstNodePtr> m_attributes;
     std::vector<AstNodePtr> m_methods;
 
   public:
-    ClassDefinition(Token tok, AstNodePtr name, AstNodePtr parent,
+    ClassDefinition(Token tok, AstNodePtr name, std::vector<AstNodePtr>  parent,
                     std::vector<AstNodePtr> attributes,
                     std::vector<AstNodePtr> methods);
 
     AstNodePtr name() const;
-    AstNodePtr parent() const;
+    std::vector<AstNodePtr>  parent() const;
     std::vector<AstNodePtr> attributes() const;
     std::vector<AstNodePtr> methods() const;
 
@@ -620,6 +621,19 @@ class InlineStatement : public AstNode {
 
   public:
     InlineStatement(Token tok, AstNodePtr body);
+    AstNodePtr body() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+class VirtualStatement : public AstNode {
+    Token m_token;
+    AstNodePtr m_body;
+
+  public:
+    VirtualStatement(Token tok, AstNodePtr body);
     AstNodePtr body() const;
     Token token() const;
     AstKind type() const;

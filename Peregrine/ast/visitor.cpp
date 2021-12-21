@@ -140,4 +140,6 @@ void MatchStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void WithStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
+void VirtualStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+
 } // namespace ast

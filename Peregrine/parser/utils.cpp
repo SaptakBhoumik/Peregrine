@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include <iostream>
 bool Parser::is_imported_var(){
     auto index=m_tokIndex;
     auto tokens = m_tokens;

@@ -1,6 +1,15 @@
-class test(parent):
+class test(parent1,parent2):
     int a = 5
     int b = 2
-
+    static d=0
+    @dec
     def addition(int a,int b) -> int:
-        return a+b
+        return self.a +self.b
+    def sub(int a,int b) -> int:
+        return self.a - self.b
+    virtual def multi(int a,int b) -> int:
+        return self.a * self.b
+    inline def div():
+        return self.a / self.b
+    static inline def pow():
+        return self.a ** self.b

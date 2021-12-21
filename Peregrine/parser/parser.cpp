@@ -236,17 +236,23 @@ AstNodePtr Parser::parseClassDefinition() {
 
     std::vector<AstNodePtr> attributes;
     std::vector<AstNodePtr> methods;
+    std::vector<AstNodePtr> dec_methods;
 
     expect(tk_identifier);
 
     AstNodePtr name = parseName();
-    AstNodePtr parent = std::make_shared<NoLiteral>();
+    std::vector<AstNodePtr> parent;
 
     if (next().tkType == tk_l_paren) {
         advance();
         advance();
-        parent = parseName();
-        expect(tk_r_paren);
+        while(m_currentToken.tkType!=tk_r_paren){
+            parent.push_back(parseType());//IMPORTANT: It should always use parseType instead of parseName
+            advance();
+            if(m_currentToken.tkType==tk_comma){
+                advance();
+            }
+        }
     }
 
     expect(tk_colon);
@@ -267,7 +273,27 @@ AstNodePtr Parser::parseClassDefinition() {
                 attributes.push_back(parseVariableStatement());
                 break;
             }
-
+            case tk_at:{
+                methods.push_back(parseDecoratorCall());
+                break;
+            }
+            case tk_virtual:{
+                methods.push_back(parseVirtual());
+                break;
+            }
+            case tk_inline:{
+                methods.push_back(parseInline());
+                break;
+            }
+            case tk_static:{
+                if(next().tkType==tk_def||next().tkType==tk_inline){
+                    methods.push_back(parseStatic());
+                }
+                else{
+                    attributes.push_back(parseStatic());
+                }
+                break;
+            }
             default: {
                 error(m_currentToken,
                       "expected a method or variable declaration, got " +
@@ -280,6 +306,13 @@ AstNodePtr Parser::parseClassDefinition() {
 
     return std::make_shared<ClassDefinition>(tok, name, parent, attributes,
                                              methods);
+}
+
+AstNodePtr Parser::parseVirtual() {
+    auto tok=m_currentToken;
+    expect(tk_def);
+    AstNodePtr body=parseFunctionDef();
+    return std::make_shared<VirtualStatement>(tok ,body);
 }
 
 AstNodePtr Parser::parseImport() {
@@ -623,6 +656,10 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
     }
 
     while (nextPrecedence() > currPrecedence) {
+        Token m_prevToken;
+        if(m_tokIndex>0){
+            m_prevToken=m_tokens[m_tokIndex-1];
+        }
         advance();
 
         switch (m_currentToken.tkType) {
@@ -642,7 +679,10 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
             }
 
             default: {
-                left = parseBinaryOperation(left);
+                //To make something like eturn (self.a + self.b) valid
+                if (m_prevToken.tkType!=tk_dot){
+                    left = parseBinaryOperation(left);
+                }
                 break;
             }
         }
@@ -719,7 +759,12 @@ AstNodePtr Parser::parseDotExpression(AstNodePtr left) {
 
     // TODO: validate output of parseExpression
     AstNodePtr referenced = parseExpression();
-
+    if(precedenceMap.count(m_currentToken.tkType) != 0){
+        if (precedenceMap[m_currentToken.tkType]>pr_lowest){
+            //To make something like eturn (self.a + self.b) valid
+            return parseBinaryOperation(std::make_shared<DotExpression>(tok, left, referenced));
+        }
+    }
     return std::make_shared<DotExpression>(tok, left, referenced);
 }
 

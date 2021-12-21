@@ -478,7 +478,7 @@ std::string BlockStatement::stringify() const {
     return res;
 }
 
-ClassDefinition::ClassDefinition(Token tok, AstNodePtr name, AstNodePtr parent,
+ClassDefinition::ClassDefinition(Token tok, AstNodePtr name, std::vector<AstNodePtr> parent,
                                  std::vector<AstNodePtr> attributes,
                                  std::vector<AstNodePtr> methods) {
     m_token = tok;
@@ -490,7 +490,7 @@ ClassDefinition::ClassDefinition(Token tok, AstNodePtr name, AstNodePtr parent,
 
 AstNodePtr ClassDefinition::name() const { return m_name; }
 
-AstNodePtr ClassDefinition::parent() const { return m_parent; }
+std::vector<AstNodePtr> ClassDefinition::parent() const { return m_parent; }
 
 std::vector<AstNodePtr> ClassDefinition::attributes() const {
     return m_attributes;
@@ -507,9 +507,14 @@ std::string ClassDefinition::stringify() const {
     std::string res = "class ";
     res += m_name->stringify();
 
-    if (m_parent->type() != KAstNoLiteral) {
-        res += "(" + m_parent->stringify() + ")";
+    res += "(";
+    for (size_t i=0;i<m_parent.size();++i){
+        res+=m_parent[i]->stringify();
+        if(i<m_parent.size()-1){
+            res+=",";
+        }
     }
+        res+= ")";
 
     res += ":\n";
 
@@ -757,6 +762,23 @@ AstKind InlineStatement::type() const { return KAstInline; }
 
 std::string InlineStatement::stringify() const {
     std::string res = "inline ";
+    res += m_body->stringify();
+    return res;
+}
+
+VirtualStatement::VirtualStatement(Token tok, AstNodePtr body) {
+    m_token = tok;
+    m_body = body;
+}
+
+AstNodePtr VirtualStatement::body() const { return m_body; }
+
+Token VirtualStatement::token() const { return m_token; }
+
+AstKind VirtualStatement::type() const { return KAstVirtual; }
+
+std::string VirtualStatement::stringify() const {
+    std::string res = "virtual ";
     res += m_body->stringify();
     return res;
 }
