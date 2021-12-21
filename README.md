@@ -40,22 +40,38 @@ You can consider it to be a superset of C which compiles to clean C. So valid C 
 
 ### Requirements to build from source
 
-- [GCC compiler](https://gcc.gnu.org/)
-- [libtcc](https://bellard.org/tcc/tcc-doc.html#Libtcc)
-- [V compiler](https://vlang.io)
+- [G++ compiler](https://gcc.gnu.org/)
 
 # Compilation instructions
 
-1. Clone this repository using the following command: `git clone https://github.com/Peregrine-lang/Peregrine.git`
-2. Run `cd Peregrine/Peregrine`
-3. To build it, run `v peregrine.v`
-4. That's it. It's that simple
+**1)Clone the rewrite branch of https://github.com/peregrine-lang/Peregrine.git**
+```bash
+git clone -b rewrite https://github.com/peregrine-lang/Peregrine.git
+```
+**2)Cd into the directory**
+```bash 
+cd Peregrine
+```
+**3)Build it**
+```bash
+meson builddir
+cd builddir
+ninja
+```
+This will create the binary of the compiler named ``./peregrine.elf`` in the builddir folder
+
+**C++ backend**
+To compile it using the c++ backing just run ``./peregrine.elf compile path_to_file.pe`` .It will create the executable named ``./a.out``. Run it to see the result. Check the [can_comp.pe](https://github.com/peregrine-lang/Peregrine/blob/rewrite/can_comp.pe) file in the root directory to know what you can do with the c++ backend at this point 
+**JS Backend**
+To use the javascript backend use the following command
+``./peregrine.elf compile path_to_file.js.pe -js``.
+It will create the javascript file named ``index.js``. Run the generated javascript using ``node index.js``. Check the [can_comp.js.pe](https://github.com/peregrine-lang/Peregrine/blob/rewrite/can_comp.js.pe) file in the root directory to know what you can do with the js backend at this point
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 ## Primary implementation language
 
-It is [written in V](https://vlang.io)
+It is written in c++
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 ## Progress
