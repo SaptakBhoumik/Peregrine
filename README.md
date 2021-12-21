@@ -62,6 +62,7 @@ This will create the binary of the compiler named ``./peregrine.elf`` in the bui
 
 **C++ backend**
 To compile it using the c++ backing just run ``./peregrine.elf compile path_to_file.pe`` .It will create the executable named ``./a.out``. Run it to see the result. Check the [can_comp.pe](https://github.com/peregrine-lang/Peregrine/blob/rewrite/can_comp.pe) file in the root directory to know what you can do with the c++ backend at this point 
+
 **JS Backend**
 To use the javascript backend use the following command
 ``./peregrine.elf compile path_to_file.js.pe -js``.
