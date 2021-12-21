@@ -5,6 +5,7 @@ lexer_src = [
 
 parser_src = [
     'parser/parser.cpp',
+    'parser/utils.cpp',
     'parser/literals.cpp'
 ]
 
@@ -24,7 +25,7 @@ codegen_src = [
     'codegen/js/codegen.cpp',
     'codegen/js/utils.cpp'
 ]
-
+#TODO: Also link the linker
 lexer = static_library('lexer', sources: lexer_src)
 parser = static_library('parser', sources: parser_src)
 ast = static_library('ast', sources: ast_src)

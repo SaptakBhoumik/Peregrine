@@ -2,7 +2,8 @@
 
 #include "ast/ast.hpp"
 #include "errors/error.hpp"
-
+#include <algorithm>
+#include <cstddef>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -15,7 +16,7 @@ namespace cpp {
 Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast,std::string filename) {
     m_filename=filename;
     m_file.open(outputFilename);
-    m_file << "#include <cstdio>\n#include <functional>\nenum{AssertionError,ZeroDivisionError};\n";
+    m_file << "#include <cstdio>\n#include <functional>\ntypedef enum{error___AssertionError,error___ZeroDivisionError} error;\n";
     m_env = createEnv();
     ast->accept(*this);
     m_file.close();
@@ -27,7 +28,15 @@ Codegen::createEnv(std::shared_ptr<SymbolTable<ast::AstNodePtr>> parent) {
 }
 
 // TODO: buffer it
-void Codegen::write(std::string_view code) { m_file << code; }
+std::string Codegen::write(std::string_view code) {
+    if(save){
+        res+=code;
+    }
+    else{
+        m_file << code; 
+    }
+    return res;
+}
 
 std::string Codegen::mangleName(ast::AstNodePtr astNode) {
     return std::string("");
@@ -109,11 +118,11 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
     else{
         write("auto ");
         node.name()->accept(*this);
-        write("=[](");
+        write("=[=](");
         codegenFuncParams(node.parameters());
-        write(")->");
+        write(")mutable->");
         node.returnType()->accept(*this);
-        write("{\n");
+        write(" {\n");
         node.body()->accept(*this);
         write("\n}");
     }
@@ -277,6 +286,63 @@ bool Codegen::visit(const ast::BreakStatement& node) {
 bool Codegen::visit(const ast::DecoratorStatement& node) {
     auto items = node.decoratorItem();
     auto body = node.body();
+    std::string contains;
+    std::string x;
+    std::string prev;
+    save=true;
+    if (res!=""){
+        prev=res;
+        res="";
+    }
+    if(body->type()==ast::KAstFunctionDef || body->type()==ast::KAstStatic){
+        std::shared_ptr<ast::FunctionDefinition> function;
+        if (body->type()==ast::KAstStatic){
+            write("static ");
+            function = std::dynamic_pointer_cast<ast::FunctionDefinition>(
+                        std::dynamic_pointer_cast<ast::StaticStatement>(body)->body()
+                        );
+        }
+        else{
+            function = std::dynamic_pointer_cast<ast::FunctionDefinition>(body);
+        }
+        write("auto ");
+        function->name()->accept(*this);
+        write("=");
+        x+=res;
+        res="";
+        if(is_func_def){
+            write("[=](");
+        }
+        else{
+            write("[](");
+        }
+        codegenFuncParams(function->parameters());
+        write(")mutable->");
+        function->returnType()->accept(*this);
+        write("{\n");
+        if(not is_func_def){
+            is_func_def=true;
+            function->body()->accept(*this);
+            is_func_def=false;
+        }
+        else{
+            function->body()->accept(*this);
+        }
+        write("\n}");
+        contains=res;
+        res="";
+    }
+    for (size_t i = items.size() - 1; i != (size_t)-1; i--){
+        ast::AstNodePtr item=items[i];
+        contains=wrap(item,contains);
+    }
+    if (prev==""){
+        save=false;
+        write(x+contains);
+    }
+    else{
+        write(prev+x+contains);
+    }
     return true;
 }
 
@@ -334,13 +400,41 @@ bool Codegen::visit(const ast::FunctionCall& node) {
 }
 
 bool Codegen::visit(const ast::DotExpression& node) { 
-    node.owner()->accept(*this);
-    write(".");
-    node.referenced()->accept(*this);
-    return true; 
+    //FIXME: Not very elegent
+    if (not is_dot_exp){
+        is_dot_exp=true;
+        if (node.owner()->type()==ast::KAstIdentifier){
+            std::string name = std::dynamic_pointer_cast<ast::IdentifierExpression>(node.owner())->value();
+            if(std::count(enum_name.begin(), enum_name.end(), name)){
+                write(name+"___");
+                node.referenced()->accept(*this); 
+            }
+            else{
+                node.owner()->accept(*this);
+                write(".");
+                node.referenced()->accept(*this);   
+            }
+        is_dot_exp=false;
+        }
+        else {
+            node.owner()->accept(*this);
+            write(".");
+            node.referenced()->accept(*this); 
+        }
+        is_dot_exp=false;
     }
+    else{
+        node.owner()->accept(*this);
+        write(".");
+        node.referenced()->accept(*this);
+    }  
+    return true; 
+}
 
 bool Codegen::visit(const ast::IdentifierExpression& node) {
+    if (is_enum){
+        write(enum_name.back()+"___");
+    }
     write(node.value());
     return true;
 }
@@ -407,13 +501,58 @@ bool Codegen::visit(const ast::AssertStatement& node){
     write("if(! ");
     node.condition()->accept(*this);
     write("){\n");
-    write("printf(\"AssertionError : in line "+std::to_string(node.token().line)+" in file "+m_filename+"\\n   "+node.token().statement+"\\n\");fflush(stdout);throw AssertionError;");
+    write("printf(\"AssertionError : in line "+std::to_string(node.token().line)+" in file "+m_filename+"\\n   "+node.token().statement+"\\n\");fflush(stdout);throw error___AssertionError;");
     write("\n}");
+    return true;
+}
+bool Codegen::visit(const ast::StaticStatement& node){
+    write("static ");
+    node.body()->accept(*this);
+    return true;
+}
+bool Codegen::visit(const ast::InlineStatement& node){
+    write("inline ");
+    node.body()->accept(*this);
     return true;
 }
 bool Codegen::visit(const ast::RaiseStatement& node){
     write("throw ");
     node.value()->accept(*this);
+    return true;
+}
+bool Codegen::visit(const ast::UnionLiteral& node){
+    write("typedef union{\n");
+    for (auto& element:node.elements()){
+        element.first->accept(*this);
+        write(" ");
+        element.second->accept(*this);
+        write(";\n");
+    }
+    write("\n}");
+    node.name()->accept(*this);
+    return true;
+}
+bool Codegen::visit(const ast::EnumLiteral& node){
+    write("typedef enum{\n");
+    auto fields=node.fields();
+    std::string name=std::dynamic_pointer_cast<ast::IdentifierExpression>(node.name())->value();
+    enum_name.push_back(name);
+    for (size_t i=0;i<fields.size();++i){
+        auto field=fields[i];
+        write(name+"___");
+        field.first->accept(*this);
+        is_enum=true;
+        if (field.second->type()!=ast::KAstNoLiteral){
+            write(" = ");
+            field.second->accept(*this);
+        }
+        is_enum=false;
+        if (i!=fields.size()-1){
+            write(",\n");
+        }
+    }
+    write("\n}");
+    write(name);
     return true;
 }
 } // namespace cpp

@@ -67,7 +67,7 @@ enum TokenType {
     tk_static,    // static
     tk_scope,     // scope
     tk_union,     // union
-    tk_unknown,   // unknown type
+    tk_cast,     // cast
     tk_assert,    // assert
     tk_try,       // try
     tk_except,    // except
@@ -76,13 +76,12 @@ enum TokenType {
     tk_false,     // False
     tk_with,      // with
     tk_as,        // as
-    tk_flags,     // flags
     tk_none,      // None
     tk_const,     // const
     tk_import,    // import
     tk_from,      // from
-    tk_cppimport, // cppimport
-    tk_himport,   // himport
+    tk_inline, // inline
+    tk_virtual,   // virtual
     tk_if,        // if
     tk_else,      // else
     tk_elif,      // elif
@@ -108,7 +107,6 @@ enum TokenType {
     tk_class,     // class
     tk_type,      // type defination
     tk_enum,      // enum
-    tk_dict,      // dict
 
     // value type
     tk_decimal,

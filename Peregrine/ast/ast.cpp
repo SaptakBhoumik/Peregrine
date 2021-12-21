@@ -187,6 +187,71 @@ std::string DictLiteral::stringify() const {
     return res;
 }
 
+UnionLiteral::UnionLiteral(
+    Token tok, std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,AstNodePtr name) {
+    m_token = tok;
+    m_name = name;
+    m_elements = elements;
+}
+
+std::vector<std::pair<AstNodePtr, AstNodePtr>> UnionLiteral::elements() const {
+    return m_elements;
+}
+
+Token UnionLiteral::token() const { return m_token; }
+
+AstNodePtr UnionLiteral::name() const { return m_name; }
+
+AstKind UnionLiteral::type() const { return KAstUnion; }
+
+std::string UnionLiteral::stringify() const {
+    std::string res = "union ";
+    res+=m_name->stringify()+":\n";
+    for (size_t i = 0; i < m_elements.size(); i++) {
+        if (i)
+            res += "\n";
+        res += m_elements[i].first->stringify();
+        res += " ";
+        res += m_elements[i].second->stringify();
+    }
+
+    return res;
+}
+
+EnumLiteral::EnumLiteral(Token tok, std::vector<std::pair<AstNodePtr, AstNodePtr>> fields, AstNodePtr name) {
+    m_token = tok;
+    m_fields = fields;
+    m_name = name;
+}
+
+std::vector<std::pair<AstNodePtr, AstNodePtr>> EnumLiteral::fields() const {
+    return m_fields;
+}
+
+Token EnumLiteral::token() const { return m_token; }
+
+AstNodePtr EnumLiteral::name() const { return m_name; }
+
+AstKind EnumLiteral::type() const { return KAstEnum; }
+
+std::string EnumLiteral::stringify() const {
+    std::string res = "enum ";
+    res += m_name->stringify() + ":\n";
+    for (size_t i = 0; i < m_fields.size(); i++) {
+        if (i)
+            res += "\n";
+        
+        res += m_fields[i].first->stringify();
+        if (m_fields[i].second->type() == KAstNoLiteral) {}
+        else{
+            res += " = ";
+            res += m_fields[i].second->stringify();
+        }
+    }
+
+    return res;
+}
+
 BinaryOperation::BinaryOperation(Token tok, AstNodePtr left, Token op,
                                  AstNodePtr right) {
     m_token = tok;
@@ -410,6 +475,43 @@ std::string BlockStatement::stringify() const {
     return res;
 }
 
+ClassDefinition::ClassDefinition(AstNodePtr name,std::vector<AstNodePtr> attributes,std::vector<AstNodePtr> methods){
+    c_name = name;
+    c_attributes = attributes;
+    c_methods = methods;
+}
+
+AstNodePtr ClassDefinition::name() const { return c_name; }
+
+std::vector<AstNodePtr> ClassDefinition::attributes() const { return c_attributes; }
+
+std::vector<AstNodePtr> ClassDefinition::methods() const { return c_methods; } 
+
+AstKind ClassDefinition::type() const { return KAstClassDef; }
+
+Token ClassDefinition::token() const { return Token{}; }
+
+std::string ClassDefinition::stringify() const {
+
+    std::string res = "class ";
+    res += c_name->stringify();
+    res += ":\n";
+
+    for (auto& stmt : c_attributes) {
+        res += stmt->stringify();
+        res += "\n";
+    }
+    res += ":\n";
+
+    for (auto& stmt : c_methods) {
+        res += stmt->stringify();
+        res += "\n";
+    }
+
+    return res;
+
+}
+
 FunctionDefinition::FunctionDefinition(Token tok, AstNodePtr returnType,
                                        AstNodePtr name,
                                        std::vector<parameter> parameters,
@@ -609,6 +711,41 @@ std::string AssertStatement::stringify() const {
     res += m_condition->stringify();
     return res;
 }
+
+StaticStatement::StaticStatement(Token tok, AstNodePtr body) {
+    m_token = tok;
+    m_body = body;
+}
+
+AstNodePtr StaticStatement::body() const { return m_body; }
+
+Token StaticStatement::token() const { return m_token; }
+
+AstKind StaticStatement::type() const { return KAstStatic; }
+
+std::string StaticStatement::stringify() const {
+    std::string res = "static ";
+    res+=m_body->stringify();
+    return res;
+}
+
+InlineStatement::InlineStatement(Token tok, AstNodePtr body) {
+    m_token = tok;
+    m_body = body;
+}
+
+AstNodePtr InlineStatement::body() const { return m_body; }
+
+Token InlineStatement::token() const { return m_token; }
+
+AstKind InlineStatement::type() const { return KAstInline; }
+
+std::string InlineStatement::stringify() const {
+    std::string res = "inline ";
+    res+=m_body->stringify();
+    return res;
+}
+
 
 RaiseStatement::RaiseStatement(Token tok, AstNodePtr value) {
     m_token = tok;
@@ -917,4 +1054,42 @@ std::string DecoratorStatement::stringify() const {
     return res;
 }
 
+WithStatement::WithStatement(Token tok,
+                  std::vector<AstNodePtr> variables,
+                  std::vector<AstNodePtr> values,
+                  AstNodePtr body){
+    m_token=tok;
+    m_variables=variables;
+    m_values=values;
+    m_body=body;
+}
+std::vector<AstNodePtr> WithStatement::variables() const{
+    return m_variables;
+}
+std::vector<AstNodePtr> WithStatement::values() const{
+    return m_values;
+}
+AstNodePtr WithStatement::body() const{
+    return m_body;
+}
+Token WithStatement::token() const{
+    return m_token;
+}
+AstKind WithStatement::type() const{
+    return KAstWith;
+}
+std::string WithStatement::stringify() const{
+    std::string res="with ";
+    for (size_t i=0;i<m_values.size();++i){
+        res+=m_values[i]->stringify();
+        res+=" as ";
+        res+=m_variables[i]->stringify();
+        if (i<m_values.size()-1){
+            res+=",";
+        }
+    }
+    res+=":\n";
+    res+=m_body->stringify();
+    return res;
+}
 } // namespace ast

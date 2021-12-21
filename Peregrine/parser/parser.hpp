@@ -42,6 +42,8 @@ class Parser {
 
     std::map<TokenType, PrecedenceType> precedenceMap = createMap();
 
+    bool is_imported_var();
+    bool is_imported_type();
     void advance();
     void advanceOnNewLine();
     void expect(TokenType expectedType);
@@ -76,10 +78,13 @@ class Parser {
     AstNodePtr parseDotExpression(AstNodePtr left);
 
     AstNodePtr parseStatement();
+    AstNodePtr parseWith();
     AstNodePtr parseDecoratorCall();
     AstNodePtr parseBlockStatement();
     AstNodePtr parseImport();
     AstNodePtr parseRaise();
+    AstNodePtr parseStatic();
+    AstNodePtr parseInline();
     AstNodePtr parseVariableStatement();
     AstNodePtr parseConstDeclaration();
     AstNodePtr parseIf();
@@ -89,7 +94,10 @@ class Parser {
     AstNodePtr parseWhile();
     AstNodePtr parseFor();
     AstNodePtr parseFunctionDef();
+    AstNodePtr parseClassDefinition();
     AstNodePtr parseReturn();
+    AstNodePtr parseUnion();
+    AstNodePtr parseEnum();
     AstNodePtr parseTypeDef();
 
   public:

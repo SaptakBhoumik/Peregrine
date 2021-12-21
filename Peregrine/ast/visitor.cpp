@@ -33,7 +33,8 @@ void IdentifierExpression::accept(AstVisitor& visitor) const {
 }
 
 void TypeExpression::accept(AstVisitor& visitor) const { visitor.visit(*this); }
-
+void UnionLiteral::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+void EnumLiteral::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 void ListTypeExpr::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void DictTypeExpr::accept(AstVisitor& visitor) const { visitor.visit(*this); }
@@ -76,6 +77,16 @@ void BlockStatement::accept(AstVisitor& visitor) const {
             stmt->accept(visitor);
 }
 
+void ClassDefinition::accept(AstVisitor& visitor) const {
+    if (!visitor.visit(*this)){
+        for (auto& stmt : c_attributes)
+            stmt->accept(visitor);
+        for (auto& stmt : c_methods) 
+            stmt->accept (visitor);
+    }
+
+}
+
 void FunctionDefinition::accept(AstVisitor& visitor) const {
     visitor.visit(*this);
 }
@@ -90,6 +101,8 @@ void DotExpression::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void IfStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 void AssertStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+void StaticStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+void InlineStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 void RaiseStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void WhileStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
@@ -113,5 +126,6 @@ void ScopeStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 void TypeDefinition::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void MatchStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+void WithStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 } // namespace ast

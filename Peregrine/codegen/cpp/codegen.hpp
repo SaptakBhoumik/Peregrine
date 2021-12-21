@@ -6,6 +6,7 @@
 #include "utils/symbolTable.hpp"
 
 #include <fstream>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <string_view>
@@ -21,10 +22,15 @@ class Codegen : public ast::AstVisitor {
     EnvPtr createEnv(EnvPtr parent = nullptr);
 
   private:
+    bool is_dot_exp=false;
+    bool is_enum=false;
+    std::vector<std::string> enum_name={"error"};
+    std::string res;
+    bool save=false;
     std::string m_filename;
     std::ofstream m_file;
-    bool is_func_def;
-    void write(std::string_view code);
+    bool is_func_def=false;
+    std::string write(std::string_view code);
     std::string mangleName(ast::AstNodePtr astNode);
 
     std::string searchDefaultModule(std::string path, std::string moduleName);
@@ -32,7 +38,7 @@ class Codegen : public ast::AstVisitor {
 
     void matchArg(std::vector<ast::AstNodePtr> matchItem,
                   std::vector<ast::AstNodePtr> caseItem);
-
+    std::string wrap(ast::AstNodePtr item,std::string contains);
     bool visit(const ast::Program& node);
     bool visit(const ast::BlockStatement& node);
     bool visit(const ast::ImportStatement& node);
@@ -43,6 +49,8 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::PassStatement& node);
     bool visit(const ast::IfStatement& node);
     bool visit(const ast::AssertStatement& node);
+    bool visit(const ast::StaticStatement& node);
+    bool visit(const ast::InlineStatement& node);
     bool visit(const ast::WhileStatement& node);
     bool visit(const ast::ForStatement& node);
     bool visit(const ast::MatchStatement& node);
@@ -71,6 +79,8 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::BoolLiteral& node);
     bool visit(const ast::NoneLiteral& node);
     bool visit(const ast::RaiseStatement& node);
+    bool visit(const ast::UnionLiteral& node);
+    bool visit(const ast::EnumLiteral& node);
 
     EnvPtr m_env;
 };

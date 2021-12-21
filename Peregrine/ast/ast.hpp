@@ -33,6 +33,7 @@ enum AstKind {
     KAstConstDecl,
     KAstBlockStmt,
     KAstFunctionDef,
+    KAstClassDef,
     KAstReturnStatement,
     KAstFunctionCall,
     KAstDotExpression,
@@ -47,7 +48,12 @@ enum AstKind {
     KAstTypeDefinition,
     KAstRaiseStmt,
     KAstDecorator,
-    KAstPassStatement
+    KAstPassStatement,
+    KAstUnion,
+    KAstStatic,
+    KAstInline,
+    KAstEnum,
+    KAstWith
 };
 
 class AstVisitor;
@@ -282,6 +288,45 @@ class DictLiteral : public AstNode {
     void accept(AstVisitor& visitor) const;
 };
 
+class UnionLiteral : public AstNode {
+    Token m_token;
+    // first is the key, second is the value
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> m_elements;
+    AstNodePtr m_name;
+
+  public:
+    UnionLiteral(Token tok,
+                std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,AstNodePtr name);
+
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> elements() const;
+
+    AstNodePtr name() const;
+
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+class EnumLiteral : public AstNode {
+  Token m_token;
+
+  std::vector<std::pair<AstNodePtr, AstNodePtr>> m_fields;
+  AstNodePtr m_name;
+
+  public:
+    EnumLiteral(Token tok, std::vector<std::pair<AstNodePtr, AstNodePtr>> fields, AstNodePtr name);
+
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> fields() const;
+
+    AstNodePtr name() const;
+    
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
 class BinaryOperation : public AstNode {
     Token m_token;
     AstNodePtr m_left;
@@ -416,6 +461,25 @@ struct parameter {
     AstNodePtr p_name;
 };
 
+class ClassDefinition: public AstNode {
+
+  AstNodePtr c_name;
+  AstNodePtr c_type;
+  std::vector<AstNodePtr> c_attributes;
+  std::vector<AstNodePtr> c_methods;
+  
+  public:
+    ClassDefinition(AstNodePtr c_name,std::vector<AstNodePtr> c_attributes,std::vector<AstNodePtr> c_methods);
+    Token token() const;
+    AstNodePtr name() const;
+    std::vector<AstNodePtr> attributes() const;
+    std::vector<AstNodePtr> methods() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+
 class FunctionDefinition : public AstNode {
     Token m_token;
     AstNodePtr m_returnType;
@@ -524,6 +588,32 @@ class AssertStatement : public AstNode {
   public:
     AssertStatement(Token tok, AstNodePtr condition);
     AstNodePtr condition() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+
+
+class StaticStatement : public AstNode {
+    Token m_token;
+    AstNodePtr m_body;
+  public:
+    StaticStatement(Token tok, AstNodePtr body);
+    AstNodePtr body() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+class InlineStatement : public AstNode {
+    Token m_token;
+    AstNodePtr m_body;
+  public:
+    InlineStatement(Token tok, AstNodePtr body);
+    AstNodePtr body() const;
     Token token() const;
     AstKind type() const;
     std::string stringify() const;
@@ -706,7 +796,25 @@ class DecoratorStatement : public AstNode {
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
 };
+class WithStatement : public AstNode {
+    Token m_token;
+    std::vector<AstNodePtr> m_variables;
+    std::vector<AstNodePtr> m_values;
+    AstNodePtr m_body;
+    public:
+    WithStatement(Token tok,
+                  std::vector<AstNodePtr> variables,
+                  std::vector<AstNodePtr> values,
+                  AstNodePtr body);
 
+    std::vector<AstNodePtr> variables() const;
+    std::vector<AstNodePtr> values() const;
+    AstNodePtr body() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
 } // namespace ast
 
 #endif

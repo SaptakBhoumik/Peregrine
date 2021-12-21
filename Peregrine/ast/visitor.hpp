@@ -11,6 +11,7 @@ class AstVisitor {
 
     virtual bool visit(const Program& node) { return false; };
     virtual bool visit(const BlockStatement& node) { return false; };
+    virtual bool visit(const ClassDefinition& node){ return false; }
     virtual bool visit(const ImportStatement& node) { return false; };
     virtual bool visit(const FunctionDefinition& node) { return false; };
     virtual bool visit(const VariableStatement& node) { return false; };
@@ -19,6 +20,8 @@ class AstVisitor {
     virtual bool visit(const PassStatement& node) { return false; };
     virtual bool visit(const IfStatement& node) { return false; };
     virtual bool visit(const AssertStatement& node) { return false; };
+    virtual bool visit(const StaticStatement& node) { return false; };
+    virtual bool visit(const InlineStatement& node) { return false; };
     virtual bool visit(const RaiseStatement& node) { return false; };
     virtual bool visit(const WhileStatement& node) { return false; };
     virtual bool visit(const ForStatement& node) { return false; };
@@ -47,6 +50,9 @@ class AstVisitor {
     virtual bool visit(const StringLiteral& node) { return false; };
     virtual bool visit(const BoolLiteral& node) { return false; };
     virtual bool visit(const NoneLiteral& node) { return false; };
+    virtual bool visit(const UnionLiteral& node) { return false; };
+    virtual bool visit(const EnumLiteral& node) { return false; };
+    virtual bool visit(const WithStatement& node) { return false; };
 };
 
 } // namespace ast

@@ -104,8 +104,6 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_type;
     } else if (item == "union") {
         return tk_union;
-    } else if (item == "unknown") {
-        return tk_unknown;
     } else if (item == "scope") {
         return tk_scope;
     } else if (item == "elif") {
@@ -136,6 +134,8 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_match;
     } else if (item == "extern") {
         return tk_extern;
+    } else if (item == "cast") {
+        return tk_cast;
     } else if (item == "case") {
         return tk_case;
     } else if (item == "default") {
@@ -166,15 +166,13 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_in;
     } else if (item == "Cppcode") {
         return tk_cppcode;
-    } else if (item == "himport") {
-        return tk_himport;
-    } else if (item == "cppimport") {
-        return tk_cppimport;
+    } else if (item == "inline") {
+        return tk_inline;
+    } else if (item == "virtual") {
+        return tk_virtual;
     } else if (item == "class") {
         return tk_class;
-    } else if (item == "flags") {
-        return tk_flags;
-    } else {
+    }else {
         return is_number(item);
     }
 }
@@ -1008,6 +1006,7 @@ LEXEME lexer(std::string src, std::string filename) {
                        token_type(keyword, next(current_index - 1, src)),
                        start_index, current_index, line));
     }
+    bool error=false;
     if (is_string == true || is_cpp_string == true) {
         std::string temp = "Expecting a " + string_starter;
         display(PEError({.loc = Location({.line = line,
@@ -1017,7 +1016,7 @@ LEXEME lexer(std::string src, std::string filename) {
                          .msg = "Unexpected end of file",
                          .submsg = temp,
                          .ecode = "e1"}));
-        exit(1);
+        error=true;
     }
     if (is_dictionary == true) {
         std::string temp = "Expecting a }";
@@ -1028,7 +1027,7 @@ LEXEME lexer(std::string src, std::string filename) {
                          .msg = "Unexpected end of file",
                          .submsg = temp,
                          .ecode = "e1"}));
-        exit(1);
+        error=true;
     }
     if (is_array == true) {
         std::string temp = "Expecting a ]";
@@ -1039,7 +1038,7 @@ LEXEME lexer(std::string src, std::string filename) {
                          .msg = "Unexpected end of file",
                          .submsg = temp,
                          .ecode = "e1"}));
-        exit(1);
+        error=true;
     }
     if (is_cpp == true) {
         std::string temp = "Expecting a )";
@@ -1050,7 +1049,7 @@ LEXEME lexer(std::string src, std::string filename) {
                          .msg = "Unexpected end of file",
                          .submsg = temp,
                          .ecode = "e1"}));
-        exit(1);
+        error=true;
     } else if (first_bracket_count != 0) {
         std::string temp = "Expecting a )";
         display(PEError({.loc = Location({.line = line,
@@ -1060,8 +1059,9 @@ LEXEME lexer(std::string src, std::string filename) {
                          .msg = "Unexpected end of file",
                          .submsg = temp,
                          .ecode = "e1"}));
-        exit(1);
+        error=true;
     }
+    if (error){exit(1);}
     if (tokens.size() > 0) {
         uint64_t total_tab = 0;
         for (auto tok : tokens) {
