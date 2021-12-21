@@ -296,7 +296,8 @@ class UnionLiteral : public AstNode {
 
   public:
     UnionLiteral(Token tok,
-                std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,AstNodePtr name);
+                 std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,
+                 AstNodePtr name);
 
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elements() const;
 
@@ -309,18 +310,20 @@ class UnionLiteral : public AstNode {
 };
 
 class EnumLiteral : public AstNode {
-  Token m_token;
+    Token m_token;
 
-  std::vector<std::pair<AstNodePtr, AstNodePtr>> m_fields;
-  AstNodePtr m_name;
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> m_fields;
+    AstNodePtr m_name;
 
   public:
-    EnumLiteral(Token tok, std::vector<std::pair<AstNodePtr, AstNodePtr>> fields, AstNodePtr name);
+    EnumLiteral(Token tok,
+                std::vector<std::pair<AstNodePtr, AstNodePtr>> fields,
+                AstNodePtr name);
 
     std::vector<std::pair<AstNodePtr, AstNodePtr>> fields() const;
 
     AstNodePtr name() const;
-    
+
     Token token() const;
     AstKind type() const;
     std::string stringify() const;
@@ -461,24 +464,28 @@ struct parameter {
     AstNodePtr p_name;
 };
 
-class ClassDefinition: public AstNode {
+class ClassDefinition : public AstNode {
+    Token m_token;
+    AstNodePtr m_name;
+    AstNodePtr m_parent;
+    std::vector<AstNodePtr> m_attributes;
+    std::vector<AstNodePtr> m_methods;
 
-  AstNodePtr c_name;
-  AstNodePtr c_type;
-  std::vector<AstNodePtr> c_attributes;
-  std::vector<AstNodePtr> c_methods;
-  
   public:
-    ClassDefinition(AstNodePtr c_name,std::vector<AstNodePtr> c_attributes,std::vector<AstNodePtr> c_methods);
-    Token token() const;
+    ClassDefinition(Token tok, AstNodePtr name, AstNodePtr parent,
+                    std::vector<AstNodePtr> attributes,
+                    std::vector<AstNodePtr> methods);
+
     AstNodePtr name() const;
+    AstNodePtr parent() const;
     std::vector<AstNodePtr> attributes() const;
     std::vector<AstNodePtr> methods() const;
+
+    Token token() const;
     AstKind type() const;
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
 };
-
 
 class FunctionDefinition : public AstNode {
     Token m_token;
@@ -594,11 +601,10 @@ class AssertStatement : public AstNode {
     void accept(AstVisitor& visitor) const;
 };
 
-
-
 class StaticStatement : public AstNode {
     Token m_token;
     AstNodePtr m_body;
+
   public:
     StaticStatement(Token tok, AstNodePtr body);
     AstNodePtr body() const;
@@ -611,6 +617,7 @@ class StaticStatement : public AstNode {
 class InlineStatement : public AstNode {
     Token m_token;
     AstNodePtr m_body;
+
   public:
     InlineStatement(Token tok, AstNodePtr body);
     AstNodePtr body() const;
@@ -801,11 +808,10 @@ class WithStatement : public AstNode {
     std::vector<AstNodePtr> m_variables;
     std::vector<AstNodePtr> m_values;
     AstNodePtr m_body;
-    public:
-    WithStatement(Token tok,
-                  std::vector<AstNodePtr> variables,
-                  std::vector<AstNodePtr> values,
-                  AstNodePtr body);
+
+  public:
+    WithStatement(Token tok, std::vector<AstNodePtr> variables,
+                  std::vector<AstNodePtr> values, AstNodePtr body);
 
     std::vector<AstNodePtr> variables() const;
     std::vector<AstNodePtr> values() const;

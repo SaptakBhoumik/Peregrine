@@ -188,7 +188,8 @@ std::string DictLiteral::stringify() const {
 }
 
 UnionLiteral::UnionLiteral(
-    Token tok, std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,AstNodePtr name) {
+    Token tok, std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,
+    AstNodePtr name) {
     m_token = tok;
     m_name = name;
     m_elements = elements;
@@ -206,7 +207,7 @@ AstKind UnionLiteral::type() const { return KAstUnion; }
 
 std::string UnionLiteral::stringify() const {
     std::string res = "union ";
-    res+=m_name->stringify()+":\n";
+    res += m_name->stringify() + ":\n";
     for (size_t i = 0; i < m_elements.size(); i++) {
         if (i)
             res += "\n";
@@ -218,7 +219,9 @@ std::string UnionLiteral::stringify() const {
     return res;
 }
 
-EnumLiteral::EnumLiteral(Token tok, std::vector<std::pair<AstNodePtr, AstNodePtr>> fields, AstNodePtr name) {
+EnumLiteral::EnumLiteral(Token tok,
+                         std::vector<std::pair<AstNodePtr, AstNodePtr>> fields,
+                         AstNodePtr name) {
     m_token = tok;
     m_fields = fields;
     m_name = name;
@@ -240,10 +243,10 @@ std::string EnumLiteral::stringify() const {
     for (size_t i = 0; i < m_fields.size(); i++) {
         if (i)
             res += "\n";
-        
+
         res += m_fields[i].first->stringify();
-        if (m_fields[i].second->type() == KAstNoLiteral) {}
-        else{
+        if (m_fields[i].second->type() == KAstNoLiteral) {
+        } else {
             res += " = ";
             res += m_fields[i].second->stringify();
         }
@@ -475,41 +478,53 @@ std::string BlockStatement::stringify() const {
     return res;
 }
 
-ClassDefinition::ClassDefinition(AstNodePtr name,std::vector<AstNodePtr> attributes,std::vector<AstNodePtr> methods){
-    c_name = name;
-    c_attributes = attributes;
-    c_methods = methods;
+ClassDefinition::ClassDefinition(Token tok, AstNodePtr name, AstNodePtr parent,
+                                 std::vector<AstNodePtr> attributes,
+                                 std::vector<AstNodePtr> methods) {
+    m_token = tok;
+    m_name = name;
+    m_parent = parent;
+    m_attributes = attributes;
+    m_methods = methods;
 }
 
-AstNodePtr ClassDefinition::name() const { return c_name; }
+AstNodePtr ClassDefinition::name() const { return m_name; }
 
-std::vector<AstNodePtr> ClassDefinition::attributes() const { return c_attributes; }
+AstNodePtr ClassDefinition::parent() const { return m_parent; }
 
-std::vector<AstNodePtr> ClassDefinition::methods() const { return c_methods; } 
+std::vector<AstNodePtr> ClassDefinition::attributes() const {
+    return m_attributes;
+}
+
+std::vector<AstNodePtr> ClassDefinition::methods() const { return m_methods; }
 
 AstKind ClassDefinition::type() const { return KAstClassDef; }
 
-Token ClassDefinition::token() const { return Token{}; }
+Token ClassDefinition::token() const { return m_token; }
 
 std::string ClassDefinition::stringify() const {
 
     std::string res = "class ";
-    res += c_name->stringify();
+    res += m_name->stringify();
+
+    if (m_parent->type() != KAstNoLiteral) {
+        res += "(" + m_parent->stringify() + ")";
+    }
+
     res += ":\n";
 
-    for (auto& stmt : c_attributes) {
+    for (auto& stmt : m_attributes) {
         res += stmt->stringify();
         res += "\n";
     }
-    res += ":\n";
 
-    for (auto& stmt : c_methods) {
+    for (auto& stmt : m_methods) {
         res += stmt->stringify();
         res += "\n";
     }
 
+    res += "\n";
     return res;
-
 }
 
 FunctionDefinition::FunctionDefinition(Token tok, AstNodePtr returnType,
@@ -725,7 +740,7 @@ AstKind StaticStatement::type() const { return KAstStatic; }
 
 std::string StaticStatement::stringify() const {
     std::string res = "static ";
-    res+=m_body->stringify();
+    res += m_body->stringify();
     return res;
 }
 
@@ -742,10 +757,9 @@ AstKind InlineStatement::type() const { return KAstInline; }
 
 std::string InlineStatement::stringify() const {
     std::string res = "inline ";
-    res+=m_body->stringify();
+    res += m_body->stringify();
     return res;
 }
-
 
 RaiseStatement::RaiseStatement(Token tok, AstNodePtr value) {
     m_token = tok;
@@ -1054,42 +1068,30 @@ std::string DecoratorStatement::stringify() const {
     return res;
 }
 
-WithStatement::WithStatement(Token tok,
-                  std::vector<AstNodePtr> variables,
-                  std::vector<AstNodePtr> values,
-                  AstNodePtr body){
-    m_token=tok;
-    m_variables=variables;
-    m_values=values;
-    m_body=body;
+WithStatement::WithStatement(Token tok, std::vector<AstNodePtr> variables,
+                             std::vector<AstNodePtr> values, AstNodePtr body) {
+    m_token = tok;
+    m_variables = variables;
+    m_values = values;
+    m_body = body;
 }
-std::vector<AstNodePtr> WithStatement::variables() const{
-    return m_variables;
-}
-std::vector<AstNodePtr> WithStatement::values() const{
-    return m_values;
-}
-AstNodePtr WithStatement::body() const{
-    return m_body;
-}
-Token WithStatement::token() const{
-    return m_token;
-}
-AstKind WithStatement::type() const{
-    return KAstWith;
-}
-std::string WithStatement::stringify() const{
-    std::string res="with ";
-    for (size_t i=0;i<m_values.size();++i){
-        res+=m_values[i]->stringify();
-        res+=" as ";
-        res+=m_variables[i]->stringify();
-        if (i<m_values.size()-1){
-            res+=",";
+std::vector<AstNodePtr> WithStatement::variables() const { return m_variables; }
+std::vector<AstNodePtr> WithStatement::values() const { return m_values; }
+AstNodePtr WithStatement::body() const { return m_body; }
+Token WithStatement::token() const { return m_token; }
+AstKind WithStatement::type() const { return KAstWith; }
+std::string WithStatement::stringify() const {
+    std::string res = "with ";
+    for (size_t i = 0; i < m_values.size(); ++i) {
+        res += m_values[i]->stringify();
+        res += " as ";
+        res += m_variables[i]->stringify();
+        if (i < m_values.size() - 1) {
+            res += ",";
         }
     }
-    res+=":\n";
-    res+=m_body->stringify();
+    res += ":\n";
+    res += m_body->stringify();
     return res;
 }
 } // namespace ast

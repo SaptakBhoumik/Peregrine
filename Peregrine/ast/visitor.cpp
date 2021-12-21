@@ -78,13 +78,12 @@ void BlockStatement::accept(AstVisitor& visitor) const {
 }
 
 void ClassDefinition::accept(AstVisitor& visitor) const {
-    if (!visitor.visit(*this)){
-        for (auto& stmt : c_attributes)
+    if (!visitor.visit(*this)) {
+        for (auto& stmt : m_attributes)
             stmt->accept(visitor);
-        for (auto& stmt : c_methods) 
-            stmt->accept (visitor);
+        for (auto& stmt : m_methods)
+            stmt->accept(visitor);
     }
-
 }
 
 void FunctionDefinition::accept(AstVisitor& visitor) const {
@@ -100,9 +99,19 @@ void FunctionCall::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 void DotExpression::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void IfStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
-void AssertStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
-void StaticStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
-void InlineStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+
+void AssertStatement::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
+}
+
+void StaticStatement::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
+}
+
+void InlineStatement::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
+}
+
 void RaiseStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void WhileStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
@@ -111,7 +120,9 @@ void ForStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void BreakStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
-void DecoratorStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+void DecoratorStatement::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
+}
 
 void PassStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
@@ -126,6 +137,7 @@ void ScopeStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 void TypeDefinition::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void MatchStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+
 void WithStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 } // namespace ast

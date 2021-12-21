@@ -46,30 +46,37 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseStatement();
             break;
         }
+
         case tk_static: {
             stmt = parseStatic();
             break;
         }
+
         case tk_with: {
             stmt = parseWith();
             break;
         }
+
         case tk_inline: {
             stmt = parseInline();
             break;
         }
+
         case tk_const: {
             stmt = parseConstDeclaration();
             break;
         }
+
         case tk_assert: {
             stmt = parseAssert();
             break;
         }
+
         case tk_at: {
             stmt = parseDecoratorCall();
             break;
         }
+
         case tk_if: {
             stmt = parseIf();
             break;
@@ -84,6 +91,7 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseFor();
             break;
         }
+
         case tk_from:
         case tk_import: {
             stmt = parseImport();
@@ -100,20 +108,24 @@ AstNodePtr Parser::parseStatement() {
             advanceOnNewLine();
             break;
         }
+
         case tk_raise: {
             stmt = parseRaise();
             advanceOnNewLine();
             break;
         }
+
         case tk_pass: {
             stmt = std::make_shared<PassStatement>(m_currentToken);
             advanceOnNewLine();
             break;
         }
+
         case tk_match: {
             stmt = parseMatch();
             break;
         }
+
         case tk_continue: {
             stmt = std::make_shared<ContinueStatement>(m_currentToken);
             advanceOnNewLine();
@@ -124,10 +136,12 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseReturn();
             break;
         }
+
         case tk_scope: {
             stmt = parseScope();
             break;
         }
+
         case tk_cppcode: {
             advance();
             stmt = parseCpp();
@@ -149,10 +163,12 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseUnion();
             break;
         }
+
         case tk_enum: {
             stmt = parseEnum();
             break;
         }
+
         // TODO: variables currently do not work with all the types, we need to
         // fix this
         case tk_identifier: {
@@ -216,6 +232,7 @@ AstNodePtr Parser::parseBlockStatement() {
 }
 
 AstNodePtr Parser::parseClassDefinition() {
+    Token tok = m_currentToken;
 
     std::vector<AstNodePtr> attributes;
     std::vector<AstNodePtr> methods;
@@ -223,25 +240,46 @@ AstNodePtr Parser::parseClassDefinition() {
     expect(tk_identifier);
 
     AstNodePtr name = parseName();
+    AstNodePtr parent = std::make_shared<NoLiteral>();
+
+    if (next().tkType == tk_l_paren) {
+        advance();
+        advance();
+        parent = parseName();
+        expect(tk_r_paren);
+    }
 
     expect(tk_colon);
 
-    expect(tk_ident); // We are on tk_ident token
+    expect(tk_ident);
     advance();
+
     while (m_currentToken.tkType != tk_dedent) {
-        while (next().tkType == tk_identifier || next().tkType == tk_assign) {
-            attributes.push_back(parseVariableStatement());
+        switch (m_currentToken.tkType) {
+            case tk_def: {
+                methods.push_back(parseFunctionDef());
+                break;
+            }
+
+            // TODO: this is not able to parse all variable declarations, fix it
+            // later.
+            case tk_identifier: {
+                attributes.push_back(parseVariableStatement());
+                break;
+            }
+
+            default: {
+                error(m_currentToken,
+                      "expected a method or variable declaration, got " +
+                          m_currentToken.keyword + " instead");
+            }
         }
 
-        while (m_currentToken.tkType == tk_def) {
-            methods.push_back(parseFunctionDef());
-            advanceOnNewLine();
-        }
-        if (m_currentToken.tkType == tk_new_line) {
-            advance();
-        }
+        advance();
     }
-    return std::make_shared<ClassDefinition>(name, attributes, methods);
+
+    return std::make_shared<ClassDefinition>(tok, name, parent, attributes,
+                                             methods);
 }
 
 AstNodePtr Parser::parseImport() {
