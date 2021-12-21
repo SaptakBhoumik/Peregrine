@@ -126,6 +126,8 @@ def main():
     printf("item2 of var1 is %f\n",var1.item2)
     #should throw an error
     #assert 8==6
+    int cast_test=9
+    printf("Value is %f\n",cast<float>(cast_test))
     printf("%d\n",divide(6,2))
     #should terminate the program
     #printf("%d",divide(6,0))

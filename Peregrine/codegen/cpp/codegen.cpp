@@ -555,4 +555,12 @@ bool Codegen::visit(const ast::EnumLiteral& node){
     write(name);
     return true;
 }
+bool Codegen::visit(const ast::CastStatement& node){
+    write("(");
+    node.cast_type()->accept(*this);
+    write(")(");
+    node.value()->accept(*this);
+    write(")");
+    return true;
+}
 } // namespace cpp
