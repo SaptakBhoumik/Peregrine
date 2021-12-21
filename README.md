@@ -3,7 +3,10 @@
 <img id="banner" src="./graphics/banner.png" style="width: 800px; align: center;"/>
 
 # Peregrine
-
+![GitHub Repo stars](https://img.shields.io/github/stars/peregrine-lang/peregrine?style=social)
+![GitHub issues](https://img.shields.io/github/issues/peregrine-lang/peregrine?color=green&style=flat-square)
+![GitHub contributors](https://img.shields.io/github/contributors/peregrine-lang/peregrine?style=flat-square)
+   
 Peregrine is a compiled programming language currently under development. Documentation is coming soon.
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
