@@ -1116,4 +1116,20 @@ std::string WithStatement::stringify() const {
     res += m_body->stringify();
     return res;
 }
+CastStatement::CastStatement(Token token,
+                AstNodePtr type,
+                AstNodePtr value){
+    m_token=token;
+    m_type=type;
+    m_value=value;
+}
+AstNodePtr CastStatement::cast_type()const{return m_type;}
+AstNodePtr CastStatement::value()const{return m_value;}
+Token CastStatement::token()const{return m_token;}
+AstKind CastStatement::type()const{return KAstCast;}
+std::string CastStatement::stringify()const{
+    std::string res="cast";
+    res+="<"+m_type->stringify()+">("+m_value->stringify()+")";
+    return res;
+}
 } // namespace ast

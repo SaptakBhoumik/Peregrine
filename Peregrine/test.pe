@@ -1,6 +1,6 @@
 class test(parent1,parent2):
-    int a = 5
-    int b = 2
+    float a = 5.6
+    int b = cast<int>(a)
     static d=0
     @dec
     def addition(int a,int b) -> int:

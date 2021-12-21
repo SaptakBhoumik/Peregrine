@@ -78,6 +78,7 @@ class Parser {
     AstNodePtr parseDotExpression(AstNodePtr left);
 
     AstNodePtr parseVirtual();
+    AstNodePtr parseCast();
     AstNodePtr parseStatement();
     AstNodePtr parseWith();
     AstNodePtr parseDecoratorCall();

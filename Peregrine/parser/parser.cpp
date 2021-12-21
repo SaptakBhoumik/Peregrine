@@ -595,7 +595,11 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
             left = parseDecimal();
             break;
         }
-
+        case tk_cast:{
+            //TODO: cast<type>(v)=9 maybe?
+            left = parseCast();
+            break;
+        }
         case tk_none: {
             left = parseNone();
             break;
@@ -1070,4 +1074,18 @@ AstNodePtr Parser::parseWith() {
     advance();
     body = parseBlockStatement();
     return std::make_shared<WithStatement>(tok, variables, values, body);
+}
+
+
+AstNodePtr Parser::parseCast(){
+    auto tok=m_currentToken;
+    expect(tk_less);
+    expect(tk_identifier);
+    AstNodePtr type=parseType();
+    expect(tk_greater);
+    expect(tk_l_paren);
+    advance();
+    AstNodePtr value = parseExpression();
+    expect(tk_r_paren);
+    return std::make_shared<CastStatement>(tok,type, value);
 }

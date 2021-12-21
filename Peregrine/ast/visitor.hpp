@@ -54,6 +54,7 @@ class AstVisitor {
     virtual bool visit(const EnumLiteral& node) { return false; };
     virtual bool visit(const WithStatement& node) { return false; };
     virtual bool visit(const VirtualStatement& node) { return false; };
+    virtual bool visit(const CastStatement& node) { return false; };
 };
 
 } // namespace ast

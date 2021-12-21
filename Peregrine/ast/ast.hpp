@@ -54,7 +54,8 @@ enum AstKind {
     KAstInline,
     KAstEnum,
     KAstWith,
-    KAstVirtual
+    KAstVirtual,
+    KAstCast
 };
 
 class AstVisitor;
@@ -834,6 +835,21 @@ class WithStatement : public AstNode {
     AstKind type() const;
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
+};
+class CastStatement:public AstNode{
+  Token m_token;
+  AstNodePtr m_type;
+  AstNodePtr m_value;
+  public:
+  CastStatement(Token token,
+                AstNodePtr type,
+                AstNodePtr value);
+  AstNodePtr cast_type() const;
+  AstNodePtr value() const;
+  Token token() const;
+  AstKind type() const;
+  std::string stringify() const;
+  void accept(AstVisitor& visitor) const;
 };
 } // namespace ast
 
