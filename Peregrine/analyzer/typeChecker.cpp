@@ -170,7 +170,8 @@ bool TypeChecker::visit(const ast::ReturnStatement& node) {
         error(node.token(), "can not return outside of a function");
     }
 
-    check(node.returnValue(), *m_currentFunction->returnType()) return true;
+    check(node.returnValue(), *m_currentFunction->returnType());
+    return true;
 }
 
 bool TypeChecker::visit(const ast::ListLiteral& node) { return true; }
