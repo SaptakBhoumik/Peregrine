@@ -72,14 +72,14 @@ match x,y,z:
         printf(C)
     default:#will be executed at the end if no break
         pass
-
+"
 class test:
     int a = 5
     int b = 2
 
     def addition(int a,int b) -> int:
         return a+b
-
+"
 type x = def(int , char)->char
 type x = def()->char
 type x = def()

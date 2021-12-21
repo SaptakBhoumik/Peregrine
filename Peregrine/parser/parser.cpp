@@ -85,10 +85,8 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseFor();
             break;
         }
-        case tk_from: {
-            break;
-	}
-	case tk_import: {
+        case tk_from:
+	    case tk_import: {
             stmt = parseImport();
             break;
         }
