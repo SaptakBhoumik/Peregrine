@@ -33,6 +33,7 @@ enum AstKind {
     KAstConstDecl,
     KAstBlockStmt,
     KAstFunctionDef,
+    KAstClassDef,
     KAstReturnStatement,
     KAstFunctionCall,
     KAstDotExpression,
@@ -459,6 +460,25 @@ struct parameter {
     AstNodePtr p_type;
     AstNodePtr p_name;
 };
+
+class ClassDefinition: public AstNode {
+
+  AstNodePtr c_name;
+  AstNodePtr c_type;
+  std::vector<AstNodePtr> c_attributes;
+  std::vector<AstNodePtr> c_methods;
+  
+  public:
+    ClassDefinition(AstNodePtr c_name,std::vector<AstNodePtr> c_attributes,std::vector<AstNodePtr> c_methods);
+    Token token() const;
+    AstNodePtr name() const;
+    std::vector<AstNodePtr> attributes() const;
+    std::vector<AstNodePtr> methods() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
 
 class FunctionDefinition : public AstNode {
     Token m_token;

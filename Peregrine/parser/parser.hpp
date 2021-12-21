@@ -94,6 +94,7 @@ class Parser {
     AstNodePtr parseWhile();
     AstNodePtr parseFor();
     AstNodePtr parseFunctionDef();
+    AstNodePtr parseClassDefinition();
     AstNodePtr parseReturn();
     AstNodePtr parseUnion();
     AstNodePtr parseEnum();

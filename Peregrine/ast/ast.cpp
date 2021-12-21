@@ -475,6 +475,43 @@ std::string BlockStatement::stringify() const {
     return res;
 }
 
+ClassDefinition::ClassDefinition(AstNodePtr name,std::vector<AstNodePtr> attributes,std::vector<AstNodePtr> methods){
+    c_name = name;
+    c_attributes = attributes;
+    c_methods = methods;
+}
+
+AstNodePtr ClassDefinition::name() const { return c_name; }
+
+std::vector<AstNodePtr> ClassDefinition::attributes() const { return c_attributes; }
+
+std::vector<AstNodePtr> ClassDefinition::methods() const { return c_methods; } 
+
+AstKind ClassDefinition::type() const { return KAstClassDef; }
+
+Token ClassDefinition::token() const { return Token{}; }
+
+std::string ClassDefinition::stringify() const {
+
+    std::string res = "class ";
+    res += c_name->stringify();
+    res += ":\n";
+
+    for (auto& stmt : c_attributes) {
+        res += stmt->stringify();
+        res += "\n";
+    }
+    res += ":\n";
+
+    for (auto& stmt : c_methods) {
+        res += stmt->stringify();
+        res += "\n";
+    }
+
+    return res;
+
+}
+
 FunctionDefinition::FunctionDefinition(Token tok, AstNodePtr returnType,
                                        AstNodePtr name,
                                        std::vector<parameter> parameters,
