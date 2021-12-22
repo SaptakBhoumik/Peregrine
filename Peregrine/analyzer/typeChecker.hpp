@@ -22,7 +22,6 @@ class TypeChecker : public ast::AstVisitor {
     EnvPtr createEnv(EnvPtr parent = nullptr);
     std::string identifierName(ast::AstNodePtr identifier);
     void checkBody(ast::AstNodePtr body);
-    ast::AstNodePtr astNodeFromType(TypePtr type);
 
     void check(ast::AstNodePtr expr, const Type& expectedType);
 

@@ -36,17 +36,6 @@ void TypeChecker::checkBody(ast::AstNodePtr body) {
     m_env = previousEnv;
 }
 
-ast::AstNodePtr TypeChecker::astNodeFromType(TypePtr type) {
-    switch (type->category()) {
-        case TypeCategory::Integer: {
-            return std::make_shared<ast::TypeExpression>(Token{}, "int");
-        }
-
-        default:
-            return nullptr;
-    }
-}
-
 void TypeChecker::check(ast::AstNodePtr expr, const Type& expectedType) {
     expr->accept(*this);
     const Type& exprType = *m_result;
