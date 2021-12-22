@@ -1,3 +1,8 @@
+test = 324
+const aaa = "heyyy"
+
+int p = test + aaa
+
 class test(parent1,parent2):
     float a = 5.6
     int b = cast<int>(a)
@@ -7,7 +12,7 @@ class test(parent1,parent2):
         return self.a +self.b
     def sub(int a,int b) -> int:
         return self.a - self.b
-    virtual def multi(int a,int b) -> int:
+    def multi(int a,int b) -> int:
         return self.a * self.b
     inline def div():
         return self.a / self.b

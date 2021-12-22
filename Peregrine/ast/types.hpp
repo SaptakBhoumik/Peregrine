@@ -1,7 +1,6 @@
 #ifndef PEREGRINE_TYPES_HPP
 #define PEREGRINE_TYPES_HPP
 
-#include "ast.hpp"
 #include "lexer/tokens.hpp"
 
 #include <array>

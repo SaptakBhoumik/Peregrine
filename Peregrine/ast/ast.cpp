@@ -399,6 +399,14 @@ AstNodePtr VariableStatement::name() const { return m_name; }
 
 AstNodePtr VariableStatement::value() const { return m_value; }
 
+types::TypePtr VariableStatement::processedType() const {
+    return m_processedType;
+}
+
+void VariableStatement::setProcessedType(types::TypePtr processedType) {
+    m_processedType = processedType;
+}
+
 Token VariableStatement::token() const { return m_token; }
 
 AstKind VariableStatement::type() const { return KAstVariableStmt; }
@@ -434,6 +442,14 @@ AstNodePtr ConstDeclaration::constType() const { return m_type; }
 AstNodePtr ConstDeclaration::name() const { return m_name; }
 
 AstNodePtr ConstDeclaration::value() const { return m_value; }
+
+types::TypePtr ConstDeclaration::processedType() const {
+    return m_processedType;
+}
+
+void ConstDeclaration::setProcessedType(types::TypePtr processedType) {
+    m_processedType = processedType;
+}
 
 Token ConstDeclaration::token() const { return m_token; }
 
@@ -478,7 +494,8 @@ std::string BlockStatement::stringify() const {
     return res;
 }
 
-ClassDefinition::ClassDefinition(Token tok, AstNodePtr name, std::vector<AstNodePtr> parent,
+ClassDefinition::ClassDefinition(Token tok, AstNodePtr name,
+                                 std::vector<AstNodePtr> parent,
                                  std::vector<AstNodePtr> attributes,
                                  std::vector<AstNodePtr> methods) {
     m_token = tok;
@@ -508,13 +525,13 @@ std::string ClassDefinition::stringify() const {
     res += m_name->stringify();
 
     res += "(";
-    for (size_t i=0;i<m_parent.size();++i){
-        res+=m_parent[i]->stringify();
-        if(i<m_parent.size()-1){
-            res+=",";
+    for (size_t i = 0; i < m_parent.size(); ++i) {
+        res += m_parent[i]->stringify();
+        if (i < m_parent.size() - 1) {
+            res += ",";
         }
     }
-        res+= ")";
+    res += ")";
 
     res += ":\n";
 
@@ -1116,20 +1133,18 @@ std::string WithStatement::stringify() const {
     res += m_body->stringify();
     return res;
 }
-CastStatement::CastStatement(Token token,
-                AstNodePtr type,
-                AstNodePtr value){
-    m_token=token;
-    m_type=type;
-    m_value=value;
+CastStatement::CastStatement(Token token, AstNodePtr type, AstNodePtr value) {
+    m_token = token;
+    m_type = type;
+    m_value = value;
 }
-AstNodePtr CastStatement::cast_type()const{return m_type;}
-AstNodePtr CastStatement::value()const{return m_value;}
-Token CastStatement::token()const{return m_token;}
-AstKind CastStatement::type()const{return KAstCast;}
-std::string CastStatement::stringify()const{
-    std::string res="cast";
-    res+="<"+m_type->stringify()+">("+m_value->stringify()+")";
+AstNodePtr CastStatement::cast_type() const { return m_type; }
+AstNodePtr CastStatement::value() const { return m_value; }
+Token CastStatement::token() const { return m_token; }
+AstKind CastStatement::type() const { return KAstCast; }
+std::string CastStatement::stringify() const {
+    std::string res = "cast";
+    res += "<" + m_type->stringify() + ">(" + m_value->stringify() + ")";
     return res;
 }
 } // namespace ast

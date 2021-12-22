@@ -1,18 +1,20 @@
+#include "analyzer/typeChecker.hpp"
 #include "codegen/cpp/codegen.hpp"
 #include "codegen/js/codegen.hpp"
 #include "lexer/lexer.hpp"
 #include "lexer/tokens.hpp"
 #include "parser/parser.hpp"
-#include "analyzer/typeChecker.hpp"
+
 
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <vector>
 #include <string.h>
+#include <vector>
+
 
 int main(int argc, char** argv) {
-    if (argc < 3) {//the cli is still not complete
+    if (argc < 3) { // the cli is still not complete
         std::ifstream file("../Peregrine/test.pe");
         std::stringstream buf;
         buf << file.rdbuf();
@@ -30,9 +32,8 @@ int main(int argc, char** argv) {
         std::cout << program->stringify() << "\n";
 
         TypeChecker typeChecker(program);
-        
-    }
-    else{
+
+    } else {
         std::ifstream file(argv[2]);
         std::stringstream buf;
         buf << file.rdbuf();
@@ -45,22 +46,19 @@ int main(int argc, char** argv) {
 
         // TypeChecker typeChecker;
         // typeChecker.check(program);
-        std::string filename=argv[2];
-        if (argc>3){
-            if (strcmp(argv[3],"-js")==0){
-                js::Codegen codegen("index.js", program,false,filename);
+        std::string filename = argv[2];
+        if (argc > 3) {
+            if (strcmp(argv[3], "-js") == 0) {
+                js::Codegen codegen("index.js", program, false, filename);
+            } else if (strcmp(argv[3], "-html") == 0) { // embeds js in html
+                js::Codegen codegen("index.html", program, true, filename);
+            } else {
+                cpp::Codegen codegen("temp.cc", program, filename);
+                system("g++ temp.cc");
             }
-            else if (strcmp(argv[3],"-html")==0){//embeds js in html
-                js::Codegen codegen("index.html", program,true,filename);
-            }
-            else{
-               cpp::Codegen codegen("temp.cc", program,filename);
-               system("g++ temp.cc");  
-            }
-        }
-        else{
-           cpp::Codegen codegen("temp.cc", program,filename);
-           system("g++ temp.cc"); 
+        } else {
+            cpp::Codegen codegen("temp.cc", program, filename);
+            system("g++ temp.cc");
         }
     }
     return 0;

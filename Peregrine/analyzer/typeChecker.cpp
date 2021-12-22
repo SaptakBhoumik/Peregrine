@@ -36,6 +36,17 @@ void TypeChecker::checkBody(ast::AstNodePtr body) {
     m_env = previousEnv;
 }
 
+ast::AstNodePtr TypeChecker::astNodeFromType(TypePtr type) {
+    switch (type->category()) {
+        case TypeCategory::Integer: {
+            return std::make_shared<ast::TypeExpression>(Token{}, "int");
+        }
+
+        default:
+            return nullptr;
+    }
+}
+
 void TypeChecker::check(ast::AstNodePtr expr, const Type& expectedType) {
     expr->accept(*this);
     const Type& exprType = *m_result;
@@ -90,27 +101,42 @@ bool TypeChecker::visit(const ast::FunctionDefinition& node) {
 }
 
 bool TypeChecker::visit(const ast::VariableStatement& node) {
+    // not very proud of this
+    auto nonConstNode = const_cast<ast::VariableStatement&>(node);
+
     node.varType()->accept(*this);
     TypePtr varType = m_result;
 
     if (varType->category() == TypeCategory::Void) {
-        // infer it
+        // inferring the type of the variable
+        node.value()->accept(*this);
+        nonConstNode.setProcessedType(m_result);
+        varType = m_result;
+    } else {
+        check(node.value(), *varType);
+        nonConstNode.setProcessedType(varType);
     }
 
-    check(node.value(), *varType);
     m_env->set(identifierName(node.name()), varType);
     return true;
 }
 
 bool TypeChecker::visit(const ast::ConstDeclaration& node) {
+    auto nonConstNode = const_cast<ast::ConstDeclaration&>(node);
+
     node.constType()->accept(*this);
     TypePtr constType = m_result;
 
     if (constType->category() == TypeCategory::Void) {
-        // infer it
+        // inferring the type of the constant
+        node.value()->accept(*this);
+        nonConstNode.setProcessedType(m_result);
+        constType = m_result;
+    } else {
+        check(node.value(), *constType);
+        nonConstNode.setProcessedType(constType);
     }
 
-    check(node.value(), *constType);
     m_env->set(identifierName(node.name()), constType);
     return true;
 }

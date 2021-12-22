@@ -2,6 +2,7 @@
 #define PEREGRINE_AST_HPP
 
 #include "lexer/tokens.hpp"
+#include "types.hpp"
 #include <memory>
 #include <string>
 #include <string_view>
@@ -410,6 +411,11 @@ class ImportStatement : public AstNode {
 class VariableStatement : public AstNode {
     Token m_token;
     AstNodePtr m_type;
+
+    // the typechecker will fill this field, giving us more information
+    // about the type than we would otherwise have using only m_type
+    types::TypePtr m_processedType;
+
     AstNodePtr m_name;
     AstNodePtr m_value;
 
@@ -421,6 +427,9 @@ class VariableStatement : public AstNode {
     AstNodePtr name() const;
     AstNodePtr value() const;
 
+    types::TypePtr processedType() const;
+    void setProcessedType(types::TypePtr processedType);
+
     Token token() const;
     AstKind type() const;
     std::string stringify() const;
@@ -430,6 +439,9 @@ class VariableStatement : public AstNode {
 class ConstDeclaration : public AstNode {
     Token m_token;
     AstNodePtr m_type;
+
+    types::TypePtr m_processedType;
+
     AstNodePtr m_name;
     AstNodePtr m_value;
 
@@ -440,6 +452,9 @@ class ConstDeclaration : public AstNode {
     AstNodePtr constType() const;
     AstNodePtr name() const;
     AstNodePtr value() const;
+
+    types::TypePtr processedType() const;
+    void setProcessedType(types::TypePtr processedType);
 
     Token token() const;
     AstKind type() const;
@@ -469,17 +484,17 @@ struct parameter {
 class ClassDefinition : public AstNode {
     Token m_token;
     AstNodePtr m_name;
-    std::vector<AstNodePtr> m_parent;//NOTE:class test(parent1,parent2)
+    std::vector<AstNodePtr> m_parent; // NOTE:class test(parent1,parent2)
     std::vector<AstNodePtr> m_attributes;
     std::vector<AstNodePtr> m_methods;
 
   public:
-    ClassDefinition(Token tok, AstNodePtr name, std::vector<AstNodePtr>  parent,
+    ClassDefinition(Token tok, AstNodePtr name, std::vector<AstNodePtr> parent,
                     std::vector<AstNodePtr> attributes,
                     std::vector<AstNodePtr> methods);
 
     AstNodePtr name() const;
-    std::vector<AstNodePtr>  parent() const;
+    std::vector<AstNodePtr> parent() const;
     std::vector<AstNodePtr> attributes() const;
     std::vector<AstNodePtr> methods() const;
 
@@ -836,20 +851,19 @@ class WithStatement : public AstNode {
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
 };
-class CastStatement:public AstNode{
-  Token m_token;
-  AstNodePtr m_type;
-  AstNodePtr m_value;
+class CastStatement : public AstNode {
+    Token m_token;
+    AstNodePtr m_type;
+    AstNodePtr m_value;
+
   public:
-  CastStatement(Token token,
-                AstNodePtr type,
-                AstNodePtr value);
-  AstNodePtr cast_type() const;
-  AstNodePtr value() const;
-  Token token() const;
-  AstKind type() const;
-  std::string stringify() const;
-  void accept(AstVisitor& visitor) const;
+    CastStatement(Token token, AstNodePtr type, AstNodePtr value);
+    AstNodePtr cast_type() const;
+    AstNodePtr value() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 } // namespace ast
 
