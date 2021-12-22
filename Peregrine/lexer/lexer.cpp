@@ -887,6 +887,8 @@ LEXEME lexer(std::string src, std::string filename) {
                 token = token_init(statement, "**", tk_exponent, start_index,
                                    current_index, line);
             } else {
+                keyword="*";
+                start_index = current_index - 1;
                 token = token_init(statement, keyword, tk_multiply,
                                        start_index, current_index, line);
             }

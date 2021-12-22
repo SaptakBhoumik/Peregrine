@@ -220,6 +220,7 @@ AstNodePtr Parser::parseBlockStatement() {
 AstNodePtr Parser::parseClassDefinition() {
     Token tok = m_currentToken;
 
+    std::vector<AstNodePtr> other;//nested union and class
     std::vector<AstNodePtr> attributes;
     std::vector<AstNodePtr> methods;
     std::vector<AstNodePtr> dec_methods;
@@ -278,6 +279,14 @@ AstNodePtr Parser::parseClassDefinition() {
                 else{
                     attributes.push_back(parseStatic());
                 }
+                break;
+            }
+            case tk_union:{//union def in class
+                other.push_back(parseUnion());
+                break;
+            }
+            case tk_class:{//nested class
+                other.push_back(parseClassDefinition());
                 break;
             }
             default: {
@@ -624,6 +633,7 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
 
         case tk_negative:
         case tk_not:
+        case tk_ampersand:
         case tk_bit_not: {
             left = parsePrefixExpression();
             break;
@@ -809,12 +819,16 @@ AstNodePtr Parser::parseType() {
 
 AstNodePtr Parser::parseListType() {
     Token tok = m_currentToken;
-
-    expect(tk_list_close);
+    advance();
+    AstNodePtr fixed_size=std::make_shared<NoLiteral>();
+    if (m_currentToken.tkType!=tk_list_close){
+        fixed_size=parseExpression();
+        expect(tk_list_close);
+    }
     advance();
 
     AstNodePtr elemType = parseType();
-    return std::make_shared<ListTypeExpr>(tok, elemType);
+    return std::make_shared<ListTypeExpr>(tok, elemType,fixed_size);
 }
 
 AstNodePtr Parser::parseDictType() {

@@ -23,22 +23,6 @@ bool Parser::is_imported_var(){
         index++;
     }
 }
-bool Parser::is_imported_type(){
-    auto index=m_tokIndex;
-    auto tokens = m_tokens;
-    Token curr_tok;
-    Token prev_tok;
-    while (true){
-        curr_tok=tokens[index];
-        if (curr_tok.tkType==tk_identifier){
-            if (prev_tok.tkType==tk_identifier){return true;}//it is the type
-        }
-        else if (curr_tok.tkType==tk_dot){}
-        else {return false;}
-        prev_tok=curr_tok;
-        index++;
-    }
-}
 
 void Parser::advance() {
     m_tokIndex++;
@@ -95,6 +79,7 @@ void Parser::expect(TokenType expectedType) {
 std::map<TokenType, PrecedenceType> createMap() {
     std::map<TokenType, PrecedenceType> precedenceMap;
 
+    precedenceMap[tk_ampersand] = pr_prefix;
     precedenceMap[tk_negative] = pr_prefix;
     precedenceMap[tk_bit_not] = pr_prefix;
     precedenceMap[tk_and] = pr_and_or;

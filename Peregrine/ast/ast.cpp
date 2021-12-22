@@ -992,19 +992,26 @@ std::string MatchStatement::stringify() const {
     return res;
 }
 
-ListTypeExpr::ListTypeExpr(Token tok, AstNodePtr elemType) {
+ListTypeExpr::ListTypeExpr(Token tok, AstNodePtr elemType,AstNodePtr fixed_size) {
     m_token = tok;
     m_elemType = elemType;
+    m_fixed_size=fixed_size;
 }
 
 AstNodePtr ListTypeExpr::elemType() const { return m_elemType; }
+
+AstNodePtr ListTypeExpr::fixed_size() const { return m_fixed_size; }
 
 Token ListTypeExpr::token() const { return m_token; }
 
 AstKind ListTypeExpr::type() const { return KAstListTypeExpr; }
 
 std::string ListTypeExpr::stringify() const {
-    std::string res = "[]";
+    std::string res = "[";
+    if (m_fixed_size->type()!=KAstNoLiteral){
+        res+=m_fixed_size->stringify();
+    }
+    res+="]";
     res += m_elemType->stringify();
     return res;
 }

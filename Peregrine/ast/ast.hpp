@@ -207,12 +207,14 @@ class TypeExpression : public AstNode {
 class ListTypeExpr : public AstNode {
     Token m_token;
     AstNodePtr m_elemType;
+    AstNodePtr m_fixed_size;
 
   public:
-    ListTypeExpr(Token tok, AstNodePtr elemType);
+    ListTypeExpr(Token tok, AstNodePtr elemType,AstNodePtr fixed_size);
 
     AstNodePtr elemType() const;
 
+    AstNodePtr fixed_size() const;
     Token token() const;
     AstKind type() const;
     std::string stringify() const;
