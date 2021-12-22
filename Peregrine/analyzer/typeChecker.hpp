@@ -31,7 +31,6 @@ class TypeChecker : public ast::AstVisitor {
     bool visit(const ast::VariableStatement& node);
     bool visit(const ast::ConstDeclaration& node);
     bool visit(const ast::TypeDefinition& node);
-    bool visit(const ast::PassStatement& node);
     bool visit(const ast::IfStatement& node);
     bool visit(const ast::WhileStatement& node);
     bool visit(const ast::ForStatement& node);

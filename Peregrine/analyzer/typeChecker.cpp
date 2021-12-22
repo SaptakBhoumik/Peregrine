@@ -149,8 +149,6 @@ bool TypeChecker::visit(const ast::TypeDefinition& node) {
     return true;
 }
 
-bool TypeChecker::visit(const ast::PassStatement& node) { return true; }
-
 bool TypeChecker::visit(const ast::IfStatement& node) {
     check(node.condition(), *TypeProducer::boolean());
     checkBody(node.ifBody());
@@ -190,11 +188,11 @@ bool TypeChecker::visit(const ast::ScopeStatement& node) {
 }
 
 bool TypeChecker::visit(const ast::ReturnStatement& node) {
-    node.returnValue()->accept(*this);
-
     if (!m_currentFunction) {
-        error(node.token(), "can not return outside of a function");
+        error(node.token(), "can not use return outside of a function");
     }
+
+    node.returnValue()->accept(*this);
 
     check(node.returnValue(), *m_currentFunction->returnType());
     return true;
@@ -218,13 +216,14 @@ bool TypeChecker::visit(const ast::BinaryOperation& node) {
                   leftType->stringify() + " and " + m_result->stringify());
     }
 
-    m_result = leftType;
+    m_result = result;
     return true;
 }
 
 bool TypeChecker::visit(const ast::PrefixExpression& node) {
     node.right()->accept(*this);
     TypePtr result = m_result->prefixOperatorResult(node.prefix());
+
     if (!result) {
         error(node.token(), "operator " + node.prefix().keyword +
                                 " can not be used with type " +

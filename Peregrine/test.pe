@@ -1,20 +1,2 @@
-test = 324
-const aaa = "heyyy"
-
-int p = test + aaa
-
-class test(parent1,parent2):
-    float a = 5.6
-    int b = cast<int>(a)
-    static d=0
-    @dec
-    def addition(int a,int b) -> int:
-        return self.a +self.b
-    def sub(int a,int b) -> int:
-        return self.a - self.b
-    def multi(int a,int b) -> int:
-        return self.a * self.b
-    inline def div():
-        return self.a / self.b
-    static inline def pow():
-        return self.a ** self.b
+if 6 == 6:
+    printf("yes")
