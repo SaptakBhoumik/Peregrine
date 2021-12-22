@@ -2,6 +2,11 @@ for x in y:
     for i , j in x:
         pass
 
+a = 23
+test = &a
+
+b = *test + 56
+
 class test(parent1,parent2):
     "multi line 
     comment"

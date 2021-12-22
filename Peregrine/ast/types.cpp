@@ -55,6 +55,9 @@ TypePtr IntType::prefixOperatorResult(Token op) const {
         case tk_bit_not:
             return TypeProducer::integer(); // no
 
+        case tk_ampersand:
+            return TypeProducer::pointer(std::make_shared<IntType>(*this));
+
         default:
             return nullptr;
     }
@@ -126,6 +129,9 @@ TypePtr DecimalType::prefixOperatorResult(Token op) const {
         case tk_minus:
             return TypeProducer::decimal(); // no
 
+        case tk_ampersand:
+            return TypeProducer::pointer(std::make_shared<DecimalType>(*this));
+
         default:
             return nullptr;
     }
@@ -172,6 +178,11 @@ TypePtr StringType::prefixOperatorResult(Token op) const {
     if (op.tkType == tk_not)
         return TypeProducer::boolean();
 
+    // TODO: should we implement it like that?
+    //  if (op.tkType == tk_ampersand) {
+    //      return TypeProducer::pointer(std::make_shared<IntType>(*this));
+    //  }
+
     return nullptr;
 }
 
@@ -200,9 +211,42 @@ bool BoolType::isConvertibleTo(const Type& type) const {
 
 std::string BoolType::stringify() const { return "bool"; }
 
-TypePtr BoolType::prefixOperatorResult(Token op) const { return nullptr; }
+PointerType::PointerType(TypePtr baseType) { m_baseType = baseType; }
 
-TypePtr BoolType::infixOperatorResult(Token op, const TypePtr type) const {
+TypeCategory PointerType::category() const { return TypeCategory::Pointer; }
+
+TypePtr PointerType::baseType() const { return m_baseType; }
+
+bool PointerType::isConvertibleTo(const Type& type) const {
+    if (type.category() != TypeCategory::Pointer)
+        return false;
+
+    auto pointerType = dynamic_cast<const PointerType&>(type);
+    if (m_baseType->isConvertibleTo(*pointerType.baseType()))
+        return true;
+
+    return false;
+}
+
+std::string PointerType::stringify() const {
+    return "*" + m_baseType->stringify();
+}
+
+TypePtr PointerType::prefixOperatorResult(Token op) const {
+    switch (op.tkType) {
+        case tk_multiply:
+            return m_baseType;
+
+        case tk_ampersand:
+            return TypeProducer::pointer(std::make_shared<PointerType>(*this));
+
+        default:
+            return nullptr;
+    }
+}
+
+// TODO: allow pointer arithmetic as normal binary operations?
+TypePtr PointerType::infixOperatorResult(Token op, const TypePtr type) const {
     return nullptr;
 }
 
@@ -361,6 +405,10 @@ TypePtr TypeProducer::voidT() { return m_void; }
 
 TypePtr TypeProducer::list(TypePtr elemType) {
     return std::make_shared<ListType>(elemType);
+}
+
+TypePtr TypeProducer::pointer(TypePtr baseType) {
+    return std::make_shared<PointerType>(baseType);
 }
 
 std::map<std::string, TypePtr> identifierToTypeMap = {

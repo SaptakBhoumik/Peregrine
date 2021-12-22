@@ -16,6 +16,7 @@ enum TypeCategory {
     Decimal,
     String,
     Bool,
+    Pointer,
     List,
     Dict,
     UserDefined,
@@ -122,6 +123,18 @@ class BoolType : public Type {
     TypeCategory category() const;
     bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
+};
+
+class PointerType : public Type {
+    TypePtr m_baseType;
+
+  public:
+    PointerType(TypePtr baseType);
+
+    TypeCategory category() const;
+    TypePtr baseType() const;
+    bool isConvertibleTo(const Type& type) const;
+    std::string stringify() const;
 
     TypePtr prefixOperatorResult(Token op) const;
     TypePtr infixOperatorResult(Token op, const TypePtr type) const;
@@ -199,6 +212,7 @@ class TypeProducer {
     static TypePtr voidT();
 
     static TypePtr list(TypePtr elemType);
+    static TypePtr pointer(TypePtr baseType);
 };
 
 extern std::map<std::string, TypePtr> identifierToTypeMap;

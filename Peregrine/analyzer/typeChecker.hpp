@@ -49,6 +49,7 @@ class TypeChecker : public ast::AstVisitor {
     bool visit(const ast::ListTypeExpr& node);
     bool visit(const ast::DictTypeExpr& node);
     bool visit(const ast::FunctionTypeExpr& node);
+    bool visit(const ast::PointerTypeExpr& node);
     bool visit(const ast::NoLiteral& node);
     bool visit(const ast::IntegerLiteral& node);
     bool visit(const ast::DecimalLiteral& node);

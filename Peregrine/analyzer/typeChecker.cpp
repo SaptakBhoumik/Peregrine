@@ -295,6 +295,12 @@ bool TypeChecker::visit(const ast::DictTypeExpr& node) { return true; }
 
 bool TypeChecker::visit(const ast::FunctionTypeExpr& node) { return true; }
 
+bool TypeChecker::visit(const ast::PointerTypeExpr& node) {
+    node.baseType()->accept(*this);
+    m_result = TypeProducer::pointer(m_result);
+    return true;
+}
+
 bool TypeChecker::visit(const ast::NoLiteral& node) {
     m_result = TypeProducer::voidT();
     return true;
