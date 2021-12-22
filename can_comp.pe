@@ -22,13 +22,13 @@ def divide(int num1,int num2)->int:
         case _:
             return num1/num2
 def decorator(a func)->g:
-    int h=9
+    h:int =9
     def value(int c):
         h=8
         printf("%d\n",h)
         printf("Answer is %d\n",func(c))
     return value
-int ggggggg=9
+ggggggg:int=9
 @decorator
 def dec_test(int x)->int:
     ggggggg=7#mutability test
@@ -73,7 +73,7 @@ static inline def static_inline_func():
 inline def inline_func():
     printf("Hello from inline function\n")
 def main():
-    colours enum_test=colours.RED
+    enum_test:colours=colours.RED
     static_inline_func()
     inline_func()
     staticfunc()
@@ -90,17 +90,17 @@ def main():
     Cppcode(#endif)
     scope:
         printf("Hello from new scope\n")
-    bool x=False
+    x:bool =False
     const bool cc=False
     x=True
-    bool y
+    y:bool 
     y=True
     if x==y:
         pass
     printf("%d\n",test(0))
-    int a=0
-    int b=7
-    int c=7
+    a:int =0
+    b:int =7
+    c:int =7
     match a,b,c:
         case 5,7,8:
             printf("a is 5,b is 7 and c is 8")
@@ -119,14 +119,14 @@ def main():
             printf("\nHello\n")
     lambda_test(func)
     assert 8==8
-    name var1
+    var1:name 
     var1.item1=8
     printf("item1 of var1 is %d\n",var1.item1)
     var1.item2=6.8
     printf("item2 of var1 is %f\n",var1.item2)
     #should throw an error
     #assert 8==6
-    int cast_test=9
+    cast_test:int =9
     printf("Value is %f\n",cast<float>(cast_test))
     printf("%d\n",divide(6,2))
     #should terminate the program

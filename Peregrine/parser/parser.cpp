@@ -663,6 +663,9 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
         Token m_prevToken;
         if(m_tokIndex>0){
             m_prevToken=m_tokens[m_tokIndex-1];
+            if (nextPrecedence()!=pr_lowest&&m_prevToken.tkType==tk_dot){
+                break;
+            }
         }
         advance();
 
@@ -763,11 +766,11 @@ AstNodePtr Parser::parseDotExpression(AstNodePtr left) {
 
     // TODO: validate output of parseExpression
     AstNodePtr referenced = parseExpression();
-    if(precedenceMap.count(m_currentToken.tkType) != 0){
-        if (precedenceMap[m_currentToken.tkType]>pr_lowest){
+        std::cout<<m_currentToken.keyword<<"\n";
+    if (nextPrecedence()>pr_lowest){
             //To make something like eturn (self.a + self.b) valid
-            return parseBinaryOperation(std::make_shared<DotExpression>(tok, left, referenced));
-        }
+        advance();
+        return parseBinaryOperation(std::make_shared<DotExpression>(tok, left, referenced));
     }
     return std::make_shared<DotExpression>(tok, left, referenced);
 }

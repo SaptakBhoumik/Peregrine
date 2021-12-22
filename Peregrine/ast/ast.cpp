@@ -405,14 +405,12 @@ AstKind VariableStatement::type() const { return KAstVariableStmt; }
 
 std::string VariableStatement::stringify() const {
     std::string res = "";
-
+    res += m_name->stringify();
     if (m_type->type() != KAstNoLiteral) {
+        res+=":";
         res += m_type->stringify();
         res += " ";
     }
-
-    res += m_name->stringify();
-
     if (m_value->type() != KAstNoLiteral) {
         res += " = ";
         res += m_value->stringify();

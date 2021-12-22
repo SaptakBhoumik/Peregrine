@@ -117,21 +117,6 @@ If you create any new file make sure to comment your name in the file as shown `
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
-## Testing
-
-The project has automatic tests which will run on pull requests and pushes to the project.  
-Tests which require user input won't run but the code will still be compiled.  
-If you add new functionality to the project please run the appropriate tests for it, and create tests for your functionality if possible.
-
-#### It is recommended to only use input when absolutely necessary (example: you test the `input()` function)
-
-This is the case because tests which require user input will only be compiled and can only be checked for syntax errors, and not issues with the functionality of the given test subject.
-
-#### [`/Peregrine/tests/ci`](./Peregrine/tests/ci) - Tests which require no user input.
-
-#### [`/Peregrine/tests/manual`](./Peregrine/tests/manual) - Tests which require user input and also include the tests you write for CI
-
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 # License
 
