@@ -64,6 +64,8 @@ class Parser {
     AstNodePtr parseCpp();
 
     AstNodePtr parseType();
+    AstNodePtr parsePointerType();
+    AstNodePtr parseReferenceType();
     AstNodePtr parseListType();
     AstNodePtr parseDictType();
     AstNodePtr parseFuncType();

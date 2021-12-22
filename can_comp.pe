@@ -13,8 +13,8 @@ static def staticfunc():
     printf("Hello from static function\n")
     printf("Static var is %d\n",var_static)
 union name:
-    int item1
-    float item2
+    item1:int 
+    item2:float 
 def divide(num1:int ,num2:int )->int:
     match num2:
         case 0:

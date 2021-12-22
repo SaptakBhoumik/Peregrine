@@ -211,9 +211,9 @@ std::string UnionLiteral::stringify() const {
     for (size_t i = 0; i < m_elements.size(); i++) {
         if (i)
             res += "\n";
-        res += m_elements[i].first->stringify();
-        res += " ";
         res += m_elements[i].second->stringify();
+        res += ":";
+        res += m_elements[i].first->stringify();
     }
 
     return res;
@@ -478,17 +478,21 @@ std::string BlockStatement::stringify() const {
 
 ClassDefinition::ClassDefinition(Token tok, AstNodePtr name, std::vector<AstNodePtr> parent,
                                  std::vector<AstNodePtr> attributes,
-                                 std::vector<AstNodePtr> methods) {
+                                 std::vector<AstNodePtr> methods,
+                                 std::vector<AstNodePtr> other) {
     m_token = tok;
     m_name = name;
     m_parent = parent;
     m_attributes = attributes;
     m_methods = methods;
+    m_other=other;
 }
 
 AstNodePtr ClassDefinition::name() const { return m_name; }
 
 std::vector<AstNodePtr> ClassDefinition::parent() const { return m_parent; }
+
+std::vector<AstNodePtr> ClassDefinition::other() const { return m_other; }
 
 std::vector<AstNodePtr> ClassDefinition::attributes() const {
     return m_attributes;
@@ -525,7 +529,10 @@ std::string ClassDefinition::stringify() const {
         res += stmt->stringify();
         res += "\n";
     }
-
+    for (auto& stmt : m_other) {
+        res += stmt->stringify();
+        res += "\n";
+    }
     res += "\n";
     return res;
 }
@@ -1015,6 +1022,41 @@ std::string ListTypeExpr::stringify() const {
     res += m_elemType->stringify();
     return res;
 }
+
+PointerTypeExpr::PointerTypeExpr(Token tok, AstNodePtr baseType) {
+    m_token = tok;
+    m_baseType = baseType;
+}
+
+AstNodePtr PointerTypeExpr::baseType() const { return m_baseType; }
+
+Token PointerTypeExpr::token() const { return m_token; }
+
+AstKind PointerTypeExpr::type() const { return KAstPointerTypeExpr; }
+
+std::string PointerTypeExpr::stringify() const {
+    std::string res = "*";
+    res += m_baseType->stringify();
+    return res;
+}
+
+ReferenceTypeExpr::ReferenceTypeExpr(Token tok, AstNodePtr baseType) {
+    m_token = tok;
+    m_baseType = baseType;
+}
+
+AstNodePtr ReferenceTypeExpr::baseType() const { return m_baseType; }
+
+Token ReferenceTypeExpr::token() const { return m_token; }
+
+AstKind ReferenceTypeExpr::type() const { return KAstReferencedTypeExpr; }
+
+std::string ReferenceTypeExpr::stringify() const {
+    std::string res = "&";
+    res += m_baseType->stringify();
+    return res;
+}
+
 
 DictTypeExpr::DictTypeExpr(Token tok, AstNodePtr keyType,
                            AstNodePtr valueType) {

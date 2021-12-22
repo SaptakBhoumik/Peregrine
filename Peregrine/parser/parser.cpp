@@ -249,6 +249,10 @@ AstNodePtr Parser::parseClassDefinition() {
 
     while (m_currentToken.tkType != tk_dedent) {
         switch (m_currentToken.tkType) {
+            case tk_string:{//multiline comment
+                while (m_currentToken.tkType==tk_string){advance();}
+                break;
+            }
             case tk_def: {
                 methods.push_back(parseFunctionDef());
                 break;
@@ -300,7 +304,7 @@ AstNodePtr Parser::parseClassDefinition() {
     }
 
     return std::make_shared<ClassDefinition>(tok, name, parent, attributes,
-                                             methods);
+                                             methods,other);
 }
 
 AstNodePtr Parser::parseVirtual() {
@@ -798,6 +802,12 @@ AstNodePtr Parser::parseType() {
         case tk_dict:
             return parseDictType();//treate this as generic
         */
+        case tk_multiply:{
+            return parsePointerType();
+        }
+        case tk_ampersand:{
+            return parseReferenceType();
+        }
         case tk_list_open:
             return parseListType();
         case tk_identifier: {
@@ -829,6 +839,20 @@ AstNodePtr Parser::parseListType() {
 
     AstNodePtr elemType = parseType();
     return std::make_shared<ListTypeExpr>(tok, elemType,fixed_size);
+}
+
+AstNodePtr Parser::parsePointerType() {
+    Token tok = m_currentToken;
+    advance();
+    AstNodePtr typePtr = parseType();
+    return std::make_shared<PointerTypeExpr>(tok, typePtr);
+}
+
+AstNodePtr Parser::parseReferenceType() {
+    Token tok = m_currentToken;
+    advance();
+    AstNodePtr typePtr = parseType();
+    return std::make_shared<ReferenceTypeExpr>(tok, typePtr);
 }
 
 AstNodePtr Parser::parseDictType() {
@@ -969,9 +993,10 @@ AstNodePtr Parser::parseUnion() {
     advance();
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elements;
     while (m_currentToken.tkType != tk_dedent) {
-        AstNodePtr type = parseType();
-        advance();
         AstNodePtr name = parseName();
+        expect(tk_colon);
+        advance();
+        AstNodePtr type = parseType();
         advance();
         elements.push_back(std::pair(type, name));
         if (m_currentToken.tkType == tk_new_line) {
