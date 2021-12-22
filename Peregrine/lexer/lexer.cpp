@@ -887,27 +887,10 @@ LEXEME lexer(std::string src, std::string filename) {
                 token = token_init(statement, "**", tk_exponent, start_index,
                                    current_index, line);
             } else {
+                keyword="*";
                 start_index = current_index - 1;
-                keyword = item;
-                if (tokens.size() > 0) {
-                    if ((tokens.back().tkType == tk_true ||
-                         tokens.back().tkType == tk_false ||
-                         tokens.back().tkType == tk_string ||
-                         tokens.back().tkType == tk_integer ||
-                         tokens.back().tkType == tk_decimal ||
-                         tokens.back().tkType == tk_identifier ||
-                         tokens.back().tkType == tk_r_paren) &&
-                        line == tokens.back().line) {
-                        token = token_init(statement, keyword, tk_multiply,
-                                           start_index, current_index, line);
-                    } else {
-                        token = token_init(statement, keyword, tk_asterisk,
-                                           start_index, current_index, line);
-                    }
-                } else {
-                    token = token_init(statement, keyword, tk_asterisk,
+                token = token_init(statement, keyword, tk_multiply,
                                        start_index, current_index, line);
-                }
             }
         } else if (item == "~") {
             if (keyword != "") {

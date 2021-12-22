@@ -21,6 +21,8 @@ enum AstKind {
     KAstIdentifier,
     KAstTypeExpr,
     KAstListTypeExpr,
+    KAstPointerTypeExpr,
+    KAstReferencedTypeExpr,
     KAstDictTypeExpr,
     KAstFuncTypeExpr,
     KAstList,
@@ -208,12 +210,42 @@ class TypeExpression : public AstNode {
 class ListTypeExpr : public AstNode {
     Token m_token;
     AstNodePtr m_elemType;
+    AstNodePtr m_fixed_size;
 
   public:
-    ListTypeExpr(Token tok, AstNodePtr elemType);
+    ListTypeExpr(Token tok, AstNodePtr elemType,AstNodePtr fixed_size);
 
     AstNodePtr elemType() const;
 
+    AstNodePtr fixed_size() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+class PointerTypeExpr : public AstNode {
+    Token m_token;
+    AstNodePtr m_baseType;
+
+  public:
+    PointerTypeExpr(Token tok, AstNodePtr baseType);
+
+    AstNodePtr baseType() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+class ReferenceTypeExpr : public AstNode {
+    Token m_token;
+    AstNodePtr m_baseType;
+
+  public:
+    ReferenceTypeExpr(Token tok, AstNodePtr baseType);
+
+    AstNodePtr baseType() const;
     Token token() const;
     AstKind type() const;
     std::string stringify() const;
@@ -487,16 +519,19 @@ class ClassDefinition : public AstNode {
     std::vector<AstNodePtr> m_parent; // NOTE:class test(parent1,parent2)
     std::vector<AstNodePtr> m_attributes;
     std::vector<AstNodePtr> m_methods;
+    std::vector<AstNodePtr> m_other;
 
   public:
     ClassDefinition(Token tok, AstNodePtr name, std::vector<AstNodePtr> parent,
                     std::vector<AstNodePtr> attributes,
-                    std::vector<AstNodePtr> methods);
+                    std::vector<AstNodePtr> methods,
+                    std::vector<AstNodePtr> other);
 
     AstNodePtr name() const;
     std::vector<AstNodePtr> parent() const;
     std::vector<AstNodePtr> attributes() const;
     std::vector<AstNodePtr> methods() const;
+    std::vector<AstNodePtr> other() const;
 
     Token token() const;
     AstKind type() const;
@@ -689,7 +724,7 @@ class WhileStatement : public AstNode {
 
 class ForStatement : public AstNode {
     Token m_token;
-    AstNodePtr m_variable;
+    std::vector<AstNodePtr> m_variable;
 
     // the object that we will iterate on the loop, like a list
     AstNodePtr m_sequence;
@@ -697,10 +732,10 @@ class ForStatement : public AstNode {
     AstNodePtr m_body;
 
   public:
-    ForStatement(Token tok, AstNodePtr variable, AstNodePtr sequence,
+    ForStatement(Token tok, std::vector<AstNodePtr> variable, AstNodePtr sequence,
                  AstNodePtr body);
 
-    AstNodePtr variable() const;
+    std::vector<AstNodePtr> variable() const;
     AstNodePtr sequence() const;
     AstNodePtr body() const;
 

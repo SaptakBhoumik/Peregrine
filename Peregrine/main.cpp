@@ -5,13 +5,11 @@
 #include "lexer/tokens.hpp"
 #include "parser/parser.hpp"
 
-
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string.h>
 #include <vector>
-
 
 int main(int argc, char** argv) {
     if (argc < 3) { // the cli is still not complete

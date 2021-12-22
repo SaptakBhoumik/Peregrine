@@ -83,6 +83,8 @@ void ClassDefinition::accept(AstVisitor& visitor) const {
             stmt->accept(visitor);
         for (auto& stmt : m_methods)
             stmt->accept(visitor);
+        for (auto& stmt : m_other)
+            stmt->accept(visitor);
     }
 }
 
@@ -143,5 +145,9 @@ void WithStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 void VirtualStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void CastStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+
+void PointerTypeExpr::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+
+void ReferenceTypeExpr::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 } // namespace ast
