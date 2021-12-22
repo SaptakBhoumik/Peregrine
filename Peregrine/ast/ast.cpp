@@ -569,9 +569,9 @@ std::string FunctionDefinition::stringify() const {
                 res += ", ";
             }
 
-            res += param.p_type->stringify();
-            res += " ";
             res += param.p_name->stringify();
+            res += ":";
+            res += param.p_type->stringify();
         }
     }
 

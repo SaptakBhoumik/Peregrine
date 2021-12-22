@@ -172,27 +172,13 @@ AstNodePtr Parser::parseStatement() {
         // TODO: variables currently do not work with all the types, we need to
         // fix this
         case tk_identifier: {
-            if ((next().tkType == tk_identifier ||
-                 next().tkType == tk_assign) ||
-                (next().tkType == tk_dot && is_imported_type())) {
+            if ((next().tkType == tk_colon ||
+                 next().tkType == tk_assign)) {
                 // variable
                 stmt = parseVariableStatement();
                 break;
             } else if (next().tkType == tk_dot && is_imported_var()) {
-                AstNodePtr left = parseName();
-                advance();
-                AstNodePtr name = parseDotExpression(left);
-                advance();
-                if (m_currentToken.tkType == tk_list_open) {
-                    stmt = parseListOrDictAccess(name);
-                } else {
-                    auto tok = m_currentToken;
-                    advance();
-                    AstNodePtr value = parseExpression();
-                    AstNodePtr type = std::make_shared<NoLiteral>();
-                    stmt = std::make_shared<VariableStatement>(tok, type, name,
-                                                               value);
-                }
+                stmt = parseVariableStatement();
                 break;
             }
             // if it got here, it will go down the cases and match the default
@@ -369,23 +355,23 @@ AstNodePtr Parser::parseImport() {
 AstNodePtr Parser::parseVariableStatement() {
     Token tok = m_currentToken;
     AstNodePtr varType = std::make_shared<NoLiteral>();
+    AstNodePtr name = parseName();
+    advance();
 
-    if (next().tkType == tk_identifier ||
-        next().tkType ==
-            tk_dot // it is not a var because we have checked it before
-    ) {
+    if (m_currentToken.tkType == tk_colon) {
+        advance();
         varType = parseType();
         advance();
     }
 
-    AstNodePtr name = parseName();
-
+    else if(m_currentToken.tkType==tk_dot){
+        name=parseDotExpression(name);
+        advance();
+    }
     AstNodePtr value = std::make_shared<NoLiteral>();
 
-    if (next().tkType == tk_assign) {
+    if (m_currentToken.tkType == tk_assign) {
         advance();
-        advance();
-
         value = parseExpression();
     } else {
         advanceOnNewLine();
@@ -397,16 +383,13 @@ AstNodePtr Parser::parseVariableStatement() {
 AstNodePtr Parser::parseConstDeclaration() {
     Token tok = m_currentToken;
     expect(tk_identifier);
-
-    AstNodePtr constType = std::make_shared<NoLiteral>();
-
-    if (next().tkType == tk_identifier) {
-        constType = parseType();
-        advance();
-    }
-
     AstNodePtr name = parseName();
-
+    advance();
+    AstNodePtr constType = std::make_shared<NoLiteral>();
+    if (m_currentToken.tkType == tk_colon) {
+        advance();
+        constType = parseType();
+    }
     expect(tk_assign);
     advance();
 
@@ -510,24 +493,18 @@ AstNodePtr Parser::parseFunctionDef() {
     AstNodePtr name = parseName();
 
     expect(tk_l_paren);
-
     std::vector<parameter> parameters;
-
-    if (next().tkType != tk_r_paren) {
-        do {
-            advance();
-
-            AstNodePtr paramType = parseType();
-            expect(tk_identifier);
-            AstNodePtr paramName = parseName();
-
-            parameters.push_back(parameter{paramType, paramName});
-            advance();
-        } while (m_currentToken.tkType == tk_comma);
-    } else {
+    advance();
+    while (m_currentToken.tkType != tk_r_paren) {
+        AstNodePtr paramName = parseName();
+        expect(tk_colon);
         advance();
+        AstNodePtr paramType = parseType();
+        parameters.push_back(parameter{paramType, paramName});
+        advance();
+        if (m_currentToken.tkType==tk_comma){advance();}
+        else{break;}
     }
-
     if (m_currentToken.tkType != tk_r_paren) {
         error(m_currentToken,
               "expected ), got " + m_currentToken.keyword + " instead");
@@ -810,10 +787,9 @@ AstNodePtr Parser::parseType() {
         /* TODO: Change in syntax
         case tk_dict:
             return parseDictType();//treate this as generic
-
+        */
         case tk_list_open:
             return parseListType();
-        */
         case tk_identifier: {
             if (next().tkType == tk_dot) {
                 AstNodePtr left = parseName();
@@ -1038,8 +1014,7 @@ AstNodePtr Parser::parseStatic() {
             break;
         }
         case tk_identifier: {
-            if (next().tkType == tk_identifier || next().tkType == tk_assign ||
-                is_imported_type()) {
+            if (next().tkType == tk_colon || next().tkType == tk_assign ) {
                 body = parseVariableStatement();
                 break;
             }
