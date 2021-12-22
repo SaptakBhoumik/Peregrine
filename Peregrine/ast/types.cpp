@@ -256,31 +256,40 @@ bool VoidType::isConvertibleTo(const Type& type) const { return false; }
 
 std::string VoidType::stringify() const { return "void"; }
 
-ListType::ListType(TypePtr elemType) { m_elemType = elemType; }
+ListType::ListType(TypePtr elemType, std::string size) {
+    m_elemType = elemType;
+    m_size = size;
+}
 
 TypeCategory ListType::category() const { return TypeCategory::List; }
 
 TypePtr ListType::elemType() const { return m_elemType; }
+
+std::string ListType::size() const { return m_size; }
 
 bool ListType::isConvertibleTo(const Type& type) const {
     if (type.category() != TypeCategory::List)
         return false;
 
     auto listType = dynamic_cast<const ListType&>(type);
-    if (m_elemType->isConvertibleTo(*listType.elemType()))
+    if (m_elemType->isConvertibleTo(*listType.elemType()) &&
+        m_size == listType.size())
         return true;
 
     return false;
 }
 
-std::string ListType::stringify() const { return ""; }
+std::string ListType::stringify() const {
+    return "[" + m_size + "]" + m_elemType->stringify();
+}
 
 bool ListType::operator==(const Type& type) const {
     if (type.category() != TypeCategory::List)
         return false;
 
     auto listType = dynamic_cast<const ListType&>(type);
-    if (m_elemType->operator==(*listType.elemType()))
+    if (m_elemType->operator==(*listType.elemType()) &&
+        m_size == listType.size())
         return true;
 
     return false;
@@ -403,8 +412,8 @@ TypePtr TypeProducer::string() { return m_string; }
 
 TypePtr TypeProducer::voidT() { return m_void; }
 
-TypePtr TypeProducer::list(TypePtr elemType) {
-    return std::make_shared<ListType>(elemType);
+TypePtr TypeProducer::list(TypePtr elemType, std::string size) {
+    return std::make_shared<ListType>(elemType, size);
 }
 
 TypePtr TypeProducer::pointer(TypePtr baseType) {

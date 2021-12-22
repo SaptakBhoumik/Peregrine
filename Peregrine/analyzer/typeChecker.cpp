@@ -177,6 +177,8 @@ bool TypeChecker::visit(const ast::ScopeStatement& node) {
 }
 
 bool TypeChecker::visit(const ast::ReturnStatement& node) {
+    std::cout << "a"
+              << "\n";
     if (!m_currentFunction) {
         error(node.token(), "can not use return outside of a function");
     }
@@ -187,7 +189,18 @@ bool TypeChecker::visit(const ast::ReturnStatement& node) {
     return true;
 }
 
-bool TypeChecker::visit(const ast::ListLiteral& node) { return true; }
+bool TypeChecker::visit(const ast::ListLiteral& node) {
+    node.elements()[0]->accept(*this); // TODO: check to see if its not empty
+    TypePtr listType = m_result;
+
+    for (auto& elem : node.elements()) {
+        check(elem, *listType);
+    }
+
+    m_result =
+        TypeProducer::list(listType, std::to_string(node.elements().size()));
+    return true;
+}
 
 bool TypeChecker::visit(const ast::DictLiteral& node) { return true; }
 
@@ -276,7 +289,13 @@ bool TypeChecker::visit(const ast::TypeExpression& node) {
 
 bool TypeChecker::visit(const ast::ListTypeExpr& node) {
     node.elemType()->accept(*this);
-    m_result = TypeProducer::list(m_result);
+    auto listType = m_result;
+
+    check(node.size(), *TypeProducer::integer());
+
+    m_result = TypeProducer::list(
+        listType,
+        std::dynamic_pointer_cast<ast::IntegerLiteral>(node.size())->value());
     return true;
 }
 

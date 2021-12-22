@@ -415,7 +415,7 @@ std::string VariableStatement::stringify() const {
     std::string res = "";
     res += m_name->stringify();
     if (m_type->type() != KAstNoLiteral) {
-        res+=":";
+        res += ":";
         res += m_type->stringify();
         res += " ";
     }
@@ -502,7 +502,7 @@ ClassDefinition::ClassDefinition(Token tok, AstNodePtr name,
     m_parent = parent;
     m_attributes = attributes;
     m_methods = methods;
-    m_other=other;
+    m_other = other;
 }
 
 AstNodePtr ClassDefinition::name() const { return m_name; }
@@ -849,8 +849,8 @@ std::string WhileStatement::stringify() const {
     return res;
 }
 
-ForStatement::ForStatement(Token tok, std::vector<AstNodePtr> variable, AstNodePtr sequence,
-                           AstNodePtr body) {
+ForStatement::ForStatement(Token tok, std::vector<AstNodePtr> variable,
+                           AstNodePtr sequence, AstNodePtr body) {
     m_token = tok;
     m_variable = variable;
     m_sequence = sequence;
@@ -869,9 +869,11 @@ AstKind ForStatement::type() const { return KAstForStatement; }
 
 std::string ForStatement::stringify() const {
     std::string res = "for ";
-    for(size_t i=0;i<m_variable.size();++i){
+    for (size_t i = 0; i < m_variable.size(); ++i) {
         res += m_variable[i]->stringify();
-        if (i<m_variable.size()-1){res+=",";}
+        if (i < m_variable.size() - 1) {
+            res += ",";
+        }
     }
     res += " in ";
     res += m_sequence->stringify();
@@ -1018,15 +1020,15 @@ std::string MatchStatement::stringify() const {
     return res;
 }
 
-ListTypeExpr::ListTypeExpr(Token tok, AstNodePtr elemType,AstNodePtr fixed_size) {
+ListTypeExpr::ListTypeExpr(Token tok, AstNodePtr elemType, AstNodePtr size) {
     m_token = tok;
     m_elemType = elemType;
-    m_fixed_size=fixed_size;
+    m_size = size;
 }
 
 AstNodePtr ListTypeExpr::elemType() const { return m_elemType; }
 
-AstNodePtr ListTypeExpr::fixed_size() const { return m_fixed_size; }
+AstNodePtr ListTypeExpr::size() const { return m_size; }
 
 Token ListTypeExpr::token() const { return m_token; }
 
@@ -1034,10 +1036,11 @@ AstKind ListTypeExpr::type() const { return KAstListTypeExpr; }
 
 std::string ListTypeExpr::stringify() const {
     std::string res = "[";
-    if (m_fixed_size->type()!=KAstNoLiteral){
-        res+=m_fixed_size->stringify();
-    }
-    res+="]";
+
+    res += m_size->stringify();
+
+    res += "]";
+
     res += m_elemType->stringify();
     return res;
 }
@@ -1075,7 +1078,6 @@ std::string ReferenceTypeExpr::stringify() const {
     res += m_baseType->stringify();
     return res;
 }
-
 
 DictTypeExpr::DictTypeExpr(Token tok, AstNodePtr keyType,
                            AstNodePtr valueType) {

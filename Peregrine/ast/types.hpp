@@ -151,12 +151,14 @@ class VoidType : public Type {
 
 class ListType : public Type {
     TypePtr m_elemType;
+    std::string m_size;
 
   public:
-    ListType(TypePtr elemType);
+    ListType(TypePtr elemType, std::string size);
 
     TypeCategory category() const;
     TypePtr elemType() const;
+    std::string size() const;
     bool isConvertibleTo(const Type& type) const;
     std::string stringify() const;
 
@@ -211,7 +213,7 @@ class TypeProducer {
     static TypePtr boolean();
     static TypePtr voidT();
 
-    static TypePtr list(TypePtr elemType);
+    static TypePtr list(TypePtr elemType, std::string size);
     static TypePtr pointer(TypePtr baseType);
 };
 

@@ -210,14 +210,14 @@ class TypeExpression : public AstNode {
 class ListTypeExpr : public AstNode {
     Token m_token;
     AstNodePtr m_elemType;
-    AstNodePtr m_fixed_size;
+    AstNodePtr m_size;
 
   public:
-    ListTypeExpr(Token tok, AstNodePtr elemType,AstNodePtr fixed_size);
+    ListTypeExpr(Token tok, AstNodePtr elemType, AstNodePtr size);
 
     AstNodePtr elemType() const;
+    AstNodePtr size() const;
 
-    AstNodePtr fixed_size() const;
     Token token() const;
     AstKind type() const;
     std::string stringify() const;
@@ -732,8 +732,8 @@ class ForStatement : public AstNode {
     AstNodePtr m_body;
 
   public:
-    ForStatement(Token tok, std::vector<AstNodePtr> variable, AstNodePtr sequence,
-                 AstNodePtr body);
+    ForStatement(Token tok, std::vector<AstNodePtr> variable,
+                 AstNodePtr sequence, AstNodePtr body);
 
     std::vector<AstNodePtr> variable() const;
     AstNodePtr sequence() const;

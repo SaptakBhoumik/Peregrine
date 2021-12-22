@@ -7,6 +7,12 @@ test = &a
 
 b = *test + 56
 
+arr = [2, 65]
+def hey(a: [2]int):
+    2 + 4
+
+hey(arr)
+
 class test(parent1,parent2):
     "multi line 
     comment"

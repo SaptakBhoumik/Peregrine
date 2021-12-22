@@ -515,6 +515,7 @@ AstNodePtr Parser::parseFunctionDef() {
 
     expect(tk_l_paren);
     std::vector<parameter> parameters;
+
     advance();
     while (m_currentToken.tkType != tk_r_paren) {
         AstNodePtr paramName = parseName();
@@ -529,6 +530,7 @@ AstNodePtr Parser::parseFunctionDef() {
             break;
         }
     }
+
     if (m_currentToken.tkType != tk_r_paren) {
         error(m_currentToken,
               "expected ), got " + m_currentToken.keyword + " instead");
@@ -536,7 +538,7 @@ AstNodePtr Parser::parseFunctionDef() {
 
     // returns void by default
     AstNodePtr returnType =
-        std::make_shared<IdentifierExpression>(m_currentToken, "void");
+        std::make_shared<TypeExpression>(m_currentToken, "void");
 
     if (next().tkType == tk_arrow) {
         advance();
@@ -835,15 +837,14 @@ AstNodePtr Parser::parseType() {
 AstNodePtr Parser::parseListType() {
     Token tok = m_currentToken;
     advance();
-    AstNodePtr fixed_size = std::make_shared<NoLiteral>();
-    if (m_currentToken.tkType != tk_list_close) {
-        fixed_size = parseExpression();
-        expect(tk_list_close);
-    }
+
+    AstNodePtr size = parseExpression();
+
+    expect(tk_list_close);
     advance();
 
     AstNodePtr elemType = parseType();
-    return std::make_shared<ListTypeExpr>(tok, elemType, fixed_size);
+    return std::make_shared<ListTypeExpr>(tok, elemType, size);
 }
 
 AstNodePtr Parser::parsePointerType() {
