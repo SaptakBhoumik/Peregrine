@@ -7,7 +7,7 @@ bool isArithmeticToken(Token tok) {
         case tk_plus:
         case tk_minus:
         case tk_divide:
-        case tk_asterisk:
+        case tk_multiply:
         case tk_modulo:
         case tk_exponent:
             return true;
