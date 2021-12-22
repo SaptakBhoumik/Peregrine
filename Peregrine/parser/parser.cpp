@@ -484,9 +484,16 @@ AstNodePtr Parser::parseFor() {
     Token tok = m_currentToken;
     advance();
 
-    AstNodePtr variable = parseName();
+    std::vector<AstNodePtr> variable;
+    while(m_currentToken.tkType!=tk_in){
+        variable.push_back(parseName());
+        advance();
+        if (m_currentToken.tkType==tk_comma){advance();}
+        else if (m_currentToken.tkType!=tk_in){
+            //TODO:Throw error
+        }
 
-    expect(tk_in);
+    }
     advance();
 
     AstNodePtr sequence = parseExpression();

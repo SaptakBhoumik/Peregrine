@@ -83,6 +83,8 @@ void ClassDefinition::accept(AstVisitor& visitor) const {
             stmt->accept(visitor);
         for (auto& stmt : m_methods)
             stmt->accept(visitor);
+        for (auto& stmt : m_other)
+            stmt->accept(visitor);
     }
 }
 

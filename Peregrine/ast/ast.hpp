@@ -709,7 +709,7 @@ class WhileStatement : public AstNode {
 
 class ForStatement : public AstNode {
     Token m_token;
-    AstNodePtr m_variable;
+    std::vector<AstNodePtr> m_variable;
 
     // the object that we will iterate on the loop, like a list
     AstNodePtr m_sequence;
@@ -717,10 +717,10 @@ class ForStatement : public AstNode {
     AstNodePtr m_body;
 
   public:
-    ForStatement(Token tok, AstNodePtr variable, AstNodePtr sequence,
+    ForStatement(Token tok, std::vector<AstNodePtr> variable, AstNodePtr sequence,
                  AstNodePtr body);
 
-    AstNodePtr variable() const;
+    std::vector<AstNodePtr> variable() const;
     AstNodePtr sequence() const;
     AstNodePtr body() const;
 

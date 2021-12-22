@@ -1,3 +1,7 @@
+for x in y:
+    for i , j in x:
+        pass
+
 class test(parent1,parent2):
     "multi line 
     comment"

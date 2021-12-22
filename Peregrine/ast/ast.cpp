@@ -832,7 +832,7 @@ std::string WhileStatement::stringify() const {
     return res;
 }
 
-ForStatement::ForStatement(Token tok, AstNodePtr variable, AstNodePtr sequence,
+ForStatement::ForStatement(Token tok, std::vector<AstNodePtr> variable, AstNodePtr sequence,
                            AstNodePtr body) {
     m_token = tok;
     m_variable = variable;
@@ -840,7 +840,7 @@ ForStatement::ForStatement(Token tok, AstNodePtr variable, AstNodePtr sequence,
     m_body = body;
 }
 
-AstNodePtr ForStatement::variable() const { return m_variable; }
+std::vector<AstNodePtr> ForStatement::variable() const { return m_variable; }
 
 AstNodePtr ForStatement::sequence() const { return m_sequence; }
 
@@ -852,8 +852,10 @@ AstKind ForStatement::type() const { return KAstForStatement; }
 
 std::string ForStatement::stringify() const {
     std::string res = "for ";
-
-    res += m_variable->stringify();
+    for(size_t i=0;i<m_variable.size();++i){
+        res += m_variable[i]->stringify();
+        if (i<m_variable.size()-1){res+=",";}
+    }
     res += " in ";
     res += m_sequence->stringify();
     res += ":\n";
