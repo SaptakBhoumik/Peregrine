@@ -37,6 +37,10 @@ int main(int argc, char** argv) {
         buf << file.rdbuf();
 
         std::vector<Token> tokens = lexer(buf.str(), "test");
+        // for (auto& token : tokens) {
+        //     std::cout << "Keyword= " << token.keyword
+        //               << " Type= " << token.tkType << "\n";
+        // }
         Parser parser(tokens);
         AstNodePtr program = parser.parse();
 
@@ -52,11 +56,11 @@ int main(int argc, char** argv) {
                 js::Codegen codegen("index.html", program, true, filename);
             } else {
                 cpp::Codegen codegen("temp.cc", program, filename);
-                system("g++ temp.cc");
+                system("g++ -w temp.cc");
             }
         } else {
             cpp::Codegen codegen("temp.cc", program, filename);
-            system("g++ temp.cc");
+            system("g++ -w temp.cc");
         }
     }
     return 0;

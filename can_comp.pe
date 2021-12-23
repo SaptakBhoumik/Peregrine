@@ -2,6 +2,8 @@
 Hello"
 "Another Multiline comment
 Hello"
+class test:
+    const a:int=9
 enum colours:
     RED = 144,
     GREEN,
@@ -79,6 +81,11 @@ def main():
     staticfunc()
     dec_test(4)
     static_dec_test(4)
+    test_var:int=9
+    test_pointer:*int=&test_var
+    test_ref:int=test_var
+    printf("Value of test_pointer is %d is at location %p\n",*test_pointer,test_pointer)
+    printf("Value of test_ref is %d is at location %p\n",test_ref,&test_ref)
     def z()->int:
         printf("hello\n")
         return 5

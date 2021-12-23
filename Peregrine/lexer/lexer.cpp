@@ -329,9 +329,36 @@ LEXEME lexer(std::string src, std::string filename) {
         } else if (item == "#" && is_string == false &&
                    is_cpp_string == false && is_comment == false) {
             is_comment = true;
+            if (keyword != "") {
+                token = token_init(
+                    statement, keyword,
+                    token_type(keyword, next(current_index - 1, src)),
+                    start_index, current_index - 1, line);
+                if (token.tkType == tk_not &&
+                    tokens[tokens.size() - 1].tkType == tk_is) {
+                    tokens[tokens.size() - 1].tkType = tk_is_not;
+                    tokens[tokens.size() - 1].keyword = "is not";
+                } else if (token.tkType == tk_in &&
+                           tokens[tokens.size() - 1].tkType == tk_not) {
+                    tokens[tokens.size() - 1].tkType = tk_not_in;
+                    tokens[tokens.size() - 1].keyword = "not in";
+                } else {
+                    tokens.emplace_back(token);
+                }
+                token = Token();
+                keyword = "";
+            }
         } else if (is_comment == true) {
             if (item == "\n" || item == "\r\n" || item == "\r") {
                 is_comment = false;
+                if (tokens.back().tkType !=tk_new_line && // we dont want to add 2 newline one after the other
+                    tokens.back().tkType !=tk_colon
+                ){ 
+                    token = token_init(statement, "<tk_new_line>", tk_new_line,
+                                       current_index, current_index, line);
+                    tokens.emplace_back(token);
+                    token = Token();
+                }
             }
         } else if (is_string == true && string_starter != item) {
             keyword += item;
@@ -390,17 +417,13 @@ LEXEME lexer(std::string src, std::string filename) {
             }
             if ((item == "\n" || item == "\r\n" || item == "\r") &&
                 tokens.size() > 0 &&
-                first_bracket_count ==
-                    0) { // we want the no of bracket count to be zero
+                first_bracket_count ==0) { // we want the no of bracket count to be zero
                 // because peregrine allows you to write code as follows
                 // print(arg1,
                 //       arg2)
                 // to reduce the confusion while parsing
-                if (tokens.back().tkType !=
-                        tk_new_line // we dont want to add 2 newline one after
-                                    // the other
-                    && tokens.back().tkType !=
-                           tk_colon // again to reduce confusion
+                if (tokens.back().tkType !=tk_new_line // we dont want to add 2 newline one after the other
+                    && tokens.back().tkType !=tk_colon // again to reduce confusion
                     && is_dictionary == false && is_array == false &&
                     is_string == false) {
                     token = token_init(statement, "<tk_new_line>", tk_new_line,

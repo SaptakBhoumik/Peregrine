@@ -346,11 +346,30 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
     return true;
 }
 
-bool Codegen::visit(const ast::ListLiteral& node) { return true; }
+bool Codegen::visit(const ast::ListLiteral& node) {
+    write("{");
+    auto elements=node.elements();
+    if (elements.size()>0){
+        for (size_t i=0;i<elements.size();++i){
+            elements[i]->accept(*this);
+            if (i<elements.size()-1){
+                write(",");
+            }
+        }
+    }
+    write("}");
+    return true; 
+}
 
 bool Codegen::visit(const ast::DictLiteral& node) { return true; }
 
-bool Codegen::visit(const ast::ListOrDictAccess& node) { return true; }
+bool Codegen::visit(const ast::ListOrDictAccess& node) { 
+    node.container()->accept(*this);
+    write("[");
+    node.keyOrIndex()->accept(*this);
+    write("]");
+    return true; 
+}
 
 bool Codegen::visit(const ast::BinaryOperation& node) {
     if (node.op().keyword == "**") {
@@ -561,6 +580,46 @@ bool Codegen::visit(const ast::CastStatement& node){
     write(")(");
     node.value()->accept(*this);
     write(")");
+    return true;
+}
+bool Codegen::visit(const ast::PointerTypeExpr& node){
+    node.baseType()->accept(*this);
+    write("*");
+    return true;
+}
+bool Codegen::visit(const ast::ReferenceTypeExpr& node){
+    node.baseType()->accept(*this);
+    write("&");
+    return true;
+}
+bool Codegen::visit(const ast::ClassDefinition& node){
+    write("class ");
+    node.name()->accept(*this);
+    auto parents=node.parent();
+    if (parents.size()!=0){
+        write(":");
+    }
+    for (size_t i=0;i<parents.size();++i){
+        write("public ");
+        parents[i]->accept(*this);
+        if(i<parents.size()-1){write(",");}
+    }
+    write("\n{");
+    for (auto& x : node.other()){
+        x->accept(*this);
+        write(";\n");
+    }
+    write("public:\n");
+    for (auto& x : node.attributes()){
+        x->accept(*this);
+        write(";\n");
+    }
+    //TODO: Implement this
+    for (auto& x : node.methods()){
+        x->accept(*this);
+        write(";\n");
+    }
+    write("\n}");
     return true;
 }
 } // namespace cpp

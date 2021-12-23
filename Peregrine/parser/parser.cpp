@@ -1110,8 +1110,7 @@ AstNodePtr Parser::parseWith() {
 AstNodePtr Parser::parseCast() {
     auto tok = m_currentToken;
     expect(tk_less);
-    expect(tk_identifier);
-
+    advance();
     AstNodePtr type = parseType();
     expect(tk_greater);
     expect(tk_l_paren);
