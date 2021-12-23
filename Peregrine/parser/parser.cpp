@@ -255,17 +255,29 @@ AstNodePtr Parser::parseClassDefinition() {
                 }
                 break;
             }
-            case tk_def: {
-                methods.push_back(parseFunctionDef());
-                break;
-            }
-
             // TODO: this is not able to parse all variable declarations, fix it
             // later.
             case tk_identifier: {
                 attributes.push_back(parseVariableStatement());
                 break;
             }
+            case tk_const: {
+                attributes.push_back(parseConstDeclaration());
+                break;
+            }
+            case tk_static: {
+                if (next().tkType == tk_def || next().tkType == tk_inline) {
+                    methods.push_back(parseStatic());
+                } else {
+                    attributes.push_back(parseStatic());
+                }
+                break;
+            }
+            case tk_def: {
+                methods.push_back(parseFunctionDef());
+                break;
+            }
+
             case tk_at: {
                 methods.push_back(parseDecoratorCall());
                 break;
@@ -276,14 +288,6 @@ AstNodePtr Parser::parseClassDefinition() {
             }
             case tk_inline: {
                 methods.push_back(parseInline());
-                break;
-            }
-            case tk_static: {
-                if (next().tkType == tk_def || next().tkType == tk_inline) {
-                    methods.push_back(parseStatic());
-                } else {
-                    attributes.push_back(parseStatic());
-                }
                 break;
             }
             case tk_union: { // union def in class

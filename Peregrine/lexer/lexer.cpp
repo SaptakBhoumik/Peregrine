@@ -243,8 +243,7 @@ LEXEME lexer(std::string src, std::string filename) {
                      // is that it will reduce the time it takes to run
     while (current_index < src.size()) {
         item = src.at(current_index);
-        if ((item == "\n" || item == "\r\n" || item == "\r") &&
-            next(current_index, src) != "" // dont want it to be the end of file
+        if ((item == "\n" || item == "\r\n" || item == "\r")
         ) {
             last_line = current_index;
             line++;
@@ -1047,7 +1046,11 @@ LEXEME lexer(std::string src, std::string filename) {
     if (error){exit(1);}
     if (tokens.size() > 0) {
         uint64_t total_tab = 0;
-        for (auto tok : tokens) {
+        if(tokens.back().tkType!=tk_new_line){
+            tokens.push_back(token_init(statement, "<tk_new_line>", tk_new_line,
+                                       current_index, current_index, line));
+        }
+        for (auto& tok : tokens) {
             switch (tok.tkType) {
                 case tk_ident: {
                     total_tab++;
