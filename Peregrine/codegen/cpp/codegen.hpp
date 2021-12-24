@@ -24,6 +24,7 @@ class Codegen : public ast::AstVisitor {
   private:
     bool is_dot_exp=false;
     bool is_enum=false;
+    bool is_class=false;
     std::vector<std::string> enum_name={"error"};
     std::string res;
     bool save=false;
@@ -35,7 +36,8 @@ class Codegen : public ast::AstVisitor {
 
     std::string searchDefaultModule(std::string path, std::string moduleName);
     void codegenFuncParams(std::vector<ast::parameter> parameters);
-
+    void magic_methord(ast::AstNodePtr& node,std::string name);
+    void write_name(std::shared_ptr<ast::FunctionDefinition> node,std::string name,std::string virtual_static_inline="");
     void matchArg(std::vector<ast::AstNodePtr> matchItem,
                   std::vector<ast::AstNodePtr> caseItem);
     std::string wrap(ast::AstNodePtr item,std::string contains);
@@ -83,7 +85,6 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::EnumLiteral& node);
     bool visit(const ast::CastStatement& node);
     bool visit(const ast::PointerTypeExpr& node);
-    bool visit(const ast::ReferenceTypeExpr& node);
     bool visit(const ast::ClassDefinition& node);
 
     EnvPtr m_env;

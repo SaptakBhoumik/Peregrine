@@ -148,6 +148,5 @@ void CastStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void PointerTypeExpr::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
-void ReferenceTypeExpr::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 } // namespace ast

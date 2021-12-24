@@ -428,12 +428,16 @@ bool Codegen::visit(const ast::DotExpression& node) {
                 write(name+"___");
                 node.referenced()->accept(*this); 
             }
+            else if(name=="self" && is_class){
+                write("this->");
+                node.referenced()->accept(*this);
+            }
             else{
                 node.owner()->accept(*this);
                 write(".");
                 node.referenced()->accept(*this);   
             }
-        is_dot_exp=false;
+            is_dot_exp=false;
         }
         else {
             node.owner()->accept(*this);
@@ -454,7 +458,12 @@ bool Codegen::visit(const ast::IdentifierExpression& node) {
     if (is_enum){
         write(enum_name.back()+"___");
     }
-    write(node.value());
+    if(is_class && not is_dot_exp && node.value()=="self"){
+        write("*this");
+    }
+    else{
+        write(node.value());
+    }
     return true;
 }
 
@@ -587,14 +596,12 @@ bool Codegen::visit(const ast::PointerTypeExpr& node){
     write("*");
     return true;
 }
-bool Codegen::visit(const ast::ReferenceTypeExpr& node){
-    node.baseType()->accept(*this);
-    write("&");
-    return true;
-}
 bool Codegen::visit(const ast::ClassDefinition& node){
     write("class ");
     node.name()->accept(*this);
+    auto name =
+        std::dynamic_pointer_cast<ast::IdentifierExpression>(node.name())
+            ->value();
     auto parents=node.parent();
     if (parents.size()!=0){
         write(":");
@@ -610,14 +617,31 @@ bool Codegen::visit(const ast::ClassDefinition& node){
         write(";\n");
     }
     write("public:\n");
-    for (auto& x : node.attributes()){
-        x->accept(*this);
-        write(";\n");
+    if (not is_class){
+        is_class=true;
+        for (auto& x : node.attributes()){
+            x->accept(*this);
+            write(";\n");
+        }
+        //TODO: Implement this
+        for (auto& x : node.methods()){
+            magic_methord(x,name);
+            write(";\n");
+        }
+        is_class=false;
     }
-    //TODO: Implement this
-    for (auto& x : node.methods()){
-        x->accept(*this);
-        write(";\n");
+    else{
+        is_class=true;
+        for (auto& x : node.attributes()){
+            x->accept(*this);
+            write(";\n");
+        }
+        //TODO: Implement this
+        for (auto& x : node.methods()){
+            magic_methord(x,name);
+            write(";\n");
+        }
+        is_class=false;
     }
     write("\n}");
     return true;

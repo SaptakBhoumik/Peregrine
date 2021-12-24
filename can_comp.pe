@@ -4,6 +4,34 @@ Hello"
 Hello"
 class test:
     const a:int=9
+    def value()->int:
+        return self.a
+    def x1()->test:
+        return self
+    def __init__():
+        pass
+    def function1():
+        pass
+    inline def __or__(g:test):
+        pass
+    inline def function2():
+        pass
+    virtual def __neg__():
+        pass
+    def __add__(g:test):
+        pass
+    def __not__()->bool:
+        return not True
+    static def test_func1():
+        pass
+    static inline def test_func2():
+        pass
+    static def __rshift__(f:test):
+        pass
+    static inline def __lshift__(f:test):
+        pass
+    def __del__():
+        pass
 enum colours:
     RED = 144,
     GREEN,

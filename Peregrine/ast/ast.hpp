@@ -22,7 +22,6 @@ enum AstKind {
     KAstTypeExpr,
     KAstListTypeExpr,
     KAstPointerTypeExpr,
-    KAstReferencedTypeExpr,
     KAstDictTypeExpr,
     KAstFuncTypeExpr,
     KAstList,
@@ -238,19 +237,6 @@ class PointerTypeExpr : public AstNode {
     void accept(AstVisitor& visitor) const;
 };
 
-class ReferenceTypeExpr : public AstNode {
-    Token m_token;
-    AstNodePtr m_baseType;
-
-  public:
-    ReferenceTypeExpr(Token tok, AstNodePtr baseType);
-
-    AstNodePtr baseType() const;
-    Token token() const;
-    AstKind type() const;
-    std::string stringify() const;
-    void accept(AstVisitor& visitor) const;
-};
 
 class DictTypeExpr : public AstNode {
     Token m_token;

@@ -812,11 +812,6 @@ AstNodePtr Parser::parseType() {
         case tk_multiply: {
             return parsePointerType();
         }
-
-        case tk_ampersand: {
-            return parseReferenceType();
-        }
-
         case tk_list_open:
             return parseListType();
 
@@ -856,13 +851,6 @@ AstNodePtr Parser::parsePointerType() {
     advance();
     AstNodePtr typePtr = parseType();
     return std::make_shared<PointerTypeExpr>(tok, typePtr);
-}
-
-AstNodePtr Parser::parseReferenceType() {
-    Token tok = m_currentToken;
-    advance();
-    AstNodePtr typePtr = parseType();
-    return std::make_shared<ReferenceTypeExpr>(tok, typePtr);
 }
 
 AstNodePtr Parser::parseDictType() {
