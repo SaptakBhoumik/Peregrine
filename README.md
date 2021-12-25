@@ -1,5 +1,3 @@
-### Note - We are rewriting the entire thing so please check the [rewrite branch](https://github.com/peregrine-lang/Peregrine/tree/rewrite)
-
 <img id="banner" src="./graphics/banner.png" style="width: 800px; align: center;"/>
 
 # Peregrine
