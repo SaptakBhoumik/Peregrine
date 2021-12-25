@@ -154,14 +154,9 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         write(" operator"+overloaded_binary_op[name]+"(");
         codegenFuncParams(node->parameters());
         write("){\n");
-        if(not is_func_def){
-            is_func_def=true;
-            node->body()->accept(*this);
-            is_func_def=false;
-        }
-        else{
-            node->body()->accept(*this);
-        }
+        write("return "+name+"(");
+        node->parameters()[0].p_name->accept(*this);
+        write(");");
         write("\n}");
     }
     else if (overloaded_unary_op.count(name)>0 && node->parameters().size()==0 && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
@@ -182,16 +177,8 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         write(virtual_static_inline+" ");
         node->returnType()->accept(*this);
         write(" operator"+overloaded_unary_op[name]+"(");
-        codegenFuncParams(node->parameters());
         write("){\n");
-        if(not is_func_def){
-            is_func_def=true;
-            node->body()->accept(*this);
-            is_func_def=false;
-        }
-        else{
-            node->body()->accept(*this);
-        }
+        write("return "+name+"();");
         write("\n}");
     }
     else{
@@ -341,9 +328,7 @@ void Codegen::magic_methord(ast::AstNodePtr& node,std::string name){
             }
             break;
         }
-        default:{
-            node->accept(*this);
-        }
+        default:{}
     }
 }
 

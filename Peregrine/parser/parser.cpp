@@ -277,11 +277,6 @@ AstNodePtr Parser::parseClassDefinition() {
                 methods.push_back(parseFunctionDef());
                 break;
             }
-
-            case tk_at: {
-                methods.push_back(parseDecoratorCall());
-                break;
-            }
             case tk_virtual: {
                 methods.push_back(parseVirtual());
                 break;
@@ -523,9 +518,13 @@ AstNodePtr Parser::parseFunctionDef() {
     advance();
     while (m_currentToken.tkType != tk_r_paren) {
         AstNodePtr paramName = parseName();
-        expect(tk_colon);
-        advance();
-        AstNodePtr paramType = parseType();
+        AstNodePtr paramType = std::make_shared<NoLiteral>();
+        if(next().tkType==tk_comma || next().tkType==tk_r_paren){}
+        else{
+            expect(tk_colon);
+            advance();
+            paramType = parseType();
+        }
         parameters.push_back(parameter{paramType, paramName});
         advance();
         if (m_currentToken.tkType == tk_comma) {
@@ -1081,10 +1080,15 @@ AstNodePtr Parser::parseWith() {
     std::vector<AstNodePtr> values;
     AstNodePtr body;
     while (m_currentToken.tkType != tk_colon) {
-        values.push_back(parseStatement());
-        expect(tk_as);
-        expect(tk_identifier);
-        variables.push_back(parseName());
+        values.push_back(parseExpression());
+        if(next().tkType==tk_colon||next().tkType==tk_comma){
+            variables.push_back(std::make_shared<NoLiteral>());
+        }
+        else{
+            expect(tk_as);
+            expect(tk_identifier);
+            variables.push_back(parseName());
+        }
         advance();
         if (m_currentToken.tkType == tk_comma) {
             advance();

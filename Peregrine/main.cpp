@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
                 js::Codegen codegen("index.html", program, true, filename);
             } else {
                 cpp::Codegen codegen("temp.cc", program, filename);
-                system("g++ -w temp.cc");
+                system("g++ -std=c++20 temp.cc");
             }
         } else {
             cpp::Codegen codegen("temp.cc", program, filename);

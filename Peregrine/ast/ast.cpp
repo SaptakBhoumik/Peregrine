@@ -594,8 +594,10 @@ std::string FunctionDefinition::stringify() const {
             }
 
             res += param.p_name->stringify();
-            res += ":";
-            res += param.p_type->stringify();
+            if (param.p_type->type()!=KAstNoLiteral){
+                res += ":";
+                res += param.p_type->stringify();
+            }
         }
     }
 
@@ -1157,8 +1159,10 @@ std::string WithStatement::stringify() const {
     std::string res = "with ";
     for (size_t i = 0; i < m_values.size(); ++i) {
         res += m_values[i]->stringify();
-        res += " as ";
-        res += m_variables[i]->stringify();
+        if(m_variables[i]->type()!=KAstNoLiteral){
+            res += " as ";
+            res += m_variables[i]->stringify();
+        }
         if (i < m_values.size() - 1) {
             res += ",";
         }

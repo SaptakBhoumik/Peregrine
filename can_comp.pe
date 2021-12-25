@@ -2,8 +2,20 @@
 Hello"
 "Another Multiline comment
 Hello"
+def unknown_type(var):
+    for x in var:
+        printf("Item is %d\n",x)
+    with var as y:
+        printf("Y is %d\n",y)
+    with var:
+        pass
+    with var as y,var as x:
+        printf("Y is %d\n",y)
+        printf("X is %d\n",x)
 class test:
     const a:int=9
+    def unknown_type(var):
+        pass
     def value()->int:
         return self.a
     def x1()->test:
@@ -32,6 +44,21 @@ class test:
         pass
     def __del__():
         pass
+class iterate_test:
+    i:int=0
+    x:int
+    def __init__(c):
+        self.i=c
+        self.x=self.i
+    def __iter__()->int:
+        return self.x-1
+    def __iterate__()->int:
+        self.i=self.i-1
+        return self.i
+    def __enter__()->int:
+        return 6
+    def __end__():
+        printf("Context ended\n")
 enum colours:
     RED = 144,
     GREEN,
@@ -103,6 +130,7 @@ static inline def static_inline_func():
 inline def inline_func():
     printf("Hello from inline function\n")
 def main():
+    unknown_type(iterate_test(9))
     enum_test:colours=colours.RED
     static_inline_func()
     inline_func()

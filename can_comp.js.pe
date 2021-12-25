@@ -1,5 +1,7 @@
 type a = def(int)->int
 type g = def(int)
+def unknown_type(variable):
+    pass
 enum colours:
     RED = 144,
     GREEN,

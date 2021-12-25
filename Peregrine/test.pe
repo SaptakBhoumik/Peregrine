@@ -1,3 +1,5 @@
+def test(a,b):
+    pass
 for x in y:
     for i , j in x:
         pass
@@ -12,7 +14,12 @@ def hey(a: [2]int):
     2 + 4
 
 hey(arr)
-
+with c:
+    pass
+with x as c:
+    pass
+with x as c,y as u:
+    pass
 class test(parent1,parent2):
     "multi line 
     comment"
@@ -26,9 +33,6 @@ class test(parent1,parent2):
         y:int
     class nested_class:
         a=8
-    @dec
-    def addition(a:int,b:int) -> int:
-        return self.a +self.b
     def sub(a:int,b:int) -> int:
         return self.a - self.b
     inline def div():

@@ -64,8 +64,12 @@ void Codegen::codegenFuncParams(std::vector<ast::parameter> parameters) {
         for (size_t i = 0; i < parameters.size(); ++i) {
             if (i)
                 write(", ");
-
-            parameters[i].p_type->accept(*this);
+            if (parameters[i].p_type->type()==ast::KAstNoLiteral){
+                write("auto");
+            }
+            else{
+                parameters[i].p_type->accept(*this);
+            }
             write(" ");
             parameters[i].p_name->accept(*this);
         }
@@ -211,7 +215,34 @@ bool Codegen::visit(const ast::WhileStatement& node) {
     return true;
 }
 
-bool Codegen::visit(const ast::ForStatement& node) { return true; }
+bool Codegen::visit(const ast::ForStatement& node) { 
+    write("for (size_t ____PEREGRINE____i=0;____PEREGRINE____i<");
+    node.sequence()->accept(*this);
+    write(".__iter__();++____PEREGRINE____i){\n");
+    if (node.variable().size()==1){
+        write("auto ");
+        node.variable()[0]->accept(*this);
+        write("=");
+        node.sequence()->accept(*this);
+        write(".__iterate__();\n");
+    }
+    else{
+        write("auto ____PEREGRINE____TEMP=");
+        node.sequence()->accept(*this);
+        write(".__iterate__();\n");
+        for (size_t i=0;i<node.variable().size();++i){
+            auto x=node.variable()[i];
+            write("auto ");
+            x->accept(*this);
+            write("=____PEREGRINE____TEMP[");
+            write(std::to_string(i));
+            write("];\n");
+        }
+    }
+    node.body()->accept(*this);
+    write("\n}");
+    return true; 
+}
 
 bool Codegen::visit(const ast::MatchStatement& node) {
     auto toMatch = node.matchItem();
@@ -644,6 +675,39 @@ bool Codegen::visit(const ast::ClassDefinition& node){
         is_class=false;
     }
     write("\n}");
+    return true;
+}
+bool Codegen::visit(const ast::WithStatement& node) {
+    write("{\n");
+    std::vector<ast::AstNodePtr> variables=node.variables();
+    std::vector<ast::AstNodePtr> values=node.values();
+    std::vector<std::string> no_var;
+    for(size_t i=0;i<values.size();++i){
+        write("auto CONTEXT____MANAGER____PEREGRINE____");
+        no_var.push_back(std::to_string(i));
+        write(std::to_string(i));
+        write("=");
+        values[i]->accept(*this);
+        write(";\n");
+        if(variables[i]->type()!=ast::KAstNoLiteral){
+            write("auto ");
+            variables[i]->accept(*this);
+            write("=");
+            write("CONTEXT____MANAGER____PEREGRINE____"+no_var.back());
+            write(".__enter__()");
+        }
+        else{
+            write("CONTEXT____MANAGER____PEREGRINE____"+no_var.back());
+            write(".__enter__()");
+        }
+        write(";\n");
+    }
+    node.body()->accept(*this);
+    for(auto& x:no_var){
+        write("CONTEXT____MANAGER____PEREGRINE____"+x);
+        write(".__end__();\n");
+    }
+    write("\n}\n");
     return true;
 }
 } // namespace cpp
