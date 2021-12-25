@@ -18,8 +18,6 @@ https://github.com/peregrine-lang/Peregrine/tree/main/Peregrine/codegen
 
 This folder contains the file that converts the abstract syntax tree to C++ or js code 
 
-Builtin function written in Peregrine and C
-
 https://github.com/peregrine-lang/Peregrine/blob/main/Peregrine/main.cpp
 
 This is the entry point of the program
