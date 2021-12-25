@@ -48,7 +48,7 @@ You can consider it to be a dialect of python which compiles to clean C++. It wi
 
 **1)Clone the rewrite branch of https://github.com/peregrine-lang/Peregrine.git**
 ```bash
-git clone -b rewrite https://github.com/peregrine-lang/Peregrine.git
+git clone https://github.com/peregrine-lang/Peregrine.git
 ```
 **2)Cd into the directory**
 ```bash 
