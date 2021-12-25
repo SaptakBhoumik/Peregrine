@@ -22,3 +22,8 @@ https://github.com/peregrine-lang/Peregrine/blob/main/Peregrine/main.cpp
 
 This is the entry point of the program
 
+Follow the instruction in the readme to build it.
+
+If you are making changes to the parser/lexer/analyzer then test it by running ``./peregrine.elf``. This should print the content of ![test.pe](https://github.com/peregrine-lang/Peregrine/blob/main/Peregrine/test.pe)(add your tests to test.pe) after generating the ast then converting it to the output shown on the console.
+
+If you are making changes to the codegen then run ``./peregrine.elf compile can_comp.pe ``(for c++ backend) or ``./peregrine.elf compile can_comp.js.pe -js``(for js backend)
