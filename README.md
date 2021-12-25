@@ -1,11 +1,19 @@
-<img id="banner" src="./graphics/banner.png" style="width: 800px; align: center;"/>
+<p align='center'>
+   <img id="banner" src="./graphics/banner.png" style="width: 65%; align: center;"/>
+   <br/>
+   <i>A Blazing-Fast Language for the Blazing-Fast world.</i>
+   <br/><br/>
+   <a href="https://discord.gg/CAMgzwDJDM">
+      <img src="https://img.shields.io/discord/895990298419818546?logo=discord?style=social">
+   </a>
+   <img src="https://img.shields.io/github/stars/peregrine-lang/peregrine?style=social">
+   <br/>
+   <img src="https://img.shields.io/github/issues/peregrine-lang/peregrine?color=green">
+   <img src="https://img.shields.io/github/contributors/peregrine-lang/peregrine">
+</p>
 
-# Peregrine
-![GitHub Repo stars](https://img.shields.io/github/stars/peregrine-lang/peregrine?style=social)
-![GitHub issues](https://img.shields.io/github/issues/peregrine-lang/peregrine?color=green&style=flat-square)
-![GitHub contributors](https://img.shields.io/github/contributors/peregrine-lang/peregrine?style=flat-square)
-   
-Peregrine is a compiled programming language currently under development. Documentation is coming soon.
+<p align='center'><h1>The Peregrine Programming Language</h1></p>
+Peregrine is a Compiled, Systems Programming Language, currently under development.
 
 
 ## Purpose and intent
@@ -14,7 +22,6 @@ Peregrine is a compiled programming language currently under development. Docume
 ### Why am I creating this language?
 
 I am creating it to have the simplicity of Python with the efficiency of C.
-
 
 ### Goals
 
