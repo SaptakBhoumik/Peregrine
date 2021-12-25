@@ -1,0 +1,95 @@
+type a = def(int)->int
+type g = def(int)
+def unknown_type(variable):
+    pass
+enum colours:
+    RED = 144,
+    GREEN,
+    BLUE = 59,Other=9+GREEN
+def divide(num1:int ,num2:int )->int:
+    match num2:
+        case 0:
+            raise error.ZeroDivisionError
+        case _:
+            return num1/num2
+def decorator(func:a)->g:
+    h:int=9
+    def value(c:int):
+        h=8
+        printf("%d",h)
+        printf("Answer is %d",func(c))
+    return value
+ggggggg:int=9
+@decorator
+def dec_test(x:int)->int:
+    ggggggg=7#mutability test
+    printf("%d",ggggggg)
+    @decorator
+    def nested_test(x:int)->int:
+        ggggggg=7#mutability test
+        printf("%d",ggggggg)
+        def nested_test2(x:int)->int:
+            ggggggg=7#mutability test
+            printf("%d",ggggggg)
+            return x*x
+        nested_test2(7)
+        return x*x
+    nested_test(7)
+    return x*x
+def test(x:int)->int:#this is comment
+    return x
+def lambda_test(x:a):
+    printf("The value is %d",x(5))
+def func(g:int )->int:
+    return g
+def main():
+    dec_test(4)
+    def z():
+        printf("hello")
+    z()
+    scope:
+        printf("Hello from new scope")
+    bddd:list=[9,7]
+    printf(bddd)
+    printf(bddd[1])
+    gg:dict={
+        "k":154,
+        "t":1
+    }
+    printf(gg["k"])
+    x:bool=False
+    const cc:bool =False
+    x=True
+    y:bool 
+    y=True
+    if x==y:
+        pass
+    printf("%d",test(0))
+    a:int=0
+    b:int=7
+    c:int=7
+    match a,b,c:
+        case 5,7,8:
+            printf("a is 5,b is 7 and c is 8")
+        case 4,7,_:#c can be anything
+            printf("a is 4 but b is 7")
+            break  #we dont want default to execute 
+        case 4,_,7:#b can be anything
+            printf("a is 4 but c is 7")
+            break  #we dont want default to execute 
+        case 8,_:#b and c can be anything
+            printf("a is 8")
+        case _:
+            printf("idk")
+        #optional
+        default:#will be executed at the end if no break
+            printf("Hello")
+    lambda_test(func)
+    assert 8==8
+    #should throw an error
+    #assert 8==6
+    printf("%d",divide(6,2))
+    #should terminate the program
+    #printf("%d",divide(6,0))
+    color:colours = colours.RED
+    print("Enum is " , color)

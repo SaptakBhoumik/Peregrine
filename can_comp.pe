@@ -1,0 +1,177 @@
+"Multiline comment
+Hello"
+"Another Multiline comment
+Hello"
+def unknown_type(var):
+    for x in var:
+        printf("Item is %d\n",x)
+    with var as y:
+        printf("Y is %d\n",y)
+    with var:
+        pass
+    with var as y,var as x:
+        printf("Y is %d\n",y)
+        printf("X is %d\n",x)
+    printf("5 in var = %d\n",5 in var)
+    printf("55 in var = %d\n",55 in var)
+    printf("5 not in var = %d\n",5 not in var)
+    printf("55 not in var = %d\n",55 not in var)
+    printf("var[6] = %d\n",var[6])
+    printf("var.__getitem__(7,8) = %d\n",var.__getitem__(7,index2=8))
+class iterate_test:
+    i:int=0
+    x:int
+    def __init__(c):
+        self.i=c
+        self.x=self.i
+    def __iter__()->int:
+        return self.x-1
+    def __iterate__()->int:
+        self.i=self.i-1
+        return self.i
+    def __enter__()->int:
+        return 6
+    def __contains__(y:int)->bool:
+        if y<self.x:
+            return True
+        else:
+            return False
+    def __end__():
+        printf("Context ended\n")
+    def __getitem__(index1:int,index2:int=0)->int:
+        return index1+index2
+enum colours:
+    RED = 144,
+    GREEN,
+    BLUE = 59,Another=GREEN+9
+type a = def(int)->int
+type g = def(int)
+static var_static:int = 8
+static def staticfunc():
+    printf("Hello from static function\n")
+    printf("Static var is %d\n",var_static)
+union name:
+    item1:int 
+    item2:float 
+def divide(num1:int ,num2:int )->int:
+    match num2:
+        case 0:
+            raise error.ZeroDivisionError
+        case _:
+            return num1/num2
+def decorator(func:a )->g:
+    h:int =9
+    def value(c:int):
+        h=8
+        printf("%d\n",h)
+        printf("Answer is %d\n",func(c))
+    return value
+ggggggg:int=9
+@decorator
+def dec_test(x:int)->int:
+    ggggggg=7#mutability test
+    printf("%d\n",ggggggg)
+    @decorator
+    def nested_test(x:int)->int:
+        ggggggg=7#mutability test
+        printf("%d\n",ggggggg)
+        def nested_test2(x:int)->int:
+            ggggggg=7#mutability test
+            printf("%d\n",ggggggg)
+            return x*x
+        nested_test2(7)
+        return x*x
+    nested_test(7)
+    return x*x
+@decorator
+static def static_dec_test(x:int)->int:
+    printf("Static decorator\n")
+    ggggggg=7#mutability test
+    printf("%d\n",ggggggg)
+    @decorator
+    def nested_test(x:int)->int:
+        ggggggg=7#mutability test
+        printf("%d\n",ggggggg)
+        def nested_test2(x:int)->int:
+            ggggggg=7#mutability test
+            printf("%d\n",ggggggg)
+            return x*x
+        nested_test2(7)
+        return x*x
+    nested_test(7)
+    return x*x
+def test(x:int)->int:#this is comment
+    return x
+def lambda_test(x:a):
+    printf("The value is %d\n",x(5))
+def func(g:int)->int:
+    return g
+static inline def static_inline_func():
+    printf("Hello from static inline function\n")
+inline def inline_func():
+    printf("Hello from inline function\n")
+def main():
+    unknown_type(iterate_test(6))
+    enum_test:colours=colours.RED
+    static_inline_func()
+    inline_func()
+    staticfunc()
+    dec_test(4)
+    static_dec_test(4)
+    test_var:int=9
+    test_pointer:*int=&test_var
+    test_ref:int=test_var
+    printf("Value of test_pointer is %d is at location %p\n",*test_pointer,test_pointer)
+    printf("Value of test_ref is %d is at location %p\n",test_ref,&test_ref)
+    def z()->int:
+        printf("hello\n")
+        return 5
+    printf("value of z() is %d\n",z())
+    Cppcode(#ifdef _WIN32)
+    printf("On windows\n")
+    Cppcode(#elif __linux__)
+    printf("On linux\n")
+    Cppcode(#endif)
+    scope:
+        printf("Hello from new scope\n")
+    x:bool =False
+    const  cc:bool=False
+    x=True
+    y:bool 
+    y=True
+    if x==y:
+        pass
+    printf("%d\n",test(0))
+    a:int =0
+    b:int =7
+    c:int =7
+    match a,b,c:
+        case 5,7,8:
+            printf("a is 5,b is 7 and c is 8")
+        case 4,7,_:#c can be anything
+            printf("a is 4 but b is 7")
+            break  #we dont want default to execute 
+        case 4,_,7:#b can be anything
+            printf("a is 4 but c is 7")
+            break  #we dont want default to execute 
+        case 8,_:#b and c can be anything
+            printf("a is 8")
+        case _:
+            printf("idk")
+        #optional
+        default:#will be executed at the end if no break
+            printf("\nHello\n")
+    lambda_test(func)
+    assert 8==8
+    var1:name 
+    var1.item1=8
+    printf("item1 of var1 is %d\n",var1.item1)
+    var1.item2=6.8
+    printf("item2 of var1 is %f\n",var1.item2)
+    #should throw an error
+    #assert 8==6
+    cast_test:int =9
+    printf("Value is %f\n",cast<float>(cast_test))
+    printf("%d\n",divide(6,2))
+    #should terminate the program
+    #printf("%d",divide(6,0))

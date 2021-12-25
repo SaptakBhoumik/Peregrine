@@ -4,7 +4,7 @@ def main():
     match a:
         case 4:
             print("It is 4\n")
-            print("It is 4\n")
+            break
         case 2:
             print("It is 2\n")
             break
