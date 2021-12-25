@@ -31,7 +31,8 @@ I am creating it to have the simplicity of Python with the efficiency of C.
 
 ### How does it work?
 
-You can consider it to be a superset of C which compiles to clean C. So valid C code is also valid Peregrine code (the language is named Peregrine). It will have no garbage collector because it is a system programming language but it will be very easy to use so there will be less chance of a memory leak.
+You can consider it to be a dialect of python which compiles to clean C++. It will have no garbage collector because it is a system programming language.
+
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
