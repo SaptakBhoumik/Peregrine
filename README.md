@@ -7,17 +7,14 @@
    
 Peregrine is a compiled programming language currently under development. Documentation is coming soon.
 
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 ## Purpose and intent
 
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 ### Why am I creating this language?
 
 I am creating it to have the simplicity of Python with the efficiency of C.
 
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 ### Goals
 
@@ -27,18 +24,14 @@ I am creating it to have the simplicity of Python with the efficiency of C.
 - Occupies less memory
 - Compiled
 
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 ### How does it work?
 
 You can consider it to be a dialect of python which compiles to clean C++. It will have no garbage collector because it is a system programming language.
 
 
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
-
 ## Building/compiling Peregrine
 
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 ### Requirements to build from source
 
@@ -70,18 +63,11 @@ To use the javascript backend use the following command
 ``./peregrine.elf compile path_to_file.js.pe -js``.
 It will create the javascript file named ``index.js``. Run the generated javascript using ``node index.js``. Check the [can_comp.js.pe](https://github.com/peregrine-lang/Peregrine/blob/rewrite/can_comp.js.pe) file in the root directory to know what you can do with the js backend at this point
 
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
-
-## Primary implementation language
-
-It is written in c++
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 ## Progress
 
 Currently we are working on the codegen and some Peregrine programs are working
 
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 ## Example
 
@@ -94,7 +80,6 @@ def main():
 
 The `main` function is the entry point for the program.
 
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 ## Have questions?
 
@@ -102,7 +87,7 @@ Cool, you can contact me via mail.
 <br> Email: saptakbhoumik@gmail.com
 <br> Discord : https://discord.gg/CAMgzwDJDM
 
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
+
 
 ## Want to contribute?
 
@@ -112,8 +97,6 @@ Take a look at the [open issues](https://github.com/Peregrine-lang/Peregrine/iss
 
 Please check [CONTRIBUTING.md](https://github.com/Peregrine-lang/Peregrine/blob/main/CONTRIBUTING.md) to learn how you can contribute.
 
-
-![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
 
 # License
