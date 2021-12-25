@@ -111,7 +111,6 @@ Take a look at the [open issues](https://github.com/Peregrine-lang/Peregrine/iss
 
 Please check [CONTRIBUTING.md](https://github.com/Peregrine-lang/Peregrine/blob/main/CONTRIBUTING.md) to learn how you can contribute.
 
-If you create any new file make sure to comment your name in the file as shown `Original author: Your name`
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
