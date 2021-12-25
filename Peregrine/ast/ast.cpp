@@ -311,7 +311,7 @@ std::string PrefixExpression::stringify() const {
 }
 
 ListOrDictAccess::ListOrDictAccess(Token tok, AstNodePtr container,
-                                   AstNodePtr keyOrIndex) {
+                                   std::vector<AstNodePtr> keyOrIndex) {
     m_token = tok;
     m_container = container;
     m_keyOrIndex = keyOrIndex;
@@ -319,7 +319,7 @@ ListOrDictAccess::ListOrDictAccess(Token tok, AstNodePtr container,
 
 AstNodePtr ListOrDictAccess::container() const { return m_container; }
 
-AstNodePtr ListOrDictAccess::keyOrIndex() const { return m_keyOrIndex; }
+std::vector<AstNodePtr> ListOrDictAccess::keyOrIndex() const { return m_keyOrIndex; }
 
 Token ListOrDictAccess::token() const { return m_token; }
 
@@ -329,7 +329,11 @@ std::string ListOrDictAccess::stringify() const {
     std::string res = "";
 
     res += m_container->stringify() + "[";
-    res += m_keyOrIndex->stringify() + "]";
+    res += m_keyOrIndex[0]->stringify(); 
+    if(m_keyOrIndex.size()==2){
+        res +=":" + m_keyOrIndex[1]->stringify(); 
+    }
+    res+="]";
 
     return res;
 }
@@ -597,6 +601,10 @@ std::string FunctionDefinition::stringify() const {
             if (param.p_type->type()!=KAstNoLiteral){
                 res += ":";
                 res += param.p_type->stringify();
+            }
+            if (param.p_default->type()!=ast::KAstNoLiteral){
+                res+="=";
+                res+=param.p_default->stringify();
             }
         }
     }
@@ -1183,6 +1191,28 @@ AstKind CastStatement::type() const { return KAstCast; }
 std::string CastStatement::stringify() const {
     std::string res = "cast";
     res += "<" + m_type->stringify() + ">(" + m_value->stringify() + ")";
+    return res;
+}
+DefaultArg::DefaultArg(Token tok, AstNodePtr name, AstNodePtr value) {
+    m_token = tok;
+    m_name = name;
+    m_value = value;
+}
+
+AstNodePtr DefaultArg::value() const { return m_value; }
+
+AstNodePtr DefaultArg::name() const { return m_name; }
+
+Token DefaultArg::token() const { return m_token; }
+
+AstKind DefaultArg::type() const { return KAstDefaultArg; }
+
+std::string DefaultArg::stringify() const {
+    std::string res = "";
+
+    res += m_name->stringify() + "=";
+    res += m_value->stringify();
+
     return res;
 }
 } // namespace ast

@@ -57,7 +57,8 @@ enum AstKind {
     KAstEnum,
     KAstWith,
     KAstVirtual,
-    KAstCast
+    KAstCast,
+    KAstDefaultArg
 };
 
 class AstVisitor;
@@ -390,13 +391,13 @@ class PrefixExpression : public AstNode {
 class ListOrDictAccess : public AstNode {
     Token m_token;
     AstNodePtr m_container;
-    AstNodePtr m_keyOrIndex;
+    std::vector<AstNodePtr> m_keyOrIndex;
 
   public:
-    ListOrDictAccess(Token tok, AstNodePtr container, AstNodePtr keyOrIndex);
+    ListOrDictAccess(Token tok, AstNodePtr container, std::vector<AstNodePtr> keyOrIndex);
 
     AstNodePtr container() const;
-    AstNodePtr keyOrIndex() const;
+    std::vector<AstNodePtr> keyOrIndex() const;
 
     Token token() const;
     AstKind type() const;
@@ -497,6 +498,7 @@ class BlockStatement : public AstNode {
 struct parameter {
     AstNodePtr p_type;
     AstNodePtr p_name;
+    AstNodePtr p_default;
 };
 
 class ClassDefinition : public AstNode {
@@ -592,6 +594,23 @@ class DotExpression : public AstNode {
 
     AstNodePtr owner() const;
     AstNodePtr referenced() const;
+
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+class DefaultArg : public AstNode {
+    Token m_token;
+    AstNodePtr m_name;      // the node that comes before the .
+    AstNodePtr m_value; // the node that comes after the .
+
+  public:
+    DefaultArg(Token tok, AstNodePtr name, AstNodePtr value);
+
+    AstNodePtr name() const;
+    AstNodePtr value() const;
 
     Token token() const;
     AstKind type() const;

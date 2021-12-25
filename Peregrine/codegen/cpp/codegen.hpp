@@ -87,6 +87,7 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::PointerTypeExpr& node);
     bool visit(const ast::ClassDefinition& node);
     bool visit(const ast::WithStatement& node);
+    bool visit(const ast::DefaultArg& node);
     EnvPtr m_env;
 };
 

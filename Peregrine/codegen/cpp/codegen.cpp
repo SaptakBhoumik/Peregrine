@@ -72,6 +72,10 @@ void Codegen::codegenFuncParams(std::vector<ast::parameter> parameters) {
             }
             write(" ");
             parameters[i].p_name->accept(*this);
+            if (parameters[i].p_default->type()!=ast::KAstNoLiteral){
+                write("=");
+                parameters[i].p_default->accept(*this);
+            }
         }
     }
 }
@@ -79,7 +83,7 @@ void Codegen::codegenFuncParams(std::vector<ast::parameter> parameters) {
 bool Codegen::visit(const ast::Program& node) {
     for (auto& stmt : node.statements()) {
         stmt->accept(*this);
-        write(";\n"); // TODO: will this break stuff later?
+        write(";\n");
     }
     return true;
 }
@@ -396,9 +400,13 @@ bool Codegen::visit(const ast::DictLiteral& node) { return true; }
 
 bool Codegen::visit(const ast::ListOrDictAccess& node) { 
     node.container()->accept(*this);
-    write("[");
-    node.keyOrIndex()->accept(*this);
-    write("]");
+    write(".__getitem__(");
+    node.keyOrIndex()[0]->accept(*this);
+    if(node.keyOrIndex().size()==2){
+        write(",");
+        node.keyOrIndex()[1]->accept(*this);
+    }
+    write(")");
     return true; 
 }
 
@@ -415,7 +423,22 @@ bool Codegen::visit(const ast::BinaryOperation& node) {
         write("/");
         node.right()->accept(*this);
         write(")");
-    } else {
+    }
+    else if(node.token().tkType==tk_in){
+        write("(");
+        node.right()->accept(*this);
+        write(".__contains__(");
+        node.left()->accept(*this);
+        write("))");
+    }
+    else if(node.token().tkType==tk_not_in){
+        write("(not ");
+        node.right()->accept(*this);
+        write(".__contains__(");
+        node.left()->accept(*this);
+        write("))");
+    }
+     else {
         write("(");
         node.left()->accept(*this);
         write(" " + node.op().keyword + " ");
@@ -708,6 +731,14 @@ bool Codegen::visit(const ast::WithStatement& node) {
         write(".__end__();\n");
     }
     write("\n}\n");
+    return true;
+}
+bool Codegen::visit(const ast::DefaultArg& node){
+    //TODO:
+    // write(".");
+    // node.name()->accept(*this);
+    // write("=");
+    node.value()->accept(*this);
     return true;
 }
 } // namespace cpp

@@ -12,38 +12,12 @@ def unknown_type(var):
     with var as y,var as x:
         printf("Y is %d\n",y)
         printf("X is %d\n",x)
-class test:
-    const a:int=9
-    def unknown_type(var):
-        pass
-    def value()->int:
-        return self.a
-    def x1()->test:
-        return self
-    def __init__():
-        pass
-    def function1():
-        pass
-    inline def __or__(g:test):
-        pass
-    inline def function2():
-        pass
-    virtual def __neg__():
-        pass
-    def __add__(g:test):
-        pass
-    def __not__()->bool:
-        return not True
-    static def test_func1():
-        pass
-    static inline def test_func2():
-        pass
-    static def __rshift__(f:test):
-        pass
-    static inline def __lshift__(f:test):
-        pass
-    def __del__():
-        pass
+    printf("5 in var = %d\n",5 in var)
+    printf("55 in var = %d\n",55 in var)
+    printf("5 not in var = %d\n",5 not in var)
+    printf("55 not in var = %d\n",55 not in var)
+    printf("var[6] = %d\n",var[6])
+    printf("var.__getitem__(7,8) = %d\n",var.__getitem__(7,index2=8))
 class iterate_test:
     i:int=0
     x:int
@@ -57,8 +31,15 @@ class iterate_test:
         return self.i
     def __enter__()->int:
         return 6
+    def __contains__(y:int)->bool:
+        if y<self.x:
+            return True
+        else:
+            return False
     def __end__():
         printf("Context ended\n")
+    def __getitem__(index1:int,index2:int=0)->int:
+        return index1+index2
 enum colours:
     RED = 144,
     GREEN,
@@ -130,7 +111,7 @@ static inline def static_inline_func():
 inline def inline_func():
     printf("Hello from inline function\n")
 def main():
-    unknown_type(iterate_test(9))
+    unknown_type(iterate_test(6))
     enum_test:colours=colours.RED
     static_inline_func()
     inline_func()

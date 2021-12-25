@@ -41,3 +41,7 @@ class test(parent1,parent2):
         return self.a ** self.b
     virtual def multi(a:int,b:int) -> int:
         return self.a * self.b
+
+def test_x(a=0,b:int=9):
+    pass
+test_x(a=8,b=7)

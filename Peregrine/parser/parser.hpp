@@ -102,6 +102,7 @@ class Parser {
     AstNodePtr parseUnion();
     AstNodePtr parseEnum();
     AstNodePtr parseTypeDef();
+    AstNodePtr parseDefaultArg();
 
   public:
     Parser(const std::vector<Token>& tokens);

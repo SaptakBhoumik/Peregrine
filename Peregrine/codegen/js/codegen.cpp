@@ -356,7 +356,7 @@ bool Codegen::visit(const ast::DictLiteral& node) {
 bool Codegen::visit(const ast::ListOrDictAccess& node) { 
     node.container()->accept(*this);
     write("[");
-    node.keyOrIndex()->accept(*this);
+    node.keyOrIndex()[0]->accept(*this);//TODO: Wont work in the future
     write("]");
     return true;
 }

@@ -519,14 +519,20 @@ AstNodePtr Parser::parseFunctionDef() {
     while (m_currentToken.tkType != tk_r_paren) {
         AstNodePtr paramName = parseName();
         AstNodePtr paramType = std::make_shared<NoLiteral>();
-        if(next().tkType==tk_comma || next().tkType==tk_r_paren){}
+        AstNodePtr paramDefault = std::make_shared<NoLiteral>();
+        if(next().tkType==tk_comma || next().tkType==tk_r_paren|| next().tkType==tk_assign){}
         else{
             expect(tk_colon);
             advance();
             paramType = parseType();
         }
-        parameters.push_back(parameter{paramType, paramName});
         advance();
+        if(m_currentToken.tkType==tk_assign){
+            advance();
+            paramDefault=parseExpression();
+            advance();
+        }
+        parameters.push_back(parameter{paramType, paramName,paramDefault});
         if (m_currentToken.tkType == tk_comma) {
             advance();
         } else {
@@ -719,8 +725,12 @@ AstNodePtr Parser::parseFunctionCall(AstNodePtr left) {
     if (next().tkType != tk_r_paren) {
         do {
             advance();
-
-            arguments.push_back(parseExpression());
+            if(m_currentToken.tkType==tk_identifier && next().tkType==tk_assign){
+                arguments.push_back(parseDefaultArg());
+            }
+            else{
+                arguments.push_back(parseExpression());
+            }
 
             advance();
         } while (m_currentToken.tkType == tk_comma);
@@ -741,9 +751,14 @@ AstNodePtr Parser::parseFunctionCall(AstNodePtr left) {
 AstNodePtr Parser::parseListOrDictAccess(AstNodePtr left) {
     Token tok = m_currentToken;
     advance();
-
-    AstNodePtr keyOrIndex = parseExpression();
-
+    std::vector<AstNodePtr> keyOrIndex;
+    keyOrIndex.push_back(parseExpression());
+    //array slicing
+    if(next().tkType==tk_colon){
+        advance();
+        advance();
+        keyOrIndex.push_back(parseExpression());
+    }
     expect(tk_list_close);
 
     AstNodePtr node = std::make_shared<ListOrDictAccess>(tok, left, keyOrIndex);
@@ -1111,4 +1126,13 @@ AstNodePtr Parser::parseCast() {
     AstNodePtr value = parseExpression();
     expect(tk_r_paren);
     return std::make_shared<CastStatement>(tok, type, value);
+}
+
+AstNodePtr Parser::parseDefaultArg(){
+    auto tok=m_currentToken;
+    AstNodePtr name=parseName();
+    advance();
+    advance();
+    AstNodePtr value=parseExpression();
+    return std::make_shared<DefaultArg>(tok,name, value);
 }
