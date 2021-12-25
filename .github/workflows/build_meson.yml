@@ -1,0 +1,21 @@
+name: Build - Meson
+on: 
+  pull_request:
+    branches:
+      - "main"
+    paths-ignore:
+      - "./github/**"
+  push:
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Meson
+      run: sudo apt-get update && sudo apt-get install python3 python3-pip python3-setuptools python3-wheel ninja-build && pip3 install meson
+    - name: Meson
+      run: meson builddir
+    - name: Ninja
+      run: cd builddir && ninja
