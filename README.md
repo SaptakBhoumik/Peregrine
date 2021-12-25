@@ -10,9 +10,10 @@
    <br/>
    <img src="https://img.shields.io/github/issues/peregrine-lang/peregrine?color=green">
    <img src="https://img.shields.io/github/contributors/peregrine-lang/peregrine">
+   <br/>
+   <h1>The Peregrine Programming Language</h1>
 </p>
 
-<p align='center'><h1>The Peregrine Programming Language</h1></p>
 Peregrine is a Compiled, Systems Programming Language, currently under development.
 
 
