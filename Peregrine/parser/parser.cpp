@@ -250,7 +250,7 @@ AstNodePtr Parser::parseClassDefinition() {
     while (m_currentToken.tkType != tk_dedent) {
         switch (m_currentToken.tkType) {
             case tk_string: { // multiline comment
-                while (m_currentToken.tkType == tk_string) {
+                while (m_currentToken.tkType == tk_string || m_currentToken.tkType == tk_new_line) {
                     advance();
                 }
                 break;
