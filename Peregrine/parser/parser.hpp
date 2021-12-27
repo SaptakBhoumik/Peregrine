@@ -41,9 +41,8 @@ class Parser {
     std::vector<PEError> m_errors;
 
     std::map<TokenType, PrecedenceType> precedenceMap = createMap();
-
+    bool is_dot_exp=false;
     bool is_imported_var();
-    bool is_imported_type();
     void advance();
     void advanceOnNewLine();
     void expect(TokenType expectedType);

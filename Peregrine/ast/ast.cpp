@@ -416,7 +416,7 @@ Token VariableStatement::token() const { return m_token; }
 AstKind VariableStatement::type() const { return KAstVariableStmt; }
 
 std::string VariableStatement::stringify() const {
-    std::string res = "";
+    std::string res = "(";
     res += m_name->stringify();
     if (m_type->type() != KAstNoLiteral) {
         res += ":";
@@ -427,7 +427,7 @@ std::string VariableStatement::stringify() const {
         res += " = ";
         res += m_value->stringify();
     }
-
+    res+=")";
     return res;
 }
 

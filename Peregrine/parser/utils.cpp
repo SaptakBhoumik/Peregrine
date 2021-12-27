@@ -18,7 +18,7 @@ bool Parser::is_imported_var(){
         else if (curr_tok.tkType==tk_list_open){list_brac_count++;}
         else if (curr_tok.tkType==tk_list_close){list_brac_count--;}
         else if(curr_tok.tkType==tk_assign){return true;}
-        else if (brac_count==0){return false;}
+        else if (brac_count==0 && list_brac_count==0){return false;}
         prev_tok=curr_tok;
         index++;
     }

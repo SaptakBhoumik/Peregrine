@@ -293,6 +293,10 @@ AstNodePtr Parser::parseClassDefinition() {
                 other.push_back(parseClassDefinition());
                 break;
             }
+            case tk_enum: { 
+                other.push_back(parseEnum());
+                break;
+            }
             default: {
                 error(m_currentToken,
                       "expected a method or variable declaration, got " +
@@ -763,7 +767,7 @@ AstNodePtr Parser::parseListOrDictAccess(AstNodePtr left) {
 
     AstNodePtr node = std::make_shared<ListOrDictAccess>(tok, left, keyOrIndex);
 
-    if (next().tkType != tk_assign)
+    if (next().tkType != tk_assign || is_dot_exp)
         return node;
 
     // parsing variable statements in 2 different places, is this really ideal?
@@ -782,10 +786,16 @@ AstNodePtr Parser::parseDotExpression(AstNodePtr left) {
     Token tok = m_currentToken;
     PrecedenceType currentPrecedence = precedenceMap[tok.tkType];
     advance();
-
+    AstNodePtr referenced;
     // TODO: validate output of parseExpression
-    AstNodePtr referenced = parseExpression(currentPrecedence);
-
+    if (not is_dot_exp){
+        is_dot_exp=true;
+        referenced = parseExpression(currentPrecedence);
+        is_dot_exp=false;
+    }
+    else{
+        referenced = parseExpression(currentPrecedence);
+    }
     return std::make_shared<DotExpression>(tok, left, referenced);
 }
 
