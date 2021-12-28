@@ -401,9 +401,10 @@ AstNodePtr Parser::parseConstDeclaration() {
     Token tok = m_currentToken;
     expect(tk_identifier);
     AstNodePtr name = parseName();
-    advance();
+    // advance();
     AstNodePtr constType = std::make_shared<NoLiteral>();
-    if (m_currentToken.tkType == tk_colon) {
+    if (next().tkType == tk_colon) {
+        advance();
         advance();
         constType = parseType();
     }
@@ -411,7 +412,6 @@ AstNodePtr Parser::parseConstDeclaration() {
     advance();
 
     AstNodePtr value = parseExpression();
-
     return std::make_shared<ConstDeclaration>(tok, constType, name, value);
 }
 
@@ -1073,6 +1073,10 @@ AstNodePtr Parser::parseStatic() {
         }
         case tk_inline: {
             body = parseInline();
+            break;
+        }
+        case tk_const:{
+            body=parseConstDeclaration();
             break;
         }
         case tk_identifier: {

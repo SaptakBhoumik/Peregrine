@@ -45,3 +45,6 @@ class test(parent1,parent2):
 def test_x(a=0,b:int=9):
     pass
 test_x(a=8,b=7)
+
+static const gg=5
+static const gg:int=5
