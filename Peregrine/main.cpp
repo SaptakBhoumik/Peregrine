@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
             }
         } else {
             cpp::Codegen codegen("temp.cc", program, filename);
-            system("g++ -w temp.cc");
+            system("g++ -std=c++20  temp.cc");
         }
     }
     return 0;

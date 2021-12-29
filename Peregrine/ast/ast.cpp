@@ -781,6 +781,23 @@ std::string StaticStatement::stringify() const {
     return res;
 }
 
+ExportStatement::ExportStatement(Token tok, AstNodePtr body) {
+    m_token = tok;
+    m_body = body;
+}
+
+AstNodePtr ExportStatement::body() const { return m_body; }
+
+Token ExportStatement::token() const { return m_token; }
+
+AstKind ExportStatement::type() const { return KAstExport; }
+
+std::string ExportStatement::stringify() const {
+    std::string res = "export ";
+    res += m_body->stringify();
+    return res;
+}
+
 InlineStatement::InlineStatement(Token tok, AstNodePtr body) {
     m_token = tok;
     m_body = body;

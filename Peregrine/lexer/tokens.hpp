@@ -106,6 +106,7 @@ enum TokenType {
     tk_class,     // class
     tk_type,      // type defination
     tk_enum,      // enum
+    tk_export,    // export
 
     // value type
     tk_decimal,

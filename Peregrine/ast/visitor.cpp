@@ -109,7 +109,9 @@ void AssertStatement::accept(AstVisitor& visitor) const {
 void StaticStatement::accept(AstVisitor& visitor) const {
     visitor.visit(*this);
 }
-
+void ExportStatement::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
+}
 void InlineStatement::accept(AstVisitor& visitor) const {
     visitor.visit(*this);
 }

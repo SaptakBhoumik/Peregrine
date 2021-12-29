@@ -58,7 +58,8 @@ enum AstKind {
     KAstWith,
     KAstVirtual,
     KAstCast,
-    KAstDefaultArg
+    KAstDefaultArg,
+    KAstExport,
 };
 
 class AstVisitor;
@@ -664,6 +665,19 @@ class StaticStatement : public AstNode {
 
   public:
     StaticStatement(Token tok, AstNodePtr body);
+    AstNodePtr body() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+class ExportStatement : public AstNode {
+    Token m_token;
+    AstNodePtr m_body;
+
+  public:
+    ExportStatement(Token tok, AstNodePtr body);
     AstNodePtr body() const;
     Token token() const;
     AstKind type() const;

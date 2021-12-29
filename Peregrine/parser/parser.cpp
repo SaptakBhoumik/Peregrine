@@ -168,7 +168,10 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseEnum();
             break;
         }
-
+        case tk_export:{
+            stmt = parseExport();
+            break;
+        }
         // TODO: variables currently do not work with all the types, we need to
         // fix this
         case tk_identifier: {
@@ -1149,4 +1152,11 @@ AstNodePtr Parser::parseDefaultArg(){
     advance();
     AstNodePtr value=parseExpression();
     return std::make_shared<DefaultArg>(tok,name, value);
+}
+
+AstNodePtr Parser::parseExport() {
+    auto tok = m_currentToken;
+    expect(tk_def);
+    AstNodePtr body=parseFunctionDef();
+    return std::make_shared<ExportStatement>(tok, body);
 }

@@ -21,6 +21,7 @@ class AstVisitor {
     virtual bool visit(const IfStatement& node) { return false; };
     virtual bool visit(const AssertStatement& node) { return false; };
     virtual bool visit(const StaticStatement& node) { return false; };
+    virtual bool visit(const ExportStatement& node) { return false; };
     virtual bool visit(const InlineStatement& node) { return false; };
     virtual bool visit(const RaiseStatement& node) { return false; };
     virtual bool visit(const WhileStatement& node) { return false; };

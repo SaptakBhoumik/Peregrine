@@ -741,4 +741,10 @@ bool Codegen::visit(const ast::DefaultArg& node){
     node.value()->accept(*this);
     return true;
 }
+bool Codegen::visit(const ast::ExportStatement& node){
+    //dont mangle this name
+    write("extern \"C\" ");
+    node.body()->accept(*this);
+    return true;
+}
 } // namespace cpp

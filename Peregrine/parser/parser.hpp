@@ -100,6 +100,7 @@ class Parser {
     AstNodePtr parseReturn();
     AstNodePtr parseUnion();
     AstNodePtr parseEnum();
+    AstNodePtr parseExport();
     AstNodePtr parseTypeDef();
     AstNodePtr parseDefaultArg();
 

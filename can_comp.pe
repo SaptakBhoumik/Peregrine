@@ -110,7 +110,11 @@ static inline def static_inline_func():
     printf("Hello from static inline function\n")
 inline def inline_func():
     printf("Hello from inline function\n")
+export def exported_func():
+    printf("Hello from peregrine\n")
+    
 def main():
+    exported_func()
     unknown_type(iterate_test(6))
     enum_test:colours=colours.RED
     static_inline_func()

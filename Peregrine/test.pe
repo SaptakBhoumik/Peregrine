@@ -48,3 +48,6 @@ test_x(a=8,b=7)
 
 static const gg=5
 static const gg:int=5
+
+export def test2():
+    pass
