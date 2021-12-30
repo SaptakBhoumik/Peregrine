@@ -189,10 +189,11 @@ std::string DictLiteral::stringify() const {
 
 UnionLiteral::UnionLiteral(
     Token tok, std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,
-    AstNodePtr name) {
+    AstNodePtr name,std::string  comment) {
     m_token = tok;
     m_name = name;
     m_elements = elements;
+    m_comment=comment;
 }
 
 std::vector<std::pair<AstNodePtr, AstNodePtr>> UnionLiteral::elements() const {
@@ -200,6 +201,8 @@ std::vector<std::pair<AstNodePtr, AstNodePtr>> UnionLiteral::elements() const {
 }
 
 Token UnionLiteral::token() const { return m_token; }
+
+std::string UnionLiteral::comment() const { return m_comment; }
 
 AstNodePtr UnionLiteral::name() const { return m_name; }
 
@@ -329,9 +332,9 @@ std::string ListOrDictAccess::stringify() const {
     std::string res = "";
 
     res += m_container->stringify() + "[";
-    res += m_keyOrIndex[0]->stringify(); 
+    res += m_keyOrIndex[0]->stringify();
     if(m_keyOrIndex.size()==2){
-        res +=":" + m_keyOrIndex[1]->stringify(); 
+        res +=":" + m_keyOrIndex[1]->stringify();
     }
     res+="]";
 
@@ -500,18 +503,22 @@ ClassDefinition::ClassDefinition(Token tok, AstNodePtr name,
                                  std::vector<AstNodePtr> parent,
                                  std::vector<AstNodePtr> attributes,
                                  std::vector<AstNodePtr> methods,
-                                 std::vector<AstNodePtr> other) {
+                                 std::vector<AstNodePtr> other,
+                                 std::string comment) {
     m_token = tok;
     m_name = name;
     m_parent = parent;
     m_attributes = attributes;
     m_methods = methods;
     m_other = other;
+    m_comment=comment;
 }
 
 AstNodePtr ClassDefinition::name() const { return m_name; }
 
 std::vector<AstNodePtr> ClassDefinition::parent() const { return m_parent; }
+
+std::string ClassDefinition::comment() const { return m_comment; }
 
 std::vector<AstNodePtr> ClassDefinition::other() const { return m_other; }
 
@@ -561,12 +568,13 @@ std::string ClassDefinition::stringify() const {
 FunctionDefinition::FunctionDefinition(Token tok, AstNodePtr returnType,
                                        AstNodePtr name,
                                        std::vector<parameter> parameters,
-                                       AstNodePtr body) {
+                                       AstNodePtr body,std::string comment) {
     m_token = tok;
     m_returnType = returnType;
     m_name = name;
     m_parameters = parameters;
     m_body = body;
+    m_comment=comment;
 }
 
 AstNodePtr FunctionDefinition::returnType() const { return m_returnType; }
@@ -576,6 +584,7 @@ AstNodePtr FunctionDefinition::name() const { return m_name; }
 std::vector<parameter> FunctionDefinition::parameters() const {
     return m_parameters;
 }
+std::string FunctionDefinition::comment() const { return m_comment; }
 
 AstNodePtr FunctionDefinition::body() const { return m_body; }
 

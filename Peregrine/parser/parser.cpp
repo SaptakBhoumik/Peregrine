@@ -249,7 +249,10 @@ AstNodePtr Parser::parseClassDefinition() {
 
     expect(tk_ident);
     advance();
-
+    std::string comment;
+    if(m_currentToken.tkType==tk_string){
+      comment=m_currentToken.keyword;
+    }
     while (m_currentToken.tkType != tk_dedent) {
         switch (m_currentToken.tkType) {
             case tk_string: { // multiline comment
@@ -296,7 +299,7 @@ AstNodePtr Parser::parseClassDefinition() {
                 other.push_back(parseClassDefinition());
                 break;
             }
-            case tk_enum: { 
+            case tk_enum: {
                 other.push_back(parseEnum());
                 break;
             }
@@ -309,9 +312,8 @@ AstNodePtr Parser::parseClassDefinition() {
 
         advance();
     }
-
     return std::make_shared<ClassDefinition>(tok, name, parent, attributes,
-                                             methods, other);
+                                             methods, other,comment);
 }
 
 AstNodePtr Parser::parseVirtual() {
@@ -565,11 +567,13 @@ AstNodePtr Parser::parseFunctionDef() {
 
     expect(tk_colon);
     expect(tk_ident);
-
+    std::string comment;
+    if (next().tkType==tk_string){
+      comment=next().keyword;
+    }
     AstNodePtr body = parseBlockStatement();
-
     return std::make_shared<FunctionDefinition>(tok, returnType, name,
-                                                parameters, body);
+                                                parameters, body,comment);
 }
 
 AstNodePtr Parser::parseReturn() {
@@ -1018,7 +1022,15 @@ AstNodePtr Parser::parseUnion() {
     expect(tk_ident);
     advance();
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elements;
+    std::string comment;
     while (m_currentToken.tkType != tk_dedent) {
+        while(m_currentToken.tkType==tk_string){
+          if(comment=="" && elements.size()==0){
+            comment=m_currentToken.keyword;
+          }
+          advance();
+          if(m_currentToken.tkType==tk_new_line){advance();}
+        }
         AstNodePtr name = parseName();
         expect(tk_colon);
         advance();
@@ -1029,7 +1041,7 @@ AstNodePtr Parser::parseUnion() {
             advance();
         }
     }
-    return std::make_shared<UnionLiteral>(tok, elements, union_name);
+    return std::make_shared<UnionLiteral>(tok, elements, union_name,comment);
 }
 
 AstNodePtr Parser::parseEnum() {

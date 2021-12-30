@@ -21,7 +21,7 @@ with x as c:
 with x as c,y as u:
     pass
 class test(parent1,parent2):
-    "multi line 
+    "multi line
     comment"
     "test"
     a :float = 5.6
@@ -51,3 +51,9 @@ static const gg:int=5
 
 export def test2():
     pass
+
+union n:
+  "comment1"
+  "comment""comment
+  comment"
+  g:int

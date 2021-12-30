@@ -313,6 +313,7 @@ class DictLiteral : public AstNode {
 
 class UnionLiteral : public AstNode {
     Token m_token;
+    std::string  m_comment;//For generating docs
     // first is the key, second is the value
     std::vector<std::pair<AstNodePtr, AstNodePtr>> m_elements;
     AstNodePtr m_name;
@@ -320,7 +321,7 @@ class UnionLiteral : public AstNode {
   public:
     UnionLiteral(Token tok,
                  std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,
-                 AstNodePtr name);
+                 AstNodePtr name,std::string  comment);
 
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elements() const;
 
@@ -328,6 +329,7 @@ class UnionLiteral : public AstNode {
 
     Token token() const;
     AstKind type() const;
+    std::string comment() const;
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
 };
@@ -509,14 +511,16 @@ class ClassDefinition : public AstNode {
     std::vector<AstNodePtr> m_attributes;
     std::vector<AstNodePtr> m_methods;
     std::vector<AstNodePtr> m_other;
-
+    std::string m_comment;//For generating docs
   public:
     ClassDefinition(Token tok, AstNodePtr name, std::vector<AstNodePtr> parent,
                     std::vector<AstNodePtr> attributes,
                     std::vector<AstNodePtr> methods,
-                    std::vector<AstNodePtr> other);
+                    std::vector<AstNodePtr> other,
+                    std::string comment);
 
     AstNodePtr name() const;
+    std::string comment() const;
     std::vector<AstNodePtr> parent() const;
     std::vector<AstNodePtr> attributes() const;
     std::vector<AstNodePtr> methods() const;
@@ -534,18 +538,18 @@ class FunctionDefinition : public AstNode {
     AstNodePtr m_name;
 
     std::vector<parameter> m_parameters;
-
+    std::string m_comment;//For generating docs
     AstNodePtr m_body;
 
   public:
     FunctionDefinition(Token tok, AstNodePtr returnType, AstNodePtr name,
-                       std::vector<parameter> parameters, AstNodePtr body);
+                       std::vector<parameter> parameters, AstNodePtr body,std::string comment);
 
     AstNodePtr returnType() const;
     AstNodePtr name() const;
     std::vector<parameter> parameters() const;
     AstNodePtr body() const;
-
+    std::string comment() const;
     Token token() const;
     AstKind type() const;
     std::string stringify() const;
