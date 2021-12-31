@@ -7,11 +7,15 @@
 
 namespace ast {
 
-Program::Program(std::vector<AstNodePtr> statements) {
+Program::Program(std::vector<AstNodePtr> statements,std::string  comment) {
     m_statements = statements;
+    m_comment=comment;
 }
 
 std::vector<AstNodePtr> Program::statements() const { return m_statements; }
+
+std::string Program::comment() const{ return m_comment; }
+
 
 Token Program::token() const { return Token{}; }
 
@@ -224,15 +228,19 @@ std::string UnionLiteral::stringify() const {
 
 EnumLiteral::EnumLiteral(Token tok,
                          std::vector<std::pair<AstNodePtr, AstNodePtr>> fields,
-                         AstNodePtr name) {
+                         AstNodePtr name,std::string comment) {
     m_token = tok;
     m_fields = fields;
     m_name = name;
+    m_comment=comment;
+
 }
 
 std::vector<std::pair<AstNodePtr, AstNodePtr>> EnumLiteral::fields() const {
     return m_fields;
 }
+
+std::string EnumLiteral::comment() const {return m_comment;}
 
 Token EnumLiteral::token() const { return m_token; }
 

@@ -15,6 +15,10 @@ ast_src = [
     'ast/visitor.cpp'
 ]
 
+doc_src = [
+    'docgen/html/docgen.cpp'
+]
+
 analyzer_src = [
     'analyzer/typeChecker.cpp'
 ]
@@ -31,3 +35,4 @@ parser = static_library('parser', sources: parser_src)
 ast = static_library('ast', sources: ast_src)
 analyzer = static_library('analyzer', sources: analyzer_src)
 codegen = static_library('codegen', sources: codegen_src)
+docgen = static_library('docgen',sources:doc_src)

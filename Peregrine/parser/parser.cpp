@@ -18,8 +18,11 @@ Parser::~Parser() {}
 
 AstNodePtr Parser::parse() {
     std::vector<AstNodePtr> statements;
-
+    std::string comment;
     while (m_currentToken.tkType != tk_eof) {
+        if(m_currentToken.tkType==tk_string && statements.size()==0 && comment==""){
+          comment=m_currentToken.keyword;
+        }
         statements.push_back(parseStatement());
         advance();
     }
@@ -31,7 +34,7 @@ AstNodePtr Parser::parse() {
         exit(1);
     }
 
-    return std::make_shared<Program>(statements);
+    return std::make_shared<Program>(statements,comment);
 }
 
 AstNodePtr Parser::parseStatement() {
@@ -1051,10 +1054,18 @@ AstNodePtr Parser::parseEnum() {
     expect(tk_colon);
     expect(tk_ident);
     advance();
+    std::string comment;
+    if (m_currentToken.tkType==tk_string){
+      comment=m_currentToken.keyword;
+    }
     std::vector<std::pair<AstNodePtr, AstNodePtr>> fields;
     AstNodePtr val;
 
     while (m_currentToken.tkType != tk_dedent) {
+        while(m_currentToken.tkType==tk_string){
+          advance();
+          if(m_currentToken.tkType==tk_new_line){advance();}
+        }
         AstNodePtr name = parseName();
         advance();
 
@@ -1074,7 +1085,7 @@ AstNodePtr Parser::parseEnum() {
         }
     }
 
-    return std::make_shared<EnumLiteral>(token, fields, enum_name);
+    return std::make_shared<EnumLiteral>(token, fields, enum_name,comment);
 }
 
 AstNodePtr Parser::parseStatic() {

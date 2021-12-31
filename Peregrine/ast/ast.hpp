@@ -78,10 +78,10 @@ using AstNodePtr = std::shared_ptr<AstNode>;
 
 class Program : public AstNode {
     std::vector<AstNodePtr> m_statements;
-
+    std::string  m_comment;//For generating docs
   public:
-    Program(std::vector<AstNodePtr> statements);
-
+    Program(std::vector<AstNodePtr> statements,std::string  comment);
+    std::string comment() const;
     std::vector<AstNodePtr> statements() const;
 
     Token token() const;
@@ -336,19 +336,19 @@ class UnionLiteral : public AstNode {
 
 class EnumLiteral : public AstNode {
     Token m_token;
-
+    std::string m_comment;
     std::vector<std::pair<AstNodePtr, AstNodePtr>> m_fields;
     AstNodePtr m_name;
 
   public:
     EnumLiteral(Token tok,
                 std::vector<std::pair<AstNodePtr, AstNodePtr>> fields,
-                AstNodePtr name);
+                AstNodePtr name,std::string comment);
 
     std::vector<std::pair<AstNodePtr, AstNodePtr>> fields() const;
 
     AstNodePtr name() const;
-
+    std::string comment() const;
     Token token() const;
     AstKind type() const;
     std::string stringify() const;

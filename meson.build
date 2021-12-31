@@ -14,10 +14,10 @@ build_tests = get_option('build_tests')
 subdir('Peregrine/')
 
 executable(
-    'peregrine.elf', 
+    'peregrine.elf',
     sources: cpp_src, 
     include_directories: include,
-    link_with: [lexer, parser, ast, analyzer, codegen]
+    link_with: [lexer, parser, ast, analyzer, codegen,docgen]
 )
 
 if build_tests

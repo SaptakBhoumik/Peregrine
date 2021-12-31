@@ -1,4 +1,5 @@
 #include "analyzer/typeChecker.hpp"
+#include "docgen/html/docgen.hpp"
 #include "codegen/cpp/codegen.hpp"
 #include "codegen/js/codegen.hpp"
 #include "lexer/lexer.hpp"
@@ -54,7 +55,10 @@ int main(int argc, char** argv) {
                 js::Codegen codegen("index.js", program, false, filename);
             } else if (strcmp(argv[3], "-html") == 0) { // embeds js in html
                 js::Codegen codegen("index.html", program, true, filename);
-            } else {
+            }
+            else if (strcmp(argv[3], "-doc_html") == 0) {
+                html::Docgen Docgen("index.html", program,filename);
+            }else {
                 cpp::Codegen codegen("temp.cc", program, filename);
                 system("g++ -std=c++20 temp.cc");
             }

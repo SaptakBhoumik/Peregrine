@@ -1,0 +1,17 @@
+"Just a test"
+class test(parent1,parent2):
+  "Just a test class"
+  def __init__(g:int=9):
+    "initialize the class"
+    pass
+  def __del__():
+    "destroy the class"
+    pass
+
+def func():
+  "a function"
+  pass
+
+def main():
+  "entry point"
+  pass
