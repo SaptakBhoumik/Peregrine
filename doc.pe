@@ -4,14 +4,31 @@ class test(parent1,parent2):
   def __init__(g:int=9):
     "initialize the class"
     pass
+  virtual def g():
+    pass
   def __del__():
     "destroy the class"
     pass
-
-def func():
+@decorator
+def func()->int:
   "a function"
-  pass
+  return 0
 
+@decorator
+static def func2()->int:
+  "a function"
+  return 0
+inline def gg():
+  pass
+enum x:
+  o,h=9
+union c:
+  h:x
+  y:**int
+static def f():
+  pass
+static inline def ff():
+  pass
 def main():
   "entry point"
   pass

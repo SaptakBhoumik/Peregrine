@@ -42,9 +42,9 @@ Docgen::Docgen(std::string outputFilename, ast::AstNodePtr ast,std::string file)
     m_file.open(outputFilename);
     std::string style="body {background: black;color:white } .local{color:#2d3748} a{text-decoration: none;}";
     style+="h1 {font-weight: bold;font-size: 40px;} h2 {font-weight: bold;font-size: 35px;} h3 {font-size: 25px;} h4 {font-size: 20px;}";
-    style+=".code {background:#2d3748;padding: 10px}";
+    style+=".code {background:#2d3748;padding: 10px;font-size:20px}";
     style+="hr {border: none; height: 1px;background-color: #333;}";
-    m_file<<"<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>DOCS</title> <style type=\"text/css\">"+style+"</style></head><body>\n";
+    m_file<<"<html lang=\"en\"><head><meta charset=\"UTF-8\"><meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>DOCS</title> <style type=\"text/css\">"+style+"</style></head><body>";
     res+="<h1 id=\"content\">"+module_name(file);
     ast->accept(*this);
     write(res);
@@ -77,10 +77,12 @@ bool Docgen::visit(const ast::Program& node) {
     return true;
 }
 bool Docgen::visit(const ClassDefinition& node) {
+    id++;
+    auto str="id"+std::to_string(id);
     is_class=true;
     class_name=node.name()->stringify();
-    res+="<h2 id=\""+class_name+"\">"+"class "+node.name()->stringify();
-    res+="<a href=\"#"+class_name+"\" class=\"local\"> #</a></h2><hr>";
+    res+="<h2 id=\""+str+"\">"+"class "+node.name()->stringify();
+    res+="<a href=\"#"+str+"\" class=\"local\"> #</a></h2><hr>";
     res+="<h3><div class=\"code\"><font color=#63b3ed>class</font> ";
     res+="<font color=#45a4a0>"+class_name+"</font>(";
     auto parents=node.parent();
@@ -100,17 +102,63 @@ bool Docgen::visit(const ClassDefinition& node) {
       x->accept(*this);
     }
     if(node.methods().size()==0){
-      res+="<hr>";      
+      res+="<hr>";
     }
     is_class=false;
     class_name="";
     return true;
 }
 bool Docgen::visit(const DecoratorStatement& node) {
-
+    std::string larger;
+    std::string smaller;
+    std::shared_ptr<FunctionDefinition> body;
+    std::string prefix="";
+    if (node.body()->type()==KAstStatic){
+      prefix="static ";
+      body=std::dynamic_pointer_cast<FunctionDefinition>(
+        std::dynamic_pointer_cast<StaticStatement>(node.body())->body()
+      );
+    }
+    else{
+      body=std::dynamic_pointer_cast<FunctionDefinition>(node.body());
+    }
+    id++;
+    auto str="id"+std::to_string(id);
+    if(is_class){
+      larger="h3";
+      smaller="h4";
+    }
+    else{
+      larger="h2";
+      smaller="h3";
+    }
+    res+="<"+larger +" id=\""+str+"\">"+"def "+body->name()->stringify();
+    res+="<a href=\"#"+str+"\" class=\"local\"> #</a>"+"</"+smaller+">"+"<hr>";
+    res+="<"+smaller+"><div class=\"code\">";
+    for (auto&x : node.decoratorItem()){
+      res+="<font color=#45a4a0>@"+x->stringify()+"</font>";
+      res+="<br>";
+    }
+    res+="<font color=#cf222e>"+prefix+"</font> <font color=#63b3ed>def</font> ";
+    res+="<font color=#45a4a0>"+body->name()->stringify()+"</font>(";
+    funcParams(body->parameters());
+    res+=")";
+    if(body->returnType()->stringify()!="void"){
+      res+="-><font color=#45a4a0>"+body->returnType()->stringify()+"</font>";
+    }
+    res+="</div></"+smaller+">";
+    if(body->comment()!=""){
+      res+=body->comment();
+    }
+    else{
+      res+="None";
+    }
+    res+="<hr>";
     return true;
 }
 bool Docgen::visit(const FunctionDefinition& node) {
+    id++;
+    auto str="id"+std::to_string(id);
     std::string larger;
     std::string smaller;
     if(is_class){
@@ -121,13 +169,16 @@ bool Docgen::visit(const FunctionDefinition& node) {
       larger="h2";
       smaller="h3";
     }
-    res+="<"+larger +" id=\""+node.name()->stringify()+"_"+class_name+"\">"+"def "+node.name()->stringify();
-    res+="<a href=\"#"+node.name()->stringify()+"_"+class_name+"\" class=\"local\"> #</a>"+"</"+smaller+">"+"<hr>";
+    res+="<"+larger +" id=\""+str+"\">"+"def "+node.name()->stringify();
+    res+="<a href=\"#"+str+"\" class=\"local\"> #</a>"+"</"+smaller+">"+"<hr>";
     res+="<"+smaller+"><div class=\"code\"><font color=#63b3ed>def</font> ";
     res+="<font color=#45a4a0>"+node.name()->stringify()+"</font>(";
     funcParams(node.parameters());
     res+=")";
-    res+="</div>"+std::string("</")+smaller+">";
+    if(node.returnType()->stringify()!="void"){
+      res+="-><font color=#45a4a0>"+node.returnType()->stringify()+"</font>";
+    }
+    res+="</div></"+smaller+">";
     if(node.comment()!=""){
       res+=node.comment();
     }
@@ -138,19 +189,166 @@ bool Docgen::visit(const FunctionDefinition& node) {
     return true;
 }
 bool Docgen::visit(const StaticStatement& node) {
-
+    std::string larger;
+    std::string smaller;
+    std::shared_ptr<FunctionDefinition> body;
+    std::string prefix="static";
+    if (node.body()->type()==KAstInline){
+      prefix="static inline";
+      body=std::dynamic_pointer_cast<FunctionDefinition>(
+        std::dynamic_pointer_cast<InlineStatement>(node.body())->body()
+      );
+    }
+    else if(node.body()->type()==KAstFunctionDef){
+      body=std::dynamic_pointer_cast<FunctionDefinition>(node.body());
+    }
+    else{
+      return true;
+    }
+    id++;
+    auto str="id"+std::to_string(id);
+    if(is_class){
+      larger="h3";
+      smaller="h4";
+    }
+    else{
+      larger="h2";
+      smaller="h3";
+    }
+    res+="<"+larger +" id=\""+str+"\">"+"def "+body->name()->stringify();
+    res+="<a href=\"#"+str+"\" class=\"local\"> #</a>"+"</"+smaller+">"+"<hr>";
+    res+="<"+smaller+"><div class=\"code\">";
+    res+="<font color=#cf222e>"+prefix+"</font> <font color=#63b3ed>def</font> ";
+    res+="<font color=#45a4a0>"+body->name()->stringify()+"</font>(";
+    funcParams(body->parameters());
+    res+=")";
+    if(body->returnType()->stringify()!="void"){
+      res+="-><font color=#45a4a0>"+body->returnType()->stringify()+"</font>";
+    }
+    res+="</div></"+smaller+">";
+    if(body->comment()!=""){
+      res+=body->comment();
+    }
+    else{
+      res+="None";
+    }
+    res+="<hr>";
     return true;
 }
 bool Docgen::visit(const InlineStatement& node) {
-
+    std::string larger;
+    std::string smaller;
+    auto body=std::dynamic_pointer_cast<FunctionDefinition>(node.body());
+    id++;
+    auto str="id"+std::to_string(id);
+    if(is_class){
+      larger="h3";
+      smaller="h4";
+    }
+    else{
+      larger="h2";
+      smaller="h3";
+    }
+    res+="<"+larger +" id=\""+str+"\">"+"def "+body->name()->stringify();
+    res+="<a href=\"#"+str+"\" class=\"local\"> #</a>"+"</"+smaller+">"+"<hr>";
+    res+="<"+smaller+"><div class=\"code\"><font color=#cf222e>inline</font> <font color=#63b3ed>def</font> ";
+    res+="<font color=#45a4a0>"+body->name()->stringify()+"</font>(";
+    funcParams(body->parameters());
+    res+=")";
+    if(body->returnType()->stringify()!="void"){
+      res+="-><font color=#45a4a0>"+body->returnType()->stringify()+"</font>";
+    }
+    res+="</div></"+smaller+">";
+    if(body->comment()!=""){
+      res+=body->comment();
+    }
+    else{
+      res+="None";
+    }
+    res+="<hr>";
     return true;
 }
 bool Docgen::visit(const VirtualStatement& node) {
-
+    std::string larger;
+    std::string smaller;
+    auto body=std::dynamic_pointer_cast<FunctionDefinition>(node.body());
+    id++;
+    auto str="id"+std::to_string(id);
+    if(is_class){
+      larger="h3";
+      smaller="h4";
+    }
+    else{
+      larger="h2";
+      smaller="h3";
+    }
+    res+="<"+larger +" id=\""+str+"\">"+"def "+body->name()->stringify();
+    res+="<a href=\"#"+str+"\" class=\"local\"> #</a>"+"</"+smaller+">"+"<hr>";
+    res+="<"+smaller+"><div class=\"code\"><font color=#cf222e>virtual</font> <font color=#63b3ed>def</font> ";
+    res+="<font color=#45a4a0>"+body->name()->stringify()+"</font>(";
+    funcParams(body->parameters());
+    res+=")";
+    if(body->returnType()->stringify()!="void"){
+      res+="-><font color=#45a4a0>"+body->returnType()->stringify()+"</font>";
+    }
+    res+="</div></"+smaller+">";
+    if(body->comment()!=""){
+      res+=body->comment();
+    }
+    else{
+      res+="None";
+    }
+    res+="<hr>";
     return true;
 }
 bool Docgen::visit(const EnumLiteral& node) {
-
+    id++;
+    auto str="id"+std::to_string(id);
+    std::string larger="h2";
+    std::string smaller="h3";
+    res+="<"+larger +" id=\""+str+"\">"+"enum "+node.name()->stringify();
+    res+="<a href=\"#"+str+"\" class=\"local\"> #</a>"+"</"+smaller+">"+"<hr>";
+    res+="<"+smaller+"><div class=\"code\"><font color=#63b3ed>enum</font> ";
+    res+="<font color=#45a4a0>"+node.name()->stringify()+"</font><br>";
+    for(auto&x:node.fields()){
+      res+="<font color=#45a4a0> &emsp; "+x.first->stringify()+"</font>";
+      if(x.second->type()!=KAstNoLiteral){
+        res+="=<font color=#45a4a0>"+x.second->stringify()+"</font>";
+      }
+      res+="<br>";
+    }
+    res+="</div></"+smaller+">";
+    if(node.comment()!=""){
+      res+=node.comment();
+    }
+    else{
+      res+="None";
+    }
+    res+="<hr>";
+    return true;
+}
+bool Docgen::visit(const UnionLiteral& node) {
+    id++;
+    auto str="id"+std::to_string(id);
+    std::string larger="h2";
+    std::string smaller="h3";
+    res+="<"+larger +" id=\""+str+"\">"+"union "+node.name()->stringify();
+    res+="<a href=\"#"+str+"\" class=\"local\"> #</a>"+"</"+smaller+">"+"<hr>";
+    res+="<"+smaller+"><div class=\"code\"><font color=#63b3ed>union</font> ";
+    res+="<font color=#45a4a0>"+node.name()->stringify()+"</font><br>";
+    for(auto&x:node.elements()){
+      res+="<font color=#45a4a0>&emsp;"+x.second->stringify()+"</font>:";
+      res+="<font color=#45a4a0> "+x.first->stringify()+"</font>";
+      res+="<br>";
+    }
+    res+="</div></"+smaller+">";
+    if(node.comment()!=""){
+      res+=node.comment();
+    }
+    else{
+      res+="None";
+    }
+    res+="<hr>";
     return true;
 }
 };

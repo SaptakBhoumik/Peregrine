@@ -12,6 +12,7 @@ class Docgen : public ast::AstVisitor {
   public:
     Docgen(std::string outputFilename, ast::AstNodePtr ast,std::string file);
   private:
+    size_t id=0;
     std::ofstream m_file;
     std::string res;
     std::string class_name;
@@ -25,7 +26,7 @@ class Docgen : public ast::AstVisitor {
     bool visit(const ast::InlineStatement& node);
     bool visit(const ast::VirtualStatement& node);
     bool visit(const ast::EnumLiteral& node);
-
+    bool visit(const ast::UnionLiteral& node);
     void write(std::string_view code);
 };
 };
