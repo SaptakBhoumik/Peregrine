@@ -39,6 +39,7 @@ enum AstKind {
     KAstReturnStatement,
     KAstFunctionCall,
     KAstDotExpression,
+    KAstArrowExpression,
     KAstIfStmt,
     KAstAssertStmt,
     KAstMatchStmt,
@@ -918,6 +919,22 @@ class CastStatement : public AstNode {
     CastStatement(Token token, AstNodePtr type, AstNodePtr value);
     AstNodePtr cast_type() const;
     AstNodePtr value() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+class ArrowExpression : public AstNode {
+    Token m_token;
+    AstNodePtr m_owner;      // the node that comes before the ->
+    AstNodePtr m_referenced; // the node that comes after the ->
+
+  public:
+    ArrowExpression(Token tok, AstNodePtr owner, AstNodePtr referenced);
+
+    AstNodePtr owner() const;
+    AstNodePtr referenced() const;
+
     Token token() const;
     AstKind type() const;
     std::string stringify() const;

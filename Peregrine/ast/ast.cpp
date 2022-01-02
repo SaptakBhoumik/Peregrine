@@ -1249,4 +1249,27 @@ std::string DefaultArg::stringify() const {
 
     return res;
 }
+ArrowExpression::ArrowExpression(Token tok, AstNodePtr owner,
+                             AstNodePtr referenced) {
+    m_token = tok;
+    m_owner = owner;
+    m_referenced = referenced;
+}
+
+AstNodePtr ArrowExpression::owner() const { return m_owner; }
+
+AstNodePtr ArrowExpression::referenced() const { return m_referenced; }
+
+Token ArrowExpression::token() const { return m_token; }
+
+AstKind ArrowExpression::type() const { return KAstArrowExpression; }
+
+std::string ArrowExpression::stringify() const {
+    std::string res = "";
+
+    res += m_owner->stringify() + "->";
+    res += m_referenced->stringify();
+    return res;
+}
+
 } // namespace ast

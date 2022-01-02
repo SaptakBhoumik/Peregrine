@@ -182,7 +182,7 @@ AstNodePtr Parser::parseStatement() {
                 // variable
                 stmt = parseVariableStatement();
                 break;
-            } else if (next().tkType == tk_dot && is_imported_var()) {
+            } else if ((next().tkType == tk_dot||next().tkType == tk_arrow) && is_imported_var()) {
                 stmt = parseVariableStatement();
                 break;
             }
@@ -391,6 +391,10 @@ AstNodePtr Parser::parseVariableStatement() {
 
     else if (m_currentToken.tkType == tk_dot) {
         name = parseDotExpression(name);
+        advance();
+    }
+    else if (m_currentToken.tkType == tk_arrow) {
+        name = parseArrowExpression(name);
         advance();
     }
     AstNodePtr value = std::make_shared<NoLiteral>();
@@ -711,6 +715,11 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
                 break;
             }
 
+            case tk_arrow: {
+                left = parseArrowExpression(left);
+                break;
+            }
+
             default: {
                 left = parseBinaryOperation(left);
                 break;
@@ -777,7 +786,7 @@ AstNodePtr Parser::parseListOrDictAccess(AstNodePtr left) {
 
     AstNodePtr node = std::make_shared<ListOrDictAccess>(tok, left, keyOrIndex);
 
-    if (next().tkType != tk_assign || is_dot_exp)
+    if (next().tkType != tk_assign || is_dot_arrow_exp)
         return node;
 
     // parsing variable statements in 2 different places, is this really ideal?
@@ -798,10 +807,10 @@ AstNodePtr Parser::parseDotExpression(AstNodePtr left) {
     advance();
     AstNodePtr referenced;
     // TODO: validate output of parseExpression
-    if (not is_dot_exp){
-        is_dot_exp=true;
+    if (not is_dot_arrow_exp){
+        is_dot_arrow_exp=true;
         referenced = parseExpression(currentPrecedence);
-        is_dot_exp=false;
+        is_dot_arrow_exp=false;
     }
     else{
         referenced = parseExpression(currentPrecedence);
@@ -992,7 +1001,7 @@ AstNodePtr Parser::parseDecoratorCall() {
     AstNodePtr body;
     while (m_currentToken.tkType == tk_at) {
         expect(tk_identifier);
-        decorators.push_back(parseExpression(pr_lowest));
+        decorators.push_back(parseExpression());
         advance();
     }
     if (m_currentToken.tkType == tk_def) {
@@ -1182,4 +1191,21 @@ AstNodePtr Parser::parseExport() {
     expect(tk_def);
     AstNodePtr body=parseFunctionDef();
     return std::make_shared<ExportStatement>(tok, body);
+}
+
+AstNodePtr Parser::parseArrowExpression(AstNodePtr left) {
+    Token tok = m_currentToken;
+    PrecedenceType currentPrecedence = precedenceMap[tok.tkType];
+    advance();
+    AstNodePtr referenced;
+    // TODO: validate output of parseExpression
+    if (not is_dot_arrow_exp){
+        is_dot_arrow_exp=true;
+        referenced = parseExpression(currentPrecedence);
+        is_dot_arrow_exp=false;
+    }
+    else{
+        referenced = parseExpression(currentPrecedence);
+    }
+    return std::make_shared<ArrowExpression>(tok, left, referenced);
 }

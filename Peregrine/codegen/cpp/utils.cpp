@@ -62,13 +62,71 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
             var+=res;
             res="";
             ast::AstNodePtr member=exp->referenced();
-            while(member->type()==ast::KAstDotExpression){
-                auto curr = std::dynamic_pointer_cast<ast::DotExpression>(member);
-                curr->owner()->accept(*this);
-                write(".");
-                var+=res;
+            while(member->type()==ast::KAstDotExpression || member->type()==ast::KAstArrowExpression){
+                if(member->type()==ast::KAstArrowExpression){
+                  auto curr = std::dynamic_pointer_cast<ast::ArrowExpression>(member);
+                  curr->owner()->accept(*this);
+                  write("->");
+                  var+=res;
+                  res="";
+                  member=curr->referenced();
+                }
+                else{
+                  auto curr = std::dynamic_pointer_cast<ast::DotExpression>(member);
+                  curr->owner()->accept(*this);
+                  write(".");
+                  var+=res;
+                  res="";
+                  member=curr->referenced();
+                }
+            }
+            if (member->type()==ast::KAstIdentifier){
+                member->accept(*this);
+                var+=res+"("+contains+")";
                 res="";
-                member=curr->referenced();
+            }
+            else if(member->type()==ast::KAstFunctionCall){
+                auto function = std::dynamic_pointer_cast<ast::FunctionCall>(member);
+                function->name()->accept(*this);
+                var+=res+"("+contains;
+                res="";
+                auto args = function->arguments();
+                if (args.size()) {
+                    for (size_t i = 0; i < args.size(); ++i) {
+                        if (i)
+                            write(", ");
+                        args[i]->accept(*this);
+                    }
+                }
+                var+=res+")";
+                res="";
+            }
+            break;
+        }
+        case ast::KAstArrowExpression:{
+            auto exp = std::dynamic_pointer_cast<ast::ArrowExpression>(item);
+            exp->owner()->accept(*this);
+            write("->");
+            var+=res;
+            res="";
+            ast::AstNodePtr member=exp->referenced();
+            while(member->type()==ast::KAstDotExpression || member->type()==ast::KAstArrowExpression){
+                if(member->type()==ast::KAstArrowExpression){
+                  auto curr = std::dynamic_pointer_cast<ast::ArrowExpression>(member);
+                  curr->owner()->accept(*this);
+                  write("->");
+                  var+=res;
+                  res="";
+                  member=curr->referenced();
+                }
+                else{
+                  auto curr = std::dynamic_pointer_cast<ast::DotExpression>(member);
+                  curr->owner()->accept(*this);
+                  write(".");
+                  var+=res;
+                  res="";
+                  member=curr->referenced();
+                }
             }
             if (member->type()==ast::KAstIdentifier){
                 member->accept(*this);

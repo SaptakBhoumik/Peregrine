@@ -354,8 +354,8 @@ LEXEME lexer(std::string src, std::string filename) {
             if (item == "\n" || item == "\r\n" || item == "\r") {
                 is_comment = false;
                 if (tokens.back().tkType !=tk_new_line && // we dont want to add 2 newline one after the other
-                    tokens.back().tkType !=tk_colon
-                ){ 
+                    tokens.back().tkType !=tk_colon && tokens.size()>0
+                ){
                     token = token_init(statement, "<tk_new_line>", tk_new_line,
                                        current_index, current_index, line);
                     tokens.emplace_back(token);

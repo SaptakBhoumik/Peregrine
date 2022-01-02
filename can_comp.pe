@@ -51,8 +51,8 @@ static def staticfunc():
     printf("Hello from static function\n")
     printf("Static var is %d\n",var_static)
 union name:
-    item1:int 
-    item2:float 
+    item1:int
+    item2:float
 def divide(num1:int ,num2:int )->int:
     match num2:
         case 0:
@@ -112,8 +112,16 @@ inline def inline_func():
     printf("Hello from inline function\n")
 export def exported_func():
     printf("Hello from peregrine\n")
-    
+
+union union_name:
+    f:float
+    i:int
+
 def main():
+    cc1:union_name
+    arrow_test:*union_name=&cc1
+    arrow_test->i=7
+    printf("arrow_test->i=%d\n",arrow_test->i)
     exported_func()
     unknown_type(iterate_test(6))
     enum_test:colours=colours.RED
@@ -141,7 +149,7 @@ def main():
     x:bool =False
     const  cc:bool=False
     x=True
-    y:bool 
+    y:bool
     y=True
     if x==y:
         pass
@@ -154,10 +162,10 @@ def main():
             printf("a is 5,b is 7 and c is 8")
         case 4,7,_:#c can be anything
             printf("a is 4 but b is 7")
-            break  #we dont want default to execute 
+            break  #we dont want default to execute
         case 4,_,7:#b can be anything
             printf("a is 4 but c is 7")
-            break  #we dont want default to execute 
+            break  #we dont want default to execute
         case 8,_:#b and c can be anything
             printf("a is 8")
         case _:
@@ -167,7 +175,7 @@ def main():
             printf("\nHello\n")
     lambda_test(func)
     assert 8==8
-    var1:name 
+    var1:name
     var1.item1=8
     printf("item1 of var1 is %d\n",var1.item1)
     var1.item2=6.8

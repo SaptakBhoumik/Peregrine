@@ -23,7 +23,7 @@ enum PrecedenceType {
     pr_mul_div,     // *, /, %, //
     pr_expo,        // **
     pr_prefix,      // -x
-    pr_dot_ref,     // x.test(), x.prop
+    pr_dot_arrow_ref,     // x.test(), x.prop ,x->y
     pr_list_access, // x[0], x["test"]
     pr_call         // x()
 };
@@ -41,7 +41,7 @@ class Parser {
     std::vector<PEError> m_errors;
 
     std::map<TokenType, PrecedenceType> precedenceMap = createMap();
-    bool is_dot_exp=false;
+    bool is_dot_arrow_exp=false;
     bool is_imported_var();
     void advance();
     void advanceOnNewLine();
@@ -76,6 +76,7 @@ class Parser {
     AstNodePtr parseFunctionCall(AstNodePtr left);
     AstNodePtr parseListOrDictAccess(AstNodePtr left);
     AstNodePtr parseDotExpression(AstNodePtr left);
+    AstNodePtr parseArrowExpression(AstNodePtr left);
 
     AstNodePtr parseVirtual();
     AstNodePtr parseCast();

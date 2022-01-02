@@ -12,7 +12,7 @@ bool Parser::is_imported_var(){
         if (curr_tok.tkType==tk_identifier){
             if (prev_tok.tkType==tk_identifier){return false;}//it is the type
         }
-        else if (curr_tok.tkType==tk_dot){}
+        else if (curr_tok.tkType==tk_dot || curr_tok.tkType==tk_arrow){}
         else if (curr_tok.tkType==tk_l_paren){brac_count++;}
         else if (curr_tok.tkType==tk_r_paren){brac_count--;}
         else if (curr_tok.tkType==tk_list_open){list_brac_count++;}
@@ -107,7 +107,8 @@ std::map<TokenType, PrecedenceType> createMap() {
     precedenceMap[tk_modulo] = pr_mul_div;
     precedenceMap[tk_floor] = pr_mul_div;
     precedenceMap[tk_exponent] = pr_expo;
-    precedenceMap[tk_dot] = pr_dot_ref;
+    precedenceMap[tk_dot] = pr_dot_arrow_ref;
+    precedenceMap[tk_arrow] = pr_dot_arrow_ref;
     precedenceMap[tk_list_open] = pr_list_access;
     precedenceMap[tk_l_paren] = pr_call;
 

@@ -33,7 +33,7 @@ std::string Codegen::write(std::string_view code) {
         res+=code;
     }
     else{
-        m_file << code; 
+        m_file << code;
     }
     return res;
 }
@@ -153,7 +153,7 @@ bool Codegen::visit(const ast::VariableStatement& node) {
 }
 
 bool Codegen::visit(const ast::ConstDeclaration& node) {
-    write("const "); 
+    write("const ");
     if (node.constType()->type()!=ast::KAstNoLiteral){
         node.constType()->accept(*this);
     }
@@ -161,7 +161,7 @@ bool Codegen::visit(const ast::ConstDeclaration& node) {
     node.name()->accept(*this);
     write("=");
     node.value()->accept(*this);
-    return true; 
+    return true;
     }
 
 bool Codegen::visit(const ast::TypeDefinition& node) {
@@ -219,7 +219,7 @@ bool Codegen::visit(const ast::WhileStatement& node) {
     return true;
 }
 
-bool Codegen::visit(const ast::ForStatement& node) { 
+bool Codegen::visit(const ast::ForStatement& node) {
     write("for (size_t ____PEREGRINE____i=0;____PEREGRINE____i<");
     node.sequence()->accept(*this);
     write(".__iter__();++____PEREGRINE____i){\n");
@@ -245,7 +245,7 @@ bool Codegen::visit(const ast::ForStatement& node) {
     }
     node.body()->accept(*this);
     write("\n}");
-    return true; 
+    return true;
 }
 
 bool Codegen::visit(const ast::MatchStatement& node) {
@@ -393,12 +393,12 @@ bool Codegen::visit(const ast::ListLiteral& node) {
         }
     }
     write("}");
-    return true; 
+    return true;
 }
 
 bool Codegen::visit(const ast::DictLiteral& node) { return true; }
 
-bool Codegen::visit(const ast::ListOrDictAccess& node) { 
+bool Codegen::visit(const ast::ListOrDictAccess& node) {
     node.container()->accept(*this);
     write(".__getitem__(");
     node.keyOrIndex()[0]->accept(*this);
@@ -407,7 +407,7 @@ bool Codegen::visit(const ast::ListOrDictAccess& node) {
         node.keyOrIndex()[1]->accept(*this);
     }
     write(")");
-    return true; 
+    return true;
 }
 
 bool Codegen::visit(const ast::BinaryOperation& node) {
@@ -472,31 +472,40 @@ bool Codegen::visit(const ast::FunctionCall& node) {
     return true;
 }
 
-bool Codegen::visit(const ast::DotExpression& node) { 
+bool Codegen::visit(const ast::ArrowExpression& node) {
+    node.owner()->accept(*this);
+    write("->");
+    node.referenced()->accept(*this);
+    return true;
+}
+
+
+bool Codegen::visit(const ast::DotExpression& node) {
     //FIXME: Not very elegent
     if (not is_dot_exp){
-        is_dot_exp=true;
         if (node.owner()->type()==ast::KAstIdentifier){
             std::string name = std::dynamic_pointer_cast<ast::IdentifierExpression>(node.owner())->value();
             if(std::count(enum_name.begin(), enum_name.end(), name)){
                 write(name+"___");
-                node.referenced()->accept(*this); 
+                node.referenced()->accept(*this);
             }
             else if(name=="self" && is_class){
+                is_dot_exp=true;
                 write("this->");
                 node.referenced()->accept(*this);
             }
             else{
+                is_dot_exp=true;
                 node.owner()->accept(*this);
                 write(".");
-                node.referenced()->accept(*this);   
+                node.referenced()->accept(*this);
             }
-            is_dot_exp=false;
         }
         else {
+            if(node.owner()->type()!=ast::KAstDotExpression){is_dot_exp=true;}
             node.owner()->accept(*this);
             write(".");
-            node.referenced()->accept(*this); 
+            node.referenced()->accept(*this);
         }
         is_dot_exp=false;
     }
@@ -504,8 +513,8 @@ bool Codegen::visit(const ast::DotExpression& node) {
         node.owner()->accept(*this);
         write(".");
         node.referenced()->accept(*this);
-    }  
-    return true; 
+    }
+    return true;
 }
 
 bool Codegen::visit(const ast::IdentifierExpression& node) {
@@ -618,6 +627,7 @@ bool Codegen::visit(const ast::EnumLiteral& node){
     write("typedef enum{\n");
     auto fields=node.fields();
     std::string name=std::dynamic_pointer_cast<ast::IdentifierExpression>(node.name())->value();
+    //TODO:DO something for local enum
     enum_name.push_back(name);
     for (size_t i=0;i<fields.size();++i){
         auto field=fields[i];

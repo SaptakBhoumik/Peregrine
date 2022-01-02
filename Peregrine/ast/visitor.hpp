@@ -40,6 +40,7 @@ class AstVisitor {
     virtual bool visit(const PrefixExpression& node) { return false; };
     virtual bool visit(const FunctionCall& node) { return false; };
     virtual bool visit(const DotExpression& node) { return false; };
+    virtual bool visit(const ArrowExpression& node) { return false; };
     virtual bool visit(const IdentifierExpression& node) { return false; };
     virtual bool visit(const TypeExpression& node) { return false; };
     virtual bool visit(const ListTypeExpr& node) { return false; };
