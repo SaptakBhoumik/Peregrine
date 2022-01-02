@@ -35,7 +35,7 @@ class Codegen : public ast::AstVisitor {
     std::string mangleName(ast::AstNodePtr astNode);
 
     std::string searchDefaultModule(std::string path, std::string moduleName);
-    void codegenFuncParams(std::vector<ast::parameter> parameters);
+    void codegenFuncParams(std::vector<ast::parameter> parameters,size_t start=0);
     void magic_methord(ast::AstNodePtr& node,std::string name);
     void write_name(std::shared_ptr<ast::FunctionDefinition> node,std::string name,std::string virtual_static_inline="");
     void matchArg(std::vector<ast::AstNodePtr> matchItem,

@@ -21,24 +21,28 @@ def unknown_type(var):
 class iterate_test:
     i:int=0
     x:int
-    def __init__(c):
+    def __init__(self,c):
         self.i=c
         self.x=self.i
-    def __iter__()->int:
+    def __add__(self,item)->int:
+        return 0
+    def __neg__(self)->int:
+        return 0
+    def __iter__(self)->int:
         return self.x-1
-    def __iterate__()->int:
+    def __iterate__(self)->int:
         self.i=self.i-1
         return self.i
-    def __enter__()->int:
+    def __enter__(self)->int:
         return 6
-    def __contains__(y:int)->bool:
+    def __contains__(self,y:int)->bool:
         if y<self.x:
             return True
         else:
             return False
-    def __end__():
+    def __end__(self):
         printf("Context ended\n")
-    def __getitem__(index1:int,index2:int=0)->int:
+    def __getitem__(self,index1:int,index2:int=0)->int:
         return index1+index2
 enum colours:
     RED = 144,

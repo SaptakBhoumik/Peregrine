@@ -59,10 +59,10 @@ std::string Codegen::searchDefaultModule(std::string path,
     return "";
 }
 
-void Codegen::codegenFuncParams(std::vector<ast::parameter> parameters) {
+void Codegen::codegenFuncParams(std::vector<ast::parameter> parameters,size_t start) {
     if (parameters.size()) {
-        for (size_t i = 0; i < parameters.size(); ++i) {
-            if (i)
+        for (size_t i = start; i < parameters.size(); ++i) {
+            if (i-start)
                 write(", ");
             if (parameters[i].p_type->type()==ast::KAstNoLiteral){
                 write("auto");
@@ -489,11 +489,6 @@ bool Codegen::visit(const ast::DotExpression& node) {
                 write(name+"___");
                 node.referenced()->accept(*this);
             }
-            else if(name=="self" && is_class){
-                is_dot_exp=true;
-                write("this->");
-                node.referenced()->accept(*this);
-            }
             else{
                 is_dot_exp=true;
                 node.owner()->accept(*this);
@@ -521,12 +516,7 @@ bool Codegen::visit(const ast::IdentifierExpression& node) {
     if (is_enum){
         write(enum_name.back()+"___");
     }
-    if(is_class && not is_dot_exp && node.value()=="self"){
-        write("*this");
-    }
-    else{
-        write(node.value());
-    }
+    write(node.value());
     return true;
 }
 
