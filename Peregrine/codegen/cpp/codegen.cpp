@@ -143,11 +143,42 @@ bool Codegen::visit(const ast::VariableStatement& node) {
         write(" ");
     }
 
-    node.name()->accept(*this);
+    //TODO: We are getting this if input is a.b->u[9].h=9. Is is valid?
+    //a.b->u.__getitem__(9).h = 9;
 
-    if (node.value()->type() != ast::KAstNoLiteral) {
-        write(" = ");
-        node.value()->accept(*this);
+    ast::AstNodePtr name=node.name();
+    while(name->type()==ast::KAstDotExpression){
+      std::shared_ptr<ast::DotExpression> dot_exp=std::dynamic_pointer_cast<ast::DotExpression>(name);
+      dot_exp->owner()->accept(*this);
+      write(".");
+      name=dot_exp->referenced();
+    }
+    while(name->type()==ast::KAstArrowExpression){
+      std::shared_ptr<ast::ArrowExpression> arrow_exp=std::dynamic_pointer_cast<ast::ArrowExpression>(name);
+      arrow_exp->owner()->accept(*this);
+      write("->");
+      name=arrow_exp->referenced();
+    }
+
+    if (name->type()==ast::KAstListOrDictAccess){
+      std::shared_ptr<ast::ListOrDictAccess> access_exp=std::dynamic_pointer_cast<ast::ListOrDictAccess>(name);
+      access_exp->container()->accept(*this);
+      write(".__getitem__(");
+      access_exp->keyOrIndex()[0]->accept(*this);
+      if(access_exp->keyOrIndex().size()==2){
+          write(",");
+          access_exp->keyOrIndex()[1]->accept(*this);
+      }
+      write(",");
+      node.value()->accept(*this);
+      write(")");
+    }
+    else{
+      name->accept(*this);
+      if (node.value()->type() != ast::KAstNoLiteral) {
+          write(" = ");
+          node.value()->accept(*this);
+      }
     }
     return true;
 }

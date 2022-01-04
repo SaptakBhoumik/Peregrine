@@ -62,14 +62,14 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
             var+=res;
             res="";
             ast::AstNodePtr member=exp->referenced();
-            while(member->type()==ast::KAstDotExpression){
-                auto curr = std::dynamic_pointer_cast<ast::DotExpression>(member);
-                curr->owner()->accept(*this);
-                write(".");
-                var+=res;
-                res="";
-                member=curr->referenced();
-            }
+//            while(member->type()==ast::KAstDotExpression){
+//                auto curr = std::dynamic_pointer_cast<ast::DotExpression>(member);
+//                curr->owner()->accept(*this);
+//                write(".");
+//                var+=res;
+//                res="";
+//                member=curr->referenced();
+//            }
             if (member->type()==ast::KAstIdentifier){
                 member->accept(*this);
                 var+=res+"("+contains+")";

@@ -8,7 +8,6 @@ enum TokenType {
     tk_eof, // end of file
     // Some operators
     tk_plus,       // +
-    tk_underscore, // _
     tk_at,         // @
     tk_negative,   // negative number
     tk_minus,      // -

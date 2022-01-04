@@ -389,13 +389,21 @@ AstNodePtr Parser::parseVariableStatement() {
         advance();
     }
 
-    else if (m_currentToken.tkType == tk_dot) {
+    while (m_currentToken.tkType == tk_dot) {
         name = parseDotExpression(name);
         advance();
+        while (m_currentToken.tkType == tk_arrow) {
+            name = parseArrowExpression(name);
+            advance();
+        }
     }
-    else if (m_currentToken.tkType == tk_arrow) {
+    while (m_currentToken.tkType == tk_arrow) {
         name = parseArrowExpression(name);
         advance();
+        while (m_currentToken.tkType == tk_dot) {
+            name = parseDotExpression(name);
+            advance();
+        }
     }
     AstNodePtr value = std::make_shared<NoLiteral>();
 
@@ -704,7 +712,10 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
                 left = parseFunctionCall(left);
                 break;
             }
-
+//            case tk_if:{
+//                left = parseSingleIf(left);
+//                break;
+//            }
             case tk_list_open: {
                 left = parseListOrDictAccess(left);
                 break;
@@ -777,6 +788,7 @@ AstNodePtr Parser::parseListOrDictAccess(AstNodePtr left) {
     std::vector<AstNodePtr> keyOrIndex;
     keyOrIndex.push_back(parseExpression());
     //array slicing
+
     if(next().tkType==tk_colon){
         advance();
         advance();
@@ -967,7 +979,7 @@ AstNodePtr Parser::parseMatch() {
         advance();
         std::vector<AstNodePtr> cases_arg;
         while (m_currentToken.tkType != tk_colon) {
-            if (m_currentToken.tkType == tk_underscore) {
+            if (m_currentToken.keyword == "_") {
                 cases_arg.push_back(std::make_shared<NoLiteral>());
             } else {
                 cases_arg.push_back(parseExpression());

@@ -60,7 +60,7 @@ def main():
     x:bool=False
     const cc:bool =False
     x=True
-    y:bool 
+    y:bool
     y=True
     if x==y:
         pass
@@ -73,10 +73,10 @@ def main():
             printf("a is 5,b is 7 and c is 8")
         case 4,7,_:#c can be anything
             printf("a is 4 but b is 7")
-            break  #we dont want default to execute 
+            break  #we dont want default to execute
         case 4,_,7:#b can be anything
             printf("a is 4 but c is 7")
-            break  #we dont want default to execute 
+            break  #we dont want default to execute
         case 8,_:#b and c can be anything
             printf("a is 8")
         case _:
