@@ -82,6 +82,8 @@ std::map<TokenType, PrecedenceType> createMap() {
     precedenceMap[tk_ampersand] = pr_prefix;
     precedenceMap[tk_negative] = pr_prefix;
     precedenceMap[tk_bit_not] = pr_prefix;
+    precedenceMap[tk_if] = pr_conditional;
+    precedenceMap[tk_else] = pr_conditional;
     precedenceMap[tk_and] = pr_and_or;
     precedenceMap[tk_or] = pr_and_or;
     precedenceMap[tk_not] = pr_not;

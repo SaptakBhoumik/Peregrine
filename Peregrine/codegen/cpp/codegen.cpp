@@ -269,9 +269,9 @@ bool Codegen::visit(const ast::ForStatement& node) {
             auto x=node.variable()[i];
             write("auto ");
             x->accept(*this);
-            write("=____PEREGRINE____TEMP[");
+            write("=____PEREGRINE____TEMP.__getitem__(");
             write(std::to_string(i));
-            write("];\n");
+            write(");\n");
         }
     }
     node.body()->accept(*this);
@@ -776,6 +776,15 @@ bool Codegen::visit(const ast::ExportStatement& node){
     //dont mangle this name
     write("extern \"C\" ");
     node.body()->accept(*this);
+    return true;
+}
+bool Codegen::visit(const ast::TernaryIf& node){
+    write("(");
+    node.if_condition()->accept(*this);
+    write(")?");
+    node.if_value()->accept(*this);
+    write(":");
+    node.else_value()->accept(*this);
     return true;
 }
 } // namespace cpp

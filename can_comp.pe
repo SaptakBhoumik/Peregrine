@@ -189,5 +189,10 @@ def main():
     cast_test:int =9
     printf("Value is %f\n",cast<float>(cast_test))
     printf("%d\n",divide(6,2))
+    TernaryIf:int=5 if True else 6
+    assert TernaryIf==5
+    TernaryIf=5 if False else 6
+    assert TernaryIf==6
+
     #should terminate the program
     #printf("%d",divide(6,0))

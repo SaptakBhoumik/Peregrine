@@ -182,7 +182,7 @@ AstNodePtr Parser::parseStatement() {
                 // variable
                 stmt = parseVariableStatement();
                 break;
-            } else if ((next().tkType == tk_dot||next().tkType == tk_arrow) && is_imported_var()) {
+            } else if ((next().tkType == tk_dot||next().tkType == tk_list_open||next().tkType == tk_arrow) && is_imported_var()) {
                 stmt = parseVariableStatement();
                 break;
             }
@@ -388,22 +388,29 @@ AstNodePtr Parser::parseVariableStatement() {
         varType = parseType();
         advance();
     }
-
-    while (m_currentToken.tkType == tk_dot) {
-        name = parseDotExpression(name);
+    else{
+      if(m_currentToken.tkType==tk_list_open){
+        name=parseListOrDictAccess(name);
         advance();
-        while (m_currentToken.tkType == tk_arrow) {
-            name = parseArrowExpression(name);
-            advance();
-        }
-    }
-    while (m_currentToken.tkType == tk_arrow) {
-        name = parseArrowExpression(name);
-        advance();
+      }
+      else{
         while (m_currentToken.tkType == tk_dot) {
             name = parseDotExpression(name);
             advance();
+            while (m_currentToken.tkType == tk_arrow) {
+                name = parseArrowExpression(name);
+                advance();
+            }
         }
+        while (m_currentToken.tkType == tk_arrow) {
+            name = parseArrowExpression(name);
+            advance();
+            while (m_currentToken.tkType == tk_dot) {
+                name = parseDotExpression(name);
+                advance();
+            }
+        }
+      }
     }
     AstNodePtr value = std::make_shared<NoLiteral>();
 
@@ -712,10 +719,10 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
                 left = parseFunctionCall(left);
                 break;
             }
-//            case tk_if:{
-//                left = parseSingleIf(left);
-//                break;
-//            }
+           case tk_if:{
+               left = parseTernaryIf(left);
+               break;
+           }
             case tk_list_open: {
                 left = parseListOrDictAccess(left);
                 break;
@@ -797,20 +804,7 @@ AstNodePtr Parser::parseListOrDictAccess(AstNodePtr left) {
     expect(tk_list_close);
 
     AstNodePtr node = std::make_shared<ListOrDictAccess>(tok, left, keyOrIndex);
-
-    if (next().tkType != tk_assign || is_dot_arrow_exp)
-        return node;
-
-    // parsing variable statements in 2 different places, is this really ideal?
-
-    advance();
-    advance();
-
-    AstNodePtr newValue = parseExpression();
-    advanceOnNewLine();
-
-    return std::make_shared<VariableStatement>(
-        tok, std::make_shared<NoLiteral>(), node, newValue);
+    return node;
 }
 
 AstNodePtr Parser::parseDotExpression(AstNodePtr left) {
@@ -1220,4 +1214,13 @@ AstNodePtr Parser::parseArrowExpression(AstNodePtr left) {
         referenced = parseExpression(currentPrecedence);
     }
     return std::make_shared<ArrowExpression>(tok, left, referenced);
+}
+AstNodePtr Parser::parseTernaryIf(AstNodePtr left){
+    auto tok=m_currentToken;
+    advance();
+    AstNodePtr if_condition=parseExpression(pr_conditional);
+    expect(tk_else);
+    advance();
+    AstNodePtr else_value=parseExpression(pr_conditional);
+    return std::make_shared<TernaryIf>(tok,left,if_condition,else_value);
 }

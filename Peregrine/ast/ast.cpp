@@ -1272,4 +1272,21 @@ std::string ArrowExpression::stringify() const {
     return res;
 }
 
+TernaryIf::TernaryIf(Token token,AstNodePtr if_value,AstNodePtr if_condition,AstNodePtr else_value){
+  m_token=token;
+  m_if_value=if_value;
+  m_if_condition=if_condition;
+  m_else_value=else_value;
+}
+AstNodePtr TernaryIf::if_value() const{return m_if_value;}
+AstNodePtr TernaryIf::if_condition() const{return m_if_condition;}
+AstNodePtr TernaryIf::else_value() const{return m_else_value;}
+Token TernaryIf::token() const{return m_token;}
+AstKind TernaryIf::type() const{return KAstTernaryIf;}
+std::string TernaryIf::stringify() const{
+  std::string res=m_if_value->stringify()+" if("+m_if_value->stringify()+") else "+m_else_value->stringify();
+  return res;
+}
+
+
 } // namespace ast

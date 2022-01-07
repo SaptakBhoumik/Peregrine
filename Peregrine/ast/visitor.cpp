@@ -154,5 +154,7 @@ void PointerTypeExpr::accept(AstVisitor& visitor) const { visitor.visit(*this); 
 
 void DefaultArg::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
+void TernaryIf::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+
 
 } // namespace ast

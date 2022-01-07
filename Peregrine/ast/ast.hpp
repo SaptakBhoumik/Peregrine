@@ -61,6 +61,7 @@ enum AstKind {
     KAstCast,
     KAstDefaultArg,
     KAstExport,
+    KAstTernaryIf
 };
 
 class AstVisitor;
@@ -939,6 +940,22 @@ class ArrowExpression : public AstNode {
     AstKind type() const;
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
+};
+class TernaryIf : public AstNode {
+    Token m_token;
+    AstNodePtr m_if_value;
+    AstNodePtr m_if_condition;
+    AstNodePtr m_else_value;
+  public:
+    TernaryIf(Token token,AstNodePtr if_value,AstNodePtr if_condition,AstNodePtr else_value);
+    AstNodePtr if_value() const;
+    AstNodePtr if_condition() const;
+    AstNodePtr else_value() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+
 };
 } // namespace ast
 

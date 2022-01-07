@@ -1,3 +1,60 @@
-a[7]=3
-a.b.b[9]=9
-a.b->u[9].h=9
+def test(a,b):
+    pass
+for x in y:
+    for i , j in x:
+        pass
+
+a = 23
+test = &a
+
+b = *test + 56
+
+arr = [2, 65]
+def hey(a: [2]int):
+    2 + 4
+
+hey(arr)
+with c:
+    pass
+with x as c:
+    pass
+with x as c,y as u:
+    pass
+class test(parent1,parent2):
+    "multi line
+    comment"
+    "test"
+    a :float = 5.6
+    b :int = cast<int>(a)+8
+    c:*int=&b
+    static d=0
+    union gg:
+        x:int
+        y:int
+    class nested_class:
+        a=8
+    def sub(a:int,b:int) -> int:
+        return self.a - self.b
+    inline def div():
+        return self.a / self.b
+    static inline def pow():
+        return self.a ** self.b
+    virtual def multi(a:int,b:int) -> int:
+        return self.a * self.b
+
+def test_x(a=0,b:int=9):
+    pass
+test_x(a=8,b=7)
+
+static const gg=5
+static const gg:int=5
+
+export def test2():
+    pass
+
+union n:
+  "comment1"
+  "comment""comment
+  comment"
+  g:int
+x = 3 if a==2 else 0
