@@ -450,7 +450,6 @@ AstNodePtr Parser::parseIf() {
 
     expect(tk_colon);
 
-    // TODO: maybe support single-line ifs
     AstNodePtr ifBody;
     auto line=m_currentToken.line;
     if(next().tkType!=tk_ident && next().line==line){
