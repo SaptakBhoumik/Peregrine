@@ -344,7 +344,7 @@ AstNodePtr Parser::parseImport() {
 
             moduleName.second = parseName();
         }
-        // advance on new line?
+        advanceOnNewLine();
         return std::make_shared<ImportStatement>(tok, moduleName,
                                                  importedSymbols);
     }
@@ -451,10 +451,18 @@ AstNodePtr Parser::parseIf() {
     expect(tk_colon);
 
     // TODO: maybe support single-line ifs
-    expect(tk_ident);
-
-    AstNodePtr ifBody = parseBlockStatement();
-
+    AstNodePtr ifBody;
+    auto line=m_currentToken.line;
+    if(next().tkType!=tk_ident && next().line==line){
+      advance();
+      std::vector<AstNodePtr> x;
+      x.push_back(parseStatement());
+      ifBody = std::make_shared<BlockStatement>(x);
+    }
+    else{
+      expect(tk_ident);
+      ifBody = parseBlockStatement();
+    }
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs;
 
     while (next().tkType == tk_elif) {
@@ -464,9 +472,18 @@ AstNodePtr Parser::parseIf() {
         AstNodePtr condition = parseExpression();
 
         expect(tk_colon);
-        expect(tk_ident);
-
-        AstNodePtr body = parseBlockStatement();
+        AstNodePtr body;
+        auto line=m_currentToken.line;
+        if(next().tkType!=tk_ident && next().line==line){
+          advance();
+          std::vector<AstNodePtr> x;
+          x.push_back(parseStatement());
+          body = std::make_shared<BlockStatement>(x);
+        }
+        else{
+          expect(tk_ident);
+          body = parseBlockStatement();
+        }
 
         elifs.push_back(std::pair(condition, body));
     }
@@ -475,11 +492,19 @@ AstNodePtr Parser::parseIf() {
 
     if (next().tkType == tk_else) {
         advance();
-
         expect(tk_colon);
-        expect(tk_ident);
+        auto line=m_currentToken.line;
+        if(next().tkType!=tk_ident && next().line==line){
+          advance();
+          std::vector<AstNodePtr> x;
+          x.push_back(parseStatement());
+          elseBody = std::make_shared<BlockStatement>(x);
+        }
+        else{
+          expect(tk_ident);
+          elseBody = parseBlockStatement();
+        }
 
-        elseBody = parseBlockStatement();
     }
 
     return std::make_shared<IfStatement>(tok, condition, ifBody, elseBody,
@@ -489,12 +514,19 @@ AstNodePtr Parser::parseIf() {
 AstNodePtr Parser::parseScope() {
     Token tok = m_currentToken;
     expect(tk_colon);
-
-    // TODO:  support single-line scope
-    expect(tk_ident);
-
-    AstNodePtr scope_body = parseBlockStatement();
-    return std::make_shared<ScopeStatement>(tok, scope_body);
+    AstNodePtr body;
+    auto line=m_currentToken.line;
+    if(next().tkType!=tk_ident && next().line==line){
+      advance();
+      std::vector<AstNodePtr> x;
+      x.push_back(parseStatement());
+      body = std::make_shared<BlockStatement>(x);
+    }
+    else{
+      expect(tk_ident);
+      body = parseBlockStatement();
+    }
+    return std::make_shared<ScopeStatement>(tok, body);
 }
 
 AstNodePtr Parser::parseWhile() {
@@ -504,9 +536,18 @@ AstNodePtr Parser::parseWhile() {
     AstNodePtr condition = parseExpression();
 
     expect(tk_colon);
-    expect(tk_ident);
-
-    AstNodePtr body = parseBlockStatement();
+    AstNodePtr body;
+    auto line=m_currentToken.line;
+    if(next().tkType!=tk_ident && next().line==line){
+      advance();
+      std::vector<AstNodePtr> x;
+      x.push_back(parseStatement());
+      body = std::make_shared<BlockStatement>(x);
+    }
+    else{
+      expect(tk_ident);
+      body = parseBlockStatement();
+    }
 
     return std::make_shared<WhileStatement>(tok, condition, body);
 }
@@ -528,11 +569,19 @@ AstNodePtr Parser::parseFor() {
     advance();
 
     AstNodePtr sequence = parseExpression();
-
     expect(tk_colon);
-    expect(tk_ident);
-
-    AstNodePtr body = parseBlockStatement();
+    AstNodePtr body;
+    auto line=m_currentToken.line;
+    if(next().tkType!=tk_ident && next().line==line){
+      advance();
+      std::vector<AstNodePtr> x;
+      x.push_back(parseStatement());
+      body = std::make_shared<BlockStatement>(x);
+    }
+    else{
+      expect(tk_ident);
+      body = parseBlockStatement();
+    }
 
     return std::make_shared<ForStatement>(tok, variable, sequence, body);
 }
@@ -586,14 +635,23 @@ AstNodePtr Parser::parseFunctionDef() {
 
         returnType = parseType();
     }
-
-    expect(tk_colon);
-    expect(tk_ident);
     std::string comment;
-    if (next().tkType==tk_string){
-      comment=next().keyword;
+    expect(tk_colon);
+    size_t line=m_currentToken.line;
+    AstNodePtr body;
+    if(next().tkType!=tk_ident && next().line==line){
+      advance();
+      std::vector<AstNodePtr> x;
+      x.push_back(parseStatement());
+      body = std::make_shared<BlockStatement>(x);
     }
-    AstNodePtr body = parseBlockStatement();
+    else{
+      expect(tk_ident);
+      if (next().tkType==tk_string){
+        comment=next().keyword;
+      }
+      body = parseBlockStatement();
+    }
     return std::make_shared<FunctionDefinition>(tok, returnType, name,
                                                 parameters, body,comment);
 }
@@ -983,8 +1041,18 @@ AstNodePtr Parser::parseMatch() {
                 advance();
             }
         }
-        expect(tk_ident);
-        AstNodePtr body = parseBlockStatement();
+        AstNodePtr body;
+        size_t line=m_currentToken.line;
+        if(next().tkType!=tk_ident && next().line==line){
+            advance();
+            std::vector<AstNodePtr> x;
+            x.push_back(parseStatement());
+            body = std::make_shared<BlockStatement>(x);
+        }
+        else{
+            expect(tk_ident);
+            body = parseBlockStatement();
+        }
         cases.push_back(
             std::pair<std::vector<AstNodePtr>, AstNodePtr>(cases_arg, body));
     }
@@ -993,9 +1061,17 @@ AstNodePtr Parser::parseMatch() {
     if (next().tkType == tk_default) {
         advance();
         expect(tk_colon);
-        expect(tk_ident);
-
-        default_body = parseBlockStatement();
+        size_t line=m_currentToken.line;
+        if(next().tkType!=tk_ident && next().line==line){
+            advance();
+            std::vector<AstNodePtr> x;
+            x.push_back(parseStatement());
+            default_body = std::make_shared<BlockStatement>(x);
+        }
+        else{
+            expect(tk_ident);
+            default_body = parseBlockStatement();
+        }
     }
     expect(tk_dedent);
     return std::make_shared<MatchStatement>(tok, toMatch, cases, default_body);
@@ -1067,7 +1143,10 @@ AstNodePtr Parser::parseEnum() {
     advance();
     AstNodePtr enum_name = parseName();
     expect(tk_colon);
-    expect(tk_ident);
+    auto line=m_currentToken.line;
+    TokenType stopat=tk_dedent;
+    if(next().tkType!=tk_ident && next().line==line){stopat=tk_new_line;}
+    else{expect(tk_ident);}
     advance();
     std::string comment;
     if (m_currentToken.tkType==tk_string){
@@ -1076,26 +1155,27 @@ AstNodePtr Parser::parseEnum() {
     std::vector<std::pair<AstNodePtr, AstNodePtr>> fields;
     AstNodePtr val;
 
-    while (m_currentToken.tkType != tk_dedent) {
+    while (m_currentToken.tkType != stopat) {
         while(m_currentToken.tkType==tk_string){
           advance();
           if(m_currentToken.tkType==tk_new_line){advance();}
         }
         AstNodePtr name = parseName();
         advance();
-
         if (m_currentToken.tkType == tk_assign) {
             advance();
             val = parseExpression();
         } else {
             val = std::make_shared<NoLiteral>();
         }
-        advance();
+        if(stopat==tk_dedent){
+          advance();
+        }
         fields.push_back(std::pair(name, val));
         if (m_currentToken.tkType == tk_comma) {
             advance();
         }
-        if (m_currentToken.tkType == tk_new_line) {
+        if (m_currentToken.tkType == tk_new_line && m_currentToken.tkType!=stopat) {
             advance();
         }
     }
@@ -1164,8 +1244,17 @@ AstNodePtr Parser::parseWith() {
             advance();
         }
     }
-    advance();
-    body = parseBlockStatement();
+    size_t line=m_currentToken.line;
+    if(next().tkType!=tk_ident && next().line==line){
+      advance();
+      std::vector<AstNodePtr> x;
+      x.push_back(parseStatement());
+      body = std::make_shared<BlockStatement>(x);
+    }
+    else{
+      expect(tk_ident);
+      body = parseBlockStatement();
+    }
     return std::make_shared<WithStatement>(tok, variables, values, body);
 }
 

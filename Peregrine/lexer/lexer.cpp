@@ -400,7 +400,7 @@ LEXEME lexer(std::string src, std::string filename) {
                 token = token_init(
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
-                    start_index, current_index - 1, line);
+                    start_index, current_index - 1, line-1);
                 if (token.tkType == tk_not &&
                     tokens[tokens.size() - 1].tkType == tk_is) {
                     tokens[tokens.size() - 1].tkType = tk_is_not;
@@ -1096,5 +1096,6 @@ LEXEME lexer(std::string src, std::string filename) {
         tokens.push_back(
             token_init("", "", tk_eof, current_index, current_index, line));
     }
+    else{exit(1);}
     return tokens;
 }

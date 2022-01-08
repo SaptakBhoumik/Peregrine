@@ -39,7 +39,7 @@ std::string Codegen::write(std::string_view code) {
         res+=code;
     }
     else{
-        m_file << code; 
+        m_file << code;
     }
     return res;
 }
@@ -74,7 +74,7 @@ bool Codegen::visit(const ast::Program& node) {
     for (auto& stmt : node.statements()) {
         stmt->accept(*this);
         write(";\n"); // TODO: will this break stuff later?
-                     // no 
+                     // no
     }
     return true;
 }
@@ -137,13 +137,13 @@ bool Codegen::visit(const ast::VariableStatement& node) {
     return true;
 }
 
-bool Codegen::visit(const ast::ConstDeclaration& node) { 
-    write("const "); 
+bool Codegen::visit(const ast::ConstDeclaration& node) {
+    write("const ");
     write(" ");
     node.name()->accept(*this);
     write("=");
     node.value()->accept(*this);
-    return true; 
+    return true;
     }
 
 bool Codegen::visit(const ast::TypeDefinition& node) {
@@ -321,7 +321,7 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
 }
 
 
-bool Codegen::visit(const ast::ListLiteral& node) { 
+bool Codegen::visit(const ast::ListLiteral& node) {
     write("[");
     auto elements=node.elements();
     if (elements.size()>0){
@@ -336,7 +336,7 @@ bool Codegen::visit(const ast::ListLiteral& node) {
     return true;
 }
 
-bool Codegen::visit(const ast::DictLiteral& node) { 
+bool Codegen::visit(const ast::DictLiteral& node) {
     auto elements=node.elements();
     write("{");
     if (elements.size()>0){
@@ -350,10 +350,10 @@ bool Codegen::visit(const ast::DictLiteral& node) {
         }
     }
     write("}");
-    return true; 
+    return true;
 }
 
-bool Codegen::visit(const ast::ListOrDictAccess& node) { 
+bool Codegen::visit(const ast::ListOrDictAccess& node) {
     node.container()->accept(*this);
     write("[");
     node.keyOrIndex()[0]->accept(*this);//TODO: Wont work in the future
@@ -421,7 +421,7 @@ bool Codegen::visit(const ast::FunctionCall& node) {
     return true;
 }
 
-bool Codegen::visit(const ast::DotExpression& node) { 
+bool Codegen::visit(const ast::DotExpression& node) {
     //FIXME: Not very elegent
     if (not is_dot_exp){
         is_dot_exp=true;
@@ -429,19 +429,19 @@ bool Codegen::visit(const ast::DotExpression& node) {
             std::string name = std::dynamic_pointer_cast<ast::IdentifierExpression>(node.owner())->value();
             if(std::count(enum_name.begin(), enum_name.end(), name)){
                 write(name+"___");
-                node.referenced()->accept(*this); 
+                node.referenced()->accept(*this);
             }
             else{
                 node.owner()->accept(*this);
                 write(".");
-                node.referenced()->accept(*this);   
+                node.referenced()->accept(*this);
             }
         is_dot_exp=false;
         }
         else {
             node.owner()->accept(*this);
             write(".");
-            node.referenced()->accept(*this); 
+            node.referenced()->accept(*this);
         }
         is_dot_exp=false;
     }
@@ -449,8 +449,8 @@ bool Codegen::visit(const ast::DotExpression& node) {
         node.owner()->accept(*this);
         write(".");
         node.referenced()->accept(*this);
-    }  
-    return true; 
+    }
+    return true;
 }
 
 bool Codegen::visit(const ast::IdentifierExpression& node) {
@@ -545,6 +545,20 @@ bool Codegen::visit(const ast::EnumLiteral& node){
         prev_element=field.first;
         write(";\n");
     }
+    return true;
+}
+bool Codegen::visit(const ast::ExportStatement& node){
+    //dont mangle this name
+    node.body()->accept(*this);
+    return true;
+}
+bool Codegen::visit(const ast::TernaryIf& node){
+    write("(");
+    node.if_condition()->accept(*this);
+    write(")?");
+    node.if_value()->accept(*this);
+    write(":");
+    node.else_value()->accept(*this);
     return true;
 }
 } // namespace js

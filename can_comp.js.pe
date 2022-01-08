@@ -93,3 +93,7 @@ def main():
     #printf("%d",divide(6,0))
     color:colours = colours.RED
     print("Enum is " , color)
+    TernaryIf:int=5 if True else 6
+    assert TernaryIf==5
+    TernaryIf=5 if False else 6
+    assert TernaryIf==6

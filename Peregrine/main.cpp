@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
 
         for (auto& token : tokens) {
             std::cout << "Keyword= " << token.keyword
-                      << " Type= " << token.tkType << "\n";
+                      << " Type= " << token.tkType <<" Line= "<<token.line<< "\n";
         }
 
         Parser parser(tokens);

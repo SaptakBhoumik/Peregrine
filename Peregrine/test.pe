@@ -1,3 +1,5 @@
+while True:#Infinite loop lol
+  pass
 def test(a,b):
     pass
 for x in y:
@@ -58,3 +60,20 @@ union n:
   comment"
   g:int
 x = 3 if a==2 else 0
+scope:
+  pass
+def v():pass
+for x in y:pass
+while True:pass
+scope:pass
+if True:pass
+elif False:pass
+elif True:pass
+else:pass
+enum b:x,h=0
+with x as y:pass
+match x:
+    case t:
+        pass
+    case y:pass
+    default:pass
