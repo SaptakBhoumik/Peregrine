@@ -191,7 +191,9 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
     std::map<std::string,std::string> overloaded_unary_op={
                                                     {"__neg__","-"},
                                                     {"__invert__","+"},
-                                                    {"__not__"," not"}
+                                                    {"__not__"," not"},
+                                                    {"__increment__","++"},
+                                                    {"__decrement__","--"}
                                                     };
     if (overloaded_binary_op.count(name)>0 && node->parameters().size()==2 && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
         //TODO: Dont declare it twice

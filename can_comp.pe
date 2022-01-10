@@ -128,6 +128,8 @@ def main():
     printf("arrow_test->i=%d\n",arrow_test->i)
     exported_func()
     unknown_type(iterate_test(6))
+    for x in iterate_test(6):
+        printf("Item is %d\n",x)
     enum_test:colours=colours.RED
     static_inline_func()
     inline_func()
@@ -193,6 +195,10 @@ def main():
     assert TernaryIf==5
     TernaryIf=5 if False else 6
     assert TernaryIf==6
-
+    r:int=3
+    r--
+    assert r==2
+    r++
+    assert r==3
     #should terminate the program
     #printf("%d",divide(6,0))

@@ -67,6 +67,7 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::ListOrDictAccess& node);
     bool visit(const ast::BinaryOperation& node);
     bool visit(const ast::PrefixExpression& node);
+    bool visit(const ast::PostfixExpression& node);
     bool visit(const ast::FunctionCall& node);
     bool visit(const ast::DotExpression& node);
     bool visit(const ast::ArrowExpression& node);

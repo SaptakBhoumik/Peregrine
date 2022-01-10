@@ -29,6 +29,7 @@ enum AstKind {
     KAstCpp,
     KAstBinaryOp,
     KAstPrefixExpr,
+    KAstPostfixExpr,
     KAstListOrDictAccess,
     KAstImportStmt,
     KAstVariableStmt,
@@ -392,6 +393,23 @@ class PrefixExpression : public AstNode {
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
 };
+class PostfixExpression : public AstNode {
+    Token m_token;
+    Token m_postfix;
+    AstNodePtr m_left;
+
+  public:
+    PostfixExpression(Token tok, Token postfix, AstNodePtr left);
+
+    Token postfix() const;
+    AstNodePtr left() const;
+
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
 
 class ListOrDictAccess : public AstNode {
     Token m_token;

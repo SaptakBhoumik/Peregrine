@@ -320,6 +320,28 @@ std::string PrefixExpression::stringify() const {
 
     return res;
 }
+PostfixExpression::PostfixExpression(Token tok, Token postfix, AstNodePtr left) {
+    m_token = tok;
+    m_postfix = postfix;
+    m_left = left;
+}
+Token PostfixExpression::postfix() const { return m_postfix; }
+
+AstNodePtr PostfixExpression::left() const { return m_left; }
+
+Token PostfixExpression::token() const { return m_token; }
+
+AstKind PostfixExpression::type() const { return KAstPostfixExpr; }
+
+std::string PostfixExpression::stringify() const {
+    std::string res = "(" + m_left->stringify();
+
+    res += m_postfix.keyword;
+
+    res += ")";
+
+    return res;
+}
 
 ListOrDictAccess::ListOrDictAccess(Token tok, AstNodePtr container,
                                    std::vector<AstNodePtr> keyOrIndex) {

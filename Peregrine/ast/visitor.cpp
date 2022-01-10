@@ -54,7 +54,9 @@ void BinaryOperation::accept(AstVisitor& visitor) const {
 void PrefixExpression::accept(AstVisitor& visitor) const {
     visitor.visit(*this);
 }
-
+void PostfixExpression::accept(AstVisitor& visitor) const {
+    visitor.visit(*this);
+}
 void ListOrDictAccess::accept(AstVisitor& visitor) const {
     visitor.visit(*this);
 }

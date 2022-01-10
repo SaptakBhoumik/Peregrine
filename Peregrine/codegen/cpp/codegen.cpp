@@ -163,7 +163,7 @@ bool Codegen::visit(const ast::VariableStatement& node) {
     if (name->type()==ast::KAstListOrDictAccess){
       std::shared_ptr<ast::ListOrDictAccess> access_exp=std::dynamic_pointer_cast<ast::ListOrDictAccess>(name);
       access_exp->container()->accept(*this);
-      write(".__getitem__(");
+      write(".__assignitem__(");
       access_exp->keyOrIndex()[0]->accept(*this);
       if(access_exp->keyOrIndex().size()==2){
           write(",");
@@ -251,20 +251,17 @@ bool Codegen::visit(const ast::WhileStatement& node) {
 }
 
 bool Codegen::visit(const ast::ForStatement& node) {
-    write("for (size_t ____PEREGRINE____i=0;____PEREGRINE____i<");
+    write("auto ____PEREGRINE____VALUE=");
     node.sequence()->accept(*this);
-    write(".__iter__();++____PEREGRINE____i){\n");
+    write(";\n");
+    write("for (size_t ____PEREGRINE____i=0;____PEREGRINE____i<____PEREGRINE____VALUE.__iter__();++____PEREGRINE____i){\n");
     if (node.variable().size()==1){
         write("auto ");
         node.variable()[0]->accept(*this);
-        write("=");
-        node.sequence()->accept(*this);
-        write(".__iterate__();\n");
+        write("=____PEREGRINE____VALUE.__iterate__();\n");
     }
     else{
-        write("auto ____PEREGRINE____TEMP=");
-        node.sequence()->accept(*this);
-        write(".__iterate__();\n");
+        write("auto ____PEREGRINE____TEMP=____PEREGRINE____VALUE.__iterate__();\n");
         for (size_t i=0;i<node.variable().size();++i){
             auto x=node.variable()[i];
             write("auto ");
@@ -485,7 +482,11 @@ bool Codegen::visit(const ast::PrefixExpression& node) {
     write(")");
     return true;
 }
-
+bool Codegen::visit(const ast::PostfixExpression& node) {
+    node.left()->accept(*this);
+    write(node.postfix().keyword);
+    return true;
+}
 bool Codegen::visit(const ast::FunctionCall& node) {
     node.name()->accept(*this);
     write("(");

@@ -113,6 +113,8 @@ std::map<TokenType, PrecedenceType> createMap() {
     precedenceMap[tk_arrow] = pr_dot_arrow_ref;
     precedenceMap[tk_list_open] = pr_list_access;
     precedenceMap[tk_l_paren] = pr_call;
+    precedenceMap[tk_increment] = pr_postfix;
+    precedenceMap[tk_decrement] = pr_postfix;
 
     return precedenceMap;
 }

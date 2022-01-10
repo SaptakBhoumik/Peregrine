@@ -794,7 +794,11 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
                 left = parseArrowExpression(left);
                 break;
             }
-
+            case tk_increment:
+            case tk_decrement:{
+                left = parsePostfixExpression(left);
+                break;
+            }
             default: {
                 left = parseBinaryOperation(left);
                 break;
@@ -870,14 +874,7 @@ AstNodePtr Parser::parseDotExpression(AstNodePtr left) {
     advance();
     AstNodePtr referenced;
     // TODO: validate output of parseExpression
-    if (not is_dot_arrow_exp){
-        is_dot_arrow_exp=true;
-        referenced = parseExpression(currentPrecedence);
-        is_dot_arrow_exp=false;
-    }
-    else{
-        referenced = parseExpression(currentPrecedence);
-    }
+    referenced = parseExpression(currentPrecedence);
     return std::make_shared<DotExpression>(tok, left, referenced);
 }
 
@@ -890,6 +887,11 @@ AstNodePtr Parser::parsePrefixExpression() {
     AstNodePtr right = parseExpression(precedence);
 
     return std::make_shared<PrefixExpression>(prefix, prefix, right);
+}
+
+AstNodePtr Parser::parsePostfixExpression(AstNodePtr left) {
+    Token prefix = m_currentToken;
+    return std::make_shared<PostfixExpression>(prefix, prefix, left);
 }
 
 AstNodePtr Parser::parseGroupedExpr() {
@@ -1293,14 +1295,7 @@ AstNodePtr Parser::parseArrowExpression(AstNodePtr left) {
     advance();
     AstNodePtr referenced;
     // TODO: validate output of parseExpression
-    if (not is_dot_arrow_exp){
-        is_dot_arrow_exp=true;
-        referenced = parseExpression(currentPrecedence);
-        is_dot_arrow_exp=false;
-    }
-    else{
-        referenced = parseExpression(currentPrecedence);
-    }
+    referenced = parseExpression(currentPrecedence);
     return std::make_shared<ArrowExpression>(tok, left, referenced);
 }
 AstNodePtr Parser::parseTernaryIf(AstNodePtr left){
