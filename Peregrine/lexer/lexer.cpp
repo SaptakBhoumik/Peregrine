@@ -265,9 +265,7 @@ LEXEME lexer(std::string src, std::string filename) {
             if(increment){
                 last_line = current_index;
                 line++;
-                if (seperate_lines.size() > line - 1) {
-                    statement = seperate_lines.at(line - 1);
-                }
+                statement = seperate_lines.at(line - 2);
             }
         }
         if (item == "(" && !is_comment && !is_string && !is_cpp_string) {
