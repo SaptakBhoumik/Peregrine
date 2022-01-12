@@ -1,5 +1,5 @@
 while True:#Infinite loop lol
-  pass
+    pass
 def test(a,b):
     pass
 for x in y:

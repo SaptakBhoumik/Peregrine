@@ -40,7 +40,6 @@ class Parser {
     std::vector<Token> m_tokens;
     std::string m_filename;
 
-    std::vector<PEError> m_errors;
 
     std::map<TokenType, PrecedenceType> precedenceMap = createMap();
     bool is_imported_var();

@@ -26,13 +26,7 @@ AstNodePtr Parser::parse() {
         statements.push_back(parseStatement());
         advance();
     }
-    if (!m_errors.empty()) {
-        for (auto& err : m_errors) {
-            display(err);
-        }
-
-        exit(1);
-    }
+    
 
     return std::make_shared<Program>(statements,comment);
 }

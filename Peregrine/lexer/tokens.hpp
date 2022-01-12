@@ -121,6 +121,7 @@ enum TokenType {
 };
 
 struct Token {
+    size_t location;
     std::string statement;
     std::string keyword;
     size_t start;

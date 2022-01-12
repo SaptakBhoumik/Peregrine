@@ -29,7 +29,7 @@ void display(PEError e) {
     std::cout << std::to_string(e.loc.line) << " | "
               << e.loc.code.substr(0, e.loc.code.length()) << "\n";
     std::cout << "  |";
-    std::cout << std::string(e.loc.col, ' ');
+    std::cout << std::string(e.loc.loc+1, ' ');
     std::cout << fg("~", light_red);
     std::cout << fg(style(" <----- " + e.submsg, bold), light_red) << "\n";
     std::cout << "  |\n  |\n";

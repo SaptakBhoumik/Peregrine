@@ -16,6 +16,7 @@ const std::string bold = "1";
 struct Location {
     size_t line;
     size_t col;
+    size_t loc;
     std::string file;
     std::string code;
 };

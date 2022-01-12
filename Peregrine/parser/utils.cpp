@@ -57,13 +57,14 @@ PrecedenceType Parser::nextPrecedence() {
 }
 
 void Parser::error(Token tok, std::string_view msg) {
-    PEError err = {{tok.line, tok.start, m_filename, tok.statement},
+    PEError err = {{tok.line, tok.start,tok.location, m_filename, tok.statement},
                    std::string(msg),
                    "",
                    "",
                    ""};
 
-    m_errors.push_back(err);
+    display(err);
+    exit(1);
 }
 
 void Parser::expect(TokenType expectedType) {

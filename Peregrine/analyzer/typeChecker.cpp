@@ -16,7 +16,7 @@ TypeChecker::TypeChecker(ast::AstNodePtr ast) {
 }
 
 void TypeChecker::error(Token tok, std::string_view msg) {
-    PEError err = {{tok.line, tok.start, m_filename, tok.statement},
+    PEError err = {{tok.line, tok.start,tok.location, m_filename, tok.statement},
                    std::string(msg),
                    "TypeError",
                    "",
