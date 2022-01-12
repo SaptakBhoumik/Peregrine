@@ -265,7 +265,9 @@ LEXEME lexer(std::string src, std::string filename) {
             if(increment){
                 last_line = current_index;
                 line++;
-                statement = seperate_lines.at(line - 2);
+                if (seperate_lines.size() > line - 1) {
+                    statement = seperate_lines.at(line - 1);
+                }
             }
         }
         if (item == "(" && !is_comment && !is_string && !is_cpp_string) {
@@ -418,7 +420,7 @@ LEXEME lexer(std::string src, std::string filename) {
                 if(item == "\n" || item == "\r"){i=line-1;}
                 else{i=line;}
                 token = token_init(current_index - last_line,
-                    statement, keyword,
+                    seperate_lines[i-1], keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, i);
                 if (token.tkType == tk_not &&
