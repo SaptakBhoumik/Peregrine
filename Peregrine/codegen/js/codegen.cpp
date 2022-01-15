@@ -49,10 +49,10 @@ std::string Codegen::searchDefaultModule(std::string path,
         if (std::filesystem::path(entry.path()).filename() == moduleName) {
             // TODO :ignore extensions?
             if (entry.is_regular_file()) {
-                return entry.path();
+                return entry.path().string();
             } else if (entry.is_directory()) {
                 // TODO: avoid deeply nested folders
-                searchDefaultModule(entry.path(), moduleName);
+                searchDefaultModule(entry.path().string(), moduleName);
             }
         }
     }
@@ -93,7 +93,7 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
     auto functionName =
         std::dynamic_pointer_cast<ast::IdentifierExpression>(node.name())
             ->value();
-    if (not is_func_def){
+    if (!is_func_def){
         is_func_def = true;
         if (functionName == "main") {
             // we want the main function to always return 0 if success
@@ -294,7 +294,7 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
         codegenFuncParams(function->parameters());
         write(")");
         write("{\n");
-        if(not is_func_def){
+        if(!is_func_def){
             is_func_def=true;
             function->body()->accept(*this);
             is_func_def=false;
@@ -423,7 +423,7 @@ bool Codegen::visit(const ast::FunctionCall& node) {
 
 bool Codegen::visit(const ast::DotExpression& node) {
     //FIXME: Not very elegent
-    if (not is_dot_exp){
+    if (!is_dot_exp){
         is_dot_exp=true;
         if (node.owner()->type()==ast::KAstIdentifier){
             std::string name = std::dynamic_pointer_cast<ast::IdentifierExpression>(node.owner())->value();
