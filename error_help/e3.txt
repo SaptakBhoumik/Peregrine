@@ -1,0 +1,14 @@
+A class can only contain variable or methords or nested class/union or enum
+
+Example:-
+class iterate_test:
+    variable:int=0
+    class nested_class:
+        pass
+    enum nested_enum:
+        a,b,c
+    union nested_union:
+        x:int
+        y:float
+    def __init__(self,c):
+        pass

@@ -1,0 +1,5 @@
+A virtual function can be declared inside a class only. Here is an example:-
+
+class name:
+    virtual __init__(self):
+        pass

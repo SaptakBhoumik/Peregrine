@@ -169,6 +169,10 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseExport();
             break;
         }
+        case tk_virtual:{
+            error(m_currentToken, "Virtual function should be inside class only","","","e4");
+            break;
+        }
         // TODO: variables currently do not work with all the types, we need to
         // fix this
         case tk_identifier: {
@@ -206,7 +210,7 @@ AstNodePtr Parser::parseBlockStatement() {
     while (m_currentToken.tkType != tk_dedent) {
         if (m_currentToken.tkType == tk_eof) {
             error(m_currentToken,
-                  "expected end of identation, got eof instead");
+                  "Expected end of identation, got EOF instead","","","e1");
         }
 
         statements.push_back(parseStatement());
@@ -224,7 +228,8 @@ AstNodePtr Parser::parseClassDefinition() {
     std::vector<AstNodePtr> methods;
     std::vector<AstNodePtr> dec_methods;
 
-    expect(tk_identifier);
+    expect(tk_identifier,
+                "Expected the name of the class but got "+next().keyword+" instead","Add a name here","","e2");
 
     AstNodePtr name = parseName();
     std::vector<AstNodePtr> parent;
@@ -242,9 +247,10 @@ AstNodePtr Parser::parseClassDefinition() {
         }
     }
 
-    expect(tk_colon);
+    expect(tk_colon,
+    "Expected : but got "+next().keyword+" instead","Add a : here","","e2");
 
-    expect(tk_ident);
+    expect(tk_ident,"Expected an ident but got "+next().keyword+" instead");
     advance();
     std::string comment;
     if(m_currentToken.tkType==tk_string){
@@ -300,10 +306,19 @@ AstNodePtr Parser::parseClassDefinition() {
                 other.push_back(parseEnum());
                 break;
             }
+            case tk_pass:{
+                advance();
+                break;
+            }
+            case tk_eof:{
+                error(m_currentToken,
+                      "Expected end of identation, got EOF instead","","","e1");
+                break;
+            }
             default: {
                 error(m_currentToken,
-                      "expected a method or variable declaration, got " +
-                          m_currentToken.keyword + " instead");
+                      "Expected a method or variable declaration or enums or nested class/union but got " +
+                          m_currentToken.keyword + " instead" ,"A class can only contain methods(functions) or variable declaration or enums or nested class/union ","","e3");
             }
         }
 
@@ -315,7 +330,8 @@ AstNodePtr Parser::parseClassDefinition() {
 
 AstNodePtr Parser::parseVirtual() {
     auto tok = m_currentToken;
-    expect(tk_def);
+    expect(tk_def,
+           "Expected a function declaration but got "+next().keyword+" instead","Declare a function here","","e4");
     AstNodePtr body = parseFunctionDef();
     return std::make_shared<VirtualStatement>(tok, body);
 }

@@ -1,0 +1,9 @@
+To define a class use the following syntax
+
+class name:
+    "Your code here"
+
+To define a class with multiple inheritance use the following syntax
+
+class name(object1,object2):
+    "Your code here"

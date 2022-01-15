@@ -289,16 +289,18 @@ LEXEME lexer(std::string src, std::string filename) {
                             identation_level.at(identation_level.size() - 1);
                     }
                     if (curr_identation_level > previous_identation) {
-                        token = token_init(current_index - last_line,statement, "", tk_ident,
+                        token = token_init(current_index - last_line,statement, "<ident>", tk_ident,
                                            current_index, current_index, line);
                         tokens.emplace_back(token);
+                        token=Token();
                         identation_level.emplace_back(curr_identation_level);
                     }
                     while (curr_identation_level < previous_identation) {
                         identation_level.pop_back();
-                        token = token_init(current_index - last_line,statement, "", tk_dedent,
+                        token = token_init(current_index - last_line,statement, "<dedent>", tk_dedent,
                                            current_index, current_index, line);
                         tokens.emplace_back(token);
+                        token=Token();
                         if (identation_level.size() != 0) {
                             if (curr_identation_level >=
                                 identation_level.at(identation_level.size() -

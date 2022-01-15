@@ -6,6 +6,7 @@
 #include "lexer/lexer.hpp"
 #include "lexer/tokens.hpp"
 #include <map>
+#include <string>
 #include <vector>
 
 using namespace ast;
@@ -45,11 +46,11 @@ class Parser {
     bool is_imported_var();
     void advance();
     void advanceOnNewLine();
-    void expect(TokenType expectedType);
+    void expect(TokenType expectedType, std::string msg="",std::string submsg="",std::string hint="",std::string ecode="");
     Token next();
     PrecedenceType nextPrecedence();
 
-    void error(Token tok, std::string_view msg);
+    void error(Token tok, std::string msg,std::string submsg="",std::string hint="",std::string ecode="");
 
     AstNodePtr parseInteger();
     AstNodePtr parseDecimal();

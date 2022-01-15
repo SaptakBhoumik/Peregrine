@@ -1,0 +1,5 @@
+#test for errors
+virtual def func():pass
+class a:
+    a:int=9
+    virtual enum x:a,b

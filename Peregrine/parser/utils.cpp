@@ -56,24 +56,30 @@ PrecedenceType Parser::nextPrecedence() {
     return pr_lowest;
 }
 
-void Parser::error(Token tok, std::string_view msg) {
+void Parser::error(Token tok, std::string msg,std::string submsg,std::string hint,std::string ecode) {
     PEError err = {{tok.line, tok.start,tok.location, m_filename, tok.statement},
                    std::string(msg),
-                   "",
-                   "",
-                   ""};
+                   submsg,
+                   hint,
+                   ecode};
 
     display(err);
     exit(1);
 }
 
-void Parser::expect(TokenType expectedType) {
-    if (next().tkType != expectedType) {
-        error(next(), "expected token of type " + std::to_string(expectedType) +
-                          ", got " + std::to_string(next().tkType) +
-                          " instead");
-    }
+void Parser::expect(TokenType expectedType, std::string msg,std::string submsg,std::string hint,std::string ecode) {
 
+    if (next().tkType != expectedType) {
+        if(msg==""){
+            msg="expected token of type " + std::to_string(expectedType) +", got " + std::to_string(next().tkType) + " instead";
+        }
+        if(next().tkType==tk_new_line){
+            error(m_currentToken,msg,submsg,hint,ecode);
+        }
+        else{
+            error(next(),msg,submsg,hint,ecode);
+        }
+    }
     advance();
 }
 
