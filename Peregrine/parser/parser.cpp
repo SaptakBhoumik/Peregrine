@@ -264,8 +264,6 @@ AstNodePtr Parser::parseClassDefinition() {
                 }
                 break;
             }
-            // TODO: this is not able to parse all variable declarations, fix it
-            // later.
             case tk_identifier: {
                 attributes.push_back(parseVariableStatement());
                 break;
@@ -337,6 +335,7 @@ AstNodePtr Parser::parseVirtual() {
 }
 
 AstNodePtr Parser::parseImport() {
+    //TODO: Show error
     Token tok = m_currentToken;
     bool hasFrom = m_currentToken.tkType == tk_from;
 
@@ -445,7 +444,7 @@ AstNodePtr Parser::parseConstDeclaration() {
         advance();
         constType = parseType();
     }
-    expect(tk_assign);
+    expect(tk_assign,"Expected an assignment but got "+next().keyword+" instead","Constants can't have uninitialised value","","");
     advance();
 
     AstNodePtr value = parseExpression();
@@ -457,8 +456,11 @@ AstNodePtr Parser::parseIf() {
     advance(); // skip the if token
 
     AstNodePtr condition = parseExpression();
-
-    expect(tk_colon);
+    if (next().tkType!=tk_colon){
+        error(m_currentToken,
+                "Expected a : after the condition but got "+m_currentToken.keyword+" instead","Add a : here","","");
+    }
+    advance();
 
     AstNodePtr ifBody;
     auto line=m_currentToken.line;
@@ -469,7 +471,7 @@ AstNodePtr Parser::parseIf() {
       ifBody = std::make_shared<BlockStatement>(x);
     }
     else{
-      expect(tk_ident);
+      expect(tk_ident, "Expected an ident but got "+next().keyword+" instead");
       ifBody = parseBlockStatement();
     }
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs;
@@ -480,7 +482,11 @@ AstNodePtr Parser::parseIf() {
 
         AstNodePtr condition = parseExpression();
 
-        expect(tk_colon);
+        if (next().tkType!=tk_colon){
+            error(m_currentToken,
+                "Expected a : after the condition but got "+m_currentToken.keyword+" instead","Add a : here","","");
+        }
+        advance();
         AstNodePtr body;
         auto line=m_currentToken.line;
         if(next().tkType!=tk_ident && next().line==line){
@@ -490,8 +496,8 @@ AstNodePtr Parser::parseIf() {
           body = std::make_shared<BlockStatement>(x);
         }
         else{
-          expect(tk_ident);
-          body = parseBlockStatement();
+            expect(tk_ident, "Expected an ident but got "+next().keyword+" instead");
+            body = parseBlockStatement();
         }
 
         elifs.push_back(std::pair(condition, body));
@@ -501,7 +507,11 @@ AstNodePtr Parser::parseIf() {
 
     if (next().tkType == tk_else) {
         advance();
-        expect(tk_colon);
+        if (next().tkType!=tk_colon){
+            error(next(),
+                "Expected a : after else but got "+next().keyword+" instead","Add a : here","","");
+        }
+        advance();
         auto line=m_currentToken.line;
         if(next().tkType!=tk_ident && next().line==line){
           advance();
@@ -510,7 +520,7 @@ AstNodePtr Parser::parseIf() {
           elseBody = std::make_shared<BlockStatement>(x);
         }
         else{
-          expect(tk_ident);
+          expect(tk_ident, "Expected an ident but got "+next().keyword+" instead");
           elseBody = parseBlockStatement();
         }
 
@@ -522,7 +532,11 @@ AstNodePtr Parser::parseIf() {
 
 AstNodePtr Parser::parseScope() {
     Token tok = m_currentToken;
-    expect(tk_colon);
+    if (next().tkType!=tk_colon){
+            error(next(),
+                "Expected a : after scope but got "+next().keyword+" instead","Add a : here","","");
+    }
+    advance();
     AstNodePtr body;
     auto line=m_currentToken.line;
     if(next().tkType!=tk_ident && next().line==line){
@@ -532,7 +546,7 @@ AstNodePtr Parser::parseScope() {
       body = std::make_shared<BlockStatement>(x);
     }
     else{
-      expect(tk_ident);
+      expect(tk_ident, "Expected an ident but got "+next().keyword+" instead");
       body = parseBlockStatement();
     }
     return std::make_shared<ScopeStatement>(tok, body);
@@ -544,7 +558,11 @@ AstNodePtr Parser::parseWhile() {
 
     AstNodePtr condition = parseExpression();
 
-    expect(tk_colon);
+    if (next().tkType!=tk_colon){
+            error(m_currentToken,
+                "Expected a : after the condition but got "+m_currentToken.keyword+" instead","Add a : here","","");
+    }
+    advance();
     AstNodePtr body;
     auto line=m_currentToken.line;
     if(next().tkType!=tk_ident && next().line==line){
@@ -554,7 +572,7 @@ AstNodePtr Parser::parseWhile() {
       body = std::make_shared<BlockStatement>(x);
     }
     else{
-      expect(tk_ident);
+      expect(tk_ident, "Expected an ident but got "+next().keyword+" instead");
       body = parseBlockStatement();
     }
 
@@ -572,13 +590,18 @@ AstNodePtr Parser::parseFor() {
         if (m_currentToken.tkType == tk_comma) {
             advance();
         } else if (m_currentToken.tkType != tk_in) {
-            // TODO:Throw error
+            error(m_currentToken,
+                "Expected an in after the variable but got "+m_currentToken.keyword+" instead","Add an in here","","e5");
         }
     }
     advance();
 
     AstNodePtr sequence = parseExpression();
-    expect(tk_colon);
+    if (next().tkType!=tk_colon){
+            error(m_currentToken,
+                "Expected a : but got "+m_currentToken.keyword+" instead","Add a : here","","");
+    }
+    advance();
     AstNodePtr body;
     auto line=m_currentToken.line;
     if(next().tkType!=tk_ident && next().line==line){
@@ -588,7 +611,7 @@ AstNodePtr Parser::parseFor() {
       body = std::make_shared<BlockStatement>(x);
     }
     else{
-      expect(tk_ident);
+      expect(tk_ident, "Expected an ident but got "+next().keyword+" instead");
       body = parseBlockStatement();
     }
 

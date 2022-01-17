@@ -68,7 +68,6 @@ void Parser::error(Token tok, std::string msg,std::string submsg,std::string hin
 }
 
 void Parser::expect(TokenType expectedType, std::string msg,std::string submsg,std::string hint,std::string ecode) {
-
     if (next().tkType != expectedType) {
         if(msg==""){
             msg="expected token of type " + std::to_string(expectedType) +", got " + std::to_string(next().tkType) + " instead";

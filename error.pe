@@ -1,5 +1,14 @@
 #test for errors
-virtual def func():pass
-class a:
-    a:int=9
-    virtual enum x:a,b
+def main():
+    if True:
+        pass
+    elif False:
+        pass
+    else:
+        pass
+    scope:
+        pass
+    while True:
+        pass
+    for i in range(10):
+        pass

@@ -450,8 +450,8 @@ LEXEME lexer(std::string src, std::string filename) {
                     && tokens.back().tkType !=tk_colon // again to reduce confusion
                     && is_dictionary == false && is_array == false &&
                     is_string == false) {
-                    token = token_init(current_index - last_line,statement, "<tk_new_line>", tk_new_line,
-                                       current_index, current_index, line);
+                    token = token_init(seperate_lines[line-2].size(),seperate_lines[line-2], "<tk_new_line>", tk_new_line,
+                                       current_index, current_index, line-1);
                     tokens.emplace_back(token);
                     token = Token();
                 }
