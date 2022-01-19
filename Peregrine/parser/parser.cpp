@@ -620,11 +620,11 @@ AstNodePtr Parser::parseFor() {
 
 AstNodePtr Parser::parseFunctionDef() {
     Token tok = m_currentToken;
-    expect(tk_identifier);
+    expect(tk_identifier, "Expected a name but got "+next().keyword+" instead","Add a name here","","");
 
     AstNodePtr name = parseName();
 
-    expect(tk_l_paren);
+    expect(tk_l_paren,"Expected a ( but got "+next().keyword+" instead");
     std::vector<parameter> parameters;
 
     advance();
@@ -634,7 +634,7 @@ AstNodePtr Parser::parseFunctionDef() {
         AstNodePtr paramDefault = std::make_shared<NoLiteral>();
         if(next().tkType==tk_comma || next().tkType==tk_r_paren|| next().tkType==tk_assign){}
         else{
-            expect(tk_colon);
+            expect(tk_colon,"Expected a : but got "+next().keyword+" instead");
             advance();
             paramType = parseType();
         }
@@ -657,9 +657,7 @@ AstNodePtr Parser::parseFunctionDef() {
               "expected ), got " + m_currentToken.keyword + " instead");
     }
 
-    // returns void by default
-    AstNodePtr returnType =
-        std::make_shared<TypeExpression>(m_currentToken, "void");
+    AstNodePtr returnType =std::make_shared<TypeExpression>(Token(), "void");
 
     if (next().tkType == tk_arrow) {
         advance();
@@ -668,7 +666,7 @@ AstNodePtr Parser::parseFunctionDef() {
         returnType = parseType();
     }
     std::string comment;
-    expect(tk_colon);
+    expect(tk_colon,"Expected a : but got "+next().keyword+" instead","Add a : here","","");
     size_t line=m_currentToken.line;
     AstNodePtr body;
     if(next().tkType!=tk_ident && next().line==line){
@@ -678,7 +676,7 @@ AstNodePtr Parser::parseFunctionDef() {
       body = std::make_shared<BlockStatement>(x);
     }
     else{
-      expect(tk_ident);
+      expect(tk_ident, "Expected an ident but got "+next().keyword+" instead");
       if (next().tkType==tk_string){
         comment=next().keyword;
       }
@@ -708,7 +706,7 @@ AstNodePtr Parser::parseTypeDef() {
 
     AstNodePtr name = parseName();
 
-    expect(tk_assign);
+    expect(tk_assign, "Expected an = but got "+next().keyword+" instead","","","");
     advance();
 
     AstNodePtr type = parseType();
@@ -788,12 +786,32 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
         case tk_negative:
         case tk_not:
         case tk_ampersand:
+        case tk_plus:
         case tk_multiply:
         case tk_bit_not: {
             left = parsePrefixExpression();
             break;
         }
-
+        case tk_ident: {
+            error(m_currentToken,
+                  "IndentationError: unexpected indent");
+            break;
+        }
+        case tk_dedent: {
+            error(m_currentToken,
+                  "IndentationError: unexpected dedent");
+            break;
+        }
+        case tk_new_line: {
+            error(m_currentToken,
+                  "Unexpected newline");
+            break;
+        }
+        case tk_eof: {
+            error(m_tokens[m_tokens.size() - 2],
+                  "Unexpected end of file","","","e1");
+            break;
+        }
         default: {
             error(m_currentToken,
                   m_currentToken.keyword + " is not an expression");
@@ -889,13 +907,12 @@ AstNodePtr Parser::parseListOrDictAccess(AstNodePtr left) {
     std::vector<AstNodePtr> keyOrIndex;
     keyOrIndex.push_back(parseExpression());
     //array slicing
-
     if(next().tkType==tk_colon){
         advance();
         advance();
         keyOrIndex.push_back(parseExpression());
     }
-    expect(tk_list_close);
+    expect(tk_list_close, "Expected ] but got "+next().keyword+" instead","Add a ] here","","");
 
     AstNodePtr node = std::make_shared<ListOrDictAccess>(tok, left, keyOrIndex);
     return node;
@@ -932,12 +949,16 @@ AstNodePtr Parser::parseGroupedExpr() {
 
     AstNodePtr expr = parseExpression();
 
-    expect(tk_r_paren);
+    expect(tk_r_paren, "Expected ) but got "+next().keyword+" instead","Add a ) here","","");
 
     return expr;
 }
 
 AstNodePtr Parser::parseIdentifier() {
+    if (m_currentToken.tkType!=tk_identifier){
+        error(m_currentToken,
+              "Expected identifier but got " + m_currentToken.keyword + " instead");
+    }
     return std::make_shared<IdentifierExpression>(m_currentToken,
                                                   m_currentToken.keyword);
 }
@@ -976,11 +997,12 @@ AstNodePtr Parser::parseType() {
 
 AstNodePtr Parser::parseListType() {
     Token tok = m_currentToken;
-    advance();
-
-    AstNodePtr size = parseExpression();
-
-    expect(tk_list_close);
+    AstNodePtr size=std::make_shared<NoLiteral>();
+    if (next().tkType != tk_list_close) {   
+        advance();
+        size = parseExpression();
+    }
+    expect(tk_list_close, "Expected ] but got "+next().keyword+" instead","Add a ] here","","");
     advance();
 
     AstNodePtr elemType = parseType();
@@ -995,43 +1017,42 @@ AstNodePtr Parser::parsePointerType() {
 }
 
 AstNodePtr Parser::parseDictType() {
-    Token tok = m_currentToken;
-    expect(tk_list_open);
-    advance();
+    // Token tok = m_currentToken;
+    // expect(tk_list_open);
+    // advance();
 
-    AstNodePtr keyType = parseType();
+    // AstNodePtr keyType = parseType();
 
-    expect(tk_list_close);
-    advance();
+    // expect(tk_list_close);
+    // advance();
 
-    AstNodePtr valueType = parseType();
-    return std::make_shared<DictTypeExpr>(tok, keyType, valueType);
+    // AstNodePtr valueType = parseType();
+    // return std::make_shared<DictTypeExpr>(tok, keyType, valueType);
+    return nullptr;
 }
 
 AstNodePtr Parser::parseFuncType() {
     auto tok = m_currentToken;
-    expect(tk_l_paren);
+    expect(tk_l_paren,"Expected ( but got "+next().keyword+" instead","Add a ( here","","");
     std::vector<AstNodePtr> types; // arg types
     std::vector<AstNodePtr> returnTypes;
     while (m_currentToken.tkType != tk_r_paren) {
         advance();
-        if (m_currentToken.tkType == tk_identifier) {
-            types.push_back(parseName());
-        } else if (m_currentToken.tkType == tk_comma) {
-            expect(tk_identifier);
-            types.push_back(parseName());
+        if (m_currentToken.tkType == tk_comma) {
+            advance();
+            types.push_back(parseType());
         } else if (m_currentToken.tkType == tk_r_paren) {
             break;
         } else {
-            // TODO: throw error
+            types.push_back(parseType());
         }
         advance();
     }
     if (next().tkType == tk_arrow) {
         advance();
-        expect(tk_identifier);
+        advance();
         // TODO: Implement multiple return
-        returnTypes.push_back(parseName());
+        returnTypes.push_back(parseType());
     }
     return std::make_shared<FunctionTypeExpr>(tok, types, returnTypes);
 }
@@ -1039,7 +1060,7 @@ AstNodePtr Parser::parseFuncType() {
 AstNodePtr Parser::parseName() {
     if (m_currentToken.tkType != tk_identifier) {
         error(m_currentToken, "expected an identifier, got " +
-                                  std::to_string(m_currentToken.tkType) +
+                                  m_currentToken.keyword +
                                   " instead");
     }
 
@@ -1058,7 +1079,7 @@ AstNodePtr Parser::parseMatch() {
             advance();
         }
     }
-    expect(tk_ident);
+    expect(tk_ident, "Expected identation but got "+next().keyword+" instead","","","");
     std::vector<std::pair<std::vector<AstNodePtr>, AstNodePtr>> cases;
     while (next().tkType == tk_case) {
         advance();
@@ -1071,8 +1092,15 @@ AstNodePtr Parser::parseMatch() {
                 cases_arg.push_back(parseExpression());
             }
             advance();
-            if (m_currentToken.tkType != tk_colon) {
+
+            if (m_currentToken.tkType == tk_comma) {
                 advance();
+            }
+            else if(m_currentToken.tkType==tk_colon){
+                break;
+            }
+            else{
+                error(m_currentToken, "Expected , or : but got "+m_currentToken.keyword+" instead","","","");
             }
         }
         AstNodePtr body;
@@ -1084,7 +1112,7 @@ AstNodePtr Parser::parseMatch() {
             body = std::make_shared<BlockStatement>(x);
         }
         else{
-            expect(tk_ident);
+            expect(tk_ident, "Expected identation but got "+next().keyword+" instead","","","");
             body = parseBlockStatement();
         }
         cases.push_back(
@@ -1094,7 +1122,10 @@ AstNodePtr Parser::parseMatch() {
 
     if (next().tkType == tk_default) {
         advance();
-        expect(tk_colon);
+        if(next().tkType!=tk_colon){
+            error(next(), "Expected : but got "+next().keyword+" instead","Add a : here","","");
+        }
+        advance();
         size_t line=m_currentToken.line;
         if(next().tkType!=tk_ident && next().line==line){
             advance();
@@ -1103,7 +1134,7 @@ AstNodePtr Parser::parseMatch() {
             default_body = std::make_shared<BlockStatement>(x);
         }
         else{
-            expect(tk_ident);
+            expect(tk_ident, "Expected identation but got "+next().keyword+" instead","","","");
             default_body = parseBlockStatement();
         }
     }
@@ -1116,7 +1147,13 @@ AstNodePtr Parser::parseDecoratorCall() {
     std::vector<AstNodePtr> decorators;
     AstNodePtr body;
     while (m_currentToken.tkType == tk_at) {
-        expect(tk_identifier);
+        if (next().tkType != tk_identifier) {
+            error(next(), "Expected an identifier, got " +
+                                  next().keyword +
+                                  " instead");
+        }
+        advance();
+        
         decorators.push_back(parseExpression());
         advance();
     }
@@ -1124,6 +1161,15 @@ AstNodePtr Parser::parseDecoratorCall() {
         body = parseFunctionDef();
     } else if (m_currentToken.tkType == tk_static) {
         body = parseStatic();
+    }
+    else if(m_currentToken.tkType==tk_inline){
+        error(m_currentToken,"Can't use decorators with inline function","","","");
+    }
+    else if(m_currentToken.tkType==tk_virtual){
+        error(m_currentToken,"Can't use decorators with virtual function","","","");
+    }
+    else{
+        error(m_currentToken, "Expected a function declaration but got "+m_currentToken.keyword+" instead","","","");
     }
     return std::make_shared<DecoratorStatement>(tok, decorators, body);
 }
@@ -1144,10 +1190,12 @@ AstNodePtr Parser::parseRaise() {
 
 AstNodePtr Parser::parseUnion() {
     auto tok = m_currentToken;
-    advance();
+    expect(tk_identifier, "Expected an identifier, got " +
+                                  next().keyword +
+                                  " instead");
     AstNodePtr union_name = parseName();
-    expect(tk_colon);
-    expect(tk_ident);
+    expect(tk_colon, "Expected : but got "+next().keyword+" instead","Add a : here","","");
+    expect(tk_ident, "Expected identation but got "+next().keyword+" instead","","","");
     advance();
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elements;
     std::string comment;
@@ -1168,19 +1216,27 @@ AstNodePtr Parser::parseUnion() {
         if (m_currentToken.tkType == tk_new_line) {
             advance();
         }
+        else if(m_currentToken.tkType==tk_dedent){}
+        else{
+            error(m_currentToken, "Expected new line or dedent but got "+m_currentToken.keyword+" instead","","","");
+        }
     }
     return std::make_shared<UnionLiteral>(tok, elements, union_name,comment);
 }
 
 AstNodePtr Parser::parseEnum() {
     auto token = m_currentToken;
-    advance();
+    expect(tk_identifier, "Expected an identifier, got " +
+                                  next().keyword +
+                                  " instead");
     AstNodePtr enum_name = parseName();
-    expect(tk_colon);
+    expect(tk_colon, "Expected : but got "+next().keyword+" instead","Add a : here","","");
     auto line=m_currentToken.line;
     TokenType stopat=tk_dedent;
-    if(next().tkType!=tk_ident && next().line==line){stopat=tk_new_line;}
-    else{expect(tk_ident);}
+    if(next().tkType!=tk_ident && next().line==line && next().tkType!=tk_new_line){stopat=tk_new_line;}
+    else{
+        expect(tk_ident,"Expected identation but got "+next().keyword+" instead","","","");
+        }
     advance();
     std::string comment;
     if (m_currentToken.tkType==tk_string){
@@ -1243,7 +1299,7 @@ AstNodePtr Parser::parseStatic() {
             // case. DO NOT add another case below this one
         }
         default: {
-            // TODO: Show error
+            error(m_currentToken , "Expected a function or variable or constant declaration but got "+m_currentToken.keyword+" instead","","","");
         }
     }
     return std::make_shared<StaticStatement>(tok, body);
@@ -1251,7 +1307,9 @@ AstNodePtr Parser::parseStatic() {
 
 AstNodePtr Parser::parseInline() {
     auto tok = m_currentToken;
-    expect(tk_def);
+    expect(tk_def, "Expected function defination but got " +
+                          next().keyword +
+                          " instead");
     AstNodePtr body;
     body = parseFunctionDef();
     return std::make_shared<InlineStatement>(tok, body);
@@ -1269,8 +1327,12 @@ AstNodePtr Parser::parseWith() {
             variables.push_back(std::make_shared<NoLiteral>());
         }
         else{
-            expect(tk_as);
-            expect(tk_identifier);
+            expect(tk_as, "Expected as but got " +
+                               next().keyword +
+                               " instead");
+            expect(tk_identifier, "Expected an identifier, got " +
+                                          next().keyword +
+                                          " instead");
             variables.push_back(parseName());
         }
         advance();
@@ -1286,7 +1348,7 @@ AstNodePtr Parser::parseWith() {
       body = std::make_shared<BlockStatement>(x);
     }
     else{
-      expect(tk_ident);
+      expect(tk_ident,"Expected identation but got "+next().keyword+" instead","","","");
       body = parseBlockStatement();
     }
     return std::make_shared<WithStatement>(tok, variables, values, body);
@@ -1294,15 +1356,19 @@ AstNodePtr Parser::parseWith() {
 
 AstNodePtr Parser::parseCast() {
     auto tok = m_currentToken;
-    expect(tk_less);
+    expect(tk_less, "Expected < but got " +
+                         next().keyword +
+                         " instead");
     advance();
     AstNodePtr type = parseType();
-    expect(tk_greater);
-    expect(tk_l_paren);
+    expect(tk_greater, "Expected > but got " +
+                            next().keyword +
+                            " instead");
+    expect(tk_l_paren,"Expected ( but got "+next().keyword+" instead","","","");
     advance();
 
     AstNodePtr value = parseExpression();
-    expect(tk_r_paren);
+    expect(tk_r_paren,"Expected ) but got "+next().keyword+" instead","","","");
     return std::make_shared<CastStatement>(tok, type, value);
 }
 
@@ -1317,7 +1383,9 @@ AstNodePtr Parser::parseDefaultArg(){
 
 AstNodePtr Parser::parseExport() {
     auto tok = m_currentToken;
-    expect(tk_def);
+    expect(tk_def, "Expected function defination but got " +
+                          next().keyword +
+                          " instead");
     AstNodePtr body=parseFunctionDef();
     return std::make_shared<ExportStatement>(tok, body);
 }
@@ -1335,7 +1403,21 @@ AstNodePtr Parser::parseTernaryIf(AstNodePtr left){
     auto tok=m_currentToken;
     advance();
     AstNodePtr if_condition=parseExpression(pr_conditional);
-    expect(tk_else);
+    if (next().tkType != tk_else) {
+        if (m_currentToken.tkType==tk_new_line){
+            error(m_currentToken,"Expected else but got newline instead",
+                        "Ternary if statement not possible without an else body",
+                        "Add an else body here","");
+        }
+        else{
+            error(next(),"Expected else but got "+
+                            next().keyword+
+                            " instead",
+                            "Ternary if statement not possible without an else body",
+                            "Add an else body here","");
+        }
+    } 
+    advance();
     advance();
     AstNodePtr else_value=parseExpression(pr_conditional);
     return std::make_shared<TernaryIf>(tok,left,if_condition,else_value);

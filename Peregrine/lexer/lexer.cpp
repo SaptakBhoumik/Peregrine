@@ -279,7 +279,10 @@ LEXEME lexer(std::string src, std::string filename) {
             is_string == false && first_bracket_count == 0) {
             if (item == " " && is_tab == true) {
                 curr_identation_level += 1;
-            } else if (item != " " && is_tab == true &&
+            }
+            else if(item=="\t" && is_tab==true){curr_identation_level+=4;}
+            
+            else if ((item != " " || item!="\t")&& is_tab == true &&
                        !(item == "\n" || item == "\r")) {
                 is_tab = false;
                 previous_identation = 0;
@@ -415,13 +418,17 @@ LEXEME lexer(std::string src, std::string filename) {
             if (third_bracket_count == 0) {
                 is_dictionary = false;
             }
-        } else if (item == " " || item == "\n" || 
+        } else if ((item == " "||item == "\t") || item == "\n" || 
                    item == "\r") {
             if (keyword != "") {
                 size_t i=0;
-                if(item == "\n" || item == "\r"){i=line-1;}
+                auto x=current_index - last_line;
+                if(item == "\n" || item == "\r"){
+                    i=line-1;
+                    x=seperate_lines[i-1].size()-keyword.size();
+                }
                 else{i=line;}
-                token = token_init(current_index - last_line,
+                token = token_init(x,
                     seperate_lines[i-1], keyword,
                     token_type(keyword, next(current_index - 1, src)),
                     start_index, current_index - 1, i);

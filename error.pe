@@ -10,5 +10,15 @@ def main():
         pass
     while True:
         pass
-    for i in range(10):
-        pass
+    match 9,j:
+        case 1, 6:
+            pass
+        default:
+            pass
+@rer
+def f():
+    pass
+union v:
+    a:b
+enum f:uy
+a=9+
