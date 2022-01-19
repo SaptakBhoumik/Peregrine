@@ -29,10 +29,14 @@ codegen_src = [
     'codegen/js/codegen.cpp',
     'codegen/js/utils.cpp'
 ]
+cli_src = [
+    'cli/cli.cpp'
+]
 #TODO: Also link the linker
 lexer = static_library('lexer', sources: lexer_src)
 parser = static_library('parser', sources: parser_src)
 ast = static_library('ast', sources: ast_src)
 analyzer = static_library('analyzer', sources: analyzer_src)
 codegen = static_library('codegen', sources: codegen_src)
+cli = static_library('cli', sources: cli_src)
 docgen = static_library('docgen',sources:doc_src)

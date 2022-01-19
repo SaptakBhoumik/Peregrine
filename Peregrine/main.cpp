@@ -1,6 +1,7 @@
 #include "analyzer/typeChecker.hpp"
 #include "docgen/html/docgen.hpp"
 #include "codegen/cpp/codegen.hpp"
+#include "cli/cli.hpp"
 #include "codegen/js/codegen.hpp"
 #include "lexer/lexer.hpp"
 #include "lexer/tokens.hpp"
@@ -13,24 +14,27 @@
 #include <vector>
 
 int main(int argc, char** argv) {
+    cli::CLI cli(argc, argv);
+    cli::state state = cli.parse();
     if (argc < 3) { // the cli is still not complete
-        std::ifstream file("../Peregrine/test.pe");
-        std::stringstream buf;
-        buf << file.rdbuf();
 
-        std::vector<Token> tokens = lexer(buf.str(), "test");
+        // std::ifstream file("../Peregrine/test.pe");
+        // std::stringstream buf;
+        // buf << file.rdbuf();
 
-        for (auto& token : tokens) {
-            std::cout << "Keyword= " << token.keyword
-                      << " Type= " << token.tkType <<" Line= "<<token.line<<" Loc="<<token.location<<"\n";
-        }
+        // std::vector<Token> tokens = lexer(buf.str(), "test");
 
-        Parser parser(tokens);
-        AstNodePtr program = parser.parse();
+        // for (auto& token : tokens) {
+        //     std::cout << "Keyword= " << token.keyword
+        //               << " Type= " << token.tkType <<" Line= "<<token.line<<" Loc="<<token.location<<"\n";
+        // }
 
-        std::cout << program->stringify() << "\n";
+        // Parser parser(tokens);
+        // AstNodePtr program = parser.parse();
 
-        TypeChecker typeChecker(program);
+        // std::cout << program->stringify() << "\n";
+
+        // TypeChecker typeChecker(program);
 
     } else {
         std::ifstream file(argv[2]);
