@@ -18,23 +18,23 @@ int main(int argc, char** argv) {
     cli::state state = cli.parse();
     if (argc < 3) { // the cli is still not complete
 
-        // std::ifstream file("../Peregrine/test.pe");
-        // std::stringstream buf;
-        // buf << file.rdbuf();
+        std::ifstream file("../Peregrine/test.pe");
+        std::stringstream buf;
+        buf << file.rdbuf();
 
-        // std::vector<Token> tokens = lexer(buf.str(), "test");
+        std::vector<Token> tokens = lexer(buf.str(), "test");
 
-        // for (auto& token : tokens) {
-        //     std::cout << "Keyword= " << token.keyword
-        //               << " Type= " << token.tkType <<" Line= "<<token.line<<" Loc="<<token.location<<"\n";
-        // }
+        for (auto& token : tokens) {
+            std::cout << "Keyword= " << token.keyword
+                      << " Type= " << token.tkType <<" Line= "<<token.line<<" Loc="<<token.location<<"\n";
+        }
 
-        // Parser parser(tokens);
-        // AstNodePtr program = parser.parse();
+        Parser parser(tokens);
+        AstNodePtr program = parser.parse();
 
-        // std::cout << program->stringify() << "\n";
+        std::cout << program->stringify() << "\n";
 
-        // TypeChecker typeChecker(program);
+        TypeChecker typeChecker(program);
 
     } else {
         std::ifstream file(argv[2]);
