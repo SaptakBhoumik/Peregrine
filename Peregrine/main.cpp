@@ -25,7 +25,7 @@ void compile(cli::state s){
                       << " Type= " << token.tkType <<" Line= "<<token.line<<" Loc="<<token.location<<"\n";
         }
         Parser parser(tokens, "test");
-        AstNodePtr program = parser.parse();
+        ast::AstNodePtr program = parser.parse();
         std::cout << program->stringify() << "\n";
         TypeChecker typeChecker(program);
     }
@@ -35,7 +35,7 @@ void compile(cli::state s){
         buf << file.rdbuf();
         std::vector<Token> tokens = lexer(buf.str(), s.input_filename);
         Parser parser(tokens, s.input_filename);
-        AstNodePtr program = parser.parse();
+        ast::AstNodePtr program = parser.parse();
         auto output=s.output_filename;
         auto filename=s.input_filename;
         if (s.emit_js){
