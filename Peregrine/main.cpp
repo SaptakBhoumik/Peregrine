@@ -12,12 +12,8 @@
 #include <sstream>
 #include <string.h>
 #include <vector>
-
-int main(int argc, char** argv) {
-    cli::CLI cli(argc, argv);
-    cli::state state = cli.parse();
-    if (argc < 3) { // the cli is still not complete
-
+void compile(cli::state s){
+    if (s.dev_debug){
         std::ifstream file("../Peregrine/test.pe");
         std::stringstream buf;
         buf << file.rdbuf();
@@ -28,48 +24,50 @@ int main(int argc, char** argv) {
             std::cout << "Keyword= " << token.keyword
                       << " Type= " << token.tkType <<" Line= "<<token.line<<" Loc="<<token.location<<"\n";
         }
-
-        Parser parser(tokens);
+        Parser parser(tokens, "test");
         AstNodePtr program = parser.parse();
-
         std::cout << program->stringify() << "\n";
-
         TypeChecker typeChecker(program);
-
-    } else {
-        std::ifstream file(argv[2]);
+    }
+    else{
+        std::ifstream file(s.input_filename);
         std::stringstream buf;
         buf << file.rdbuf();
-
-        std::vector<Token> tokens = lexer(buf.str(), "test");
-        // for (auto& token : tokens) {
-        //     std::cout << "Keyword= " << token.keyword
-        //               << " Type= " << token.tkType << "\n";
-        // }
-        Parser parser(tokens);
+        std::vector<Token> tokens = lexer(buf.str(), s.input_filename);
+        Parser parser(tokens, s.input_filename);
         AstNodePtr program = parser.parse();
-
-        // std::cout << program->stringify() << "\n";
-
-        // TypeChecker typeChecker;
-        // typeChecker.check(program);
-        std::string filename = argv[2];
-        if (argc > 3) {
-            if (strcmp(argv[3], "-js") == 0) {
-                js::Codegen codegen("index.js", program, false, filename);
-            } else if (strcmp(argv[3], "-html") == 0) { // embeds js in html
-                js::Codegen codegen("index.html", program, true, filename);
-            }
-            else if (strcmp(argv[3], "-doc_html") == 0) {
-                html::Docgen Docgen("index.html", program,filename);
-            }else {
-                cpp::Codegen codegen("temp.cc", program, filename);
-                system("g++ -std=c++20 temp.cc");
-            }
-        } else {
-            cpp::Codegen codegen("temp.cc", program, filename);
-            system("g++ -std=c++20  temp.cc");
+        auto output=s.output_filename;
+        auto filename=s.input_filename;
+        if (s.emit_js){
+            js::Codegen codegen(output, program, false, filename);
+        }else if(s.emit_html){
+            js::Codegen codegen(output, program, true, filename);
+        }else if(s.doc_html){
+            html::Docgen Docgen(output, program, filename);
+        }else if(s.emit_cpp){
+            cpp::Codegen codegen(output, program,filename);
+        }else if(s.emit_obj){
+            cpp::Codegen codegen("temp.cc", program,filename);
+            auto cmd=s.cpp_compiler+" -c -std=c++20 temp.cc -w "+s.cpp_arg+" -o "+output;
+            system(cmd.c_str());
+            system("rm temp.cc");
+        }else{
+            cpp::Codegen codegen("temp.cc", program,filename);
+            auto cmd=s.cpp_compiler+" -std=c++20 temp.cc -w "+s.cpp_arg+" -o "+output;
+            system(cmd.c_str());
+            system("rm temp.cc");
         }
+    }
+}
+int main(int argc, char** argv) {
+    cli::CLI cli(argc, argv);
+    cli::state state = cli.parse();
+    if (argc== 1) {
+        cli::help();
+        return 0;
+    } else {
+        state.validate_state();
+        compile(state);
     }
     return 0;
 }

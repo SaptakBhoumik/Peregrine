@@ -5,8 +5,9 @@
 #include <vector>
 namespace cli{
 void help();
-struct state{
-    std::string cpp_compiler="g++ -std=c++20 ";
+class state{
+    public:
+    std::string cpp_compiler="";
     std::string input_filename="";
     std::string output_filename="";
     std::string cpp_arg="";
@@ -15,7 +16,8 @@ struct state{
     bool emit_js=false;
     bool emit_html=false;
     bool doc_html=false;
-    bool dev_debug=false;//Will be removed later. It is for debugging parser only.
+    bool dev_debug=false;//Will be removed later. It is for debugging the parser
+    void validate_state();
 };
 class CLI{
     std::vector<std::string> args;
@@ -25,7 +27,6 @@ class CLI{
     void advance();
     void checkargs(std::string s);
     public:
-    void validate_state();
     CLI(int argc, char** argv);
     state parse();
 };

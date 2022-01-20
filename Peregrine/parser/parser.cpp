@@ -10,8 +10,9 @@
 
 using namespace ast;
 
-Parser::Parser(const std::vector<Token>& tokens) : m_tokens(tokens) {
+Parser::Parser(const std::vector<Token>& tokens,std::string filename) : m_tokens(tokens) {
     m_currentToken = tokens[0];
+    m_filename=filename;
 }
 
 Parser::~Parser() {}

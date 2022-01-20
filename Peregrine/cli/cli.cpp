@@ -88,18 +88,70 @@ namespace cli{
             exit(1);
         }
     }
-    void CLI::validate_state(){
-        if (m_state.input_filename==""){
+    void state::validate_state(){
+        auto& m_state=*this;
+        if (m_state.input_filename=="" && !m_state.dev_debug){
             println("No input file specified.\nUse 'peregrine help' for more information");
             exit(1);
         }
+        int check_state=0;
         if(m_state.output_filename==""){
             if(m_state.emit_cpp){
-                m_state.output_filename=m_state.input_filename.substr(0, m_state.input_filename.size()-3)+"cpp";
+                m_state.output_filename=m_state.input_filename.substr(0, m_state.input_filename.size()-3)+".cpp";
             }
-            if(m_state.emit_js){
-                m_state.output_filename=m_state.input_filename.substr(0, m_state.input_filename.size()-3)+"o";
+            else if(m_state.emit_js){
+                m_state.output_filename=m_state.input_filename.substr(0, m_state.input_filename.size()-3)+".js";
             }
+            else if(m_state.emit_html){
+                m_state.output_filename=m_state.input_filename.substr(0, m_state.input_filename.size()-3)+".html";
+            }
+            else if(m_state.doc_html){
+                m_state.output_filename=m_state.input_filename.substr(0, m_state.input_filename.size()-3)+".html";
+            }
+            else if(m_state.emit_obj){
+                m_state.output_filename=m_state.input_filename.substr(0, m_state.input_filename.size()-3)+".o";
+            }
+            else{
+                #ifdef _WIN32
+                m_state.output_filename=m_state.input_filename.substr(0, m_state.input_filename.size()-3)+".exe";
+                #else
+                m_state.output_filename=m_state.input_filename.substr(0, m_state.input_filename.size()-3);
+                #endif
+            }
+        }
+        if(m_state.emit_cpp){
+            check_state++;
+        }
+        if(m_state.emit_js){
+            if(check_state!=0){
+                println("Cannot emit multiple output formats.\nUse 'peregrine help' for more information");
+                exit(1);
+            }
+            check_state++;
+        }
+        if(m_state.emit_html){
+            if(check_state!=0){
+                println("Cannot emit multiple output formats.\nUse 'peregrine help' for more information");
+                exit(1);
+            }
+            check_state++;
+        }
+        if(m_state.doc_html){
+            if(check_state!=0){
+                println("Cannot emit multiple output formats.\nUse 'peregrine help' for more information");
+                exit(1);
+            }
+            check_state++;
+        }
+        if(m_state.emit_obj){
+            if(check_state!=0){
+                println("Cannot emit multiple output formats.\nUse 'peregrine help' for more information");
+                exit(1);
+            }
+            check_state++;
+        }
+        if(m_state.cpp_compiler==""){
+            m_state.cpp_compiler="g++";//it will use clang that we are shiping with in the future
         }
     }
 }

@@ -37,7 +37,6 @@ class Parser {
   private:
     size_t m_tokIndex{0};
     Token m_currentToken;
-
     std::vector<Token> m_tokens;
     std::string m_filename;
 
@@ -109,7 +108,7 @@ class Parser {
     AstNodePtr parseDefaultArg();
 
   public:
-    Parser(const std::vector<Token>& tokens);
+    Parser(const std::vector<Token>& tokens,std::string filename);
     ~Parser();
 
     AstNodePtr parse();
