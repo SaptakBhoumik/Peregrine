@@ -35,6 +35,8 @@ class iterate_test:
     def __init__(self,c):
         self.i=c
         self.x=self.i
+    def peregrine4(self)->int,int:
+        return 6,6
     def __add__(self,item)->int:
         return 0
     def __neg__(self)->int:
@@ -133,6 +135,7 @@ union union_name:
     i:int
 
 def main():
+    peregrine1()
     cc1:union_name
     arrow_test:*union_name=&cc1
     arrow_test->i=7

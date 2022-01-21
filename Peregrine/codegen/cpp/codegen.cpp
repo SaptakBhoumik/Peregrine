@@ -371,7 +371,7 @@ bool Codegen::visit(const ast::ReturnStatement& node) {
         node.returnValue()[0]->accept(*this);
     }
     else{
-        write("if (____PEREGRINE____RETURN____0!=nullptr){\n");
+        write("if (____PEREGRINE____RETURN____0!=NULL){\n");
         for (size_t i=0;i<node.returnValue().size();++i){
             auto x=node.returnValue()[i];
             write("*____PEREGRINE____RETURN____"+std::to_string(i)+"=");

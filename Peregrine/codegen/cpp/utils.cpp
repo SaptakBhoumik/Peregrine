@@ -257,7 +257,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         write(" "+name+"(");
         codegenFuncParams(node->parameters(),1);
         if(node->returnType().size()>1){
-            if(node->parameters().size()>0){
+            if(node->parameters().size()>1){
                 write(",");
             }
             for(size_t i=0;i<node->returnType().size();++i){
