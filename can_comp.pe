@@ -2,6 +2,17 @@
 Hello"
 "Another Multiline comment
 Hello"
+def peregrine1()->int,int:
+    def peregrine2()->int,int:
+        return 2,2
+    return 1,1
+type a_type=def()->int,int
+def dec(x:a_type)->a_type:return x
+@dec
+def peregrine3()->int,int:
+    def peregrine2()->int,int:
+        return 3,3
+    return 4,4
 def unknown_type(var):
     for x in var:
         printf("Item is %d\n",x)

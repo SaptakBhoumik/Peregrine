@@ -112,11 +112,28 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
             node.body()->accept(*this);
             write("return 0;\n}");
         } else {
-            node.returnType()->accept(*this);
+            if(node.returnType().size()==1){
+                node.returnType()[0]->accept(*this);
+            }
+            else{
+                write("void");
+            }
             write(" ");
             node.name()->accept(*this);
             write("(");
             codegenFuncParams(node.parameters());
+            if(node.returnType().size()>1){
+                if(node.parameters().size()>0){
+                    write(",");
+                }
+                for(size_t i=0;i<node.returnType().size();++i){
+                    node.returnType()[i]->accept(*this);
+                    write("* ____PEREGRINE____RETURN____"+std::to_string(i)+"=NULL");
+                    if(i!=node.returnType().size()-1){
+                        write(",");
+                    }
+                }
+            }
             write(") {\n");
             node.body()->accept(*this);
             write("\n}");
@@ -128,8 +145,26 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
         node.name()->accept(*this);
         write("=[=](");
         codegenFuncParams(node.parameters());
-        write(")mutable->");
-        node.returnType()->accept(*this);
+        if(node.returnType().size()==0){
+            write(")mutable->void");
+        }
+        else if(node.returnType().size()==1){
+            write(")mutable->");
+            node.returnType()[0]->accept(*this);
+        }
+        else{
+            if(node.parameters().size()>0){
+                    write(",");
+            }
+            for(size_t i=0;i<node.returnType().size();++i){
+                node.returnType()[i]->accept(*this);
+                write("* ____PEREGRINE____RETURN____"+std::to_string(i)+"=NULL");
+                if(i!=node.returnType().size()-1){
+                    write(",");
+                }
+            }
+            write(")mutable->void");
+        }
         write(" {\n");
         node.body()->accept(*this);
         write("\n}");
@@ -331,8 +366,20 @@ bool Codegen::visit(const ast::CppStatement& node) {
 }
 
 bool Codegen::visit(const ast::ReturnStatement& node) {
-    write("return ");
-    node.returnValue()->accept(*this);
+    if(node.returnValue().size() == 1){
+        write("return ");
+        node.returnValue()[0]->accept(*this);
+    }
+    else{
+        write("if (____PEREGRINE____RETURN____0!=nullptr){\n");
+        for (size_t i=0;i<node.returnValue().size();++i){
+            auto x=node.returnValue()[i];
+            write("*____PEREGRINE____RETURN____"+std::to_string(i)+"=");
+            x->accept(*this);
+            write(";\n");
+        }
+        write("}\n");
+    }
     return true;
 }
 
@@ -380,8 +427,26 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
             write("[](");
         }
         codegenFuncParams(function->parameters());
-        write(")mutable->");
-        function->returnType()->accept(*this);
+        if(function->returnType().size()==0){
+            write(")mutable->void");
+        }
+        else if(function->returnType().size()==1){
+            write(")mutable->");
+            function->returnType()[0]->accept(*this);
+        }
+        else{
+            if(function->parameters().size()>0){
+                    write(",");
+            }
+            for(size_t i=0;i<function->returnType().size();++i){
+                function->returnType()[i]->accept(*this);
+                write("* ____PEREGRINE____RETURN____"+std::to_string(i)+"=NULL");
+                if(i!=function->returnType().size()-1){
+                    write(",");
+                }
+            }
+            write(")mutable->void");
+        }
         write("{\n");
         if(!is_func_def){
             is_func_def=true;
@@ -563,11 +628,11 @@ bool Codegen::visit(const ast::DictTypeExpr& node) { return true; }
 
 bool Codegen::visit(const ast::FunctionTypeExpr& node) {
     write("std::function<");
-    if (node.returnTypes().size() == 0) {
-        write("void (");
-    } else {
+    if (node.returnTypes().size() == 1) {
         node.returnTypes()[0]->accept(*this);
         write("(");
+    } else {
+        write("void(");
     }
     auto argTypes = node.argTypes();
     if (argTypes.size() > 0) {
@@ -575,6 +640,18 @@ bool Codegen::visit(const ast::FunctionTypeExpr& node) {
             if (i)
                 write(",");
             argTypes[i]->accept(*this);
+        }
+    }
+    if(node.returnTypes().size()>1){
+        if(node.argTypes().size()>0){
+            write(",");
+        }
+        for(size_t i=0;i<node.returnTypes().size();++i){
+            node.returnTypes()[i]->accept(*this);
+            write("*");
+            if(i<node.returnTypes().size()-1){
+                write(",");
+            }
         }
     }
     write(")>");

@@ -258,7 +258,12 @@ bool Codegen::visit(const ast::CppStatement& node) {
 
 bool Codegen::visit(const ast::ReturnStatement& node) {
     write("return ");
-    node.returnValue()->accept(*this);
+    for(size_t i=0;i<node.returnValue().size();++i){
+        node.returnValue()[i]->accept(*this);
+        if(i<node.returnValue().size()-1){
+            write(",");
+        }
+    }
     return true;
 }
 

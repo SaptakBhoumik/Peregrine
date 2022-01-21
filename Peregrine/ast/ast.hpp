@@ -554,7 +554,7 @@ class ClassDefinition : public AstNode {
 
 class FunctionDefinition : public AstNode {
     Token m_token;
-    AstNodePtr m_returnType;
+    std::vector<AstNodePtr> m_returnType;
     AstNodePtr m_name;
 
     std::vector<parameter> m_parameters;
@@ -562,10 +562,10 @@ class FunctionDefinition : public AstNode {
     AstNodePtr m_body;
 
   public:
-    FunctionDefinition(Token tok, AstNodePtr returnType, AstNodePtr name,
+    FunctionDefinition(Token tok, std::vector<AstNodePtr> returnType, AstNodePtr name,
                        std::vector<parameter> parameters, AstNodePtr body,std::string comment);
 
-    AstNodePtr returnType() const;
+    std::vector<AstNodePtr> returnType() const;
     AstNodePtr name() const;
     std::vector<parameter> parameters() const;
     AstNodePtr body() const;
@@ -578,12 +578,12 @@ class FunctionDefinition : public AstNode {
 
 class ReturnStatement : public AstNode {
     Token m_token;
-    AstNodePtr m_returnValue;
+    std::vector<AstNodePtr>  m_returnValue;
 
   public:
-    ReturnStatement(Token tok, AstNodePtr returnValue);
+    ReturnStatement(Token tok, std::vector<AstNodePtr>  returnValue);
 
-    AstNodePtr returnValue() const;
+    std::vector<AstNodePtr>  returnValue() const;
 
     Token token() const;
     AstKind type() const;

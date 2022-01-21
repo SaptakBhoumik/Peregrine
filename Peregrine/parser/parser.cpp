@@ -658,16 +658,26 @@ AstNodePtr Parser::parseFunctionDef() {
               "expected ), got " + m_currentToken.keyword + " instead");
     }
 
-    AstNodePtr returnType =std::make_shared<TypeExpression>(Token(), "void");
+    std::vector<AstNodePtr> returnType;
 
     if (next().tkType == tk_arrow) {
         advance();
         advance();
-
-        returnType = parseType();
+        while (m_currentToken.tkType != tk_colon) {
+            returnType.push_back(parseType());
+            advance();
+            if (m_currentToken.tkType == tk_comma) {
+                advance();
+            } else if (m_currentToken.tkType != tk_colon) {
+                error(m_currentToken,
+                      "Expected :, got " + m_currentToken.keyword + " instead","Add a : here");
+            }
+        }
     }
     std::string comment;
-    expect(tk_colon,"Expected a : but got "+next().keyword+" instead","Add a : here","","");
+    if(returnType.size()==0){
+        expect(tk_colon,"Expected a : but got "+next().keyword+" instead","Add a : here","","");
+    }
     size_t line=m_currentToken.line;
     AstNodePtr body;
     if(next().tkType!=tk_ident && next().line==line){
@@ -689,13 +699,17 @@ AstNodePtr Parser::parseFunctionDef() {
 
 AstNodePtr Parser::parseReturn() {
     Token tok = m_currentToken;
-    AstNodePtr returnValue = std::make_shared<NoLiteral>();
-
-    if (next().tkType != tk_new_line) {
-        advance();
-        returnValue = parseExpression();
-    } else {
-        advance();
+    std::vector<AstNodePtr> returnValue;
+    advance();
+    while (m_currentToken.tkType != tk_new_line) {
+        returnValue.push_back(parseExpression());
+        if (next().tkType==tk_comma) {
+            advance();
+            advance();
+        } else if(m_currentToken.tkType != tk_new_line) {
+            error(m_currentToken,
+                "Expected a , but got "+m_currentToken.keyword+" instead","Add a , here","","");
+        }
     }
 
     return std::make_shared<ReturnStatement>(tok, returnValue);
@@ -1052,8 +1066,17 @@ AstNodePtr Parser::parseFuncType() {
     if (next().tkType == tk_arrow) {
         advance();
         advance();
-        // TODO: Implement multiple return
         returnTypes.push_back(parseType());
+        if(next().tkType==tk_comma){
+            advance();
+        }
+        while (m_currentToken.tkType==tk_comma) {
+            advance();
+            returnTypes.push_back(parseType());
+            if(next().tkType==tk_comma){
+                advance();
+            }
+        }
     }
     return std::make_shared<FunctionTypeExpr>(tok, types, returnTypes);
 }

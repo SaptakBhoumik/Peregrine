@@ -79,3 +79,5 @@ match x:
     default:pass
 i++
 i--
+def v():
+    return 1,2

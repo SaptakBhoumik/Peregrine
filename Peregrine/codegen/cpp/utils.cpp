@@ -195,9 +195,9 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
                                                     {"__increment__","++"},
                                                     {"__decrement__","--"}
                                                     };
-    if (overloaded_binary_op.count(name)>0 && node->parameters().size()==2 && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
+    if (overloaded_binary_op.count(name)>0 && node->parameters().size()==2  && node->returnType().size()==1 && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
         //TODO: Dont declare it twice
-        node->returnType()->accept(*this);
+        node->returnType()[0]->accept(*this);
         write(" "+name+"(");
         codegenFuncParams(node->parameters(),1);
         write("){\n");
@@ -214,7 +214,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         }
         write("\n};\n");
         write(virtual_static_inline+" ");
-        node->returnType()->accept(*this);
+        node->returnType()[0]->accept(*this);
         write(" operator"+overloaded_binary_op[name]+"(");
         codegenFuncParams(node->parameters(),1);
         write("){\n");
@@ -223,9 +223,9 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         write(");");
         write("\n}");
     }
-    else if (overloaded_unary_op.count(name)>0 && node->parameters().size()==1 && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
+    else if (overloaded_unary_op.count(name)>0 && node->returnType().size()==1 && node->parameters().size()==1 && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
         //TODO: Dont declare it twice
-        node->returnType()->accept(*this);
+        node->returnType()[0]->accept(*this);
         write(" "+name+"(");
         write("){\n");
         write("auto& ");
@@ -241,16 +241,33 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         }
         write("\n};\n");
         write(virtual_static_inline+" ");
-        node->returnType()->accept(*this);
+        node->returnType()[0]->accept(*this);
         write(" operator"+overloaded_unary_op[name]+"(){\n");
         write("return "+name+"();");
         write("\n}");
     }
     else{
         assert(node->parameters().size()>0);
-        node->returnType()->accept(*this);
+        if(node->returnType().size()==1){
+                node->returnType()[0]->accept(*this);
+        }
+        else{
+            write("void");
+        }
         write(" "+name+"(");
         codegenFuncParams(node->parameters(),1);
+        if(node->returnType().size()>1){
+            if(node->parameters().size()>0){
+                write(",");
+            }
+            for(size_t i=0;i<node->returnType().size();++i){
+                node->returnType()[i]->accept(*this);
+                write("* ____PEREGRINE____RETURN____"+std::to_string(i)+"=NULL");
+                if(i!=node->returnType().size()-1){
+                    write(",");
+                }
+            }
+        }
         write("){\n");
         write("auto& ");
         node->parameters()[0].p_name->accept(*this);

@@ -595,7 +595,7 @@ std::string ClassDefinition::stringify() const {
     return res;
 }
 
-FunctionDefinition::FunctionDefinition(Token tok, AstNodePtr returnType,
+FunctionDefinition::FunctionDefinition(Token tok, std::vector<AstNodePtr> returnType,
                                        AstNodePtr name,
                                        std::vector<parameter> parameters,
                                        AstNodePtr body,std::string comment) {
@@ -607,7 +607,7 @@ FunctionDefinition::FunctionDefinition(Token tok, AstNodePtr returnType,
     m_comment=comment;
 }
 
-AstNodePtr FunctionDefinition::returnType() const { return m_returnType; }
+std::vector<AstNodePtr> FunctionDefinition::returnType() const { return m_returnType; }
 
 AstNodePtr FunctionDefinition::name() const { return m_name; }
 
@@ -647,9 +647,15 @@ std::string FunctionDefinition::stringify() const {
             }
         }
     }
-
-    res += ") -> ";
-    res += m_returnType->stringify();
+    if(m_returnType.size()>0){
+        res += ") -> ";
+        for (size_t i = 0; i < m_returnType.size(); i++) {
+            res += m_returnType[i]->stringify();
+            if (i < m_returnType.size() - 1) {
+                res += ",";
+            }
+        }
+    }
     res += ":\n";
 
     res += m_body->stringify();
@@ -657,12 +663,12 @@ std::string FunctionDefinition::stringify() const {
     return res;
 }
 
-ReturnStatement::ReturnStatement(Token tok, AstNodePtr returnValue) {
+ReturnStatement::ReturnStatement(Token tok, std::vector<AstNodePtr> returnValue) {
     m_token = tok;
     m_returnValue = returnValue;
 }
 
-AstNodePtr ReturnStatement::returnValue() const { return m_returnValue; }
+std::vector<AstNodePtr>  ReturnStatement::returnValue() const { return m_returnValue; }
 
 Token ReturnStatement::token() const { return m_token; }
 
@@ -671,8 +677,14 @@ AstKind ReturnStatement::type() const { return KAstReturnStatement; }
 std::string ReturnStatement::stringify() const {
     std::string res = "return";
 
-    if (m_returnValue->type() != KAstNoLiteral) {
-        res += " " + m_returnValue->stringify();
+    if (m_returnValue.size() != 0) {
+        for (size_t i=0; i<m_returnValue.size(); ++i) {
+            res += " ";
+            res += m_returnValue[i]->stringify();
+            if(i<m_returnValue.size()-1){
+                res += ",";
+            }
+        }
     }
 
     return res;
