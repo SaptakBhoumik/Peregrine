@@ -213,6 +213,16 @@ def main():
     r--
     assert r==2
     r++
-    assert r==3
-    #should terminate the program
-    #printf("%d",divide(6,0))
+    try:
+        assert r==3
+    except error.AssertionError:
+        printf("Assertion error\n")
+    try:
+        #should terminate the program
+        printf("%d",divide(6,0))
+    except error.AssertionError:pass
+    except:
+        printf("Exception caught\n")
+    try:assert False
+    except error.AssertionError,error.ZeroDivisionError as e:
+        printf("Exception caught %d\n",e)

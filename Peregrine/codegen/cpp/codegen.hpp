@@ -92,6 +92,7 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::DefaultArg& node);
     bool visit(const ast::ExportStatement& node);
     bool visit(const ast::TernaryIf& node);
+    bool visit(const ast::TryExcept& node);
     EnvPtr m_env;
 };
 

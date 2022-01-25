@@ -519,7 +519,9 @@ bool Codegen::visit(const ast::AssertStatement& node){
 }
 bool Codegen::visit(const ast::RaiseStatement& node){
     write("throw ");
-    node.value()->accept(*this);
+    if(node.value()->type()!=ast::KAstNoLiteral){
+        node.value()->accept(*this);
+    }
     return true;
 }
 bool Codegen::visit(const ast::EnumLiteral& node){

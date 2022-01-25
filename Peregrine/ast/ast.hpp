@@ -62,7 +62,8 @@ enum AstKind {
     KAstCast,
     KAstDefaultArg,
     KAstExport,
-    KAstTernaryIf
+    KAstTernaryIf,
+    KAstTryExcept
 };
 
 class AstVisitor;
@@ -974,6 +975,29 @@ class TernaryIf : public AstNode {
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
 
+};
+//This is long 🤣🤣
+typedef std::pair<std::pair<std::vector<AstNodePtr>,AstNodePtr>,AstNodePtr> except_type;
+/*
+except_type.first.first=the various exception types
+except_type.first.second=exception as variable
+except_type.second=except_type's body
+*/
+class TryExcept : public AstNode {
+    Token m_token;
+    AstNodePtr m_body;
+    std::vector<except_type> m_except_clauses;
+
+    AstNodePtr m_else_body;
+  public:
+    TryExcept(Token token,AstNodePtr body,std::vector<except_type> except_clauses,AstNodePtr else_body);
+    AstNodePtr body() const;
+    std::vector<except_type> except_clauses() const;
+    AstNodePtr else_body() const;//If none of the exeptions are thrown, this is executed
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 } // namespace ast
 

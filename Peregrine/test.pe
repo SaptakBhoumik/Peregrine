@@ -1,7 +1,7 @@
 while True:#Infinite loop lol
     pass
 def test(a,b):
-    pass
+    raise
 for x in y:
     for i , j in x:
         pass
@@ -81,3 +81,13 @@ i++
 i--
 def v():
     return 1,2
+try:
+    pass
+except a:
+    pass
+except a as b:
+    pass
+except a,c as b:
+    pass
+except:
+    pass

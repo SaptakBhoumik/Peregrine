@@ -522,7 +522,7 @@ std::string BlockStatement::stringify() const {
     std::string res = "";
 
     for (auto& stmt : m_statements) {
-        res += stmt->stringify();
+        res += "    "+stmt->stringify();
         res += "\n";
     }
 
@@ -1321,6 +1321,38 @@ std::string TernaryIf::stringify() const{
   std::string res=m_if_value->stringify()+" if("+m_if_value->stringify()+") else "+m_else_value->stringify();
   return res;
 }
-
+TryExcept::TryExcept(Token token,AstNodePtr body,std::vector<except_type>  except_clauses,AstNodePtr else_body){
+    m_token=token;
+    m_body=body;
+    m_except_clauses=except_clauses;
+    m_else_body=else_body;
+}
+AstNodePtr TryExcept::body() const{return m_body;}
+std::vector<except_type> TryExcept::except_clauses() const{return m_except_clauses;}
+AstNodePtr TryExcept::else_body() const{return m_else_body;}
+Token TryExcept::token() const{return m_token;}
+AstKind TryExcept::type() const{return KAstTryExcept;}
+std::string TryExcept::stringify() const{
+    std::string res="try:\n";
+    res+=m_body->stringify();
+    res+="\n";
+    for(size_t i=0;i<m_except_clauses.size();++i){
+        except_type x=m_except_clauses[i];
+        res+="except ";
+        for (size_t i=0;i<x.first.first.size();++i){
+            res+=x.first.first[i]->stringify();
+            if(i<x.first.first.size()-1){
+                res+=",";
+            }
+        }
+        res+=" as ";
+        res+=x.first.second->stringify();
+        res+=":\n";
+        res+=x.second->stringify();
+        res+="\n";
+    }
+    res+="except:\n"+m_else_body->stringify();
+    return res;
+}
 
 } // namespace ast

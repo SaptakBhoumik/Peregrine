@@ -174,8 +174,30 @@ AstNodePtr Parser::parseStatement() {
             error(m_currentToken, "Virtual function should be inside class only","","","e4");
             break;
         }
-        // TODO: variables currently do not work with all the types, we need to
-        // fix this
+        case tk_try:{
+            stmt = parseTryExcept();
+            break;
+        }
+        case tk_else:{
+            error(m_currentToken, "else statement without a previous if","","","e4");
+            break;
+        }
+        case tk_elif:{
+            error(m_currentToken, "elif statement without a previous if","","","e4");
+            break;
+        }
+        case tk_except:{
+            error(m_currentToken, "except statement without a previous try","","","");
+            break;
+        }
+        case tk_case:{
+            error(m_currentToken, "case statement without a previous match","","","");
+            break;
+        }
+        case tk_default:{
+            error(m_currentToken, "default statement without a previous match","","","");
+            break;
+        }
         case tk_identifier: {
             if ((next().tkType == tk_colon || next().tkType == tk_assign)) {
                 // variable
@@ -386,7 +408,6 @@ AstNodePtr Parser::parseImport() {
     return std::make_shared<ImportStatement>(tok, moduleName, importedSymbols);
 }
 
-// TODO: make this invalid: int = 43
 AstNodePtr Parser::parseVariableStatement() {
     Token tok = m_currentToken;
     AstNodePtr varType = std::make_shared<NoLiteral>();
@@ -1208,7 +1229,10 @@ AstNodePtr Parser::parseAssert() {
 AstNodePtr Parser::parseRaise() {
     auto tok = m_currentToken;
     advance();
-    AstNodePtr value = parseExpression();
+    AstNodePtr value = std::make_shared<NoLiteral>();
+    if(m_currentToken.tkType!=tk_new_line){
+        value = parseExpression();
+    }
     return std::make_shared<RaiseStatement>(tok, value);
 }
 
@@ -1445,4 +1469,83 @@ AstNodePtr Parser::parseTernaryIf(AstNodePtr left){
     advance();
     AstNodePtr else_value=parseExpression(pr_conditional);
     return std::make_shared<TernaryIf>(tok,left,if_condition,else_value);
+}
+AstNodePtr Parser::parseTryExcept(){
+    auto tok=m_currentToken;
+    expect(tk_colon,"Expected : but got "+next().keyword+" instead","Add a : here","","");
+    auto line=m_currentToken.line;
+    AstNodePtr try_body;
+    if(next().tkType!=tk_ident && next().line==line){
+      advance();
+      std::vector<AstNodePtr> x;
+      x.push_back(parseStatement());
+      try_body = std::make_shared<BlockStatement>(x);
+    }
+    else{
+      expect(tk_ident,"Expected identation but got "+next().keyword+" instead","","","");
+      try_body = parseBlockStatement();
+    }
+    expect(tk_except,"Expected except but got "+next().keyword+" instead","Atleast one except is necessary","","");
+    AstNodePtr else_body=std::make_shared<NoLiteral>();
+    std::vector<except_type> m_except_clauses;
+    while(m_currentToken.tkType==tk_except){
+        if(next().tkType==tk_colon){
+            advance();
+            auto line=m_currentToken.line;
+            if(next().tkType!=tk_ident && next().line==line){
+              advance();
+              std::vector<AstNodePtr> x;
+              x.push_back(parseStatement());
+              else_body = std::make_shared<BlockStatement>(x);
+            }
+            else{
+              expect(tk_ident,"Expected identation but got "+next().keyword+" instead","","","");
+              else_body = parseBlockStatement();
+            }
+            break;
+        }
+        else{
+
+            AstNodePtr name=std::make_shared<NoLiteral>();
+            AstNodePtr except_body=std::make_shared<NoLiteral>();
+            std::vector<AstNodePtr> exceptions;
+            advance();
+            while(m_currentToken.tkType!=tk_colon && m_currentToken.tkType!=tk_as){
+                exceptions.push_back(parseExpression());
+                if(next().tkType==tk_comma){
+                    advance();
+                    advance();
+                }
+                else if(next().tkType==tk_as||next().tkType==tk_colon){
+                    advance();
+                }
+                else{
+                    error(next(),"Expected ',' or 'as' or ':' but got "+
+                                    next().keyword+
+                                    " instead","","","");
+                }
+            }
+            if(m_currentToken.tkType==tk_as){
+                advance();
+                name=parseName();
+                expect(tk_colon,"Expected : but got "+next().keyword+" instead","Add a : here","","");
+            }
+            auto line=m_currentToken.line;
+            if(next().tkType!=tk_ident && next().line==line){
+              advance();
+              std::vector<AstNodePtr> x;
+              x.push_back(parseStatement());
+              except_body = std::make_shared<BlockStatement>(x);
+            }
+            else{
+              expect(tk_ident,"Expected identation but got "+next().keyword+" instead","","","");
+              except_body = parseBlockStatement();
+            }
+            if (next().tkType==tk_except){
+                advance();
+            }
+            m_except_clauses.push_back(std::make_pair(std::make_pair(exceptions,name),except_body));
+        }
+    }
+    return std::make_shared<TryExcept>(tok,try_body,m_except_clauses,else_body);
 }

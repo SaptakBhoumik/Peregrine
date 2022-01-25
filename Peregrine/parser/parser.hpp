@@ -106,6 +106,7 @@ class Parser {
     AstNodePtr parseExport();
     AstNodePtr parseTypeDef();
     AstNodePtr parseDefaultArg();
+    AstNodePtr parseTryExcept();
 
   public:
     Parser(const std::vector<Token>& tokens,std::string filename);

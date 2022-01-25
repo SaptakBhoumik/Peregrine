@@ -168,8 +168,8 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
                                                     {"__lshift__","<<"},
                                                     {"__and__"," and"},
                                                     {"__or__"," or"},
-                                                    {"__bit_and__","&"},
-                                                    {"__bit_or__","|"},
+                                                    {"__rand__","&"},
+                                                    {"__ror__","|"},
                                                     {"__xor__","^"},
                                                     {"__lt__","<"},
                                                     {"__gt__",">"},
@@ -190,7 +190,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
                                                     };
     std::map<std::string,std::string> overloaded_unary_op={
                                                     {"__neg__","-"},
-                                                    {"__invert__","+"},
+                                                    {"__invert__","~"},
                                                     {"__not__"," not"},
                                                     {"__increment__","++"},
                                                     {"__decrement__","--"}
