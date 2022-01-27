@@ -214,7 +214,7 @@ def main():
     assert r==2
     r++
     try:
-        assert r==3
+        assert r==0
     except error.AssertionError:
         printf("Assertion error\n")
     try:

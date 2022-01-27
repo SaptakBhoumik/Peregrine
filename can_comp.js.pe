@@ -42,6 +42,7 @@ def lambda_test(x:a):
     printf("The value is %d",x(5))
 def func(g:int )->int:
     return g
+export def fun():pass
 def main():
     dec_test(4)
     def z():
@@ -97,3 +98,20 @@ def main():
     assert TernaryIf==5
     TernaryIf=5 if False else 6
     assert TernaryIf==6
+    r:int=3
+    r--
+    assert r==2
+    r++
+    try:
+        assert r==0
+    except error.AssertionError:
+        printf("Assertion error\n")
+    try:
+        #should terminate the program
+        printf("%d",divide(6,0))
+    except error.AssertionError:pass
+    except:
+        printf("Exception caught\n")
+    try:assert False
+    except error.AssertionError,error.ZeroDivisionError as e:
+        printf("Exception caught %d\n",e)

@@ -81,6 +81,7 @@ bool Codegen::visit(const ast::Program& node) {
 
 bool Codegen::visit(const ast::BlockStatement& node) {
     for (auto& stmt : node.statements()) {
+        write("    ");
         stmt->accept(*this);
         write(";\n");
     }
@@ -568,4 +569,72 @@ bool Codegen::visit(const ast::TernaryIf& node){
     node.else_value()->accept(*this);
     return true;
 }
+bool Codegen::visit(const ast::TryExcept& node){
+    write("try{\n");
+    node.body()->accept(*this);
+    //TODO:This should be base exception
+    write("}\ncatch(__PEREGRINE__exception){\n");
+    if(node.except_clauses().size()>0){
+        write("if (");
+        auto x=node.except_clauses()[0];
+        for (size_t i=0;i<x.first.first.size();++i){
+            write("__PEREGRINE__exception===");
+            x.first.first[i]->accept(*this);
+            if(i<x.first.first.size()-1){write("||");}
+        }
+        write("){\n");
+        if(x.first.second->type()!=ast::KAstNoLiteral){
+            write("let ");
+            x.first.second->accept(*this);
+            write("=__PEREGRINE__exception;\n");
+        }
+        x.second->accept(*this);
+        write("}\n");
+        for(size_t i=1;i<node.except_clauses().size();++i){
+            write("else if (");
+            auto x=node.except_clauses()[i];
+            for (size_t i=0;i<x.first.first.size();++i){
+                write("__PEREGRINE__exception===");
+                x.first.first[i]->accept(*this);
+                if(i<x.first.first.size()-1){write("||");}
+            }
+            write("){\n");
+            if(x.first.second->type()!=ast::KAstNoLiteral){
+                write("let ");
+                x.first.second->accept(*this);
+                write("=__PEREGRINE__exception;\n");
+            }
+            x.second->accept(*this);
+            write("}\n");
+        }
+    }
+    if(node.else_body()->type()!=ast::KAstNoLiteral){
+        if(node.except_clauses().size()>0){
+            write("else{");
+            node.else_body()->accept(*this);
+            write("}\n");
+        }
+        else{
+            node.else_body()->accept(*this);
+        }
+    }
+    else{
+        if(node.except_clauses().size()>0){
+            write("else{");
+            write("throw __PEREGRINE__exception;\n");
+            write("}\n");
+        }
+        else{
+            write("throw __PEREGRINE__exception;\n");
+        }
+    }
+    write("}");
+    return true; 
+}
+bool Codegen::visit(const ast::PostfixExpression& node) {
+    node.left()->accept(*this);
+    write(node.postfix().keyword);
+    return true;
+}
+
 } // namespace js

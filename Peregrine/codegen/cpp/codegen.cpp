@@ -90,6 +90,7 @@ bool Codegen::visit(const ast::Program& node) {
 
 bool Codegen::visit(const ast::BlockStatement& node) {
     for (auto& stmt : node.statements()) {
+        write("    ");
         stmt->accept(*this);
         write(";\n");
     }
@@ -688,7 +689,7 @@ bool Codegen::visit(const ast::NoneLiteral& node) {
     return true;
 }
 bool Codegen::visit(const ast::AssertStatement& node){
-    write("if(! ");
+    write("if(not ");
     node.condition()->accept(*this);
     write("){\n");
     write("printf(\"AssertionError : in line "+std::to_string(node.token().line)+" in file "+m_filename+"\\n   "+node.token().statement+"\\n\");fflush(stdout);throw error___AssertionError;");
@@ -881,7 +882,7 @@ bool Codegen::visit(const ast::TryExcept& node){
         for (size_t i=0;i<x.first.first.size();++i){
             write("__PEREGRINE__exception==");
             x.first.first[i]->accept(*this);
-            if(i<x.first.first.size()-1){write("||");}
+            if(i<x.first.first.size()-1){write(" or ");}
         }
         write("){\n");
         if(x.first.second->type()!=ast::KAstNoLiteral){
@@ -897,7 +898,7 @@ bool Codegen::visit(const ast::TryExcept& node){
             for (size_t i=0;i<x.first.first.size();++i){
                 write("__PEREGRINE__exception==");
                 x.first.first[i]->accept(*this);
-                if(i<x.first.first.size()-1){write("||");}
+                if(i<x.first.first.size()-1){write(" or ");}
             }
             write("){\n");
             if(x.first.second->type()!=ast::KAstNoLiteral){
