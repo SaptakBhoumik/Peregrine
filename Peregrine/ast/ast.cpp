@@ -118,18 +118,35 @@ AstKind IdentifierExpression::type() const { return KAstIdentifier; }
 
 std::string IdentifierExpression::stringify() const { return m_value; }
 
-TypeExpression::TypeExpression(Token tok, std::string_view value) {
+TypeExpression::TypeExpression(Token tok, std::string_view value,
+                               std::vector<AstNodePtr> generic_type) {
     m_token = tok;
     m_value = value;
+    m_generic_type = generic_type;
 }
 
 std::string TypeExpression::value() const { return m_value; }
+
+std::vector<AstNodePtr> TypeExpression::generic_types() const { return m_generic_type; }
 
 Token TypeExpression::token() const { return m_token; }
 
 AstKind TypeExpression::type() const { return KAstTypeExpr; }
 
-std::string TypeExpression::stringify() const { return m_value; }
+std::string TypeExpression::stringify() const { 
+    auto res= m_value;
+    if(m_generic_type.size()>0){
+        res+="<";
+        for(size_t i=0;i<m_generic_type.size();i++){
+            res+=m_generic_type[i]->stringify();
+            if(i<m_generic_type.size()-1){
+                res+=",";
+            }
+        }
+        res+=">";
+    } 
+    return res;
+}
 
 ListLiteral::ListLiteral(Token tok, AstNodePtr type,
                          std::vector<AstNodePtr> elements) {

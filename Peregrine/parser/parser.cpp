@@ -412,11 +412,12 @@ AstNodePtr Parser::parseVariableStatement() {
     Token tok = m_currentToken;
     AstNodePtr varType = std::make_shared<NoLiteral>();
     AstNodePtr name = parseName();
+    bool has_value=false;
     advance();
 
     if (m_currentToken.tkType == tk_colon) {
         advance();
-        varType = parseType();
+        varType = parseType(true,&has_value);
         advance();
     }
     else{
@@ -444,8 +445,7 @@ AstNodePtr Parser::parseVariableStatement() {
       }
     }
     AstNodePtr value = std::make_shared<NoLiteral>();
-
-    if (m_currentToken.tkType == tk_assign) {
+    if (m_currentToken.tkType == tk_assign||has_value) {
         advance();
         value = parseExpression();
     } else {
@@ -999,7 +999,7 @@ AstNodePtr Parser::parseIdentifier() {
                                                   m_currentToken.keyword);
 }
 
-AstNodePtr Parser::parseType() {
+AstNodePtr Parser::parseType(bool var_dec,bool* has_value) {
     switch (m_currentToken.tkType) {
         case tk_def:
             return parseFuncType();
@@ -1015,9 +1015,26 @@ AstNodePtr Parser::parseType() {
 
         case tk_identifier: {
             if (next().tkType == tk_dot) {
-                AstNodePtr left = parseName();
+                return parseImportedType();
+            }
+            else if(next().tkType==tk_less){
+                auto tok=m_currentToken;
+                std::vector<AstNodePtr> generic_types;
                 advance();
-                return parseDotExpression(left);
+                advance();
+                while(m_currentToken.tkType!=tk_greater){
+                    generic_types.push_back(parseType());
+                    if(next().tkType==tk_comma){
+                        advance();
+                    }
+                    else if(next().tkType==tk_gr_or_equ && var_dec && has_value!=nullptr){
+                        *has_value=true;
+                        break;
+                    }
+                    advance();
+                }
+                return std::make_shared<TypeExpression>(tok,
+                                                    tok.keyword,generic_types);
             }
             return std::make_shared<TypeExpression>(m_currentToken,
                                                     m_currentToken.keyword);
@@ -1548,4 +1565,21 @@ AstNodePtr Parser::parseTryExcept(){
         }
     }
     return std::make_shared<TryExcept>(tok,try_body,m_except_clauses,else_body);
+}
+AstNodePtr Parser::parseImportedType(){
+    AstNodePtr name=parseName();
+    advance();
+    while(m_currentToken.tkType==tk_dot){
+        auto tok=m_currentToken;
+        advance();
+        if(next().tkType!=tk_dot){
+            name=std::make_shared<DotExpression>(tok,name,parseType());
+            break;
+        }
+        else{
+            name=std::make_shared<DotExpression>(tok,name,parseName());
+            advance();
+        }
+    }
+    return name;
 }

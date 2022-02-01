@@ -91,3 +91,7 @@ except a,c as b:
     pass
 except:
     pass
+a:i.h.g=0
+a:int
+a:generic<T1,T2>= 0
+a:generic<T1,T2> = 0

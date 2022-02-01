@@ -620,6 +620,17 @@ bool Codegen::visit(const ast::IdentifierExpression& node) {
 
 bool Codegen::visit(const ast::TypeExpression& node) {
     write(node.value());
+    auto generic_types=node.generic_types();
+    if(generic_types.size()>0){
+        write("<");
+        for(size_t i=0;i<generic_types.size();i++){
+            generic_types[i]->accept(*this);
+            if(i<generic_types.size()-1){
+                write(",");
+            }
+        }
+        write(">");
+    } 
     return true;
 }
 

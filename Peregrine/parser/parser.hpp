@@ -62,7 +62,8 @@ class Parser {
     AstNodePtr parseDict();
     AstNodePtr parseCpp();
 
-    AstNodePtr parseType();
+    AstNodePtr parseType(bool var_dec=false, bool* has_value=nullptr);
+    AstNodePtr parseImportedType();
     AstNodePtr parsePointerType();
     AstNodePtr parseListType();
     AstNodePtr parseDictType();

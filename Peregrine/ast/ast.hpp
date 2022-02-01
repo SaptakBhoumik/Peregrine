@@ -200,11 +200,13 @@ class IdentifierExpression : public AstNode {
 class TypeExpression : public AstNode {
     Token m_token;
     std::string m_value;
+    std::vector<AstNodePtr> m_generic_type;
 
   public:
-    TypeExpression(Token tok, std::string_view value);
+    TypeExpression(Token tok, std::string_view value, std::vector<AstNodePtr> generic_type={});
 
     std::string value() const;
+    std::vector<AstNodePtr> generic_types() const;
 
     Token token() const;
     AstKind type() const;
