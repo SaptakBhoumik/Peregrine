@@ -1,3 +1,6 @@
+val = [45, 3]
+val2 = cast<int>(val)
+
 while True:#Infinite loop lol
     pass
 def test(a,b):
@@ -5,6 +8,9 @@ def test(a,b):
 for x in y:
     for i , j in x:
         pass
+
+c = [3, 54, 76]
+c[2] = 4
 
 a = 23
 test = &a
@@ -46,7 +52,7 @@ class test(parent1,parent2):
 
 def test_x(a=0,b:int=9):
     pass
-test_x(a=8,b=7)
+test_x(7)
 
 static const gg=5
 static const gg:int=5

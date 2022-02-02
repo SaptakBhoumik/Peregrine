@@ -38,6 +38,10 @@ class Type {
     // returns true if the type can be converted to the other IMPLICITLY
     virtual bool isConvertibleTo(const Type& type) const = 0;
 
+    // returns true if the type can be converted to the other EXPLICITLY (by
+    // using cast)
+    virtual bool isCastableTo(const Type& type) const = 0;
+
     virtual std::string stringify() const { return ""; }
 
     // returns the type obtained after applying the given operator to this type
@@ -70,6 +74,7 @@ class IntType : public Type {
     IntSizes size() const;
     Modifier modifier() const;
     bool isConvertibleTo(const Type& type) const;
+    bool isCastableTo(const Type& type) const;
     std::string stringify() const;
 
     TypePtr prefixOperatorResult(Token op) const;
@@ -91,6 +96,7 @@ class DecimalType : public Type {
     TypeCategory category() const;
     DecimalSize size() const;
     bool isConvertibleTo(const Type& type) const;
+    bool isCastableTo(const Type& type) const;
     std::string stringify() const;
 
     bool isFloat() const;
@@ -110,6 +116,7 @@ class StringType : public Type {
 
     TypeCategory category() const;
     bool isConvertibleTo(const Type& type) const;
+    bool isCastableTo(const Type& type) const;
     std::string stringify() const;
 
     TypePtr prefixOperatorResult(Token op) const;
@@ -122,6 +129,7 @@ class BoolType : public Type {
 
     TypeCategory category() const;
     bool isConvertibleTo(const Type& type) const;
+    bool isCastableTo(const Type& type) const;
     std::string stringify() const;
 };
 
@@ -134,6 +142,7 @@ class PointerType : public Type {
     TypeCategory category() const;
     TypePtr baseType() const;
     bool isConvertibleTo(const Type& type) const;
+    bool isCastableTo(const Type& type) const;
     std::string stringify() const;
 
     TypePtr prefixOperatorResult(Token op) const;
@@ -146,6 +155,7 @@ class VoidType : public Type {
 
     TypeCategory category() const;
     bool isConvertibleTo(const Type& type) const;
+    bool isCastableTo(const Type& type) const;
     std::string stringify() const;
 };
 
@@ -160,6 +170,7 @@ class ListType : public Type {
     TypePtr elemType() const;
     std::string size() const;
     bool isConvertibleTo(const Type& type) const;
+    bool isCastableTo(const Type& type) const;
     std::string stringify() const;
 
     bool operator==(const Type& type) const;
@@ -174,6 +185,7 @@ class UserDefinedType : public Type {
     TypeCategory category() const;
     TypePtr baseType() const;
     bool isConvertibleTo(const Type& type) const;
+    bool isCastableTo(const Type& type) const;
     std::string stringify() const;
 
     bool operator==(const Type& type) const;
@@ -190,6 +202,7 @@ class FunctionType : public Type {
     const std::vector<TypePtr>& parameterTypes() const;
     TypePtr returnType() const;
     bool isConvertibleTo(const Type& type) const;
+    bool isCastableTo(const Type& type) const;
     std::string stringify() const;
 
     bool operator==(const Type& type) const;

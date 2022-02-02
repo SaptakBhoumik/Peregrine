@@ -43,6 +43,28 @@ bool IntType::isConvertibleTo(const Type& type) const {
     return true;
 }
 
+bool IntType::isCastableTo(const Type& type) const {
+    switch (type.category()) {
+        case TypeCategory::Integer:
+        case TypeCategory::Decimal:
+        case TypeCategory::Pointer:
+        case TypeCategory::Bool:
+        case TypeCategory::UserDefined:
+            break;
+
+        default:
+            return false;
+    }
+
+    if (type.category() == TypeCategory::UserDefined) {
+        auto& userDefinedType = dynamic_cast<const UserDefinedType&>(type);
+
+        return isCastableTo(*userDefinedType.baseType());
+    }
+
+    return true;
+}
+
 std::string IntType::stringify() const { return "integer"; }
 
 // TODO: unsigned ints
@@ -113,6 +135,27 @@ bool DecimalType::isConvertibleTo(const Type& type) const {
     return true;
 }
 
+bool DecimalType::isCastableTo(const Type& type) const {
+    switch (type.category()) {
+        case TypeCategory::Integer:
+        case TypeCategory::Decimal:
+        case TypeCategory::Bool:
+        case TypeCategory::UserDefined:
+            break;
+
+        default:
+            return false;
+    }
+
+    if (type.category() == TypeCategory::UserDefined) {
+        auto& userDefinedType = dynamic_cast<const UserDefinedType&>(type);
+
+        return isCastableTo(*userDefinedType.baseType());
+    }
+
+    return true;
+}
+
 std::string DecimalType::stringify() const {
     return (isFloat()) ? "float" : "double";
 }
@@ -172,6 +215,25 @@ bool StringType::isConvertibleTo(const Type& type) const {
     return (type.category() == TypeCategory::String);
 }
 
+bool StringType::isCastableTo(const Type& type) const {
+    switch (type.category()) {
+        case TypeCategory::UserDefined:
+        case TypeCategory::String:
+            break;
+
+        default:
+            return false;
+    }
+
+    if (type.category() == TypeCategory::UserDefined) {
+        auto& userDefinedType = dynamic_cast<const UserDefinedType&>(type);
+
+        return isCastableTo(*userDefinedType.baseType());
+    }
+
+    return true;
+}
+
 std::string StringType::stringify() const { return "string"; }
 
 TypePtr StringType::prefixOperatorResult(Token op) const {
@@ -209,6 +271,26 @@ bool BoolType::isConvertibleTo(const Type& type) const {
     return (type.category() == TypeCategory::Bool);
 }
 
+bool BoolType::isCastableTo(const Type& type) const {
+    switch (type.category()) {
+        case TypeCategory::UserDefined:
+        case TypeCategory::Integer:
+        case TypeCategory::Bool:
+            break;
+
+        default:
+            return false;
+    }
+
+    if (type.category() == TypeCategory::UserDefined) {
+        auto& userDefinedType = dynamic_cast<const UserDefinedType&>(type);
+
+        return isCastableTo(*userDefinedType.baseType());
+    }
+
+    return true;
+}
+
 std::string BoolType::stringify() const { return "bool"; }
 
 PointerType::PointerType(TypePtr baseType) { m_baseType = baseType; }
@@ -226,6 +308,26 @@ bool PointerType::isConvertibleTo(const Type& type) const {
         return true;
 
     return false;
+}
+
+bool PointerType::isCastableTo(const Type& type) const {
+    switch (type.category()) {
+        case TypeCategory::UserDefined:
+        case TypeCategory::Integer:
+        case TypeCategory::Pointer:
+            break;
+
+        default:
+            return false;
+    }
+
+    if (type.category() == TypeCategory::UserDefined) {
+        auto& userDefinedType = dynamic_cast<const UserDefinedType&>(type);
+
+        return isCastableTo(*userDefinedType.baseType());
+    }
+
+    return true;
 }
 
 std::string PointerType::stringify() const {
@@ -254,6 +356,8 @@ TypeCategory VoidType::category() const { return TypeCategory::Void; }
 
 bool VoidType::isConvertibleTo(const Type& type) const { return false; }
 
+bool VoidType::isCastableTo(const Type& type) const { return false; }
+
 std::string VoidType::stringify() const { return "void"; }
 
 ListType::ListType(TypePtr elemType, std::string size) {
@@ -277,6 +381,25 @@ bool ListType::isConvertibleTo(const Type& type) const {
         return true;
 
     return false;
+}
+
+bool ListType::isCastableTo(const Type& type) const {
+    switch (type.category()) {
+        case TypeCategory::UserDefined:
+        case TypeCategory::List:
+            break;
+
+        default:
+            return false;
+    }
+
+    if (type.category() == TypeCategory::UserDefined) {
+        auto& userDefinedType = dynamic_cast<const UserDefinedType&>(type);
+
+        return isCastableTo(*userDefinedType.baseType());
+    }
+
+    return true;
 }
 
 std::string ListType::stringify() const {
@@ -305,6 +428,10 @@ TypePtr UserDefinedType::baseType() const { return m_baseType; }
 
 bool UserDefinedType::isConvertibleTo(const Type& type) const {
     return m_baseType->isConvertibleTo(type);
+}
+
+bool UserDefinedType::isCastableTo(const Type& type) const {
+    return m_baseType->isCastableTo(type);
 }
 
 // TODO
@@ -351,6 +478,9 @@ bool FunctionType::isConvertibleTo(const Type& type) const {
 
     return true;
 }
+
+// TODO
+bool FunctionType::isCastableTo(const Type& type) const { return false; }
 
 std::string FunctionType::stringify() const { return "function"; }
 

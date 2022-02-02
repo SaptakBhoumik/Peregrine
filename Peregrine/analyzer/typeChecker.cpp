@@ -16,11 +16,12 @@ TypeChecker::TypeChecker(ast::AstNodePtr ast) {
 }
 
 void TypeChecker::error(Token tok, std::string_view msg) {
-    PEError err = {{tok.line, tok.start,tok.location, m_filename, tok.statement},
-                   std::string(msg),
-                   "TypeError",
-                   "",
-                   ""};
+    PEError err = {
+        {tok.line, tok.start, tok.location, m_filename, tok.statement},
+        std::string(msg),
+        "TypeError",
+        "",
+        ""};
     display(err);
     exit(1);
 }
@@ -59,8 +60,11 @@ std::string TypeChecker::identifierName(ast::AstNodePtr identifier) {
         ->value();
 }
 
+bool TypeChecker::visit(const ast::ClassDefinition& node) { return true; }
+
 bool TypeChecker::visit(const ast::ImportStatement& node) { return true; }
 
+// TODO: default args
 bool TypeChecker::visit(const ast::FunctionDefinition& node) {
     EnvPtr oldEnv = m_env;
     m_env = createEnv();
@@ -69,6 +73,18 @@ bool TypeChecker::visit(const ast::FunctionDefinition& node) {
     parameterTypes.reserve(node.parameters().size());
 
     for (auto& param : node.parameters()) {
+        if (param.p_default->type() != ast::KAstNoLiteral) {
+            if (param.p_type->type() != ast::KAstNoLiteral) {
+                param.p_type->accept(*this);
+                check(param.p_default, *m_result);
+            }
+
+            param.p_default->accept(*this);
+            parameterTypes.push_back(m_result);
+            m_env->set(identifierName(param.p_name), m_result);
+            continue;
+        }
+
         param.p_type->accept(*this);
         parameterTypes.push_back(m_result);
         m_env->set(identifierName(param.p_name), m_result);
@@ -153,6 +169,16 @@ bool TypeChecker::visit(const ast::IfStatement& node) {
     return true;
 }
 
+bool TypeChecker::visit(const ast::AssertStatement& node) { return true; }
+
+bool TypeChecker::visit(const ast::StaticStatement& node) { return true; }
+
+bool TypeChecker::visit(const ast::ExportStatement& node) { return true; }
+
+bool TypeChecker::visit(const ast::InlineStatement& node) { return true; }
+
+bool TypeChecker::visit(const ast::RaiseStatement& node) { return true; }
+
 bool TypeChecker::visit(const ast::WhileStatement& node) {
     check(node.condition(), *TypeProducer::boolean());
     checkBody(node.body());
@@ -178,18 +204,20 @@ bool TypeChecker::visit(const ast::ScopeStatement& node) {
 }
 
 bool TypeChecker::visit(const ast::ReturnStatement& node) {
-    std::cout << "a"
-              << "\n";
     if (!m_currentFunction) {
         error(node.token(), "can not use return outside of a function");
     }
+
     for (auto& expr : node.returnValue()) {
         expr->accept(*this);
     }
-    //TODO:Multiple return values
+
+    // TODO:Multiple return values
     check(node.returnValue()[0], *m_currentFunction->returnType());
     return true;
 }
+
+bool TypeChecker::visit(const ast::DecoratorStatement& node) { return true; }
 
 bool TypeChecker::visit(const ast::ListLiteral& node) {
     node.elements()[0]->accept(*this); // TODO: check to see if its not empty
@@ -238,6 +266,8 @@ bool TypeChecker::visit(const ast::PrefixExpression& node) {
     return true;
 }
 
+bool TypeChecker::visit(const ast::PostfixExpression& node) { return true; }
+
 bool TypeChecker::visit(const ast::FunctionCall& node) {
     node.name()->accept(*this);
 
@@ -259,6 +289,8 @@ bool TypeChecker::visit(const ast::FunctionCall& node) {
 }
 
 bool TypeChecker::visit(const ast::DotExpression& node) { return true; }
+
+bool TypeChecker::visit(const ast::ArrowExpression& node) { return true; }
 
 bool TypeChecker::visit(const ast::IdentifierExpression& node) {
     auto identifierType = m_env->get(node.value());
@@ -340,3 +372,30 @@ bool TypeChecker::visit(const ast::NoneLiteral& node) {
     m_result = TypeProducer::voidT();
     return true;
 }
+
+bool TypeChecker::visit(const ast::UnionLiteral& node) { return true; }
+
+bool TypeChecker::visit(const ast::EnumLiteral& node) { return true; }
+
+bool TypeChecker::visit(const ast::WithStatement& node) { return true; }
+
+bool TypeChecker::visit(const ast::VirtualStatement& node) { return true; }
+
+bool TypeChecker::visit(const ast::CastStatement& node) {
+    node.cast_type()->accept(*this);
+    TypePtr castType = m_result;
+    node.value()->accept(*this);
+
+    if (!m_result->isCastableTo(*castType)) {
+        error(node.token(), m_result->stringify() + " can not be casted to " +
+                                castType->stringify());
+    }
+
+    return true;
+}
+
+bool TypeChecker::visit(const ast::DefaultArg& node) { return true; }
+
+bool TypeChecker::visit(const ast::TernaryIf& node) { return true; }
+
+bool TypeChecker::visit(const ast::TryExcept& node) { return true; }
