@@ -10,6 +10,12 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    - uses: actions/upload-artifact@v2
+      with:
+        name: peregrine-build
+        path: ./builddir/peregrine.elf
+        retention-days: 1
+        if-no-files-found: error
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -19,7 +25,28 @@ jobs:
       run: meson builddir
     - name: Ninja
       run: cd builddir && ninja
-    - name: Compile
-      run: ./peregrine.elf -dev_debug && /peregrine.elf compile ../can_comp.pe -o output && /peregrine.elf compile ../can_comp.js.pe -o output.js
-    - name: Run_bin
-      run: ./output && node ./output
+    
+run-tests:
+    needs: build
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install build-essential
+        run: sudo apt-get install build-essential
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Download Artifact Compiled peregrine
+        uses: actions/download-artifact@v2
+        with:
+          name: peregrine-bin
+          path: ./builddir/
+      - name: Run tests
+        run: | 
+          cd builddir
+          ls
+          pwd
+          sudo chmod 777 ./peregrine.elf
+          sudo bash ./run_tests_ci.sh
+          ./peregrine.elf -dev_debug && /peregrine.elf compile ../can_comp.pe -o output && /peregrine.elf compile ../can_comp.js.pe -o output.js
+          ./output && node ./output.js
+          echo TEST DONE
