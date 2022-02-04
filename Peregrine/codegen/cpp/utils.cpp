@@ -1,4 +1,5 @@
 #include "codegen.hpp"
+#include <memory>
 #include <assert.h>
 
 namespace cpp {
@@ -158,6 +159,7 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
 }
 //Based on:- https://docs.python.org/3/reference/datamodel.html
 void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::string name,std::string virtual_static_inline){
+    auto return_type=TurpleTypes(node->returnType());
     std::map<std::string,std::string> overloaded_binary_op={
                                                     {"__add__","+"},
                                                     {"__sub__","-"},
@@ -195,9 +197,9 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
                                                     {"__increment__","++"},
                                                     {"__decrement__","--"}
                                                     };
-    if (overloaded_binary_op.count(name)>0 && node->parameters().size()==2  && node->returnType().size()==1 && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
+    if (overloaded_binary_op.count(name)>0 && return_type.size()==0 &&node->parameters().size()==2  && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
         //TODO: Dont declare it twice
-        node->returnType()[0]->accept(*this);
+        node->returnType()->accept(*this);
         write(" "+name+"(");
         codegenFuncParams(node->parameters(),1);
         write("){\n");
@@ -214,7 +216,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         }
         write("\n};\n");
         write(virtual_static_inline+" ");
-        node->returnType()[0]->accept(*this);
+        node->returnType()->accept(*this);
         write(" operator"+overloaded_binary_op[name]+"(");
         codegenFuncParams(node->parameters(),1);
         write("){\n");
@@ -223,9 +225,9 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         write(");");
         write("\n}");
     }
-    else if (overloaded_unary_op.count(name)>0 && node->returnType().size()==1 && node->parameters().size()==1 && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
+    else if (overloaded_unary_op.count(name)>0 && return_type.size()==0 && node->parameters().size()==1 && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
         //TODO: Dont declare it twice
-        node->returnType()[0]->accept(*this);
+        node->returnType()->accept(*this);
         write(" "+name+"(");
         write("){\n");
         write("auto& ");
@@ -241,31 +243,29 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         }
         write("\n};\n");
         write(virtual_static_inline+" ");
-        node->returnType()[0]->accept(*this);
+        node->returnType()->accept(*this);
         write(" operator"+overloaded_unary_op[name]+"(){\n");
         write("return "+name+"();");
         write("\n}");
     }
     else{
         assert(node->parameters().size()>0);
-        if(node->returnType().size()==1){
-                node->returnType()[0]->accept(*this);
+        if(return_type.size()==0){
+            node->returnType()->accept(*this);
         }
         else{
             write("void");
         }
         write(" "+name+"(");
         codegenFuncParams(node->parameters(),1);
-        if(node->returnType().size()>1){
-            if(node->parameters().size()>1){
+        if(node->parameters().size()>1 && return_type.size()>0){
+            write(",");
+        }
+        for(size_t i=0;i<return_type.size();i++){
+            return_type[i]->accept(*this);
+            write("*____PEREGRINE____RETURN____"+std::to_string(i)+"=NULL");
+            if(i<return_type.size()-1){
                 write(",");
-            }
-            for(size_t i=0;i<node->returnType().size();++i){
-                node->returnType()[i]->accept(*this);
-                write("* ____PEREGRINE____RETURN____"+std::to_string(i)+"=NULL");
-                if(i!=node->returnType().size()-1){
-                    write(",");
-                }
             }
         }
         write("){\n");
@@ -438,5 +438,26 @@ void Codegen::magic_methord(ast::AstNodePtr& node,std::string name){
         default:{}
     }
 }
-
+std::vector<ast::AstNodePtr> Codegen::TurpleTypes(ast::AstNodePtr node){
+    std::vector<ast::AstNodePtr> turple_types;
+    if(node->type()==ast::KAstTypeTuple){
+        std::shared_ptr<ast::TypeTuple> turple =std::dynamic_pointer_cast<ast::TypeTuple>(node);
+        if(turple->multiple_return()){
+            turple_types=turple->items();
+        }
+    }
+    
+    return turple_types;
+}
+std::vector<ast::AstNodePtr> Codegen::TurpleExpression(ast::AstNodePtr node){
+    std::vector<ast::AstNodePtr> turple_exp;
+    if(node->type()==ast::KAstExpressionTuple){
+        std::shared_ptr<ast::ExpressionTuple> turple =std::dynamic_pointer_cast<ast::ExpressionTuple>(node);
+        if(turple->multiple_return()){
+            turple_exp=turple->items();
+        }
+    }
+    
+    return turple_exp;
+}
 } // namespace cpp

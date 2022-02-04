@@ -27,7 +27,7 @@ void compile(cli::state s){
         Parser parser(tokens, "test");
         ast::AstNodePtr program = parser.parse();
         std::cout << program->stringify() << "\n";
-        TypeChecker typeChecker(program);
+        // TypeChecker typeChecker(program);
     }
     else{
         std::ifstream file(s.input_filename);

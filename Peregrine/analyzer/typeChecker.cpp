@@ -89,9 +89,7 @@ bool TypeChecker::visit(const ast::FunctionDefinition& node) {
         parameterTypes.push_back(m_result);
         m_env->set(identifierName(param.p_name), m_result);
     }
-    for (auto& expr : node.returnType()) {
-        expr->accept(*this);
-    }
+    node.returnType()->accept(*this);
 
     auto functionType =
         std::make_shared<FunctionType>(parameterTypes, m_result);
@@ -208,12 +206,9 @@ bool TypeChecker::visit(const ast::ReturnStatement& node) {
         error(node.token(), "can not use return outside of a function");
     }
 
-    for (auto& expr : node.returnValue()) {
-        expr->accept(*this);
-    }
+    node.returnValue()->accept(*this);
 
-    // TODO:Multiple return values
-    check(node.returnValue()[0], *m_currentFunction->returnType());
+    check(node.returnValue(), *m_currentFunction->returnType());
     return true;
 }
 

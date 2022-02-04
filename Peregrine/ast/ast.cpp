@@ -612,7 +612,7 @@ std::string ClassDefinition::stringify() const {
     return res;
 }
 
-FunctionDefinition::FunctionDefinition(Token tok, std::vector<AstNodePtr> returnType,
+FunctionDefinition::FunctionDefinition(Token tok, AstNodePtr returnType,
                                        AstNodePtr name,
                                        std::vector<parameter> parameters,
                                        AstNodePtr body,std::string comment) {
@@ -624,7 +624,7 @@ FunctionDefinition::FunctionDefinition(Token tok, std::vector<AstNodePtr> return
     m_comment=comment;
 }
 
-std::vector<AstNodePtr> FunctionDefinition::returnType() const { return m_returnType; }
+AstNodePtr FunctionDefinition::returnType() const { return m_returnType; }
 
 AstNodePtr FunctionDefinition::name() const { return m_name; }
 
@@ -664,15 +664,8 @@ std::string FunctionDefinition::stringify() const {
             }
         }
     }
-    if(m_returnType.size()>0){
-        res += ") -> ";
-        for (size_t i = 0; i < m_returnType.size(); i++) {
-            res += m_returnType[i]->stringify();
-            if (i < m_returnType.size() - 1) {
-                res += ",";
-            }
-        }
-    }
+    res += ") -> ";
+    res += m_returnType->stringify();
     res += ":\n";
 
     res += m_body->stringify();
@@ -680,29 +673,21 @@ std::string FunctionDefinition::stringify() const {
     return res;
 }
 
-ReturnStatement::ReturnStatement(Token tok, std::vector<AstNodePtr> returnValue) {
+ReturnStatement::ReturnStatement(Token tok, AstNodePtr returnValue) {
     m_token = tok;
     m_returnValue = returnValue;
 }
 
-std::vector<AstNodePtr>  ReturnStatement::returnValue() const { return m_returnValue; }
+AstNodePtr  ReturnStatement::returnValue() const { return m_returnValue; }
 
 Token ReturnStatement::token() const { return m_token; }
 
 AstKind ReturnStatement::type() const { return KAstReturnStatement; }
 
 std::string ReturnStatement::stringify() const {
-    std::string res = "return";
+    std::string res = "return ";
 
-    if (m_returnValue.size() != 0) {
-        for (size_t i=0; i<m_returnValue.size(); ++i) {
-            res += " ";
-            res += m_returnValue[i]->stringify();
-            if(i<m_returnValue.size()-1){
-                res += ",";
-            }
-        }
-    }
+    res+=m_returnValue->stringify();
 
     return res;
 }
@@ -1182,7 +1167,7 @@ std::string DictTypeExpr::stringify() const {
 }
 
 FunctionTypeExpr::FunctionTypeExpr(Token tok, std::vector<AstNodePtr> argTypes,
-                                   std::vector<AstNodePtr> returnTypes) {
+                                   AstNodePtr returnTypes) {
     m_token = tok;
     m_argTypes = argTypes;
     m_returnTypes = returnTypes;
@@ -1192,7 +1177,7 @@ Token FunctionTypeExpr::token() const { return m_token; }
 std::vector<AstNodePtr> FunctionTypeExpr::argTypes() const {
     return m_argTypes;
 }
-std::vector<AstNodePtr> FunctionTypeExpr::returnTypes() const {
+AstNodePtr FunctionTypeExpr::returnTypes() const {
     return m_returnTypes;
 }
 
@@ -1204,12 +1189,8 @@ std::string FunctionTypeExpr::stringify() const {
         }
     }
     res += ")";
-    if (m_returnTypes.size() > 0) {
-        res += "->";
-        for (auto& x : m_returnTypes) {
-            res += x->stringify() + ",";
-        }
-    }
+    res += "->";
+    res += m_returnTypes->stringify();
     return res;
 }
 
@@ -1230,7 +1211,6 @@ std::string DecoratorStatement::stringify() const {
     std::string res;
     for (auto& x : m_decorators) {
         res += "@" + x->stringify() + "\n";
-        // std::cout<<res<<"\n";
     }
     res += m_body->stringify();
     return res;
@@ -1371,5 +1351,43 @@ std::string TryExcept::stringify() const{
     res+="except:\n"+m_else_body->stringify();
     return res;
 }
+ExpressionTuple::ExpressionTuple(bool multiple_return,std::vector<AstNodePtr> items){
+    m_multiple_return=multiple_return;
+    m_items=items;
+}
+std::vector<AstNodePtr> ExpressionTuple::items() const{return m_items;}
+bool ExpressionTuple::multiple_return() const{return m_multiple_return;}
+AstKind ExpressionTuple::type() const{return KAstExpressionTuple;}
+std::string ExpressionTuple::stringify() const{
+    std::string res="(";
+    for (size_t i=0;i<m_items.size();++i){
+        res+=m_items[i]->stringify();
+        if(i<m_items.size()-1){
+            res+=",";
+        }
+    }
+    res+=")";
+    return res;
+}
+Token ExpressionTuple::token() const { return Token{}; }
+TypeTuple::TypeTuple(bool multiple_return,std::vector<AstNodePtr> items){
+    m_multiple_return=multiple_return;
+    m_items=items;
+}
+std::vector<AstNodePtr> TypeTuple::items() const{return m_items;}
+bool TypeTuple::multiple_return() const{return m_multiple_return;}
+AstKind TypeTuple::type() const{return KAstTypeTuple;}
+std::string TypeTuple::stringify() const{
+    std::string res="(";
+    for (size_t i=0;i<m_items.size();++i){
+        res+=m_items[i]->stringify();
+        if(i<m_items.size()-1){
+            res+=",";
+        }
+    }
+    res+=")";
+    return res;
+}
+Token TypeTuple::token() const { return Token{}; }
 
 } // namespace ast

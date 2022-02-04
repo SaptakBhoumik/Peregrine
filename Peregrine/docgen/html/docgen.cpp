@@ -143,14 +143,8 @@ bool Docgen::visit(const DecoratorStatement& node) {
     res+="<font color=#45a4a0>"+body->name()->stringify()+"</font>(";
     funcParams(body->parameters());
     res+=")";
-    if(body->returnType().size()!=0){
-      res+="->";
-      for (size_t i=0;i<body->returnType().size();i++){
-        res+="<font color=#45a4a0>"+body->returnType()[i]->stringify()+"</font>";
-        if(i<body->returnType().size()-1){
-          res+=",";
-        }
-      }
+    if(body->returnType()->stringify()!="void"){
+      res+="-><font color=#45a4a0>"+body->returnType()->stringify()+"</font>";
     }
     res+="</div></"+smaller+">";
     if(body->comment()!=""){
@@ -181,14 +175,8 @@ bool Docgen::visit(const FunctionDefinition& node) {
     res+="<font color=#45a4a0>"+node.name()->stringify()+"</font>(";
     funcParams(node.parameters());
     res+=")";
-    if(node.returnType().size()!=0){
-      res+="->";
-      for (size_t i=0;i<node.returnType().size();i++){
-        res+="<font color=#45a4a0>"+node.returnType()[i]->stringify()+"</font>";
-        if(i<node.returnType().size()-1){
-          res+=",";
-        }
-      }
+    if(node.returnType()->stringify()!="void"){
+      res+="-><font color=#45a4a0>"+node.returnType()->stringify()+"</font>";
     }
     res+="</div></"+smaller+">";
     if(node.comment()!=""){
@@ -234,14 +222,8 @@ bool Docgen::visit(const StaticStatement& node) {
     res+="<font color=#45a4a0>"+body->name()->stringify()+"</font>(";
     funcParams(body->parameters());
     res+=")";
-    if(body->returnType().size()!=0){
-      res+="->";
-      for (size_t i=0;i<body->returnType().size();i++){
-        res+="<font color=#45a4a0>"+body->returnType()[i]->stringify()+"</font>";
-        if(i<body->returnType().size()-1){
-          res+=",";
-        }
-      }
+    if(body->returnType()->stringify()!="void"){
+      res+="-><font color=#45a4a0>"+body->returnType()->stringify()+"</font>";
     }
     res+="</div></"+smaller+">";
     if(body->comment()!=""){
@@ -273,14 +255,8 @@ bool Docgen::visit(const InlineStatement& node) {
     res+="<font color=#45a4a0>"+body->name()->stringify()+"</font>(";
     funcParams(body->parameters());
     res+=")";
-    if(body->returnType().size()!=0){
-      res+="->";
-      for (size_t i=0;i<body->returnType().size();i++){
-        res+="<font color=#45a4a0>"+body->returnType()[i]->stringify()+"</font>";
-        if(i<body->returnType().size()-1){
-          res+=",";
-        }
-      }
+    if(body->returnType()->stringify()!="void"){
+      res+="-><font color=#45a4a0>"+body->returnType()->stringify()+"</font>";
     }
     res+="</div></"+smaller+">";
     if(body->comment()!=""){
@@ -312,14 +288,8 @@ bool Docgen::visit(const VirtualStatement& node) {
     res+="<font color=#45a4a0>"+body->name()->stringify()+"</font>(";
     funcParams(body->parameters());
     res+=")";
-    if(body->returnType().size()!=0){
-      res+="->";
-      for (size_t i=0;i<body->returnType().size();i++){
-        res+="<font color=#45a4a0>"+body->returnType()[i]->stringify()+"</font>";
-        if(i<body->returnType().size()-1){
-          res+=",";
-        }
-      }
+    if(body->returnType()->stringify()!="void"){
+      res+="-><font color=#45a4a0>"+body->returnType()->stringify()+"</font>";
     }
     res+="</div></"+smaller+">";
     if(body->comment()!=""){

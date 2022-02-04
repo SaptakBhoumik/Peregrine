@@ -100,4 +100,14 @@ except:
 a:i.h.g=0
 a:int
 a:generic<T1,T2>= 0
+a:generic<T1,T2>= 0#here >= is treated as greater than or equal by the lexer
+a:module.generic<T1,T2> = 0
+a:module.generic<T1,T2>= 0#here >= is treated as greater than or equal by the lexer
+a:[]generic<T1,T2> = 0
 a:generic<T1,T2> = 0
+a:*generic<T1,T2>= 0#here >= is treated as greater than or equal by the lexer
+a:[]generic<T1,T2>= 0#here >= is treated as greater than or equal by the lexer
+a:generic<T1,T2> = 0
+type p=def()->a,a
+def i()->p,int:
+    return 1,3

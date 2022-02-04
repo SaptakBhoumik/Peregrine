@@ -63,7 +63,9 @@ enum AstKind {
     KAstDefaultArg,
     KAstExport,
     KAstTernaryIf,
-    KAstTryExcept
+    KAstTryExcept,
+    KAstExpressionTuple,
+    KAstTypeTuple
 };
 
 class AstVisitor;
@@ -266,14 +268,14 @@ class DictTypeExpr : public AstNode {
 class FunctionTypeExpr : public AstNode {
     Token m_token;
     std::vector<AstNodePtr> m_argTypes;
-    std::vector<AstNodePtr> m_returnTypes;
+    AstNodePtr m_returnTypes;
 
   public:
     FunctionTypeExpr(Token tok, std::vector<AstNodePtr> argTypes,
-                     std::vector<AstNodePtr> returnTypes);
+                     AstNodePtr returnTypes);
 
     std::vector<AstNodePtr> argTypes() const;
-    std::vector<AstNodePtr> returnTypes() const;
+    AstNodePtr returnTypes() const;
 
     Token token() const;
     AstKind type() const;
@@ -557,7 +559,7 @@ class ClassDefinition : public AstNode {
 
 class FunctionDefinition : public AstNode {
     Token m_token;
-    std::vector<AstNodePtr> m_returnType;
+    AstNodePtr m_returnType;
     AstNodePtr m_name;
 
     std::vector<parameter> m_parameters;
@@ -565,10 +567,10 @@ class FunctionDefinition : public AstNode {
     AstNodePtr m_body;
 
   public:
-    FunctionDefinition(Token tok, std::vector<AstNodePtr> returnType, AstNodePtr name,
+    FunctionDefinition(Token tok, AstNodePtr returnType, AstNodePtr name,
                        std::vector<parameter> parameters, AstNodePtr body,std::string comment);
 
-    std::vector<AstNodePtr> returnType() const;
+    AstNodePtr returnType() const;
     AstNodePtr name() const;
     std::vector<parameter> parameters() const;
     AstNodePtr body() const;
@@ -581,12 +583,12 @@ class FunctionDefinition : public AstNode {
 
 class ReturnStatement : public AstNode {
     Token m_token;
-    std::vector<AstNodePtr>  m_returnValue;
+    AstNodePtr  m_returnValue;
 
   public:
-    ReturnStatement(Token tok, std::vector<AstNodePtr>  returnValue);
+    ReturnStatement(Token tok, AstNodePtr returnValue);
 
-    std::vector<AstNodePtr>  returnValue() const;
+    AstNodePtr  returnValue() const;
 
     Token token() const;
     AstKind type() const;
@@ -1001,6 +1003,33 @@ class TryExcept : public AstNode {
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
 };
+
+class TypeTuple : public AstNode {
+    bool m_multiple_return;// return it in a more effecient way if it has no ()
+    std::vector<AstNodePtr> m_items;
+  public:
+    TypeTuple(bool multiple_return,std::vector<AstNodePtr> items);
+    std::vector<AstNodePtr> items() const;
+    bool multiple_return() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+class ExpressionTuple : public AstNode {
+    bool m_multiple_return;// return it in a more effecient way if it has no ()
+    std::vector<AstNodePtr> m_items;
+  public:
+    ExpressionTuple(bool multiple_return,std::vector<AstNodePtr> items);
+    std::vector<AstNodePtr> items() const;
+    bool multiple_return() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
 } // namespace ast
 
 #endif

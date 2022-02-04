@@ -62,6 +62,8 @@ class AstVisitor {
     virtual bool visit(const DefaultArg& node) { return false; };
     virtual bool visit(const TernaryIf& node) { return false; };
     virtual bool visit(const TryExcept& node) { return false; };
+    virtual bool visit(const ExpressionTuple& node) { return false; };
+    virtual bool visit(const TypeTuple& node) { return false; };
 };
 
 } // namespace ast

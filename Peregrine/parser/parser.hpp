@@ -63,10 +63,9 @@ class Parser {
     AstNodePtr parseCpp();
 
     AstNodePtr parseType(bool var_dec=false, bool* has_value=nullptr);
-    AstNodePtr parseImportedType();
-    AstNodePtr parsePointerType();
-    AstNodePtr parseListType();
-    AstNodePtr parseDictType();
+    AstNodePtr parseImportedType(bool var_dec,bool* has_value);
+    AstNodePtr parsePointerType(bool var_dec,bool* has_value);
+    AstNodePtr parseListType(bool var_dec,bool* has_value);
     AstNodePtr parseFuncType();
 
     AstNodePtr parseExpression(PrecedenceType type = pr_lowest);
@@ -81,6 +80,8 @@ class Parser {
     AstNodePtr parseArrowExpression(AstNodePtr left);
     AstNodePtr parsePostfixExpression(AstNodePtr left);
 
+    AstNodePtr parseReturnExprTurple(AstNodePtr item);
+    AstNodePtr parseReturnTypeTurple(AstNodePtr item);
     AstNodePtr parseVirtual();
     AstNodePtr parseCast();
     AstNodePtr parseStatement();

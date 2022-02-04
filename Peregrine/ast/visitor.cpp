@@ -159,4 +159,7 @@ void DefaultArg::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 void TernaryIf::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 void TryExcept::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
+void ExpressionTuple::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+void TypeTuple::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+
 } // namespace ast
