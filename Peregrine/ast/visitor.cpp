@@ -160,6 +160,13 @@ void TernaryIf::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 void TryExcept::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void ExpressionTuple::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+
 void TypeTuple::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+
+void ExternStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+
+void SumType::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+
+void MultipleAssign::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 } // namespace ast

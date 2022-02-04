@@ -64,6 +64,9 @@ class AstVisitor {
     virtual bool visit(const TryExcept& node) { return false; };
     virtual bool visit(const ExpressionTuple& node) { return false; };
     virtual bool visit(const TypeTuple& node) { return false; };
+    virtual bool visit(const ExternStatement& node) { return false; };
+    virtual bool visit(const SumType& node) { return false; };
+    virtual bool visit(const MultipleAssign& node) { return false; };
 };
 
 } // namespace ast

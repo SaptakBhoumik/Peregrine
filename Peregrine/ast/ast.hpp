@@ -65,7 +65,10 @@ enum AstKind {
     KAstTernaryIf,
     KAstTryExcept,
     KAstExpressionTuple,
-    KAstTypeTuple
+    KAstTypeTuple,
+    KAstExternStatement,
+    KAstSumType,
+    KAstMultipleAssign
 };
 
 class AstVisitor;
@@ -1030,6 +1033,42 @@ class ExpressionTuple : public AstNode {
     void accept(AstVisitor& visitor) const;
 };
 
+class ExternStatement : public AstNode {
+    Token m_token;
+    std::vector<std::string> m_libs;
+    std::string m_name;
+  public:
+    ExternStatement(Token token,std::vector<std::string> libs,std::string name);
+    std::vector<std::string> libs() const;
+    std::string name() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+class SumType : public AstNode {
+    std::vector<AstNodePtr> m_types;
+  public:
+    SumType(std::vector<AstNodePtr> types);
+    std::vector<AstNodePtr> sum_types() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+//multiple assign 
+class MultipleAssign : public AstNode {
+    std::vector<AstNodePtr> m_names;
+    std::vector<AstNodePtr> m_values;
+  public:
+    MultipleAssign(std::vector<AstNodePtr> names,std::vector<AstNodePtr> values);
+    std::vector<AstNodePtr> names() const;
+    std::vector<AstNodePtr> values() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
 } // namespace ast
 
 #endif

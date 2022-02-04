@@ -1359,14 +1359,19 @@ std::vector<AstNodePtr> ExpressionTuple::items() const{return m_items;}
 bool ExpressionTuple::multiple_return() const{return m_multiple_return;}
 AstKind ExpressionTuple::type() const{return KAstExpressionTuple;}
 std::string ExpressionTuple::stringify() const{
-    std::string res="(";
+    std::string res;
+    if(!m_multiple_return){
+        res+="(";
+    }
     for (size_t i=0;i<m_items.size();++i){
         res+=m_items[i]->stringify();
         if(i<m_items.size()-1){
             res+=",";
         }
     }
-    res+=")";
+    if(!m_multiple_return){
+        res+=")";
+    }
     return res;
 }
 Token ExpressionTuple::token() const { return Token{}; }
@@ -1378,16 +1383,85 @@ std::vector<AstNodePtr> TypeTuple::items() const{return m_items;}
 bool TypeTuple::multiple_return() const{return m_multiple_return;}
 AstKind TypeTuple::type() const{return KAstTypeTuple;}
 std::string TypeTuple::stringify() const{
-    std::string res="(";
+    std::string res;
+    if(!m_multiple_return){
+        res+="(";
+    }
     for (size_t i=0;i<m_items.size();++i){
         res+=m_items[i]->stringify();
         if(i<m_items.size()-1){
             res+=",";
         }
     }
-    res+=")";
+    if(!m_multiple_return){
+        res+=")";
+    }
     return res;
 }
 Token TypeTuple::token() const { return Token{}; }
 
+ExternStatement::ExternStatement(Token token,std::vector<std::string> libs,std::string name){
+    m_token=token;
+    m_libs=libs;
+    m_name=name;
+}
+std::vector<std::string> ExternStatement::libs() const{return m_libs;}
+std::string ExternStatement::name() const{return m_name;}
+AstKind ExternStatement::type() const{return KAstExternStatement;}
+Token ExternStatement::token() const{return m_token;}
+std::string ExternStatement::stringify() const{
+    std::string res="extern ";
+    res+=m_name+"=import(";
+    for (size_t i=0;i<m_libs.size();++i){
+        res+=m_libs[i];
+        if(i<m_libs.size()-1){
+            res+=",";
+        }
+    }
+    res+=")";
+    return res;
+}
+SumType::SumType(std::vector<AstNodePtr> types){
+    m_types=types;
+}
+std::vector<AstNodePtr> SumType::sum_types() const{return m_types;}
+AstKind SumType::type() const{return KAstSumType;}
+std::string SumType::stringify() const{
+    std::string res="(";
+    for (size_t i=0;i<m_types.size();++i){
+        res+=m_types[i]->stringify();
+        if(i<m_types.size()-1){
+            res+="|";
+        }
+    }
+    res+=")";
+    return res;
+}
+Token SumType::token() const{return Token{};}
+MultipleAssign::MultipleAssign(std::vector<AstNodePtr> names,std::vector<AstNodePtr> values){
+    m_names=names;
+    m_values=values;
+}
+std::vector<AstNodePtr> MultipleAssign::names() const{return m_names;}
+std::vector<AstNodePtr> MultipleAssign::values() const{return m_values;}
+AstKind MultipleAssign::type() const{return KAstMultipleAssign;}
+std::string MultipleAssign::stringify() const{
+    std::string res="((";
+    for (size_t i=0;i<m_names.size();++i){
+        res+=m_names[i]->stringify();
+        if(i<m_names.size()-1){
+            res+=",";
+        }
+    }
+    res+=")=(";
+    for (size_t i=0;i<m_values.size();++i){
+        res+=m_values[i]->stringify();
+        if(i<m_values.size()-1){
+            res+=",";
+        }
+    }
+    res+="))";
+    return res;
+}
+Token MultipleAssign::token() const{return Token{};}
 } // namespace ast

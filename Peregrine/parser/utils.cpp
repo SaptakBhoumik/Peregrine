@@ -17,7 +17,33 @@ bool Parser::is_imported_var(){
         else if (curr_tok.tkType==tk_r_paren){brac_count--;}
         else if (curr_tok.tkType==tk_list_open){list_brac_count++;}
         else if (curr_tok.tkType==tk_list_close){list_brac_count--;}
-        else if(curr_tok.tkType==tk_assign){return true;}
+        else if(curr_tok.tkType==tk_assign && brac_count==0 && list_brac_count==0){return true;}
+        else if (brac_count==0 && list_brac_count==0){return false;}
+        prev_tok=curr_tok;
+        index++;
+    }
+}
+
+bool Parser::is_multiple_assign(){
+    auto index=m_tokIndex;
+    auto tokens = m_tokens;
+    size_t brac_count=0;
+    size_t list_brac_count=0;
+    Token curr_tok;
+    Token prev_tok;
+    bool has_comma=false;
+    while (true){
+        curr_tok=tokens[index];
+        if (curr_tok.tkType==tk_identifier){
+            if (prev_tok.tkType==tk_identifier){return false;}//it is the type
+        }
+        else if (curr_tok.tkType==tk_dot || curr_tok.tkType==tk_arrow){}
+        else if (curr_tok.tkType==tk_l_paren){brac_count++;}
+        else if (curr_tok.tkType==tk_r_paren){brac_count--;}
+        else if (curr_tok.tkType==tk_list_open){list_brac_count++;}
+        else if (curr_tok.tkType==tk_list_close){list_brac_count--;}
+        else if(curr_tok.tkType==tk_comma && brac_count==0 && list_brac_count==0){has_comma=true;}
+        else if(curr_tok.tkType==tk_assign && brac_count==0 && list_brac_count==0 && has_comma){return true;}
         else if (brac_count==0 && list_brac_count==0){return false;}
         prev_tok=curr_tok;
         index++;

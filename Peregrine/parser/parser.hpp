@@ -42,6 +42,7 @@ class Parser {
 
 
     std::map<TokenType, PrecedenceType> precedenceMap = createMap();
+    bool is_multiple_assign();
     bool is_imported_var();
     void advance();
     void advanceOnNewLine();
@@ -62,7 +63,10 @@ class Parser {
     AstNodePtr parseDict();
     AstNodePtr parseCpp();
 
-    AstNodePtr parseType(bool var_dec=false, bool* has_value=nullptr);
+    AstNodePtr parseType(bool var_dec=false, 
+                         bool* has_value=nullptr,
+                         bool can_be_sumtype=true
+                          );
     AstNodePtr parseImportedType(bool var_dec,bool* has_value);
     AstNodePtr parsePointerType(bool var_dec,bool* has_value);
     AstNodePtr parseListType(bool var_dec,bool* has_value);
@@ -82,6 +86,8 @@ class Parser {
 
     AstNodePtr parseReturnExprTurple(AstNodePtr item);
     AstNodePtr parseReturnTypeTurple(AstNodePtr item);
+    AstNodePtr parseExtern();
+    AstNodePtr parseMultipleAssign();
     AstNodePtr parseVirtual();
     AstNodePtr parseCast();
     AstNodePtr parseStatement();

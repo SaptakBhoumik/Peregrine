@@ -798,6 +798,8 @@ bool Codegen::visit(const ast::ClassDefinition& node){
         write(";\n");
     }
     write("public:\n");
+    node.name()->accept(*this);
+    write("()=default;\n");
     if (!is_class){
         is_class=true;
         for (auto& x : node.attributes()){
@@ -943,4 +945,23 @@ bool Codegen::visit(const ast::TryExcept& node){
     write("}");
     return true; 
 }
+bool Codegen::visit(const ast::MultipleAssign& node){
+    auto values=node.values();
+    auto names=node.names();
+    //TODO: Make it work with iterable and multiple function return 
+    write("{");
+    for(size_t i=0;i<values.size();++i){
+        write("auto _____PEREGRINE____temp____"+std::to_string(i)+"=");
+        values[i]->accept(*this);
+        write(";");
+    }
+    for(size_t i=0;i<names.size();++i){
+        names[i]->accept(*this);
+        write("=_____PEREGRINE____temp____"+std::to_string(i));
+        write(";");
+    }
+    write("}");
+    return true;
+}
+
 } // namespace cpp

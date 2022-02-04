@@ -170,12 +170,16 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseExport();
             break;
         }
-        case tk_virtual:{
-            error(m_currentToken, "Virtual function should be inside class only","","","e4");
-            break;
-        }
         case tk_try:{
             stmt = parseTryExcept();
+            break;
+        }
+        case tk_extern:{
+            stmt=parseExtern();
+            break;
+        }
+        case tk_virtual:{
+            error(m_currentToken, "Virtual function should be inside class only","","","e4");
             break;
         }
         case tk_else:{
@@ -198,7 +202,12 @@ AstNodePtr Parser::parseStatement() {
             error(m_currentToken, "default statement without a previous match","","","");
             break;
         }
+
         case tk_identifier: {
+            if(is_multiple_assign()){
+                stmt = parseMultipleAssign();
+                break;
+            }
             if ((next().tkType == tk_colon || next().tkType == tk_assign)) {
                 // variable
                 stmt = parseVariableStatement();
@@ -684,7 +693,7 @@ AstNodePtr Parser::parseFunctionDef() {
               "expected ), got " + m_currentToken.keyword + " instead");
     }
 
-    AstNodePtr returnType=std::make_shared<TypeExpression>(tok,"void");
+    AstNodePtr returnType=std::make_shared<TypeExpression>(Token{},"void");
 
     if (next().tkType == tk_arrow) {
         advance();
@@ -976,7 +985,17 @@ AstNodePtr Parser::parseGroupedExpr() {
     advance();
 
     AstNodePtr expr = parseExpression();
-
+    if (next().tkType == tk_comma) {
+        advance();
+        std::vector<AstNodePtr> items;
+        items.push_back(expr);
+        while(m_currentToken.tkType==tk_comma){
+            advance();
+            items.push_back(parseExpression());
+        }
+        expect(tk_r_paren, "Expected ), got "+next().keyword+" instead","Add a ) here","","");
+        return std::make_shared<ExpressionTuple>(false,items);
+    }
     expect(tk_r_paren, "Expected ) but got "+next().keyword+" instead","Add a ) here","","");
 
     return expr;
@@ -991,19 +1010,43 @@ AstNodePtr Parser::parseIdentifier() {
                                                   m_currentToken.keyword);
 }
 
-AstNodePtr Parser::parseType(bool var_dec,bool* has_value) {
+AstNodePtr Parser::parseType(bool var_dec,bool* has_value,bool can_be_sumtype) {
+    ast::AstNodePtr res;
     switch (m_currentToken.tkType) {
-        case tk_def:
-            return parseFuncType();
-        case tk_multiply: {
-            return parsePointerType(var_dec,has_value);
+        case tk_l_paren: {
+            advance();
+            std::vector<AstNodePtr> types;
+            AstNodePtr curr_type = parseType();
+            types.push_back(curr_type);
+            if(next().tkType==tk_comma){
+                advance();
+            }
+            while(m_currentToken.tkType==tk_comma){
+                advance();
+                types.push_back(parseType());
+                if(next().tkType==tk_comma){
+                    advance();
+                }
+            }
+            expect(tk_r_paren, "Expected ) but got "+next().keyword+" instead","Add a ) here","","");
+            res=std::make_shared<TypeTuple>(false,types);
+            break;
         }
-        case tk_list_open:
-            return parseListType(var_dec,has_value);
-
+        case tk_def:{
+            res = parseFuncType();
+            break;
+        }
+        case tk_multiply: {
+            res = parsePointerType(var_dec,has_value);
+            break;
+        }
+        case tk_list_open:{
+            res = parseListType(var_dec,has_value);
+            break;
+        }
         case tk_identifier: {
             if (next().tkType == tk_dot) {
-                return parseImportedType(var_dec,has_value);
+                res = parseImportedType(var_dec,has_value);
             }
             else if(next().tkType==tk_less){
                 auto tok=m_currentToken;
@@ -1021,19 +1064,34 @@ AstNodePtr Parser::parseType(bool var_dec,bool* has_value) {
                     }
                     advance();
                 }
-                return std::make_shared<TypeExpression>(tok,
+                res = std::make_shared<TypeExpression>(tok,
                                                     tok.keyword,generic_types);
             }
-            return std::make_shared<TypeExpression>(m_currentToken,
-                                                    m_currentToken.keyword);
+            else{
+                res = std::make_shared<TypeExpression>(m_currentToken,
+                                                        m_currentToken.keyword);
+            }
+            break;
         }
 
         default: {
             error(m_currentToken, m_currentToken.keyword + " is not a type");
         }
     }
-
-    return nullptr;
+    if(next().tkType==tk_bit_or && can_be_sumtype){
+        advance();
+        std::vector<AstNodePtr> sum_types;
+        sum_types.push_back(res);
+        while(m_currentToken.tkType==tk_bit_or){
+            advance();
+            sum_types.push_back(parseType(false,nullptr,false));
+            if(next().tkType==tk_bit_or){
+                advance();
+            }
+        } 
+        res=std::make_shared<SumType>(sum_types);   
+    }
+    return res;
 }
 
 AstNodePtr Parser::parseListType(bool var_dec,bool* has_value) {
@@ -1046,14 +1104,14 @@ AstNodePtr Parser::parseListType(bool var_dec,bool* has_value) {
     expect(tk_list_close, "Expected ] but got "+next().keyword+" instead","Add a ] here","","");
     advance();
 
-    AstNodePtr elemType = parseType(var_dec,has_value);
+    AstNodePtr elemType = parseType(var_dec,has_value,false);
     return std::make_shared<ListTypeExpr>(tok, elemType, size);
 }
 
 AstNodePtr Parser::parsePointerType(bool var_dec,bool* has_value) {
     Token tok = m_currentToken;
     advance();
-    AstNodePtr typePtr = parseType(var_dec,has_value);
+    AstNodePtr typePtr = parseType(var_dec,has_value,false);
     return std::make_shared<PointerTypeExpr>(tok, typePtr);
 }
 
@@ -1538,9 +1596,9 @@ AstNodePtr Parser::parseImportedType(bool var_dec,bool* has_value){
     advance();
     while(m_currentToken.tkType==tk_dot){
         auto tok=m_currentToken;
-        advance();
+        expect(tk_identifier,next().keyword+" is not a type","","","");
         if(next().tkType!=tk_dot){
-            name=std::make_shared<DotExpression>(tok,name,parseType(var_dec,has_value));
+            name=std::make_shared<DotExpression>(tok,name,parseType(var_dec,has_value,false));
             break;
         }
         else{
@@ -1576,4 +1634,45 @@ AstNodePtr Parser::parseReturnTypeTurple(AstNodePtr item){
         }
     }
     return std::make_shared<TypeTuple>(true,items);
+}
+AstNodePtr Parser::parseExtern(){
+    auto tok=m_currentToken;
+    expect(tk_identifier,"Expected identifier but got "+next().keyword+" instead","","","");
+    auto name=m_currentToken.keyword;
+    std::vector<std::string> libs;
+    expect(tk_assign,"Expected = but got "+next().keyword+" instead","","","");
+    expect(tk_import,"Expected = but got "+next().keyword+" instead","","","");
+    expect(tk_l_paren,"Expected = but got "+next().keyword+" instead","","","");
+    while(m_currentToken.tkType!=tk_r_paren){
+        expect(tk_string,"Expected string but got "+next().keyword+" instead","","","");
+        libs.push_back(m_currentToken.keyword);
+        advance();
+    }
+    advanceOnNewLine();
+    return std::make_shared<ExternStatement>(tok,libs,name);
+}
+AstNodePtr Parser::parseMultipleAssign(){
+    std::vector<AstNodePtr> names;
+    std::vector<AstNodePtr> values;
+    names.push_back(parseExpression());
+    expect(tk_comma,"Expected , but got "+next().keyword+" instead","","","");
+    while (m_currentToken.tkType==tk_comma){
+        advance();
+        names.push_back(parseExpression());
+        if(next().tkType==tk_comma){
+            advance();
+        }
+    }
+    expect(tk_assign,"Expected = but got "+next().keyword+" instead","","","");
+    advance();
+    values.push_back(parseExpression());
+    advance();
+    while (m_currentToken.tkType==tk_comma){
+        advance();
+        values.push_back(parseExpression());
+        if(next().tkType==tk_comma){
+            advance();
+        }
+    }
+    return std::make_shared<MultipleAssign>(names,values);
 }

@@ -633,5 +633,22 @@ bool Codegen::visit(const ast::PostfixExpression& node) {
     write(node.postfix().keyword);
     return true;
 }
-
+bool Codegen::visit(const ast::MultipleAssign& node){
+    auto values=node.values();
+    auto names=node.names();
+    //TODO: Make it work with iterable and multiple function return 
+    write("{");
+    for(size_t i=0;i<values.size();++i){
+        write("let _____PEREGRINE____temp____"+std::to_string(i)+"=");
+        values[i]->accept(*this);
+        write(";");
+    }
+    for(size_t i=0;i<names.size();++i){
+        names[i]->accept(*this);
+        write("=_____PEREGRINE____temp____"+std::to_string(i));
+        write(";");
+    }
+    write("}");
+    return true;
+}
 } // namespace js
