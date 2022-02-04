@@ -204,6 +204,10 @@ AstNodePtr Parser::parseStatement() {
         }
 
         case tk_identifier: {
+            if (is_aug_assign()){
+                stmt = parseAugAssign();
+                break;
+            }
             if(is_multiple_assign()){
                 stmt = parseMultipleAssign();
                 break;
@@ -225,9 +229,20 @@ AstNodePtr Parser::parseStatement() {
                 if it didn't match the statements above, then it must be
                 either an expression or invalid
             */
-
-            stmt = parseExpression();
-            break;
+            if(m_currentToken.tkType==tk_l_paren){
+                if(is_multiple_assign()){
+                    stmt = parseMultipleAssign();
+                    break;
+                }
+                else{
+                    stmt = parseExpression();
+                    break;
+                }
+            }
+            else{
+                stmt = parseExpression();
+                break;
+            }
         }
     }
 
@@ -1675,4 +1690,13 @@ AstNodePtr Parser::parseMultipleAssign(){
         }
     }
     return std::make_shared<MultipleAssign>(names,values);
+}
+
+AstNodePtr Parser::parseAugAssign(){
+    AstNodePtr name=parseExpression();
+    advance();
+    auto tok=m_currentToken;
+    advance();
+    auto value=parseExpression();
+    return std::make_shared<AugAssign>(tok,name,value);
 }

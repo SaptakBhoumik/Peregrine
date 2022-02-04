@@ -229,7 +229,11 @@ def main():
     #TODO: Make it work with iterable and multiple function return
     variable_a:int=5
     variable_b:int=1
+    printf("variable_a is %d and variable_b is %d\n",variable_a,variable_b)
     variable_b,variable_a=variable_a,variable_b
     printf("variable_a is %d and variable_b is %d\n",variable_a,variable_b)
     assert variable_a==1
     assert variable_b==5
+    variable_b += variable_a
+    assert variable_b==6
+    printf("variable_b is %d\n",variable_b)

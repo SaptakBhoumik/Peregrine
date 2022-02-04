@@ -214,6 +214,9 @@ static inline TokenType equal(std::string keyword) {
     } else if (keyword == ">=") {
         result = tk_gr_or_equ;
     }
+    else if (keyword == "**=") {
+        result = tk_exponent_equal;
+    }
     return result;
 }
 LEXEME lexer(std::string src, std::string filename) {
@@ -223,7 +226,7 @@ LEXEME lexer(std::string src, std::string filename) {
     std::vector<size_t> identation_level;
     const std::vector<std::string> operators({">", "<", "!", "/", "//", "+",
                                               "-", "*", "%", "<<", ">>", "&",
-                                              "|", "^", "="});
+                                              "|", "^", "=","**"});
     std::string string_starter;
     std::string statement = seperate_lines.at(0);
     std::string item;
@@ -934,7 +937,7 @@ LEXEME lexer(std::string src, std::string filename) {
                  tokens.back().tkType == tk_decimal ||
                  tokens.back().tkType == tk_integer ||
                  next(current_index, src) == "=")) {
-                keyword = "*";
+                keyword += "*";
                 start_index = current_index;
             } else if (keyword == "*") {
                 token = token_init(current_index - last_line,statement, "**", tk_exponent, start_index,

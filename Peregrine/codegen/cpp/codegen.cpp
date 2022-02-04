@@ -963,5 +963,11 @@ bool Codegen::visit(const ast::MultipleAssign& node){
     write("}");
     return true;
 }
+bool Codegen::visit(const ast::AugAssign& node){
+    node.name()->accept(*this);
+    write(node.op());
+    node.value()->accept(*this);
+    return true;
+}
 
 } // namespace cpp

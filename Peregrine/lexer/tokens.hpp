@@ -50,6 +50,7 @@ enum TokenType {
     tk_floor_equal,       // //=
     tk_plus_equal,        // +=
     tk_minus_equal,       // -=
+    tk_exponent_equal,    // **=
     tk_times_equal,       // *=
     tk_slash_equal,       // /=
     tk_mod_equal,         // %=

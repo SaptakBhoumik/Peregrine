@@ -116,3 +116,5 @@ a:turple_test=(1,2)
 extern c=import("test1","test2")
 type sumtype=int|float|*int|[]int|generic<int,int>
 a,b,c.d=1,2+3,3
+(a,b),c.d=(1,2+3),3
+a**=b

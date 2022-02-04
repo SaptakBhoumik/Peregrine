@@ -1464,4 +1464,21 @@ std::string MultipleAssign::stringify() const{
     return res;
 }
 Token MultipleAssign::token() const{return Token{};}
+AugAssign::AugAssign(Token tok, AstNodePtr name, AstNodePtr value){
+    m_token=tok;
+    m_name=name;
+    m_value=value;
+}
+AstKind AugAssign::type() const{return KAstAugAssign;}
+Token AugAssign::token() const{return m_token;}
+AstNodePtr AugAssign::name() const{return m_name;}
+AstNodePtr AugAssign::value() const{return m_value;}
+std::string AugAssign::op() const{return m_token.keyword;}
+std::string AugAssign::stringify() const{
+    std::string res=m_name->stringify();
+    res+=m_token.keyword;
+    res+=m_value->stringify();
+    return res;
+}
+
 } // namespace ast

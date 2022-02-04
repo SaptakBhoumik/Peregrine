@@ -68,7 +68,8 @@ enum AstKind {
     KAstTypeTuple,
     KAstExternStatement,
     KAstSumType,
-    KAstMultipleAssign
+    KAstMultipleAssign,
+    KAstAugAssign
 };
 
 class AstVisitor;
@@ -1064,6 +1065,23 @@ class MultipleAssign : public AstNode {
     MultipleAssign(std::vector<AstNodePtr> names,std::vector<AstNodePtr> values);
     std::vector<AstNodePtr> names() const;
     std::vector<AstNodePtr> values() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+class AugAssign : public AstNode {
+    Token m_token;
+    AstNodePtr m_name;
+    AstNodePtr m_value;
+
+  public:
+    AugAssign(Token tok, AstNodePtr name, AstNodePtr value);
+
+    AstNodePtr name() const;
+    std::string op() const;
+    AstNodePtr value() const;
+
     Token token() const;
     AstKind type() const;
     std::string stringify() const;

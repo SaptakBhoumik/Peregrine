@@ -96,6 +96,7 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::TernaryIf& node);
     bool visit(const ast::TryExcept& node);
     bool visit(const ast::MultipleAssign& node);
+    bool visit(const ast::AugAssign& node);
     EnvPtr m_env;
 };
 

@@ -43,6 +43,7 @@ class Parser {
 
     std::map<TokenType, PrecedenceType> precedenceMap = createMap();
     bool is_multiple_assign();
+    bool is_aug_assign();
     bool is_imported_var();
     void advance();
     void advanceOnNewLine();
@@ -76,6 +77,7 @@ class Parser {
     AstNodePtr parsePrefixExpression();
     AstNodePtr parseGroupedExpr();
 
+    AstNodePtr parseAugAssign();
     AstNodePtr parseBinaryOperation(AstNodePtr left);
     AstNodePtr parseTernaryIf(AstNodePtr left);
     AstNodePtr parseFunctionCall(AstNodePtr left);

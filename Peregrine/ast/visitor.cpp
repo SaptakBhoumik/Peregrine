@@ -169,4 +169,6 @@ void SumType::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void MultipleAssign::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
+void AugAssign::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+
 } // namespace ast
