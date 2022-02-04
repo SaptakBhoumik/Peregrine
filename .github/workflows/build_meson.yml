@@ -14,8 +14,12 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Setup Meson
-      run: sudo apt-get update && sudo apt-get install python3 python3-pip python3-setuptools python3-wheel ninja-build && pip3 install meson
+      run: sudo apt-get update && sudo apt-get install python3 python3-pip python3-setuptools nodejs python3-wheel ninja-build && pip3 install meson
     - name: Meson
       run: meson builddir
     - name: Ninja
       run: cd builddir && ninja
+    - name: Compile
+      run: ./peregrine.elf -dev_debug && /peregrine.elf compile ../can_comp.pe -o output && /peregrine.elf compile ../can_comp.js.pe -o output.js
+    - name: Run_bin
+      run: ./output && node ./output
