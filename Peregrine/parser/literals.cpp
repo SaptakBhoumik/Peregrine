@@ -85,10 +85,7 @@ AstNodePtr Parser::parseDict() {
     return std::make_shared<DictLiteral>(tok, elements);
 }
 
-AstNodePtr Parser::parseCpp() {
-    return std::make_shared<CppStatement>(m_currentToken,
-                                          m_currentToken.keyword);
-}
+
 
 AstNodePtr Parser::parseNone() {
     return std::make_shared<NoneLiteral>(m_currentToken);

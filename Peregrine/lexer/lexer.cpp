@@ -1,3 +1,5 @@
+//NOTE this is been rewritten. check lexer_re.cpp
+
 #include "lexer.hpp"
 #include "errors/error.hpp"
 #include "tokens.hpp"
@@ -169,8 +171,6 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_is;
     } else if (item == "in") {
         return tk_in;
-    } else if (item == "Cppcode") {
-        return tk_cppcode;
     } else if (item == "inline") {
         return tk_inline;
     } else if (item == "virtual") {
@@ -558,16 +558,11 @@ LEXEME lexer(std::string src, std::string filename) {
                 token = Token();
                 keyword = "";
             }
-            if (tokens.back().tkType == tk_cppcode) {
-                start_index = current_index;
-                is_cpp = true;
-                cpp_bracket_count = 1;
-            } else {
+            
                 start_index = current_index - 1;
                 keyword = item;
                 token = token_init(current_index - last_line,statement, keyword, tk_l_paren, start_index,
                                    current_index, line);
-            }
         } else if (item == ".") {
             if (keyword == "") {
                 keyword = item;
@@ -744,11 +739,11 @@ LEXEME lexer(std::string src, std::string filename) {
                         token = token_init(current_index - last_line,statement, keyword, tk_minus,
                                            start_index, current_index, line);
                     } else {
-                        token = token_init(current_index - last_line,statement, keyword, tk_negative,
+                        token = token_init(current_index - last_line,statement, keyword, tk_minus,
                                            start_index, current_index, line);
                     }
                 } else {
-                    token = token_init(current_index - last_line,statement, keyword, tk_negative,
+                    token = token_init(current_index - last_line,statement, keyword, tk_minus,
                                        start_index, current_index, line);
                 }
             }
@@ -881,7 +876,7 @@ LEXEME lexer(std::string src, std::string filename) {
                          tokens.back().tkType == tk_identifier ||
                          tokens.back().tkType == tk_r_paren) &&
                         line == tokens.back().line) {
-                        token = token_init(current_index - last_line,statement, keyword, tk_bit_and,
+                        token = token_init(current_index - last_line,statement, keyword, tk_ampersand,
                                            start_index, current_index, line);
                     } else {
                         token = token_init(current_index - last_line,statement, keyword, tk_ampersand,

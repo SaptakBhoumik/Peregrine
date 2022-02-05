@@ -354,13 +354,6 @@ bool Codegen::visit(const ast::ScopeStatement& node) {
     return true;
 }
 
-bool Codegen::visit(const ast::CppStatement& node) {
-    // we are making it a comment because ; is added to
-    // each node at the end. we dont want that to happen
-    // because it will result in ;; which is an error
-    write(node.value() + "\n//");
-    return true;
-}
 
 bool Codegen::visit(const ast::ReturnStatement& node) {
     if(node.returnValue()->type()!=ast::KAstNoLiteral){

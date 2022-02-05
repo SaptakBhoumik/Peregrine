@@ -52,7 +52,6 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::ForStatement& node);
     bool visit(const ast::MatchStatement& node);
     bool visit(const ast::ScopeStatement& node);
-    bool visit(const ast::CppStatement& node);
     bool visit(const ast::ReturnStatement& node);
     bool visit(const ast::ContinueStatement& node);
     bool visit(const ast::BreakStatement& node);

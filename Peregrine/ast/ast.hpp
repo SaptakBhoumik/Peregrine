@@ -26,7 +26,6 @@ enum AstKind {
     KAstFuncTypeExpr,
     KAstList,
     KAstDict,
-    KAstCpp,
     KAstBinaryOp,
     KAstPrefixExpr,
     KAstPostfixExpr,
@@ -833,20 +832,7 @@ class ContinueStatement : public AstNode {
     void accept(AstVisitor& visitor) const;
 };
 
-class CppStatement : public AstNode {
-    Token m_token;
-    std::string m_cppCode;
 
-  public:
-    CppStatement(Token tok, std::string cpp);
-
-    std::string value() const;
-
-    Token token() const;
-    AstKind type() const;
-    std::string stringify() const;
-    void accept(AstVisitor& visitor) const;
-};
 
 class ScopeStatement : public AstNode {
     Token m_token;

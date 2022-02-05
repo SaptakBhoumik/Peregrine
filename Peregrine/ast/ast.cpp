@@ -989,24 +989,7 @@ AstKind ContinueStatement::type() const { return KAstContinueStatement; }
 
 std::string ContinueStatement::stringify() const { return "continue"; }
 
-CppStatement::CppStatement(Token tok, std::string cpp_code) {
-    m_token = tok;
-    m_cppCode = cpp_code;
-}
 
-std::string CppStatement::value() const { return m_cppCode; }
-
-Token CppStatement::token() const { return m_token; }
-
-AstKind CppStatement::type() const { return KAstCpp; }
-
-std::string CppStatement::stringify() const {
-    std::string res = "Cppcode";
-
-    res += "(" + m_cppCode + ")";
-
-    return res;
-}
 
 ScopeStatement::ScopeStatement(Token tok, AstNodePtr body) {
     m_token = tok;

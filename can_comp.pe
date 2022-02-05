@@ -159,11 +159,6 @@ def main():
         printf("hello\n")
         return 5
     printf("value of z() is %d\n",z())
-    Cppcode(#ifdef _WIN32)
-    printf("On windows\n")
-    Cppcode(#elif __linux__)
-    printf("On linux\n")
-    Cppcode(#endif)
     scope:
         printf("Hello from new scope\n")
     x:bool =False
@@ -237,3 +232,5 @@ def main():
     variable_b += variable_a
     assert variable_b==6
     printf("variable_b is %d\n",variable_b)
+    a=1&2
+    

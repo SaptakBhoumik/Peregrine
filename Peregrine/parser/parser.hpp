@@ -62,7 +62,6 @@ class Parser {
     AstNodePtr parseName();
     AstNodePtr parseList();
     AstNodePtr parseDict();
-    AstNodePtr parseCpp();
 
     AstNodePtr parseType(bool var_dec=false, 
                          bool* has_value=nullptr,

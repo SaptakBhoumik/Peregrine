@@ -138,7 +138,6 @@ void ContinueStatement::accept(AstVisitor& visitor) const {
     visitor.visit(*this);
 }
 
-void CppStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void ScopeStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 

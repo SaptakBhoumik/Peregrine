@@ -252,11 +252,6 @@ bool Codegen::visit(const ast::ScopeStatement& node) {
     return true;
 }
 
-bool Codegen::visit(const ast::CppStatement& node) {
-    //not in js
-    return true;
-}
-
 bool Codegen::visit(const ast::ReturnStatement& node) {
     write("return ");
     if(node.returnValue()->type()!=ast::KAstNoLiteral){

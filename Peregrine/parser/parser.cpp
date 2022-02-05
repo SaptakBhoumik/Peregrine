@@ -140,13 +140,6 @@ AstNodePtr Parser::parseStatement() {
             break;
         }
 
-        case tk_cppcode: {
-            advance();
-            stmt = parseCpp();
-            advanceOnNewLine();
-            break;
-        }
-
         case tk_type: {
             stmt = parseTypeDef();
             break;
@@ -835,7 +828,7 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
             break;
         }
 
-        case tk_negative:
+        case tk_minus:
         case tk_not:
         case tk_ampersand:
         case tk_plus:

@@ -9,7 +9,6 @@ enum TokenType {
     // Some operators
     tk_plus,       // +
     tk_at,         // @
-    tk_negative,   // negative number
     tk_minus,      // -
     tk_divide,     // /
     tk_multiply,   // *
@@ -18,7 +17,6 @@ enum TokenType {
     tk_greater,    // >
     tk_less,       // <
     tk_ampersand,  // &
-    tk_bit_and,    // &
     tk_bit_or,     // |
     tk_bit_not,    // ~
     tk_assign,     // =
@@ -102,7 +100,6 @@ enum TokenType {
     tk_in,        // in
     tk_not_in,    // not in
     tk_is_not,    // is not
-    tk_cppcode,   // Cppcode
     tk_class,     // class
     tk_type,      // type defination
     tk_enum,      // enum

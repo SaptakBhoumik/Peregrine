@@ -28,7 +28,6 @@ class AstVisitor {
     virtual bool visit(const ForStatement& node) { return false; };
     virtual bool visit(const MatchStatement& node) { return false; };
     virtual bool visit(const ScopeStatement& node) { return false; };
-    virtual bool visit(const CppStatement& node) { return false; };
     virtual bool visit(const ReturnStatement& node) { return false; };
     virtual bool visit(const ContinueStatement& node) { return false; };
     virtual bool visit(const BreakStatement& node) { return false; };
