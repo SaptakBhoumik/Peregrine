@@ -20,7 +20,8 @@ jobs:
     - uses: actions/upload-artifact@master
       with:
         name: build
-        path: builddir/
+        path: builddir/peregrine.elf
+        retention-days: 1
   jscompile:
     name: JS Compile Test
     runs-on: ubuntu-latest
@@ -31,7 +32,7 @@ jobs:
     - uses: actions/download-artifact@master
       with:
         name: build
-        path: builddir/
+        path: pelf
     - run: cd ./builddir
-    - run: ./peregrine.elf -dev_debug && ./peregrine.elf compile ../can_comp.pe -o output && peregrine.elf compile ../can_comp.js.pe -o output.js
+    - run: ./pelf -dev_debug && ./pelf compile ../can_comp.pe -o output && pelf compile ../can_comp.js.pe -o output.js
     - run: ./output && node ./output.js
