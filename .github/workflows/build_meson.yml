@@ -18,7 +18,7 @@ jobs:
     - name: Ninja
       run: cd builddir && ninja
     - uses: actions/upload-artifact@master
-        with:
+      with:
         name: elffile
         path: peregrine.elf
   jscompile:
@@ -30,8 +30,8 @@ jobs:
       uses: actions/checkout@v2
     - uses: actions/download-artifact@master
       with:
-      name: my-artifact
-      path: path/to/artifact
+        name: my-artifact
+        path: path/to/artifact
     - run: cd ./builddir
     - run: ./peregrine.elf -dev_debug && ./peregrine.elf compile ../can_comp.pe -o output && peregrine.elf compile ../can_comp.js.pe -o output.js
     - run: ./output && node ./output.js
