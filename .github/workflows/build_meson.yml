@@ -20,7 +20,7 @@ jobs:
     - uses: actions/upload-artifact@master
       with:
         name: elffile
-        path: /builddir/peregrine.elf
+        path: ./peregrine.elf
   jscompile:
     name: JS Compile Test
     runs-on: ubuntu-latest
@@ -31,7 +31,7 @@ jobs:
     - uses: actions/download-artifact@master
       with:
         name: elffile
-        path: /builddir/peregrine.elf
+        path: ./builddir/peregrine.elf
     - run: cd ./builddir
     - run: ./peregrine.elf -dev_debug && ./peregrine.elf compile ../can_comp.pe -o output && peregrine.elf compile ../can_comp.js.pe -o output.js
     - run: ./output && node ./output.js
