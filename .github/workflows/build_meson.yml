@@ -33,5 +33,7 @@ jobs:
       with:
         name: build
         path: pelf
-    - run: ./pelf -dev_debug && ./pelf compile ./can_comp.pe -o output && pelf compile ./can_comp.js.pe -o output.js
+    - run: cd ./pelf
+    - run: ls
+    - run: ./peregrine.elf -dev_debug && ./peregrine.elf compile ../can_comp.pe -o output && ./peregrine.elf compile ../can_comp.js.pe -o output.js
     - run: ./output && node ./output.js
