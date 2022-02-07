@@ -19,8 +19,8 @@ jobs:
       run: cd builddir && ninja
     - uses: actions/upload-artifact@master
       with:
-        name: elffile
-        path: ./peregrine.elf
+        name: build
+        path: builddir/
   jscompile:
     name: JS Compile Test
     runs-on: ubuntu-latest
@@ -30,8 +30,8 @@ jobs:
       uses: actions/checkout@v2
     - uses: actions/download-artifact@master
       with:
-        name: elffile
-        path: ./builddir/peregrine.elf
+        name: build
+        path: builddir/
     - run: cd ./builddir
     - run: ./peregrine.elf -dev_debug && ./peregrine.elf compile ../can_comp.pe -o output && peregrine.elf compile ../can_comp.js.pe -o output.js
     - run: ./output && node ./output.js
