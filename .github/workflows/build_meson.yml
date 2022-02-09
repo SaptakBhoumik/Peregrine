@@ -6,7 +6,7 @@ on:
   push:
 jobs:
   build:
-    name: Build and Working
+    name: Build and Comp Test
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -18,6 +18,6 @@ jobs:
     - name: Ninja
       run: cd builddir && ninja
     - name: Build Example Normal
-      run: cd pelf && chmod +x peregrine.elf && ./peregrine.elf -dev_debug && ./peregrine.elf compile ../can_comp.pe -o output && ./peregrine.elf compile ../can_comp.js.pe -o output.js
+      run: cd builddir && ./peregrine.elf -dev_debug && ./peregrine.elf compile ../can_comp.pe -o output && ./peregrine.elf compile ../can_comp.js.pe -o output.js
     - name:
-      run: cd pelf && chmod +x ./output && ./output && node ./output.js
+      run: cd builddir && ./output && node ./output.js
