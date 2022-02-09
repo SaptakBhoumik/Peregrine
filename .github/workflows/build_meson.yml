@@ -6,7 +6,7 @@ on:
   push:
 jobs:
   build:
-    name: Build
+    name: Build and Working
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -17,21 +17,7 @@ jobs:
       run: meson builddir
     - name: Ninja
       run: cd builddir && ninja
-    - uses: actions/upload-artifact@master
-      with:
-        name: build
-        path: builddir/peregrine.elf
-        retention-days: 1
-  jscompile:
-    name: JS Compile Test
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - uses: actions/download-artifact@master
-      with:
-        name: build
-        path: pelf
-    - run: cd pelf && chmod +x peregrine.elf && ./peregrine.elf -dev_debug && ./peregrine.elf compile ../can_comp.pe -o output && ./peregrine.elf compile ../can_comp.js.pe -o output.js
-    - run: cd pelf && chmod +x ./output && ./output && node ./output.js
+    - name: Build Example Normal
+       run: cd pelf && chmod +x peregrine.elf && ./peregrine.elf -dev_debug && ./peregrine.elf compile ../can_comp.pe -o output && ./peregrine.elf compile ../can_comp.js.pe -o output.js
+    - name:
+      run: cd pelf && chmod +x ./output && ./output && node ./output.js
