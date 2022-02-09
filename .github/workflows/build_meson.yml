@@ -3,12 +3,10 @@ on:
   pull_request:
     branches:
       - "main"
-    paths-ignore:
-      - "./github/**"
   push:
 jobs:
   build:
-    name: Build
+    name: Build and Comp Test
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -19,3 +17,9 @@ jobs:
       run: meson builddir
     - name: Ninja
       run: cd builddir && ninja
+    - name: Build Example Normal
+      run: cd builddir && ./peregrine.elf -dev_debug && ./peregrine.elf compile ../can_comp.pe -o output && ./peregrine.elf -js compile ../can_comp.js.pe -o output.js
+    - name: Run Default
+      run: cd builddir && ./output 
+    - name: Run JS
+      run: cd builddir && node ./output.js
