@@ -19,5 +19,7 @@ jobs:
       run: cd builddir && ninja
     - name: Build Example Normal
       run: cd builddir && ./peregrine.elf -dev_debug && ./peregrine.elf compile ../can_comp.pe -o output && ./peregrine.elf compile ../can_comp.js.pe -o output.js
-    - name:
-      run: cd builddir && ./output && node ./output.js
+    - name: Run Default
+      run: cd builddir && ./output 
+    - name: Run JS
+      run: cd builddir && node ./output.js
