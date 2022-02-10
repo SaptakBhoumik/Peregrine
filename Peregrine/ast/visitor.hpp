@@ -58,6 +58,7 @@ class AstVisitor {
     virtual bool visit(const VirtualStatement& node) { return false; };
     virtual bool visit(const CastStatement& node) { return false; };
     virtual bool visit(const PointerTypeExpr& node) { return false; };
+    virtual bool visit(const RefTypeExpr& node) { return false; };
     virtual bool visit(const DefaultArg& node) { return false; };
     virtual bool visit(const TernaryIf& node) { return false; };
     virtual bool visit(const TryExcept& node) { return false; };

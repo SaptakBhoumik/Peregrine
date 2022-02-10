@@ -283,7 +283,7 @@ bool Codegen::visit(const ast::WhileStatement& node) {
 }
 
 bool Codegen::visit(const ast::ForStatement& node) {
-    write("auto ____PEREGRINE____VALUE=");
+    write("{\nauto ____PEREGRINE____VALUE=");
     node.sequence()->accept(*this);
     write(";\n");
     write("for (size_t ____PEREGRINE____i=0;____PEREGRINE____i<____PEREGRINE____VALUE.__iter__();++____PEREGRINE____i){\n");
@@ -304,7 +304,7 @@ bool Codegen::visit(const ast::ForStatement& node) {
         }
     }
     node.body()->accept(*this);
-    write("\n}");
+    write("\n}\n}");
     return true;
 }
 
@@ -768,6 +768,11 @@ bool Codegen::visit(const ast::CastStatement& node){
 bool Codegen::visit(const ast::PointerTypeExpr& node){
     node.baseType()->accept(*this);
     write("*");
+    return true;
+}
+bool Codegen::visit(const ast::RefTypeExpr& node){
+    node.baseType()->accept(*this);
+    write("&");
     return true;
 }
 bool Codegen::visit(const ast::ClassDefinition& node){

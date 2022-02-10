@@ -152,6 +152,7 @@ void VirtualStatement::accept(AstVisitor& visitor) const { visitor.visit(*this);
 void CastStatement::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void PointerTypeExpr::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+void RefTypeExpr::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void DefaultArg::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 

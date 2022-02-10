@@ -1125,6 +1125,23 @@ std::string PointerTypeExpr::stringify() const {
     return res;
 }
 
+RefTypeExpr::RefTypeExpr(Token tok, AstNodePtr baseType) {
+    m_token = tok;
+    m_baseType = baseType;
+}
+
+AstNodePtr RefTypeExpr::baseType() const { return m_baseType; }
+
+Token RefTypeExpr::token() const { return m_token; }
+
+AstKind RefTypeExpr::type() const { return KAstRefTypeExpr; }
+
+std::string RefTypeExpr::stringify() const {
+    std::string res = "&";
+    res += m_baseType->stringify();
+    return res;
+}
+
 DictTypeExpr::DictTypeExpr(Token tok, AstNodePtr keyType,
                            AstNodePtr valueType) {
     m_token = tok;

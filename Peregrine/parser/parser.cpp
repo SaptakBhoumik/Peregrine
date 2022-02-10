@@ -1048,6 +1048,10 @@ AstNodePtr Parser::parseType(bool var_dec,bool* has_value,bool can_be_sumtype) {
             res = parsePointerType(var_dec,has_value);
             break;
         }
+        case tk_ampersand: {
+            res = parseRefType(var_dec,has_value);
+            break;
+        }
         case tk_list_open:{
             res = parseListType(var_dec,has_value);
             break;
@@ -1123,6 +1127,12 @@ AstNodePtr Parser::parsePointerType(bool var_dec,bool* has_value) {
     return std::make_shared<PointerTypeExpr>(tok, typePtr);
 }
 
+AstNodePtr Parser::parseRefType(bool var_dec,bool* has_value) {
+    Token tok = m_currentToken;
+    advance();
+    AstNodePtr typePtr = parseType(var_dec,has_value,false);
+    return std::make_shared<RefTypeExpr>(tok, typePtr);
+}
 
 AstNodePtr Parser::parseFuncType() {
     auto tok = m_currentToken;

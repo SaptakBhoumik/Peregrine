@@ -118,3 +118,4 @@ type sumtype=int|float|*int|[]int|generic<int,int>
 a,b,c.d=1,2+3,3
 (a,b),c.d=(1,2+3),3
 a**=b
+x:&int=adsa

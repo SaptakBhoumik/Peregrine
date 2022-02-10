@@ -16,6 +16,8 @@ def peregrine3()->int,int:
 def unknown_type(var):
     for x in var:
         printf("Item is %d\n",x)
+    for x in var:
+        printf("Item is %d\n",x)
     with var as y:
         printf("Y is %d\n",y)
     with var:
@@ -32,9 +34,11 @@ def unknown_type(var):
 class iterate_test:
     i:int=0
     x:int
+    i_ref:&int=i
     def __init__(self,c):
         self.i=c
         self.x=self.i
+        printf("i_ref is %d\n",self.i_ref)
     def peregrine4(self)->int,int:
         return 6,6
     def __add__(self,item)->int:

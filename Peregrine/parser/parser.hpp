@@ -69,6 +69,7 @@ class Parser {
                           );
     AstNodePtr parseImportedType(bool var_dec,bool* has_value);
     AstNodePtr parsePointerType(bool var_dec,bool* has_value);
+    AstNodePtr parseRefType(bool var_dec,bool* has_value);
     AstNodePtr parseListType(bool var_dec,bool* has_value);
     AstNodePtr parseFuncType();
 
