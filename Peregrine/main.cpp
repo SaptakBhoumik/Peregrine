@@ -12,6 +12,22 @@
 #include <sstream>
 #include <string.h>
 #include <vector>
+
+
+bool check_file_existence(std::string fname){
+    FILE *file; 
+
+    file = fopen( fname.c_str() , "r");
+
+   if (file != NULL) {
+      fclose(file);
+      return true;
+   } else {
+      return false;
+   }
+}
+
+
 void compile(cli::state s){
     if (s.dev_debug){
         std::ifstream file("../Peregrine/test.pe");
@@ -30,33 +46,40 @@ void compile(cli::state s){
         // TypeChecker typeChecker(program);
     }
     else{
-        std::ifstream file(s.input_filename);
-        std::stringstream buf;
-        buf << file.rdbuf();
-        std::vector<Token> tokens = lexer(buf.str(), s.input_filename);
-        Parser parser(tokens, s.input_filename);
-        ast::AstNodePtr program = parser.parse();
-        auto output=s.output_filename;
-        auto filename=s.input_filename;
-        if (s.emit_js){
-            js::Codegen codegen(output, program, false, filename);
-        }else if(s.emit_html){
-            js::Codegen codegen(output, program, true, filename);
-        }else if(s.doc_html){
-            html::Docgen Docgen(output, program, filename);
-        }else if(s.emit_cpp){
-            cpp::Codegen codegen(output, program,filename);
-        }else if(s.emit_obj){
-            cpp::Codegen codegen("temp.cc", program,filename);
-            auto cmd=s.cpp_compiler+" -c -std=c++20 temp.cc -w "+s.cpp_arg+" -o "+output;
-            system(cmd.c_str());
-            system("rm temp.cc");
-        }else{
-            cpp::Codegen codegen("temp.cc", program,filename);
-            auto cmd=s.cpp_compiler+" -std=c++2a temp.cc -w "+s.cpp_arg+" -o "+output;
-            system(cmd.c_str());
-            system("rm temp.cc");
+
+        if (check_file_existence(s.input_filename)){
+            std::ifstream file(s.input_filename);
+            std::stringstream buf;
+            buf << file.rdbuf();
+            std::vector<Token> tokens = lexer(buf.str(), s.input_filename);
+            Parser parser(tokens, s.input_filename);
+            ast::AstNodePtr program = parser.parse();
+            auto output=s.output_filename;
+            auto filename=s.input_filename;
+            if (s.emit_js){
+                js::Codegen codegen(output, program, false, filename);
+            }else if(s.emit_html){
+                js::Codegen codegen(output, program, true, filename);
+            }else if(s.doc_html){
+                html::Docgen Docgen(output, program, filename);
+            }else if(s.emit_cpp){
+                cpp::Codegen codegen(output, program,filename);
+            }else if(s.emit_obj){
+                cpp::Codegen codegen("temp.cc", program,filename);
+                auto cmd=s.cpp_compiler+" -c -std=c++20 temp.cc -w "+s.cpp_arg+" -o "+output;
+                system(cmd.c_str());
+                system("rm temp.cc");
+            }else{
+                cpp::Codegen codegen("temp.cc", program,filename);
+                auto cmd=s.cpp_compiler+" -std=c++2a temp.cc -w "+s.cpp_arg+" -o "+output;
+                system(cmd.c_str());
+                system("rm temp.cc");
+            }
         }
+        else{
+            std::cout << "error: file with name of \"" << s.input_filename << "\" does not exist\n";
+        }
+        
     }
 }
 int main(int argc, char** argv) {
