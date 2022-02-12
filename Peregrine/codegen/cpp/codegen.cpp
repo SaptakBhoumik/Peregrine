@@ -930,6 +930,8 @@ bool Codegen::visit(const ast::DefaultArg& node){
 bool Codegen::visit(const ast::ExportStatement& node){
     //dont mangle this name
     write("extern \"C\" ");
+    std::string name=std::dynamic_pointer_cast<ast::IdentifierExpression>(std::dynamic_pointer_cast<ast::FunctionDefinition>(node.body())->name())->value();
+    m_symbolMap.set_global(name,name);
     node.body()->accept(*this);
     return true;
 }
