@@ -203,6 +203,8 @@ bool Codegen::visit(const ast::VariableStatement& node) {
     //a.b->u.__getitem__(9).h = 9;
     local_mangle_start();
     ast::AstNodePtr name=node.name();
+    name->accept(*this);
+    /*
     while(name->type()==ast::KAstDotExpression){
       std::shared_ptr<ast::DotExpression> dot_exp=std::dynamic_pointer_cast<ast::DotExpression>(name);
       dot_exp->owner()->accept(*this);
@@ -236,6 +238,11 @@ bool Codegen::visit(const ast::VariableStatement& node) {
           node.value()->accept(*this);
       }
     }
+    */
+    if (node.value()->type() != ast::KAstNoLiteral) {
+         write(" = ");
+          node.value()->accept(*this);
+     }
     local_mangle_end();
     return true;
 }
