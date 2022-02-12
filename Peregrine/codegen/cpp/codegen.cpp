@@ -796,8 +796,8 @@ bool Codegen::visit(const ast::ClassDefinition& node){
         write(";\n");
     }
     write("public:\n");
-    node.name()->accept(*this);
-    write("()=default;\n");
+    //node.name()->accept(*this);
+    //write("()=default;\n");
     if (!is_class){
         is_class=true;
         for (auto& x : node.attributes()){
