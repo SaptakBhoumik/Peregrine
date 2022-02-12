@@ -22,9 +22,12 @@ class Codegen : public ast::AstVisitor {
     EnvPtr createEnv(EnvPtr parent = nullptr);
 
   private:
+    MangleName m_symbolMap;
+    bool local=false;
     bool is_dot_exp=false;
-    bool is_enum=false;
     bool is_class=false;
+    std::string m_global_name;
+    std::string curr_enum_name="";
     std::vector<std::string> enum_name={"error"};
     std::string res;
     bool save=false;

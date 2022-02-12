@@ -10,16 +10,34 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#define local_mangle_start() bool curr_state=local;local=true; auto symbol_map=m_symbolMap;
+#define local_mangle_end() local=curr_state;m_symbolMap=symbol_map;
+std::string global_name(std::string name)
+{
+    std::string res;
+    for (auto& c : name)
+    {
+        if(c=='\\'||c=='/'||c=='.'){
+            res+="____";
+        }
+        else{
+            res+=c;
+        }
+    }
+    return res;
+}
 
 namespace cpp {
 
 Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast,std::string filename) {
     m_filename=filename;
     m_file.open(outputFilename);
-    m_file << "#include <cstdio>\n#include <functional>\ntypedef enum{error___AssertionError,error___ZeroDivisionError} error;\n";
+    m_file << "#include <cstdio>\n#include <functional>\ntypedef enum{error________PEREGRINE____PEREGRINE____AssertionError,error________PEREGRINE____PEREGRINE____ZeroDivisionError} error;\n";
+    m_global_name=global_name(filename);
     m_env = createEnv();
     ast->accept(*this);
     m_file.close();
+    // m_symbolMap.print();
 }
 
 std::shared_ptr<SymbolTable<ast::AstNodePtr>>
@@ -46,7 +64,7 @@ std::string Codegen::searchDefaultModule(std::string path,
                                          std::string moduleName) {
     for (auto& entry : std::filesystem::directory_iterator(path)) {
         if (std::filesystem::path(entry.path()).filename() == moduleName) {
-            // TODO :ignore extensions?
+            // TODO:ignore extensions?
             if (entry.is_regular_file()) {
                 return entry.path().string();
             } else if (entry.is_directory()) {
@@ -109,10 +127,12 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
         if (functionName == "main") {
             // we want the main function to always return 0 if success
             write("int main (");
+            local_mangle_start();
             codegenFuncParams(node.parameters());
             write(") {\n");
             node.body()->accept(*this);
             write("return 0;\n}");
+            local_mangle_end();
         } else {
             if(return_type.size()==0){
                 node.returnType()->accept(*this);
@@ -123,6 +143,7 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
             write(" ");
             node.name()->accept(*this);
             write("(");
+            local_mangle_start();
             codegenFuncParams(node.parameters());
             if(return_type.size()>0 && node.parameters().size()>0){
                 write(",");
@@ -137,10 +158,12 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
             write(") {\n");
             node.body()->accept(*this);
             write("\n}");
+            local_mangle_end();
         }
         is_func_def=false;
     }
     else{
+        local_mangle_start();
         write("auto ");
         node.name()->accept(*this);
         write("=[=](");
@@ -165,6 +188,7 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
         write(" {\n");
         node.body()->accept(*this);
         write("\n}");
+        local_mangle_end();
     }
     return true;
 }
@@ -177,7 +201,7 @@ bool Codegen::visit(const ast::VariableStatement& node) {
 
     //TODO: We are getting this if input is a.b->u[9].h=9. Is is valid?
     //a.b->u.__getitem__(9).h = 9;
-
+    local_mangle_start();
     ast::AstNodePtr name=node.name();
     while(name->type()==ast::KAstDotExpression){
       std::shared_ptr<ast::DotExpression> dot_exp=std::dynamic_pointer_cast<ast::DotExpression>(name);
@@ -195,7 +219,7 @@ bool Codegen::visit(const ast::VariableStatement& node) {
     if (name->type()==ast::KAstListOrDictAccess){
       std::shared_ptr<ast::ListOrDictAccess> access_exp=std::dynamic_pointer_cast<ast::ListOrDictAccess>(name);
       access_exp->container()->accept(*this);
-      write(".__assignitem__(");
+      write(".____PEREGRINE____PEREGRINE______assignitem__(");
       access_exp->keyOrIndex()[0]->accept(*this);
       if(access_exp->keyOrIndex().size()==2){
           write(",");
@@ -212,6 +236,7 @@ bool Codegen::visit(const ast::VariableStatement& node) {
           node.value()->accept(*this);
       }
     }
+    local_mangle_end();
     return true;
 }
 
@@ -221,11 +246,13 @@ bool Codegen::visit(const ast::ConstDeclaration& node) {
         node.constType()->accept(*this);
     }
     write(" ");
+    local_mangle_start();
     node.name()->accept(*this);
     write("=");
     node.value()->accept(*this);
+    local_mangle_end();
     return true;
-    }
+}
 
 bool Codegen::visit(const ast::TypeDefinition& node) {
     write("typedef ");
@@ -286,19 +313,19 @@ bool Codegen::visit(const ast::ForStatement& node) {
     write("{\nauto ____PEREGRINE____VALUE=");
     node.sequence()->accept(*this);
     write(";\n");
-    write("for (size_t ____PEREGRINE____i=0;____PEREGRINE____i<____PEREGRINE____VALUE.__iter__();++____PEREGRINE____i){\n");
+    write("for (size_t ____PEREGRINE____i=0;____PEREGRINE____i<____PEREGRINE____VALUE.____PEREGRINE____PEREGRINE______iter__();++____PEREGRINE____i){\n");
     if (node.variable().size()==1){
         write("auto ");
         node.variable()[0]->accept(*this);
-        write("=____PEREGRINE____VALUE.__iterate__();\n");
+        write("=____PEREGRINE____VALUE.____PEREGRINE____PEREGRINE______iterate__();\n");
     }
     else{
-        write("auto ____PEREGRINE____TEMP=____PEREGRINE____VALUE.__iterate__();\n");
+        write("auto ____PEREGRINE____TEMP=____PEREGRINE____VALUE.____PEREGRINE____PEREGRINE______iterate__();\n");
         for (size_t i=0;i<node.variable().size();++i){
             auto x=node.variable()[i];
             write("auto ");
             x->accept(*this);
-            write("=____PEREGRINE____TEMP.__getitem__(");
+            write("=____PEREGRINE____TEMP.____PEREGRINE____PEREGRINE______getitem__(");
             write(std::to_string(i));
             write(");\n");
         }
@@ -423,6 +450,7 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
             write("[](");
         }
         auto return_type=TurpleTypes(function->returnType());
+        local_mangle_start();
         codegenFuncParams(function->parameters());
         if(return_type.size()>0 && function->parameters().size()>0){
             write(",");
@@ -452,6 +480,7 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
             function->body()->accept(*this);
         }
         write("\n}");
+        local_mangle_end();
         contains=res;
         res="";
     }
@@ -488,7 +517,7 @@ bool Codegen::visit(const ast::DictLiteral& node) { return true; }
 
 bool Codegen::visit(const ast::ListOrDictAccess& node) {
     node.container()->accept(*this);
-    write(".__getitem__(");
+    write(".____PEREGRINE____PEREGRINE______getitem__(");
     node.keyOrIndex()[0]->accept(*this);
     if(node.keyOrIndex().size()==2){
         write(",");
@@ -515,14 +544,14 @@ bool Codegen::visit(const ast::BinaryOperation& node) {
     else if(node.token().tkType==tk_in){
         write("(");
         node.right()->accept(*this);
-        write(".__contains__(");
+        write(".____PEREGRINE____PEREGRINE______contains__(");
         node.left()->accept(*this);
         write("))");
     }
     else if(node.token().tkType==tk_not_in){
         write("(not ");
         node.right()->accept(*this);
-        write(".__contains__(");
+        write(".____PEREGRINE____PEREGRINE______contains__(");
         node.left()->accept(*this);
         write("))");
     }
@@ -573,47 +602,72 @@ bool Codegen::visit(const ast::ArrowExpression& node) {
 
 
 bool Codegen::visit(const ast::DotExpression& node) {
-    //FIXME: Not very elegent
     if (!is_dot_exp){
         if (node.owner()->type()==ast::KAstIdentifier){
             std::string name = std::dynamic_pointer_cast<ast::IdentifierExpression>(node.owner())->value();
-            if(std::count(enum_name.begin(), enum_name.end(), name)){
-                write(name+"___");
+            if(std::count(enum_name.begin(), enum_name.end(), name)&&m_symbolMap.contains(name)){
+                write(m_symbolMap[name]+"____");
+                local_mangle_start();
                 node.referenced()->accept(*this);
+                local_mangle_end();
             }
             else{
                 is_dot_exp=true;
                 node.owner()->accept(*this);
                 write(".");
+                local_mangle_start();
                 node.referenced()->accept(*this);
+                local_mangle_end();
             }
         }
         else {
             if(node.owner()->type()!=ast::KAstDotExpression){is_dot_exp=true;}
             node.owner()->accept(*this);
             write(".");
+            local_mangle_start();
             node.referenced()->accept(*this);
+            local_mangle_end();
         }
         is_dot_exp=false;
     }
     else{
         node.owner()->accept(*this);
         write(".");
+        local_mangle_start();
         node.referenced()->accept(*this);
+        local_mangle_end();
     }
     return true;
 }
 
 bool Codegen::visit(const ast::IdentifierExpression& node) {
-    if (is_enum){
-        write(enum_name.back()+"___");
+    
+    auto x=node.value();
+    if(curr_enum_name!=""){
+        write(m_symbolMap[curr_enum_name]+"________PEREGRINE____PEREGRINE____");
+        write(x);
+        return true;
     }
-    write(node.value());
+    if(!m_symbolMap.contains(x)){
+        if(local){
+            m_symbolMap.set_local(x);
+        }
+        else{
+            m_symbolMap.set_global(x,"____PEREGRINE____PEREGRINE____"+m_global_name+x);
+        }
+    }
+    write(m_symbolMap[x]);
     return true;
 }
 
 bool Codegen::visit(const ast::TypeExpression& node) {
-    write(node.value());
+    auto x=node.value();
+    if(!m_symbolMap.contains(x)){
+        write(x);
+    }
+    else{
+        write(m_symbolMap[x]);
+    }
     auto generic_types=node.generic_types();
     if(generic_types.size()>0){
         write("<");
@@ -697,7 +751,7 @@ bool Codegen::visit(const ast::AssertStatement& node){
     write("if(not ");
     node.condition()->accept(*this);
     write("){\n");
-    write("printf(\"AssertionError : in line "+std::to_string(node.token().line)+" in file "+m_filename+"\\n   "+node.token().statement+"\\n\");fflush(stdout);throw error___AssertionError;");
+    write("printf(\"AssertionError : in line "+std::to_string(node.token().line)+" in file "+m_filename+"\\n   "+node.token().statement+"\\n\");fflush(stdout);throw error________PEREGRINE____PEREGRINE____AssertionError;");
     write("\n}");
     return true;
 }
@@ -723,6 +777,7 @@ bool Codegen::visit(const ast::RaiseStatement& node){
 }
 bool Codegen::visit(const ast::UnionLiteral& node){
     write("typedef union{\n");
+    local_mangle_start();
     for (auto& element:node.elements()){
         element.first->accept(*this);
         write(" ");
@@ -730,6 +785,7 @@ bool Codegen::visit(const ast::UnionLiteral& node){
         write(";\n");
     }
     write("\n}");
+    local_mangle_end();
     node.name()->accept(*this);
     return true;
 }
@@ -737,24 +793,27 @@ bool Codegen::visit(const ast::EnumLiteral& node){
     write("typedef enum{\n");
     auto fields=node.fields();
     std::string name=std::dynamic_pointer_cast<ast::IdentifierExpression>(node.name())->value();
-    //TODO:DO something for local enum
+    auto name_ast=node.name();
     enum_name.push_back(name);
     for (size_t i=0;i<fields.size();++i){
-        auto field=fields[i];
-        write(name+"___");
+        auto field=fields[i];        
+        name_ast->accept(*this);
+        write("____");
+        local_mangle_start();
         field.first->accept(*this);
-        is_enum=true;
+        local_mangle_end();
         if (field.second->type()!=ast::KAstNoLiteral){
+            curr_enum_name=name;
             write(" = ");
             field.second->accept(*this);
+            curr_enum_name="";
         }
-        is_enum=false;
         if (i!=fields.size()-1){
             write(",\n");
         }
     }
     write("\n}");
-    write(name);
+    name_ast->accept(*this);
     return true;
 }
 bool Codegen::visit(const ast::CastStatement& node){
@@ -778,9 +837,9 @@ bool Codegen::visit(const ast::RefTypeExpr& node){
 bool Codegen::visit(const ast::ClassDefinition& node){
     write("class ");
     node.name()->accept(*this);
-    auto name =
+    auto name =m_symbolMap[
         std::dynamic_pointer_cast<ast::IdentifierExpression>(node.name())
-            ->value();
+            ->value()];
     auto parents=node.parent();
     if (parents.size()!=0){
         write(":");
@@ -791,6 +850,7 @@ bool Codegen::visit(const ast::ClassDefinition& node){
         if(i<parents.size()-1){write(",");}
     }
     write("\n{");
+    local_mangle_start();
     for (auto& x : node.other()){
         x->accept(*this);
         write(";\n");
@@ -823,6 +883,7 @@ bool Codegen::visit(const ast::ClassDefinition& node){
         is_class=false;
     }
     write("\n}");
+    local_mangle_end();
     return true;
 }
 bool Codegen::visit(const ast::WithStatement& node) {
@@ -842,18 +903,18 @@ bool Codegen::visit(const ast::WithStatement& node) {
             variables[i]->accept(*this);
             write("=");
             write("CONTEXT____MANAGER____PEREGRINE____"+no_var.back());
-            write(".__enter__()");
+            write(".____PEREGRINE____PEREGRINE______enter__()");
         }
         else{
             write("CONTEXT____MANAGER____PEREGRINE____"+no_var.back());
-            write(".__enter__()");
+            write(".____PEREGRINE____PEREGRINE______enter__()");
         }
         write(";\n");
     }
     node.body()->accept(*this);
     for(auto& x:no_var){
         write("CONTEXT____MANAGER____PEREGRINE____"+x);
-        write(".__end__();\n");
+        write(".____PEREGRINE____PEREGRINE______end__();\n");
     }
     write("\n}\n");
     return true;

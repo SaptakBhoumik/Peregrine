@@ -6,7 +6,7 @@
 #include "lexer/lexer.hpp"
 #include "lexer/tokens.hpp"
 #include "parser/parser.hpp"
-
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -51,26 +51,28 @@ void compile(cli::state s){
             std::ifstream file(s.input_filename);
             std::stringstream buf;
             buf << file.rdbuf();
-            std::vector<Token> tokens = lexer(buf.str(), s.input_filename);
-            Parser parser(tokens, s.input_filename);
+            auto filename=s.input_filename;
+            std::string path = realpath(filename.c_str(), NULL);
+            std::vector<Token> tokens = lexer(buf.str(), path);
+            Parser parser(tokens,path);
             ast::AstNodePtr program = parser.parse();
             auto output=s.output_filename;
-            auto filename=s.input_filename;
+            
             if (s.emit_js){
-                js::Codegen codegen(output, program, false, filename);
+                js::Codegen codegen(output, program, false, path);
             }else if(s.emit_html){
-                js::Codegen codegen(output, program, true, filename);
+                js::Codegen codegen(output, program, true, path);
             }else if(s.doc_html){
-                html::Docgen Docgen(output, program, filename);
+                html::Docgen Docgen(output, program, path);
             }else if(s.emit_cpp){
-                cpp::Codegen codegen(output, program,filename);
+                cpp::Codegen codegen(output, program,path);
             }else if(s.emit_obj){
-                cpp::Codegen codegen("temp.cc", program,filename);
+                cpp::Codegen codegen("temp.cc", program,path);
                 auto cmd=s.cpp_compiler+" -c -std=c++20 temp.cc -w "+s.cpp_arg+" -o "+output;
                 system(cmd.c_str());
                 system("rm temp.cc");
             }else{
-                cpp::Codegen codegen("temp.cc", program,filename);
+                cpp::Codegen codegen("temp.cc", program,path);
                 auto cmd=s.cpp_compiler+" -std=c++2a temp.cc -w "+s.cpp_arg+" -o "+output;
                 system(cmd.c_str());
                 system("rm temp.cc");

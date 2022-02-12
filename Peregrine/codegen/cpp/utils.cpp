@@ -200,7 +200,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
     if (overloaded_binary_op.count(name)>0 && return_type.size()==0 &&node->parameters().size()==2  && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
         //TODO: Dont declare it twice
         node->returnType()->accept(*this);
-        write(" "+name+"(");
+        write(" ____PEREGRINE____PEREGRINE____"+name+"(");
         codegenFuncParams(node->parameters(),1);
         write("){\n");
         write("auto& ");
@@ -220,7 +220,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         write(" operator"+overloaded_binary_op[name]+"(");
         codegenFuncParams(node->parameters(),1);
         write("){\n");
-        write("return "+name+"(");
+        write("return ____PEREGRINE____PEREGRINE____"+name+"(");
         node->parameters()[1].p_name->accept(*this);
         write(");");
         write("\n}");
@@ -228,7 +228,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
     else if (overloaded_unary_op.count(name)>0 && return_type.size()==0 && node->parameters().size()==1 && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
         //TODO: Dont declare it twice
         node->returnType()->accept(*this);
-        write(" "+name+"(");
+        write(" ____PEREGRINE____PEREGRINE____"+name+"(");
         write("){\n");
         write("auto& ");
         node->parameters()[0].p_name->accept(*this);
@@ -245,7 +245,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         write(virtual_static_inline+" ");
         node->returnType()->accept(*this);
         write(" operator"+overloaded_unary_op[name]+"(){\n");
-        write("return "+name+"();");
+        write("return ____PEREGRINE____PEREGRINE____"+name+"();");
         write("\n}");
     }
     else{
@@ -256,7 +256,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         else{
             write("void");
         }
-        write(" "+name+"(");
+        write(" ____PEREGRINE____PEREGRINE____"+name+"(");
         codegenFuncParams(node->parameters(),1);
         if(node->parameters().size()>1 && return_type.size()>0){
             write(",");

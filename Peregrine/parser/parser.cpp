@@ -1646,7 +1646,7 @@ AstNodePtr Parser::parseReturnTypeTurple(AstNodePtr item){
     items.push_back(item);
     while(m_currentToken.tkType==tk_comma){
         advance();
-        items.push_back(parseExpression());
+        items.push_back(parseType());
         if(next().tkType==tk_comma){
             advance();
         }

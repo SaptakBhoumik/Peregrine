@@ -14,6 +14,7 @@ def peregrine3()->int,int:
         return 3,3
     return 4,4
 def unknown_type(var):
+    var.__add__(1)
     for x in var:
         printf("Item is %d\n",x)
     for x in var:
