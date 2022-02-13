@@ -32,6 +32,8 @@ def unknown_type(var):
     printf("55 not in var = %d\n",55 not in var)
     printf("var[6] = %d\n",var[6])
     printf("var.__getitem__(7,8) = %d\n",var.__getitem__(7,index2=8))
+def peregrine4():printf("Wrong\n")
+self:int=7
 class iterate_test:
     i:int=0
     x:int
@@ -41,8 +43,10 @@ class iterate_test:
         self.x=self.i
         printf("i_ref is %d\n",self.i_ref)
     def peregrine4(self)->int,int:
+        printf("Correct\n")
         return 6,6
     def __add__(self,item)->int:
+        peregrine4()
         return 0
     def __neg__(self)->int:
         return 0
@@ -74,6 +78,7 @@ static var_static:int = 8
 static def staticfunc():
     printf("Hello from static function\n")
     printf("Static var is %d\n",var_static)
+item1:int=0
 union name:
     item1:int
     item2:float
@@ -143,7 +148,9 @@ union union_name:
 
 def main():
     switch:iterate_test=iterate_test(5)
-    switch2:int=switch.__add__(2)
+    switch2:int=switch.__add__(test(5))
+    switch3:*iterate_test=&switch
+    switch2=switch3->__add__(test(5))
     peregrine1()
     cc1:union_name
     arrow_test:*union_name=&cc1

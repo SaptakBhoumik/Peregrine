@@ -68,12 +68,12 @@ void compile(cli::state s){
                 cpp::Codegen codegen(output, program,path);
             }else if(s.emit_obj){
                 cpp::Codegen codegen("temp.cc", program,path);
-                auto cmd=s.cpp_compiler+" -c -std=c++20 temp.cc -w "+s.cpp_arg+" -o "+output;
+                auto cmd=s.cpp_compiler+" -c -std=c++20 temp.cc -fpermissive -w "+s.cpp_arg+" -o "+output;
                 system(cmd.c_str());
                 system("rm temp.cc");
             }else{
                 cpp::Codegen codegen("temp.cc", program,path);
-                auto cmd=s.cpp_compiler+" -std=c++2a temp.cc -w "+s.cpp_arg+" -o "+output;
+                auto cmd=s.cpp_compiler+" -std=c++2a temp.cc -fpermissive -w "+s.cpp_arg+" -o "+output;
                 system(cmd.c_str());
                 system("rm temp.cc");
             }

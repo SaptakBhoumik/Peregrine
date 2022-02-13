@@ -24,6 +24,8 @@ class Codegen : public ast::AstVisitor {
   private:
     MangleName m_symbolMap;
     bool local=false;
+    bool is_ref=false;
+    bool is_define=false;
     bool is_dot_exp=false;
     bool is_class=false;
     std::string m_global_name;

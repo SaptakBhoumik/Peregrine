@@ -64,24 +64,7 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
             var+=res;
             res="";
             ast::AstNodePtr member=exp->referenced();
-//            while(member->type()==ast::KAstDotExpression || member->type()==ast::KAstArrowExpression){
-//                if(member->type()==ast::KAstArrowExpression){
-//                  auto curr = std::dynamic_pointer_cast<ast::ArrowExpression>(member);
-//                  curr->owner()->accept(*this);
-//                  write("->");
-//                  var+=res;
-//                  res="";
-//                  member=curr->referenced();
-//                }
-//                else{
-//                  auto curr = std::dynamic_pointer_cast<ast::DotExpression>(member);
-//                  curr->owner()->accept(*this);
-//                  write(".");
-//                  var+=res;
-//                  res="";
-//                  member=curr->referenced();
-//                }
-//            }
+
             if (member->type()==ast::KAstIdentifier){
                 member->accept(*this);
                 var+=res+"("+contains+")";
@@ -112,24 +95,7 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
             var+=res;
             res="";
             ast::AstNodePtr member=exp->referenced();
-//            while(member->type()==ast::KAstDotExpression || member->type()==ast::KAstArrowExpression){
-//                if(member->type()==ast::KAstArrowExpression){
-//                  auto curr = std::dynamic_pointer_cast<ast::ArrowExpression>(member);
-//                  curr->owner()->accept(*this);
-//                  write("->");
-//                  var+=res;
-//                  res="";
-//                  member=curr->referenced();
-//                }
-//                else{
-//                  auto curr = std::dynamic_pointer_cast<ast::DotExpression>(member);
-//                  curr->owner()->accept(*this);
-//                  write(".");
-//                  var+=res;
-//                  res="";
-//                  member=curr->referenced();
-//                }
-//            }
+
             if (member->type()==ast::KAstIdentifier){
                 member->accept(*this);
                 var+=res+"("+contains+")";
@@ -201,10 +167,13 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         //TODO: Dont declare it twice
         node->returnType()->accept(*this);
         write(" ____PEREGRINE____PEREGRINE____"+name+"(");
+        m_symbolMap.set_local(name);
         codegenFuncParams(node->parameters(),1);
         write("){\n");
         write("auto& ");
+        is_define=true;
         node->parameters()[0].p_name->accept(*this);
+        is_define=false;
         write("=*this;\n");
         if(not is_func_def){
             is_func_def=true;
@@ -229,9 +198,12 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         //TODO: Dont declare it twice
         node->returnType()->accept(*this);
         write(" ____PEREGRINE____PEREGRINE____"+name+"(");
+        m_symbolMap.set_local(name);
         write("){\n");
         write("auto& ");
+        is_define=true;
         node->parameters()[0].p_name->accept(*this);
+        is_define=false;
         write("=*this;\n");
         if(not is_func_def){
             is_func_def=true;
@@ -257,6 +229,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
             write("void");
         }
         write(" ____PEREGRINE____PEREGRINE____"+name+"(");
+        m_symbolMap.set_local(name);
         codegenFuncParams(node->parameters(),1);
         if(node->parameters().size()>1 && return_type.size()>0){
             write(",");
@@ -270,7 +243,9 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         }
         write("){\n");
         write("auto& ");
+        is_define=true;
         node->parameters()[0].p_name->accept(*this);
+        is_define=false;
         write("=*this;\n");
         if(not is_func_def){
             is_func_def=true;
@@ -294,7 +269,9 @@ void Codegen::magic_methord(ast::AstNodePtr& node,std::string name){
                 codegenFuncParams(function->parameters(),1);
                 write("){\n");
                 write("auto& ");
+                is_define=true;
                 function->parameters()[0].p_name->accept(*this);
+                is_define=false;
                 write("=*this;\n");
                 if(not is_func_def){
                     is_func_def=true;
@@ -311,7 +288,9 @@ void Codegen::magic_methord(ast::AstNodePtr& node,std::string name){
                 codegenFuncParams(function->parameters(),1);
                 write("){\n");
                 write("auto& ");
+                is_define=true;
                 function->parameters()[0].p_name->accept(*this);
+                is_define=false;
                 write("=*this;\n");
                 if(not is_func_def){
                     is_func_def=true;
@@ -339,7 +318,9 @@ void Codegen::magic_methord(ast::AstNodePtr& node,std::string name){
                 codegenFuncParams(function->parameters(),1);
                 write("){\n");
                 write("auto& ");
+                is_define=true;
                 function->parameters()[0].p_name->accept(*this);
+                is_define=false;
                 write("=*this;\n");
                 if(not is_func_def){
                     is_func_def=true;
@@ -356,7 +337,9 @@ void Codegen::magic_methord(ast::AstNodePtr& node,std::string name){
                 codegenFuncParams(function->parameters(),1);
                 write("){\n");
                 write("auto& ");
+                is_define=true;
                 function->parameters()[0].p_name->accept(*this);
+                is_define=false;
                 write("=*this;\n");
                 if(not is_func_def){
                     is_func_def=true;
@@ -384,7 +367,9 @@ void Codegen::magic_methord(ast::AstNodePtr& node,std::string name){
                 codegenFuncParams(function->parameters(),1);
                 write("){\n");
                 write("auto& ");
+                is_define=true;
                 function->parameters()[0].p_name->accept(*this);
+                is_define=false;
                 write("=*this;\n");
                 if(not is_func_def){
                     is_func_def=true;
@@ -401,7 +386,9 @@ void Codegen::magic_methord(ast::AstNodePtr& node,std::string name){
                 codegenFuncParams(function->parameters(),1);
                 write("){\n");
                 write("auto& ");
+                is_define=true;
                 function->parameters()[0].p_name->accept(*this);
+                is_define=false;
                 write("=*this;\n");
                 if(not is_func_def){
                     is_func_def=true;
