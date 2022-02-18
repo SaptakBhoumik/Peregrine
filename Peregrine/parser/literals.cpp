@@ -49,9 +49,8 @@ AstNodePtr Parser::parseList() {
     advanceOnNewLine();
 
     // TODO: remove the type member? im not sure
-    AstNodePtr type = std::make_shared<NoLiteral>();
 
-    return std::make_shared<ListLiteral>(tok, type, elements);
+    return std::make_shared<ListLiteral>(tok, elements);
 }
 
 AstNodePtr Parser::parseDict() {

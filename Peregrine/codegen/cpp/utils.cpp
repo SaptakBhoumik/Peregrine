@@ -166,7 +166,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
     if (overloaded_binary_op.count(name)>0 && return_type.size()==0 &&node->parameters().size()==2  && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
         //TODO: Dont declare it twice
         node->returnType()->accept(*this);
-        write(" ____PEREGRINE____PEREGRINE____"+name+"(");
+        write(" ____P____P____"+name+"(");
         m_symbolMap.set_local(name);
         codegenFuncParams(node->parameters(),1);
         write("){\n");
@@ -189,7 +189,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         write(" operator"+overloaded_binary_op[name]+"(");
         codegenFuncParams(node->parameters(),1);
         write("){\n");
-        write("return ____PEREGRINE____PEREGRINE____"+name+"(");
+        write("return ____P____P____"+name+"(");
         node->parameters()[1].p_name->accept(*this);
         write(");");
         write("\n}");
@@ -197,7 +197,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
     else if (overloaded_unary_op.count(name)>0 && return_type.size()==0 && node->parameters().size()==1 && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
         //TODO: Dont declare it twice
         node->returnType()->accept(*this);
-        write(" ____PEREGRINE____PEREGRINE____"+name+"(");
+        write(" ____P____P____"+name+"(");
         m_symbolMap.set_local(name);
         write("){\n");
         write("auto& ");
@@ -217,7 +217,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         write(virtual_static_inline+" ");
         node->returnType()->accept(*this);
         write(" operator"+overloaded_unary_op[name]+"(){\n");
-        write("return ____PEREGRINE____PEREGRINE____"+name+"();");
+        write("return ____P____P____"+name+"();");
         write("\n}");
     }
     else{
@@ -228,7 +228,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         else{
             write("void");
         }
-        write(" ____PEREGRINE____PEREGRINE____"+name+"(");
+        write(" ____P____P____"+name+"(");
         m_symbolMap.set_local(name);
         codegenFuncParams(node->parameters(),1);
         if(node->parameters().size()>1 && return_type.size()>0){
@@ -236,7 +236,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         }
         for(size_t i=0;i<return_type.size();i++){
             return_type[i]->accept(*this);
-            write("*____PEREGRINE____RETURN____"+std::to_string(i)+"=NULL");
+            write("*____P____RETURN____"+std::to_string(i)+"=NULL");
             if(i<return_type.size()-1){
                 write(",");
             }

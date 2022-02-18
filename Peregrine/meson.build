@@ -20,7 +20,8 @@ doc_src = [
 ]
 
 analyzer_src = [
-    'analyzer/typeChecker.cpp'
+    'analyzer/typeChecker.cpp',
+    'analyzer/ast_validate.cpp'
 ]
 
 codegen_src = [

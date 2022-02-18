@@ -148,14 +148,12 @@ std::string TypeExpression::stringify() const {
     return res;
 }
 
-ListLiteral::ListLiteral(Token tok, AstNodePtr type,
+ListLiteral::ListLiteral(Token tok,
                          std::vector<AstNodePtr> elements) {
     m_token = tok;
-    m_type = type;
     m_elements = elements;
 }
 
-AstNodePtr ListLiteral::listType() const { return m_type; }
 
 std::vector<AstNodePtr> ListLiteral::elements() const { return m_elements; }
 

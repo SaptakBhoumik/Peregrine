@@ -304,13 +304,11 @@ class FunctionTypeExpr : public AstNode {
 
 class ListLiteral : public AstNode {
     Token m_token;
-    AstNodePtr m_type;
     std::vector<AstNodePtr> m_elements;
 
   public:
-    ListLiteral(Token tok, AstNodePtr type, std::vector<AstNodePtr> elements);
+    ListLiteral(Token tok, std::vector<AstNodePtr> elements);
 
-    AstNodePtr listType() const;
     std::vector<AstNodePtr> elements() const;
 
     Token token() const;
@@ -893,8 +891,7 @@ class MatchStatement : public AstNode {
         AstNodePtr defaultbody);
 
     std::vector<AstNodePtr> matchItem() const;
-    std::vector<std::pair<std::vector<AstNodePtr>, AstNodePtr>>
-    caseBody() const;
+    std::vector<std::pair<std::vector<AstNodePtr>, AstNodePtr>> caseBody() const;
     AstNodePtr defaultBody() const;
 
     Token token() const;

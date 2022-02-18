@@ -27,7 +27,6 @@ class Codegen : public ast::AstVisitor {
     bool is_ref=false;
     bool is_define=false;
     bool is_dot_exp=false;
-    bool is_class=false;
     std::string m_global_name;
     std::string curr_enum_name="";
     std::vector<std::string> enum_name={"error"};

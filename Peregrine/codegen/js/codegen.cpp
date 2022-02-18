@@ -361,13 +361,13 @@ bool Codegen::visit(const ast::ListOrDictAccess& node) {
 
 bool Codegen::visit(const ast::BinaryOperation& node) {
     if (node.op().keyword == "**") {
-        write("_PEREGRINE_POWER(");
+        write("_P_POWER(");
         node.left()->accept(*this);
         write(",");
         node.right()->accept(*this);
         write(")");
     } else if (node.op().keyword == "//") {
-        write("_PEREGRINE_FLOOR(");
+        write("_P_FLOOR(");
         node.left()->accept(*this);
         write("/");
         node.right()->accept(*this);
@@ -565,12 +565,12 @@ bool Codegen::visit(const ast::TryExcept& node){
     write("try{\n");
     node.body()->accept(*this);
     //TODO:This should be base exception
-    write("}\ncatch(__PEREGRINE__exception){\n");
+    write("}\ncatch(__P__exception){\n");
     if(node.except_clauses().size()>0){
         write("if (");
         auto x=node.except_clauses()[0];
         for (size_t i=0;i<x.first.first.size();++i){
-            write("__PEREGRINE__exception===");
+            write("__P__exception===");
             x.first.first[i]->accept(*this);
             if(i<x.first.first.size()-1){write("||");}
         }
@@ -578,7 +578,7 @@ bool Codegen::visit(const ast::TryExcept& node){
         if(x.first.second->type()!=ast::KAstNoLiteral){
             write("let ");
             x.first.second->accept(*this);
-            write("=__PEREGRINE__exception;\n");
+            write("=__P__exception;\n");
         }
         x.second->accept(*this);
         write("}\n");
@@ -586,7 +586,7 @@ bool Codegen::visit(const ast::TryExcept& node){
             write("else if (");
             auto x=node.except_clauses()[i];
             for (size_t i=0;i<x.first.first.size();++i){
-                write("__PEREGRINE__exception===");
+                write("__P__exception===");
                 x.first.first[i]->accept(*this);
                 if(i<x.first.first.size()-1){write("||");}
             }
@@ -594,7 +594,7 @@ bool Codegen::visit(const ast::TryExcept& node){
             if(x.first.second->type()!=ast::KAstNoLiteral){
                 write("let ");
                 x.first.second->accept(*this);
-                write("=__PEREGRINE__exception;\n");
+                write("=__P__exception;\n");
             }
             x.second->accept(*this);
             write("}\n");
@@ -613,11 +613,11 @@ bool Codegen::visit(const ast::TryExcept& node){
     else{
         if(node.except_clauses().size()>0){
             write("else{");
-            write("throw __PEREGRINE__exception;\n");
+            write("throw __P__exception;\n");
             write("}\n");
         }
         else{
-            write("throw __PEREGRINE__exception;\n");
+            write("throw __P__exception;\n");
         }
     }
     write("}");
@@ -634,13 +634,13 @@ bool Codegen::visit(const ast::MultipleAssign& node){
     //TODO: Make it work with iterable and multiple function return 
     write("{");
     for(size_t i=0;i<values.size();++i){
-        write("let _____PEREGRINE____temp____"+std::to_string(i)+"=");
+        write("let _____P____temp____"+std::to_string(i)+"=");
         values[i]->accept(*this);
         write(";");
     }
     for(size_t i=0;i<names.size();++i){
         names[i]->accept(*this);
-        write("=_____PEREGRINE____temp____"+std::to_string(i));
+        write("=_____P____temp____"+std::to_string(i));
         write(";");
     }
     write("}");

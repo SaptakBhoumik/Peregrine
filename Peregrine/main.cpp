@@ -1,6 +1,7 @@
 #include "analyzer/typeChecker.hpp"
 #include "docgen/html/docgen.hpp"
 #include "codegen/cpp/codegen.hpp"
+#include "analyzer/ast_validate.hpp"
 #include "cli/cli.hpp"
 #include "codegen/js/codegen.hpp"
 #include "lexer/lexer.hpp"
@@ -43,7 +44,8 @@ void compile(cli::state s){
         Parser parser(tokens, "test");
         ast::AstNodePtr program = parser.parse();
         std::cout << program->stringify() << "\n";
-        // TypeChecker typeChecker(program);
+        astValidator::Validator val(program,"test");
+        TypeChecker typeChecker(program);
     }
     else{
 
@@ -56,6 +58,7 @@ void compile(cli::state s){
             std::vector<Token> tokens = lexer(buf.str(), path);
             Parser parser(tokens,path);
             ast::AstNodePtr program = parser.parse();
+            astValidator::Validator val(program,filename);
             auto output=s.output_filename;
             
             if (s.emit_js){

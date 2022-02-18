@@ -38,6 +38,12 @@ class iterate_test:
     i:int=0
     x:int
     i_ref:&int=i
+    class nested_class:
+        def __init__(self):pass
+    enum nested_enum:x,y,z
+    union nested_union:
+        x:int
+        y:int
     def __init__(self,c):
         self.i=c
         self.x=self.i

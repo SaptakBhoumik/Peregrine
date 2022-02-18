@@ -69,7 +69,7 @@ class MangleName{
         *this=other;
     }
     void set_local(std::string original){
-        m_local_names[original]="____PEREGRINE____PEREGRINE____"+original;
+        m_local_names[original]="____P____P____"+original;
     }
     void set_global(std::string original,std::string mangled){
         m_global_names[original]=mangled;
