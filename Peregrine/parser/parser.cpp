@@ -432,30 +432,7 @@ AstNodePtr Parser::parseVariableStatement() {
         varType = parseType(true,&has_value);
         advance();
     }
-    else{
-      if(m_currentToken.tkType==tk_list_open){
-        name=parseListOrDictAccess(name);
-        advance();
-      }
-      else{
-        while (m_currentToken.tkType == tk_dot) {
-            name = parseDotExpression(name);
-            advance();
-            while (m_currentToken.tkType == tk_arrow) {
-                name = parseArrowExpression(name);
-                advance();
-            }
-        }
-        while (m_currentToken.tkType == tk_arrow) {
-            name = parseArrowExpression(name);
-            advance();
-            while (m_currentToken.tkType == tk_dot) {
-                name = parseDotExpression(name);
-                advance();
-            }
-        }
-      }
-    }
+    
     AstNodePtr value = std::make_shared<NoLiteral>();
     if (m_currentToken.tkType == tk_assign||has_value) {
         advance();
