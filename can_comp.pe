@@ -7,6 +7,17 @@ def peregrine1()->int,int:
         return 2,2
     return 1,1
 type a_type=def()->int,int
+class decorate:
+    def __init__(self):pass
+    def dec(self,x:a_type)->a_type:return x
+ooo:decorate=decorate()
+ooo_ptr:*decorate=&ooo
+@ooo_ptr->dec()
+@ooo_ptr->dec
+@ooo.dec()
+@ooo.dec
+def some_random_name()->int,int:
+    return 4,4
 def dec(x:a_type)->a_type:return x
 @dec
 def peregrine3()->int,int:
@@ -68,6 +79,7 @@ class iterate_test:
             return True
         else:
             return False
+    
     def __end__(self):
         printf("Context ended\n")
     def __getitem__(self,index1:int,index2:int=0)->int:

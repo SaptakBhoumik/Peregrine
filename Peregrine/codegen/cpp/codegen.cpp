@@ -647,7 +647,7 @@ bool Codegen::visit(const ast::IdentifierExpression& node) {
             m_symbolMap.set_global(x,"____P____P____"+m_global_name+x);
         }
     }
-    else if(is_define){
+    else if(is_define && local){
         m_symbolMap.set_local(x);
     }
     write(m_symbolMap[x]);

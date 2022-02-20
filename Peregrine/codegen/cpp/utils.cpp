@@ -66,13 +66,15 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
             ast::AstNodePtr member=exp->referenced();
 
             if (member->type()==ast::KAstIdentifier){
-                member->accept(*this);
+                auto attribute=std::dynamic_pointer_cast<ast::IdentifierExpression>(member)->value();
+                write("____P____P____"+attribute);
                 var+=res+"("+contains+")";
                 res="";
             }
             else if(member->type()==ast::KAstFunctionCall){
                 auto function = std::dynamic_pointer_cast<ast::FunctionCall>(member);
-                function->name()->accept(*this);
+                auto attribute=std::dynamic_pointer_cast<ast::IdentifierExpression>(function->name())->value();
+                write("____P____P____"+attribute);
                 var+=res+"("+contains;
                 res="";
                 auto args = function->arguments();
@@ -97,13 +99,15 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
             ast::AstNodePtr member=exp->referenced();
 
             if (member->type()==ast::KAstIdentifier){
-                member->accept(*this);
+                auto attribute=std::dynamic_pointer_cast<ast::IdentifierExpression>(member)->value();
+                write("____P____P____"+attribute);
                 var+=res+"("+contains+")";
                 res="";
             }
             else if(member->type()==ast::KAstFunctionCall){
                 auto function = std::dynamic_pointer_cast<ast::FunctionCall>(member);
-                function->name()->accept(*this);
+                auto attribute=std::dynamic_pointer_cast<ast::IdentifierExpression>(function->name())->value();
+                write("____P____P____"+attribute);
                 var+=res+"("+contains;
                 res="";
                 auto args = function->arguments();
