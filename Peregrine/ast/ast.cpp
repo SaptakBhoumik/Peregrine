@@ -1372,7 +1372,7 @@ std::string ExpressionTuple::stringify() const{
     }
     return res;
 }
-Token ExpressionTuple::token() const { return Token{}; }
+Token ExpressionTuple::token() const { return m_items[0]->token(); }
 TypeTuple::TypeTuple(bool multiple_return,std::vector<AstNodePtr> items){
     m_multiple_return=multiple_return;
     m_items=items;
@@ -1396,7 +1396,7 @@ std::string TypeTuple::stringify() const{
     }
     return res;
 }
-Token TypeTuple::token() const { return Token{}; }
+Token TypeTuple::token() const { return m_items[0]->token(); }
 
 ExternStatement::ExternStatement(Token token,std::vector<std::string> libs,std::string name){
     m_token=token;
@@ -1435,7 +1435,7 @@ std::string SumType::stringify() const{
     res+=")";
     return res;
 }
-Token SumType::token() const{return Token{};}
+Token SumType::token() const{return m_types[0]->token();}
 MultipleAssign::MultipleAssign(std::vector<AstNodePtr> names,std::vector<AstNodePtr> values){
     m_names=names;
     m_values=values;
@@ -1461,7 +1461,7 @@ std::string MultipleAssign::stringify() const{
     res+="))";
     return res;
 }
-Token MultipleAssign::token() const{return Token{};}
+Token MultipleAssign::token() const{return m_names[0]->token();}
 AugAssign::AugAssign(Token tok, AstNodePtr name, AstNodePtr value){
     m_token=tok;
     m_name=name;

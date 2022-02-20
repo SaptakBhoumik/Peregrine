@@ -1,7 +1,7 @@
 #include "parser.hpp"
 #include "lexer/lexer.hpp"
 #include "lexer/tokens.hpp"
-
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -197,22 +197,11 @@ AstNodePtr Parser::parseStatement() {
         }
 
         case tk_identifier: {
-            if (is_aug_assign()){
-                stmt = parseAugAssign();
-                break;
-            }
-            if(is_multiple_assign()){
-                stmt = parseMultipleAssign();
-                break;
-            }
             if ((next().tkType == tk_colon || next().tkType == tk_assign)) {
                 // variable
                 stmt = parseVariableStatement();
                 break;
-            } else if ((next().tkType == tk_dot||next().tkType == tk_list_open||next().tkType == tk_arrow) && is_imported_var()) {
-                stmt = parseVariableStatement();
-                break;
-            }
+            } 
             // if it got here, it will go down the cases and match the default
             // case. DO NOT add another case below this one
         }
@@ -222,20 +211,26 @@ AstNodePtr Parser::parseStatement() {
                 if it didn't match the statements above, then it must be
                 either an expression or invalid
             */
-            if(m_currentToken.tkType==tk_l_paren){
-                if(is_multiple_assign()){
-                    stmt = parseMultipleAssign();
-                    break;
-                }
-                else{
-                    stmt = parseExpression();
-                    break;
-                }
+            stmt = parseExpression();
+            if(next().tkType==tk_assign){
+                advance();
+                auto tok=m_currentToken;
+                advance();
+                auto value=parseExpression();
+                AstNodePtr varType = std::make_shared<NoLiteral>();
+                stmt = std::make_shared<VariableStatement>(tok, varType, stmt, value);
             }
-            else{
-                stmt = parseExpression();
-                break;
+            else if (next().tkType==tk_comma){
+                stmt = parseMultipleAssign(stmt);
             }
+            else if(std::count(aug_operators.begin(), aug_operators.end(), next().tkType)!=0){
+                advance();
+                auto tok=m_currentToken;
+                advance();
+                auto value=parseExpression();
+                stmt = std::make_shared<AugAssign>(tok,stmt,value);
+            }
+            break;
         }
     }
 
@@ -1669,10 +1664,10 @@ AstNodePtr Parser::parseExtern(){
     advanceOnNewLine();
     return std::make_shared<ExternStatement>(tok,libs,name);
 }
-AstNodePtr Parser::parseMultipleAssign(){
+AstNodePtr Parser::parseMultipleAssign(AstNodePtr left){
     std::vector<AstNodePtr> names;
     std::vector<AstNodePtr> values;
-    names.push_back(parseExpression());
+    names.push_back(left);
     expect(tk_comma,"Expected , but got "+next().keyword+" instead","","","");
     while (m_currentToken.tkType==tk_comma){
         advance();
@@ -1695,11 +1690,3 @@ AstNodePtr Parser::parseMultipleAssign(){
     return std::make_shared<MultipleAssign>(names,values);
 }
 
-AstNodePtr Parser::parseAugAssign(){
-    AstNodePtr name=parseExpression();
-    advance();
-    auto tok=m_currentToken;
-    advance();
-    auto value=parseExpression();
-    return std::make_shared<AugAssign>(tok,name,value);
-}

@@ -39,12 +39,21 @@ class Parser {
     Token m_currentToken;
     std::vector<Token> m_tokens;
     std::string m_filename;
-
-
+    const std::vector<TokenType> aug_operators{
+                                            tk_slash_equal,
+                                            tk_floor_equal,
+                                            tk_plus_equal,
+                                            tk_minus_equal,
+                                            tk_times_equal,
+                                            tk_mod_equal,
+                                            tk_shift_left_equal,
+                                            tk_shift_right_equal,
+                                            tk_bit_and_equal,
+                                            tk_bit_or_equal,
+                                            tk_bit_xor_equal,
+                                            tk_exponent_equal
+                                        };
     std::map<TokenType, PrecedenceType> precedenceMap = createMap();
-    bool is_multiple_assign();
-    bool is_aug_assign();
-    bool is_imported_var();
     void advance();
     void advanceOnNewLine();
     void expect(TokenType expectedType, std::string msg="",std::string submsg="",std::string hint="",std::string ecode="");
@@ -77,7 +86,6 @@ class Parser {
     AstNodePtr parsePrefixExpression();
     AstNodePtr parseGroupedExpr();
 
-    AstNodePtr parseAugAssign();
     AstNodePtr parseBinaryOperation(AstNodePtr left);
     AstNodePtr parseTernaryIf(AstNodePtr left);
     AstNodePtr parseFunctionCall(AstNodePtr left);
@@ -89,7 +97,7 @@ class Parser {
     AstNodePtr parseReturnExprTurple(AstNodePtr item);
     AstNodePtr parseReturnTypeTurple(AstNodePtr item);
     AstNodePtr parseExtern();
-    AstNodePtr parseMultipleAssign();
+    AstNodePtr parseMultipleAssign(AstNodePtr);
     AstNodePtr parseVirtual();
     AstNodePtr parseCast();
     AstNodePtr parseStatement();

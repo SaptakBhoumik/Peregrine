@@ -73,7 +73,6 @@ bool Validator::visit(const Program& node){
             }
             case KAstAugAssign:
             case KAstMultipleAssign:{
-                // std::cout<<"AugAssign"<<std::endl;
                 add_error(stmt->token(), "SyntaxError: Reassignment outside function", "Use it inside a function");
                 break;
             }
