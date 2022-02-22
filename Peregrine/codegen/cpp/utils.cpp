@@ -164,7 +164,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
     }
     write("\n}");
 }
-void Codegen::magic_methord(ast::AstNodePtr& node,std::string name){
+void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
     switch(node->type()){
         case ast::KAstFunctionDef:{
             std::shared_ptr<ast::FunctionDefinition> function =std::dynamic_pointer_cast<ast::FunctionDefinition>(node);

@@ -636,7 +636,7 @@ AstNodePtr Parser::parseFor() {
 
 AstNodePtr Parser::parseFunctionDef() {
     if(next().tkType==tk_l_paren){
-        return parseMethordDef();
+        return parseMethodDef();
     }
     Token tok = m_currentToken;
     expect(tk_identifier, "Expected a name but got "+next().keyword+" instead","Add a name here","","");
@@ -1670,7 +1670,7 @@ AstNodePtr Parser::parseMultipleAssign(AstNodePtr left){
     return std::make_shared<MultipleAssign>(names,values);
 }
 
-AstNodePtr Parser::parseMethordDef() {
+AstNodePtr Parser::parseMethodDef() {
     Token tok = m_currentToken;
     advance();
     advance();
@@ -1766,6 +1766,6 @@ AstNodePtr Parser::parseMethordDef() {
       }
       body = parseBlockStatement();
     }
-    return std::make_shared<MethordDefinition>(tok, returnType, name,
+    return std::make_shared<MethodDefinition>(tok, returnType, name,
                                                 parameters,reciever, body,comment);
 }

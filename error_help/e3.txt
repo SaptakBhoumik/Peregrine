@@ -1,4 +1,4 @@
-A class can only contain variable or methords or nested class/union or enum
+A class can only contain variable or methods or nested class/union or enum
 
 Example:-
 class iterate_test:

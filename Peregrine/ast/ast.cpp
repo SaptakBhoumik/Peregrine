@@ -1478,7 +1478,7 @@ std::string AugAssign::stringify() const{
     res+=m_value->stringify();
     return res;
 }
-MethordDefinition::MethordDefinition(Token tok, AstNodePtr returnType, AstNodePtr name,
+MethodDefinition::MethodDefinition(Token tok, AstNodePtr returnType, AstNodePtr name,
                        std::vector<parameter> parameters,parameter reciever, AstNodePtr body,std::string comment) {
     m_token = tok;
     m_returnType = returnType;
@@ -1489,29 +1489,29 @@ MethordDefinition::MethordDefinition(Token tok, AstNodePtr returnType, AstNodePt
     m_reciever=reciever;
 }
 
-AstNodePtr MethordDefinition::returnType() const { return m_returnType; }
+AstNodePtr MethodDefinition::returnType() const { return m_returnType; }
 
-parameter MethordDefinition::reciever() const { return m_reciever; }
+parameter MethodDefinition::reciever() const { return m_reciever; }
 
-AstNodePtr MethordDefinition::name() const { return m_name; }
+AstNodePtr MethodDefinition::name() const { return m_name; }
 
-std::vector<parameter> MethordDefinition::parameters() const {
+std::vector<parameter> MethodDefinition::parameters() const {
     return m_parameters;
 }
-std::vector<parameter> MethordDefinition::codegen_parameters() const {
+std::vector<parameter> MethodDefinition::codegen_parameters() const {
     auto v=m_parameters;
     v.insert(v.begin(), m_reciever);
     return v;
 }
-std::string MethordDefinition::comment() const { return m_comment; }
+std::string MethodDefinition::comment() const { return m_comment; }
 
-AstNodePtr MethordDefinition::body() const { return m_body; }
+AstNodePtr MethodDefinition::body() const { return m_body; }
 
-Token MethordDefinition::token() const { return m_token; }
+Token MethodDefinition::token() const { return m_token; }
 
-AstKind MethordDefinition::type() const { return KAstMethordDef; }
+AstKind MethodDefinition::type() const { return KAstMethodDef; }
 
-std::string MethordDefinition::stringify() const {
+std::string MethodDefinition::stringify() const {
     std::string res = "def (";
     res += m_reciever.p_name->stringify();
     if (m_reciever.p_type->type()!=KAstNoLiteral){

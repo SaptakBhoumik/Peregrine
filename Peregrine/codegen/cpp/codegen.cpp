@@ -863,7 +863,7 @@ bool Codegen::visit(const ast::ClassDefinition& node){
         write(";\n");
     }
     for (auto& x : node.methods()){
-        magic_methord(x,name);
+        magic_method(x,name);
          write(";\n");
     }
     write("\n}");
@@ -1014,7 +1014,7 @@ bool Codegen::visit(const ast::AugAssign& node){
     node.value()->accept(*this);
     return true;
 }
-bool Codegen::visit(const ast::MethordDefinition& node){
+bool Codegen::visit(const ast::MethodDefinition& node){
     auto return_type=TurpleTypes(node.returnType());
     auto functionName =
         std::dynamic_pointer_cast<ast::IdentifierExpression>(node.name())
