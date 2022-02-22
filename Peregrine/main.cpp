@@ -44,7 +44,7 @@ void compile(cli::state s){
         Parser parser(tokens, "test");
         ast::AstNodePtr program = parser.parse();
         std::cout << program->stringify() << "\n";
-        astValidator::Validator val(program,"test");
+        // astValidator::Validator val(program,"test");
         TypeChecker typeChecker(program);
     }
     else{

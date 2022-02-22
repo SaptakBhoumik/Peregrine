@@ -1,7 +1,6 @@
 #include "codegen.hpp"
 #include <memory>
 #include <assert.h>
-
 namespace cpp {
 
 void Codegen::matchArg(std::vector<ast::AstNodePtr> matchItem,
@@ -127,140 +126,43 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
     }
     return var;
 }
-//Based on:- https://docs.python.org/3/reference/datamodel.html
 void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::string name,std::string virtual_static_inline){
     auto return_type=TurpleTypes(node->returnType());
-    std::map<std::string,std::string> overloaded_binary_op={
-                                                    {"__add__","+"},
-                                                    {"__sub__","-"},
-                                                    {"__mul__","*"},
-                                                    {"__truediv__","/"},
-                                                    {"__mod__","%"},
-                                                    {"__rshift__",">>"},
-                                                    {"__lshift__","<<"},
-                                                    {"__and__"," and"},
-                                                    {"__or__"," or"},
-                                                    {"__rand__","&"},
-                                                    {"__ror__","|"},
-                                                    {"__xor__","^"},
-                                                    {"__lt__","<"},
-                                                    {"__gt__",">"},
-                                                    {"__le__","<="},
-                                                    {"__ge__",">="},
-                                                    {"__eq__","=="},
-                                                    {"__ne__","!="},
-                                                    {"__isub__","-="},
-                                                    {"__iadd__","+="},
-                                                    {"__imul__","*="},
-                                                    {"__idiv__","/="},
-                                                    {"__imod__","%="},
-                                                    {"__irshift__",">>="},
-                                                    {"__ilshift__","<<="},
-                                                    {"__iand__","&="},
-                                                    {"__ior__","|="},
-                                                    {"__ixor__","^="}
-                                                    };
-    std::map<std::string,std::string> overloaded_unary_op={
-                                                    {"__neg__","-"},
-                                                    {"__invert__","~"},
-                                                    {"__not__"," not"},
-                                                    {"__increment__","++"},
-                                                    {"__decrement__","--"}
-                                                    };
-    if (overloaded_binary_op.count(name)>0 && return_type.size()==0 &&node->parameters().size()==2  && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
-        //TODO: Dont declare it twice
+    
+    assert(node->parameters().size()>0);
+    if(return_type.size()==0){
         node->returnType()->accept(*this);
-        write(" ____P____P____"+name+"(");
-        m_symbolMap.set_local(name);
-        codegenFuncParams(node->parameters(),1);
-        write("){\n");
-        write("auto& ");
-        is_define=true;
-        node->parameters()[0].p_name->accept(*this);
-        is_define=false;
-        write("=*this;\n");
-        if(not is_func_def){
-            is_func_def=true;
-            node->body()->accept(*this);
-            is_func_def=false;
-        }
-        else{
-            node->body()->accept(*this);
-        }
-        write("\n};\n");
-        write(virtual_static_inline+" ");
-        node->returnType()->accept(*this);
-        write(" operator"+overloaded_binary_op[name]+"(");
-        codegenFuncParams(node->parameters(),1);
-        write("){\n");
-        write("return ____P____P____"+name+"(");
-        node->parameters()[1].p_name->accept(*this);
-        write(");");
-        write("\n}");
-    }
-    else if (overloaded_unary_op.count(name)>0 && return_type.size()==0 && node->parameters().size()==1 && virtual_static_inline!="static" && virtual_static_inline!="static inline"){
-        //TODO: Dont declare it twice
-        node->returnType()->accept(*this);
-        write(" ____P____P____"+name+"(");
-        m_symbolMap.set_local(name);
-        write("){\n");
-        write("auto& ");
-        is_define=true;
-        node->parameters()[0].p_name->accept(*this);
-        is_define=false;
-        write("=*this;\n");
-        if(not is_func_def){
-            is_func_def=true;
-            node->body()->accept(*this);
-            is_func_def=false;
-        }
-        else{
-            node->body()->accept(*this);
-        }
-        write("\n};\n");
-        write(virtual_static_inline+" ");
-        node->returnType()->accept(*this);
-        write(" operator"+overloaded_unary_op[name]+"(){\n");
-        write("return ____P____P____"+name+"();");
-        write("\n}");
     }
     else{
-        assert(node->parameters().size()>0);
-        if(return_type.size()==0){
-            node->returnType()->accept(*this);
-        }
-        else{
-            write("void");
-        }
-        write(" ____P____P____"+name+"(");
-        m_symbolMap.set_local(name);
-        codegenFuncParams(node->parameters(),1);
-        if(node->parameters().size()>1 && return_type.size()>0){
+        write("void");
+    }
+    write(" ____P____P____"+name+"(");
+    codegenFuncParams(node->parameters(),1);
+    if(node->parameters().size()>1 && return_type.size()>0){
+        write(",");
+    }
+    for(size_t i=0;i<return_type.size();i++){
+        return_type[i]->accept(*this);
+        write("*____P____RETURN____"+std::to_string(i)+"=NULL");
+        if(i<return_type.size()-1){
             write(",");
         }
-        for(size_t i=0;i<return_type.size();i++){
-            return_type[i]->accept(*this);
-            write("*____P____RETURN____"+std::to_string(i)+"=NULL");
-            if(i<return_type.size()-1){
-                write(",");
-            }
-        }
-        write("){\n");
-        write("auto& ");
-        is_define=true;
-        node->parameters()[0].p_name->accept(*this);
-        is_define=false;
-        write("=*this;\n");
-        if(not is_func_def){
-            is_func_def=true;
-            node->body()->accept(*this);
-            is_func_def=false;
-        }
-        else{
-            node->body()->accept(*this);
-        }
-        write("\n}");
     }
+    write("){\n");
+    write("auto& ");
+    is_define=true;
+    node->parameters()[0].p_name->accept(*this);
+    is_define=false;
+    write("=*this;\n");
+    if(not is_func_def){
+        is_func_def=true;
+        node->body()->accept(*this);
+        is_func_def=false;
+    }
+    else{
+        node->body()->accept(*this);
+    }
+    write("\n}");
 }
 void Codegen::magic_methord(ast::AstNodePtr& node,std::string name){
     switch(node->type()){

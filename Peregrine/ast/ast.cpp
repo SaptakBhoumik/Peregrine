@@ -1478,5 +1478,79 @@ std::string AugAssign::stringify() const{
     res+=m_value->stringify();
     return res;
 }
+MethordDefinition::MethordDefinition(Token tok, AstNodePtr returnType, AstNodePtr name,
+                       std::vector<parameter> parameters,parameter reciever, AstNodePtr body,std::string comment) {
+    m_token = tok;
+    m_returnType = returnType;
+    m_name = name;
+    m_parameters = parameters;
+    m_body = body;
+    m_comment=comment;
+    m_reciever=reciever;
+}
 
+AstNodePtr MethordDefinition::returnType() const { return m_returnType; }
+
+parameter MethordDefinition::reciever() const { return m_reciever; }
+
+AstNodePtr MethordDefinition::name() const { return m_name; }
+
+std::vector<parameter> MethordDefinition::parameters() const {
+    return m_parameters;
+}
+std::vector<parameter> MethordDefinition::codegen_parameters() const {
+    auto v=m_parameters;
+    v.insert(v.begin(), m_reciever);
+    return v;
+}
+std::string MethordDefinition::comment() const { return m_comment; }
+
+AstNodePtr MethordDefinition::body() const { return m_body; }
+
+Token MethordDefinition::token() const { return m_token; }
+
+AstKind MethordDefinition::type() const { return KAstMethordDef; }
+
+std::string MethordDefinition::stringify() const {
+    std::string res = "def (";
+    res += m_reciever.p_name->stringify();
+    if (m_reciever.p_type->type()!=KAstNoLiteral){
+        res += ":";
+        res += m_reciever.p_type->stringify();
+    }
+    if (m_reciever.p_default->type()!=ast::KAstNoLiteral){
+        res+="=";
+        res+=m_reciever.p_default->stringify();
+    }
+    res+=")";
+    res += m_name->stringify();
+    res += "(";
+
+    if (!m_parameters.empty()) {
+        for (size_t i = 0; i < m_parameters.size(); i++) {
+            parameter param = m_parameters[i];
+
+            if (i) {
+                res += ", ";
+            }
+
+            res += param.p_name->stringify();
+            if (param.p_type->type()!=KAstNoLiteral){
+                res += ":";
+                res += param.p_type->stringify();
+            }
+            if (param.p_default->type()!=ast::KAstNoLiteral){
+                res+="=";
+                res+=param.p_default->stringify();
+            }
+        }
+    }
+    res += ") -> ";
+    res += m_returnType->stringify();
+    res += ":\n";
+
+    res += m_body->stringify();
+
+    return res;
+}
 } // namespace ast

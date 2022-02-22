@@ -43,7 +43,7 @@ def unknown_type(var):
     printf("55 not in var = %d\n",55 not in var)
     printf("var[6] = %d\n",var[6])
     printf("var.__getitem__(7,8) = %d\n",var.__getitem__(7,index2=8))
-def peregrine4():printf("Wrong\n")
+def peregrine4():printf("Global function\n")
 self:int=7
 class iterate_test:
     i:int=0
@@ -60,10 +60,11 @@ class iterate_test:
         self.x=self.i
         printf("i_ref is %d\n",self.i_ref)
     def peregrine4(self)->int,int:
-        printf("Correct\n")
+        printf("Local func\n")
         return 6,6
     def __add__(self,item)->int:
         peregrine4()
+        self.peregrine4()
         return 0
     def __neg__(self)->int:
         return 0
@@ -163,7 +164,8 @@ export def exported_func():
 union union_name:
     f:float
     i:int
-
+def (y:int)multiply(x:int)->int:
+    return x*y
 def main():
     switch:iterate_test=iterate_test(5)
     switch2:int=switch.__add__(test(5))

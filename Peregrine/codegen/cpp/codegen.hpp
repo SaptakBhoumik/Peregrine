@@ -51,6 +51,7 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::BlockStatement& node);
     bool visit(const ast::ImportStatement& node);
     bool visit(const ast::FunctionDefinition& node);
+    bool visit(const ast::MethordDefinition& node);
     bool visit(const ast::VariableStatement& node);
     bool visit(const ast::ConstDeclaration& node);
     bool visit(const ast::TypeDefinition& node);

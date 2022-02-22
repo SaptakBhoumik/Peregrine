@@ -1014,5 +1014,72 @@ bool Codegen::visit(const ast::AugAssign& node){
     node.value()->accept(*this);
     return true;
 }
-
+bool Codegen::visit(const ast::MethordDefinition& node){
+    auto return_type=TurpleTypes(node.returnType());
+    auto functionName =
+        std::dynamic_pointer_cast<ast::IdentifierExpression>(node.name())
+            ->value();
+    if (!is_func_def){
+        is_func_def=true; 
+        if(return_type.size()==0){
+            node.returnType()->accept(*this);
+        }
+        else{
+            write("void");
+        }
+        write(" ");
+        is_define=true;
+        node.name()->accept(*this);
+        is_define=false;
+        write("(");
+        local_mangle_start();
+        codegenFuncParams(node.codegen_parameters());
+        if(return_type.size()>0 && node.codegen_parameters().size()>0){
+            write(",");
+        }
+        for(size_t i=0;i<return_type.size();i++){
+            return_type[i]->accept(*this);
+            write("*____P____RETURN____"+std::to_string(i)+"=NULL");
+            if(i<return_type.size()-1){
+                write(",");
+            }
+        }
+        write(") {\n");
+        node.body()->accept(*this);
+        write("\n}");
+        local_mangle_end();
+        is_func_def=false;
+    }
+    else{
+        local_mangle_start();
+        write("auto ");
+        is_define=true;
+        node.name()->accept(*this);
+        is_define=false;
+        write("=[=](");
+        codegenFuncParams(node.codegen_parameters());
+        if(return_type.size()>0 && node.codegen_parameters().size()>0){
+            write(",");
+        }
+        for(size_t i=0;i<return_type.size();i++){
+            return_type[i]->accept(*this);
+            write("*____P____RETURN____"+std::to_string(i)+"=NULL");
+            if(i<return_type.size()-1){
+                write(",");
+            }
+        }
+        write(")mutable->");
+        if(return_type.size()==0){
+                node.returnType()->accept(*this);
+        }
+        else{
+            write("void");
+        }
+        write(" {\n");
+        node.body()->accept(*this);
+        write("\n}");
+        local_mangle_end();
+    }
+    return true;
+}
 } // namespace cpp

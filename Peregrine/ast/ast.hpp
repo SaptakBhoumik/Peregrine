@@ -69,7 +69,8 @@ enum AstKind {
     KAstExternStatement,
     KAstSumType,
     KAstMultipleAssign,
-    KAstAugAssign
+    KAstAugAssign,
+    KAstMethordDef
 };
 
 class AstVisitor;
@@ -1079,6 +1080,32 @@ class AugAssign : public AstNode {
     std::string op() const;
     AstNodePtr value() const;
 
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+class MethordDefinition : public AstNode {
+    Token m_token;
+    AstNodePtr m_returnType;
+    AstNodePtr m_name;
+
+    std::vector<parameter> m_parameters;
+    parameter m_reciever;
+    std::string m_comment;//For generating docs
+    AstNodePtr m_body;
+
+  public:
+    MethordDefinition(Token tok, AstNodePtr returnType, AstNodePtr name,
+                       std::vector<parameter> parameters,parameter reciever, AstNodePtr body,std::string comment);
+
+    AstNodePtr returnType() const;
+    AstNodePtr name() const;
+    parameter reciever() const;
+    std::vector<parameter> parameters() const;
+    std::vector<parameter> codegen_parameters() const;
+    AstNodePtr body() const;
+    std::string comment() const;
     Token token() const;
     AstKind type() const;
     std::string stringify() const;
