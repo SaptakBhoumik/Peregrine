@@ -61,7 +61,10 @@ class SymbolTable {
 };
 
 class MangleName{
-    std::map<std::string, std::string> m_global_names;
+    std::map<std::string, std::string> m_global_names={
+                                                        {"error","error"},
+                                                        {"printf","printf"}
+                                                        };
     std::map<std::string, std::string> m_local_names;
     public:
     MangleName()=default;
@@ -71,17 +74,15 @@ class MangleName{
     void set_local(std::string original){
         m_local_names[original]="____P____P____"+original;
     }
+    void set_local(std::string original,std::string mangled){
+        m_local_names[original]=mangled;
+    }
     void set_global(std::string original,std::string mangled){
         m_global_names[original]=mangled;
     }
-    void clear_local(){
-        m_local_names.clear();
-    }
+    
     bool contains(std::string name){
-        if(name=="error"||name=="printf"){
-            return true;
-        }
-        else if(m_local_names.count(name)!=0){
+        if(m_local_names.count(name)!=0){
             return true;
         }
         else if(m_global_names.count(name)!=0){
@@ -90,10 +91,7 @@ class MangleName{
         return false;
     }
     std::string operator[](std::string name){
-        if(name=="printf"||name=="error"){
-            return name;
-        }
-        else if(m_local_names.count(name)!=0){
+        if(m_local_names.count(name)!=0){
             return m_local_names[name];
         }
         else if(m_global_names.count(name)!=0){

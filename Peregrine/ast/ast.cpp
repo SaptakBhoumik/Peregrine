@@ -1553,4 +1553,34 @@ std::string MethodDefinition::stringify() const {
 
     return res;
 }
+ExternFuncDef::ExternFuncDef(Token tok, AstNodePtr returnType, AstNodePtr name,
+                       std::vector<AstNodePtr> parameters,std::string owner){
+    m_token=tok;
+    m_returnType=returnType;
+    m_name=name;
+    m_parameters=parameters;
+    m_owner=owner;                   
+}
+AstNodePtr ExternFuncDef::returnType() const{return m_returnType;}
+AstNodePtr ExternFuncDef::name() const{return m_name;}
+std::string ExternFuncDef::owner() const{return m_owner;}
+std::vector<AstNodePtr> ExternFuncDef::parameters() const{return m_parameters;}
+Token ExternFuncDef::token() const{return m_token;}
+AstKind ExternFuncDef::type() const{return KAstExternFuncDef;}
+std::string ExternFuncDef::stringify() const{
+    std::string res="def "+m_owner+".";
+    res+=m_name->stringify();
+    res+="(";
+    for (size_t i=0;i<m_parameters.size();++i){
+        res+=m_parameters[i]->stringify();
+        if(i<m_parameters.size()-1){
+            res+=",";
+        }
+    }
+    res+=")->";
+    res+=m_returnType->stringify();
+    return res;
+}
+
+
 } // namespace ast

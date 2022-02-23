@@ -9,9 +9,7 @@ namespace ast {
 // method for the node
 
 void Program::accept(AstVisitor& visitor) const {
-    if (!visitor.visit(*this))
-        for (auto& stmt : m_statements)
-            stmt->accept(visitor);
+    visitor.visit(*this);
 }
 
 void IntegerLiteral::accept(AstVisitor& visitor) const { visitor.visit(*this); }
@@ -74,20 +72,11 @@ void ConstDeclaration::accept(AstVisitor& visitor) const {
 }
 
 void BlockStatement::accept(AstVisitor& visitor) const {
-    if (!visitor.visit(*this))
-        for (auto& stmt : m_statements)
-            stmt->accept(visitor);
+    visitor.visit(*this);
 }
 
 void ClassDefinition::accept(AstVisitor& visitor) const {
-    if (!visitor.visit(*this)) {
-        for (auto& stmt : m_attributes)
-            stmt->accept(visitor);
-        for (auto& stmt : m_methods)
-            stmt->accept(visitor);
-        for (auto& stmt : m_other)
-            stmt->accept(visitor);
-    }
+    visitor.visit(*this);
 }
 
 void FunctionDefinition::accept(AstVisitor& visitor) const {
@@ -174,4 +163,5 @@ void AugAssign::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
 void MethodDefinition::accept(AstVisitor &visitor) const {visitor.visit(*this);}
 
+void ExternFuncDef::accept(AstVisitor &visitor) const {visitor.visit(*this);}
 } // namespace ast

@@ -640,7 +640,9 @@ AstNodePtr Parser::parseFunctionDef() {
     }
     Token tok = m_currentToken;
     expect(tk_identifier, "Expected a name but got "+next().keyword+" instead","Add a name here","","");
-
+    if(next().tkType==tk_dot){
+        return parseExternFuncDef(tok);
+    }
     AstNodePtr name = parseName();
 
     expect(tk_l_paren,"Expected a ( but got "+next().keyword+" instead");
@@ -1768,4 +1770,34 @@ AstNodePtr Parser::parseMethodDef() {
     }
     return std::make_shared<MethodDefinition>(tok, returnType, name,
                                                 parameters,reciever, body,comment);
+}
+AstNodePtr Parser::parseExternFuncDef(Token tok){
+    auto owner=m_currentToken.keyword;
+    advance();
+    expect(tk_identifier,"Expected identifier but got "+next().keyword+" instead","","","");
+    AstNodePtr name=parseName();
+    expect(tk_l_paren,"Expected ( but got "+next().keyword+" instead","","","");
+    std::vector<AstNodePtr> parameters;
+    advance();
+    while (m_currentToken.tkType != tk_r_paren) {
+        parameters.push_back(parseType());
+        advance();
+        if(m_currentToken.tkType==tk_comma){
+            advance();
+        }
+        else if(m_currentToken.tkType==tk_r_paren){
+            break;
+        }
+        else{
+            error(m_currentToken,"Expected , or ) but got "+m_currentToken.keyword+" instead");
+        }
+    }
+    advance();
+    AstNodePtr returnType=std::make_shared<TypeExpression>(Token{},"void");
+    if(m_currentToken.tkType==tk_arrow){
+        advance();
+        returnType=parseType();
+    }
+    advanceOnNewLine();
+    return std::make_shared<ExternFuncDef>(tok,returnType,name,parameters,owner);
 }

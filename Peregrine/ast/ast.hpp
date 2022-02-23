@@ -70,7 +70,8 @@ enum AstKind {
     KAstSumType,
     KAstMultipleAssign,
     KAstAugAssign,
-    KAstMethodDef
+    KAstMethodDef,
+    KAstExternFuncDef
 };
 
 class AstVisitor;
@@ -1106,6 +1107,26 @@ class MethodDefinition : public AstNode {
     std::vector<parameter> codegen_parameters() const;
     AstNodePtr body() const;
     std::string comment() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+class ExternFuncDef : public AstNode {
+    Token m_token;
+    AstNodePtr m_returnType;
+    AstNodePtr m_name;
+    std::vector<AstNodePtr> m_parameters;
+    std::string m_owner;
+
+  public:
+    ExternFuncDef(Token tok, AstNodePtr returnType, AstNodePtr name,
+                       std::vector<AstNodePtr> parameters,std::string owner);
+
+    AstNodePtr returnType() const;
+    AstNodePtr name() const;
+    std::string owner() const;
+    std::vector<AstNodePtr> parameters() const;
     Token token() const;
     AstKind type() const;
     std::string stringify() const;

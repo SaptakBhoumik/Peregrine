@@ -69,6 +69,7 @@ class AstVisitor {
     virtual bool visit(const MultipleAssign& node) { return false; };
     virtual bool visit(const AugAssign& node) { return false; };
     virtual bool visit(const MethodDefinition& node) { return false; };
+    virtual bool visit(const ExternFuncDef& node) { return false; };
 };
 
 } // namespace ast

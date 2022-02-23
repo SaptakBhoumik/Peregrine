@@ -125,3 +125,5 @@ def (i:int)method(a:int,b:int):return a+b
 def (i)method(a:int,b:int):return a+b
 def (i=9)method(a:int,b:int):return a+b
 def (i:int=9)method(a:int,b:int):return a+b
+def c.exit(int)
+def c.test(int)->int

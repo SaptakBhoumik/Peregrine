@@ -12,10 +12,17 @@
 #include <memory>
 #include <string>
 #include <string_view>
-#define local_mangle_start() bool curr_state=local;local=true; auto symbol_map=m_symbolMap;
-#define local_mangle_end() local=curr_state;m_symbolMap=symbol_map;
-#define handle_ref_start() bool curr_ref=is_ref;is_ref=false;
+#define local_mangle_start() bool curr_state=local;\
+                             local=true; \
+                             auto symbol_map=m_symbolMap;
+
+#define local_mangle_end() local=curr_state;\
+                           m_symbolMap=symbol_map;
+                           
+#define handle_ref_start() bool curr_ref=is_ref;\
+                           is_ref=false;
 #define handle_ref_end() is_ref=curr_ref;
+
 std::string global_name(std::string name)
 {
     std::hash<std::string> hash;
@@ -288,19 +295,19 @@ bool Codegen::visit(const ast::ForStatement& node) {
     write("{\nauto ____P____VALUE=");
     node.sequence()->accept(*this);
     write(";\n");
-    write("for (size_t ____P____i=0;____P____i<____P____VALUE.____P____P______iter__();++____P____i){\n");
+    write("for (size_t ____P____i=0;____P____i<____P____VALUE.____mem____P____P______iter__();++____P____i){\n");
     if (node.variable().size()==1){
         write("auto ");
         node.variable()[0]->accept(*this);
-        write("=____P____VALUE.____P____P______iterate__();\n");
+        write("=____P____VALUE.____mem____P____P______iterate__();\n");
     }
     else{
-        write("auto ____P____TEMP=____P____VALUE.____P____P______iterate__();\n");
+        write("auto ____P____TEMP=____P____VALUE.____mem____P____P______iterate__();\n");
         for (size_t i=0;i<node.variable().size();++i){
             auto x=node.variable()[i];
             write("auto ");
             x->accept(*this);
-            write("=____P____TEMP.____P____P______getitem__(");
+            write("=____P____TEMP.____mem____P____P______getitem__(");
             write(std::to_string(i));
             write(");\n");
         }
@@ -494,7 +501,7 @@ bool Codegen::visit(const ast::DictLiteral& node) { return true; }
 
 bool Codegen::visit(const ast::ListOrDictAccess& node) {
     node.container()->accept(*this);
-    write(".____P____P______getitem__(");
+    write(".____mem____P____P______getitem__(");
     handle_ref_start();
     node.keyOrIndex()[0]->accept(*this);
     if(node.keyOrIndex().size()==2){
@@ -523,14 +530,14 @@ bool Codegen::visit(const ast::BinaryOperation& node) {
     else if(node.token().tkType==tk_in){
         write("(");
         node.right()->accept(*this);
-        write(".____P____P______contains__(");
+        write(".____mem____P____P______contains__(");
         node.left()->accept(*this);
         write("))");
     }
     else if(node.token().tkType==tk_not_in){
         write("(not ");
         node.right()->accept(*this);
-        write(".____P____P______contains__(");
+        write(".____mem____P____P______contains__(");
         node.left()->accept(*this);
         write("))");
     }
@@ -631,7 +638,7 @@ bool Codegen::visit(const ast::IdentifierExpression& node) {
     
     auto x=node.value();
     if(is_ref){
-        write("____P____P____"+x);
+        write("____mem____P____P____"+x);
         return true;
     }
     if(curr_enum_name!=""){
@@ -662,17 +669,6 @@ bool Codegen::visit(const ast::TypeExpression& node) {
     else{
         write(m_symbolMap[x]);
     }
-    auto generic_types=node.generic_types();
-    if(generic_types.size()>0){
-        write("<");
-        for(size_t i=0;i<generic_types.size();i++){
-            generic_types[i]->accept(*this);
-            if(i<generic_types.size()-1){
-                write(",");
-            }
-        }
-        write(">");
-    } 
     return true;
 }
 
@@ -770,21 +766,20 @@ bool Codegen::visit(const ast::RaiseStatement& node){
     return true;
 }
 bool Codegen::visit(const ast::UnionLiteral& node){
-    write("typedef union{\n");
+    write("union ");
+    is_define=true;
+    node.name()->accept(*this);
+    is_define=false;
+    write("{\n");
     local_mangle_start();
     for (auto& element:node.elements()){
         element.first->accept(*this);
-        write(" ");
-        is_define=true;
-        element.second->accept(*this);
-        is_define=false;
+        std::string mem = std::dynamic_pointer_cast<ast::IdentifierExpression>(element.second)->value();
+        write(" ____mem____P____P____"+mem);
         write(";\n");
     }
     write("\n}");
     local_mangle_end();
-    is_define=true;
-    node.name()->accept(*this);
-    is_define=false;
     return true;
 }
 bool Codegen::visit(const ast::EnumLiteral& node){
@@ -856,11 +851,47 @@ bool Codegen::visit(const ast::ClassDefinition& node){
         write(";\n");
     }
     write("public:\n");
-    //node.name()->accept(*this);
-    //write("()=default;\n");
-    for (auto& x : node.attributes()){
-        x->accept(*this);
-        write(";\n");
+    {
+        local_mangle_start();
+        for (auto& x : node.attributes()){
+            if(x->type()==ast::KAstStatic){
+                x = std::dynamic_pointer_cast<ast::StaticStatement>(x)->body();
+                write("static ");
+            }
+            switch(x->type()){
+                case ast::KAstVariableStmt:{
+                    std::shared_ptr<ast::VariableStatement> var = std::dynamic_pointer_cast<ast::VariableStatement>(x);
+                    var->varType()->accept(*this);
+                    write(" ____mem____P____P____");
+                    auto str=std::dynamic_pointer_cast<ast::IdentifierExpression>(var->name())->value();
+                    write(str);
+                    m_symbolMap.set_local(str,"____mem____P____P____"+str);
+                    if(var->value()->type()!=ast::KAstNoLiteral){
+                        write(" = ");
+                        var->value()->accept(*this);
+                    }
+                    write(";\n");
+                    break;
+                }
+                case ast::KAstConstDecl:{
+                    std::shared_ptr<ast::ConstDeclaration> var = std::dynamic_pointer_cast<ast::ConstDeclaration>(x);
+                    write("const ");
+                    var->constType()->accept(*this);
+                    write(" ____mem____P____P____");
+                    auto str=std::dynamic_pointer_cast<ast::IdentifierExpression>(var->name())->value();
+                    write(str);
+                    m_symbolMap.set_local(str,"____mem____P____P____"+str);
+                    if(var->value()->type()!=ast::KAstNoLiteral){
+                        write(" = ");
+                        var->value()->accept(*this);
+                    }
+                    write(";\n");
+                    break;
+                }
+                default:{}
+            }
+        }
+        local_mangle_end();
     }
     for (auto& x : node.methods()){
         magic_method(x,name);
@@ -887,18 +918,18 @@ bool Codegen::visit(const ast::WithStatement& node) {
             variables[i]->accept(*this);
             write("=");
             write("CONTEXT____MANAGER____P____"+no_var.back());
-            write(".____P____P______enter__()");
+            write(".____mem____P____P______enter__()");
         }
         else{
             write("CONTEXT____MANAGER____P____"+no_var.back());
-            write(".____P____P______enter__()");
+            write(".____mem____P____P______enter__()");
         }
         write(";\n");
     }
     node.body()->accept(*this);
     for(auto& x:no_var){
         write("CONTEXT____MANAGER____P____"+x);
-        write(".____P____P______end__();\n");
+        write(".____mem____P____P______end__();\n");
     }
     write("\n}\n");
     return true;

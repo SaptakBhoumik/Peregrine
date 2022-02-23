@@ -1,6 +1,13 @@
 #include "codegen.hpp"
 #include <memory>
 #include <assert.h>
+#define local_mangle_start() bool curr_state=local;\
+                             local=true; \
+                             auto symbol_map=m_symbolMap;
+
+#define local_mangle_end() local=curr_state;\
+                           m_symbolMap=symbol_map;
+                           
 namespace cpp {
 
 void Codegen::matchArg(std::vector<ast::AstNodePtr> matchItem,
@@ -66,14 +73,14 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
 
             if (member->type()==ast::KAstIdentifier){
                 auto attribute=std::dynamic_pointer_cast<ast::IdentifierExpression>(member)->value();
-                write("____P____P____"+attribute);
+                write("____mem____P____P____"+attribute);
                 var+=res+"("+contains+")";
                 res="";
             }
             else if(member->type()==ast::KAstFunctionCall){
                 auto function = std::dynamic_pointer_cast<ast::FunctionCall>(member);
                 auto attribute=std::dynamic_pointer_cast<ast::IdentifierExpression>(function->name())->value();
-                write("____P____P____"+attribute);
+                write("____mem____P____P____"+attribute);
                 var+=res+"("+contains;
                 res="";
                 auto args = function->arguments();
@@ -99,14 +106,14 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
 
             if (member->type()==ast::KAstIdentifier){
                 auto attribute=std::dynamic_pointer_cast<ast::IdentifierExpression>(member)->value();
-                write("____P____P____"+attribute);
+                write("____mem____P____P____"+attribute);
                 var+=res+"("+contains+")";
                 res="";
             }
             else if(member->type()==ast::KAstFunctionCall){
                 auto function = std::dynamic_pointer_cast<ast::FunctionCall>(member);
                 auto attribute=std::dynamic_pointer_cast<ast::IdentifierExpression>(function->name())->value();
-                write("____P____P____"+attribute);
+                write("____mem____P____P____"+attribute);
                 var+=res+"("+contains;
                 res="";
                 auto args = function->arguments();
@@ -136,7 +143,8 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
     else{
         write("void");
     }
-    write(" ____P____P____"+name+"(");
+    write(" ____mem____P____P____"+name+"(");
+    local_mangle_start();
     codegenFuncParams(node->parameters(),1);
     if(node->parameters().size()>1 && return_type.size()>0){
         write(",");
@@ -162,6 +170,7 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
     else{
         node->body()->accept(*this);
     }
+    local_mangle_end();
     write("\n}");
 }
 void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
@@ -172,6 +181,7 @@ void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
             auto func_name =std::dynamic_pointer_cast<ast::IdentifierExpression>(function->name())->value();
             if(func_name=="__init__"){
                 write(name+"(");
+                local_mangle_start();
                 codegenFuncParams(function->parameters(),1);
                 write("){\n");
                 write("auto& ");
@@ -188,9 +198,11 @@ void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
                     function->body()->accept(*this);
                 }
                 write("\n}");
+                local_mangle_end();
             }
             else if (func_name=="__del__"){
                 write("~"+name+"(");
+                local_mangle_start();
                 codegenFuncParams(function->parameters(),1);
                 write("){\n");
                 write("auto& ");
@@ -207,6 +219,7 @@ void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
                     function->body()->accept(*this);
                 }
                 write("\n}");
+                local_mangle_end();
             }
             else{
                 write_name(function,func_name);
@@ -221,6 +234,7 @@ void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
             assert(function->parameters().size()>0);
             if(func_name=="__init__"){
                 write(name+"(");
+                local_mangle_start();
                 codegenFuncParams(function->parameters(),1);
                 write("){\n");
                 write("auto& ");
@@ -237,9 +251,11 @@ void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
                     function->body()->accept(*this);
                 }
                 write("\n}");
+                local_mangle_end();
             }
             else if (func_name=="__del__"){
                 write("~"+name+"(");
+                local_mangle_start();
                 codegenFuncParams(function->parameters(),1);
                 write("){\n");
                 write("auto& ");
@@ -256,6 +272,7 @@ void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
                     function->body()->accept(*this);
                 }
                 write("\n}");
+                local_mangle_end();
             }
             else{
                 write_name(function,func_name,"virtual");
@@ -270,6 +287,7 @@ void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
             assert(function->parameters().size()>0);
             if(func_name=="__init__"){
                 write(name+"(");
+                local_mangle_start();
                 codegenFuncParams(function->parameters(),1);
                 write("){\n");
                 write("auto& ");
@@ -286,9 +304,11 @@ void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
                     function->body()->accept(*this);
                 }
                 write("\n}");
+                local_mangle_end();
             }
             else if (func_name=="__del__"){
                 write("~"+name+"(");
+                local_mangle_start();
                 codegenFuncParams(function->parameters(),1);
                 write("){\n");
                 write("auto& ");
@@ -305,6 +325,7 @@ void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
                     function->body()->accept(*this);
                 }
                 write("\n}");
+                local_mangle_end();
             }
             else{
                 write_name(function,func_name,"inline");
