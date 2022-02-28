@@ -27,22 +27,22 @@ def peregrine3()->int,int:
 def unknown_type(var):
     var.__add__(1)
     for x in var:
-        printf("Item is %d\n",x)
+        printf("Item is %lld\n",x)
     for x in var:
-        printf("Item is %d\n",x)
+        printf("Item is %lld\n",x)
     with var as y:
-        printf("Y is %d\n",y)
+        printf("Y is %lld\n",y)
     with var:
         pass
     with var as y,var as x:
-        printf("Y is %d\n",y)
-        printf("X is %d\n",x)
-    printf("5 in var = %d\n",5 in var)
-    printf("55 in var = %d\n",55 in var)
-    printf("5 not in var = %d\n",5 not in var)
-    printf("55 not in var = %d\n",55 not in var)
-    printf("var[6] = %d\n",var[6])
-    printf("var.__getitem__(7,8) = %d\n",var.__getitem__(7,index2=8))
+        printf("Y is %lld\n",y)
+        printf("X is %lld\n",x)
+    printf("5 in var = %lld\n",5 in var)
+    printf("55 in var = %lld\n",55 in var)
+    printf("5 not in var = %lld\n",5 not in var)
+    printf("55 not in var = %lld\n",55 not in var)
+    printf("var[6] = %lld\n",var[6])
+    printf("var.__getitem__(7,8) = %lld\n",var.__getitem__(7,index2=8))
 def peregrine4():printf("Global function\n")
 self:int=7
 class iterate_test:
@@ -52,13 +52,15 @@ class iterate_test:
     class nested_class:
         def __init__(self):pass
     enum nested_enum:x,y,z
+    enum nested_enum2:x,y,z=nested_enum.z
+    xyz:nested_enum=nested_enum.x
     union nested_union:
         x:int
         y:int
     def __init__(self,c):
         self.i=c
         self.x=self.i
-        printf("i_ref is %d\n",self.i_ref)
+        printf("i_ref is %lld\n",self.i_ref)
     def peregrine4(self)->int,int:
         printf("Local func\n")
         return 6,6
@@ -83,8 +85,12 @@ class iterate_test:
     
     def __end__(self):
         printf("Context ended\n")
-    def __getitem__(self,index1:int,index2:int=0)->int:
+    def __getitem__(self,index1:int,index2:int)->int:
         return index1+index2
+    def __getitem__(self,index1:int)->int:
+        return index1
+    def __del__(self):
+        printf("Deleted\n")
 switch:iterate_test=iterate_test(5)
 switch2:int=switch.__add__(2)
 enum colours:
@@ -96,7 +102,7 @@ type g = def(int)
 static var_static:int = 8
 static def staticfunc():
     printf("Hello from static function\n")
-    printf("Static var is %d\n",var_static)
+    printf("Static var is %lld\n",var_static)
 item1:int=0
 union name:
     item1:int
@@ -111,21 +117,21 @@ def decorator(func:a )->g:
     h:int =9
     def value(c:int):
         h=8
-        printf("%d\n",h)
-        printf("Answer is %d\n",func(c))
+        printf("%lld\n",h)
+        printf("Answer is %lld\n",func(c))
     return value
 ggggggg:int=9
 @decorator
 def dec_test(x:int)->int:
     ggggggg=7#mutability test
-    printf("%d\n",ggggggg)
+    printf("%lld\n",ggggggg)
     @decorator
     def nested_test(x:int)->int:
         ggggggg=7#mutability test
-        printf("%d\n",ggggggg)
+        printf("%lld\n",ggggggg)
         def nested_test2(x:int)->int:
             ggggggg=7#mutability test
-            printf("%d\n",ggggggg)
+            printf("%lld\n",ggggggg)
             return x*x
         nested_test2(7)
         return x*x
@@ -135,14 +141,14 @@ def dec_test(x:int)->int:
 static def static_dec_test(x:int)->int:
     printf("Static decorator\n")
     ggggggg=7#mutability test
-    printf("%d\n",ggggggg)
+    printf("%lld\n",ggggggg)
     @decorator
     def nested_test(x:int)->int:
         ggggggg=7#mutability test
-        printf("%d\n",ggggggg)
+        printf("%lld\n",ggggggg)
         def nested_test2(x:int)->int:
             ggggggg=7#mutability test
-            printf("%d\n",ggggggg)
+            printf("%lld\n",ggggggg)
             return x*x
         nested_test2(7)
         return x*x
@@ -151,7 +157,7 @@ static def static_dec_test(x:int)->int:
 def test(x:int)->int:#this is comment
     return x
 def lambda_test(x:a):
-    printf("The value is %d\n",x(5))
+    printf("The value is %lld\n",x(5))
 def func(g:int)->int:
     return g
 static inline def static_inline_func():
@@ -175,11 +181,11 @@ def main():
     cc1:union_name
     arrow_test:*union_name=&cc1
     arrow_test->i=7
-    printf("arrow_test->i=%d\n",arrow_test->i)
+    printf("arrow_test->i=%lld\n",arrow_test->i)
     exported_func()
     unknown_type(iterate_test(6))
     for x in iterate_test(6):
-        printf("Item is %d\n",x)
+        printf("Item is %lld\n",x)
     enum_test:colours=colours.RED
     static_inline_func()
     inline_func()
@@ -189,12 +195,12 @@ def main():
     test_var:int=9
     test_pointer:*int=&test_var
     test_ref:int=test_var
-    printf("Value of test_pointer is %d is at location %p\n",*test_pointer,test_pointer)
-    printf("Value of test_ref is %d is at location %p\n",test_ref,&test_ref)
+    printf("Value of test_pointer is %lld is at location %p\n",*test_pointer,test_pointer)
+    printf("Value of test_ref is %lld is at location %p\n",test_ref,&test_ref)
     def z()->int:
         printf("hello\n")
         return 5
-    printf("value of z() is %d\n",z())
+    printf("value of z() is %lld\n",z())
     scope:
         printf("Hello from new scope\n")
     x:bool =False
@@ -204,7 +210,7 @@ def main():
     y=True
     if x==y:
         pass
-    printf("%d\n",test(0))
+    printf("%lld\n",test(0))
     a:int =0
     b:int =7
     c:int =7
@@ -228,14 +234,14 @@ def main():
     assert 8==8
     var1:name
     var1.item1=8
-    printf("item1 of var1 is %d\n",var1.item1)
+    printf("item1 of var1 is %lld\n",var1.item1)
     var1.item2=6.8
-    printf("item2 of var1 is %f\n",var1.item2)
+    printf("item2 of var1 is %lf\n",var1.item2)
     #should throw an error
     #assert 8==6
     cast_test:int =9
-    printf("Value is %f\n",cast<float>(cast_test))
-    printf("%d\n",divide(6,2))
+    printf("Value is %lf\n",cast<float>(cast_test))
+    printf("%lld\n",divide(6,2))
     TernaryIf:int=5 if True else 6
     assert TernaryIf==5
     TernaryIf=5 if False else 6
@@ -249,24 +255,23 @@ def main():
     except error.AssertionError:
         printf("Assertion error\n")
     try:
-        #should terminate the program
-        printf("%d",divide(6,0))
-    except error.AssertionError:pass
+        printf("%lld",divide(6,0))
+    except error.AssertionError,error.ZeroDivisionError:pass
     except:
         printf("Exception caught\n")
     try:assert False
     except error.AssertionError,error.ZeroDivisionError as e:
-        printf("Exception caught %d\n",e)
+        printf("Exception caught %lld\n",e)
     #TODO: Make it work with iterable and multiple function return
     variable_a:int=5
     variable_b:int=1
-    printf("variable_a is %d and variable_b is %d\n",variable_a,variable_b)
+    printf("variable_a is %lld and variable_b is %lld\n",variable_a,variable_b)
     variable_b,variable_a=variable_a,variable_b
-    printf("variable_a is %d and variable_b is %d\n",variable_a,variable_b)
+    printf("variable_a is %lld and variable_b is %lld\n",variable_a,variable_b)
     assert variable_a==1
     assert variable_b==5
     variable_b += variable_a
     assert variable_b==6
-    printf("variable_b is %d\n",variable_b)
+    printf("variable_b is %lld\n",variable_b)
     a=1&2
     

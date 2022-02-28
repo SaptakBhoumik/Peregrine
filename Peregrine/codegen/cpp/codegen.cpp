@@ -25,7 +25,7 @@
 
 std::string global_name(std::string name)
 {
-    std::hash<std::string> hash;
+    std::hash<std::string> hash;//TODO: Not the safest way to do this
     return std::to_string(hash(name));
 }
 
@@ -34,12 +34,17 @@ namespace cpp {
 Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast,std::string filename) {
     m_filename=filename;
     m_file.open(outputFilename);
-    m_file << "#include <cstdio>\n#include <functional>\ntypedef enum{error________P____P____AssertionError,error________P____P____ZeroDivisionError} error;\n";
+    m_file << "#include <setjmp.h>\n#include <cstdlib>\n#include <stdio.h>\n#include <stdint.h>\n#include <functional>\ntypedef enum{error________P____P____AssertionError,error________P____P____ZeroDivisionError} error;\n";
+    m_file<<"struct ____P____exception_handler{\n"
+            "jmp_buf* buf;\n"
+            "std::function<void(void)> handler;\n"
+            "error err;\n"
+            "};\n";
+    m_file<<"____P____exception_handler* ____Pexception_handlers=NULL;\n";
     m_global_name=global_name(filename);
     m_env = createEnv();
     ast->accept(*this);
     m_file.close();
-    // m_symbolMap.print();
 }
 
 std::shared_ptr<SymbolTable<ast::AstNodePtr>>
@@ -80,10 +85,10 @@ std::string Codegen::searchDefaultModule(std::string path,
 }
 
 void Codegen::codegenFuncParams(std::vector<ast::parameter> parameters,size_t start) {
-    if (parameters.size()) {
+    if ((parameters.size()-start)>0) {
         for (size_t i = start; i < parameters.size(); ++i) {
-            if (i-start)
-                write(", ");
+            // if (i-start)
+            //     write(", ");
             if (parameters[i].p_type->type()==ast::KAstNoLiteral){
                 write("auto");
             }
@@ -94,12 +99,13 @@ void Codegen::codegenFuncParams(std::vector<ast::parameter> parameters,size_t st
             is_define=true;
             parameters[i].p_name->accept(*this);
             is_define=false;
-            if (parameters[i].p_default->type()!=ast::KAstNoLiteral){
-                write("=");
-                parameters[i].p_default->accept(*this);
-            }
+            
+            if(i < parameters.size()-1)
+                write(",");
         }
+        write(",");
     }
+    write("____P____exception_handler* ____Pexception_handlers");
 }
 
 bool Codegen::visit(const ast::Program& node) {
@@ -130,11 +136,9 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
         is_func_def=true;
         if (functionName == "main") {
             // we want the main function to always return 0 if success
-            write("int main (");
+            write("int main () noexcept {\n");
             m_symbolMap.set_global("main","main");
             local_mangle_start();
-            codegenFuncParams(node.parameters());
-            write(") {\n");
             node.body()->accept(*this);
             write("return 0;\n}");
             local_mangle_end();
@@ -143,7 +147,7 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
                 node.returnType()->accept(*this);
             }
             else{
-                write("void");
+                write("int");
             }
             write(" ");
             is_define=true;
@@ -152,7 +156,7 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
             write("(");
             local_mangle_start();
             codegenFuncParams(node.parameters());
-            if(return_type.size()>0 && node.parameters().size()>0){
+            if(return_type.size()>0){
                 write(",");
             }
             for(size_t i=0;i<return_type.size();i++){
@@ -162,7 +166,7 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
                     write(",");
                 }
             }
-            write(") {\n");
+            write(")  noexcept {\n");
             node.body()->accept(*this);
             write("\n}");
             local_mangle_end();
@@ -177,7 +181,7 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
         is_define=false;
         write("=[=](");
         codegenFuncParams(node.parameters());
-        if(return_type.size()>0 && node.parameters().size()>0){
+        if(return_type.size()>0){
             write(",");
         }
         for(size_t i=0;i<return_type.size();i++){
@@ -187,12 +191,12 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
                 write(",");
             }
         }
-        write(")mutable->");
+        write(")mutable noexcept ->");
         if(return_type.size()==0){
                 node.returnType()->accept(*this);
         }
         else{
-            write("void");
+            write("int ");
         }
         write(" {\n");
         node.body()->accept(*this);
@@ -295,21 +299,21 @@ bool Codegen::visit(const ast::ForStatement& node) {
     write("{\nauto ____P____VALUE=");
     node.sequence()->accept(*this);
     write(";\n");
-    write("for (size_t ____P____i=0;____P____i<____P____VALUE.____mem____P____P______iter__();++____P____i){\n");
+    write("for (size_t ____P____i=0;____P____i<____P____VALUE.____mem____P____P______iter__(____Pexception_handlers);++____P____i){\n");
     if (node.variable().size()==1){
         write("auto ");
         node.variable()[0]->accept(*this);
-        write("=____P____VALUE.____mem____P____P______iterate__();\n");
+        write("=____P____VALUE.____mem____P____P______iterate__(____Pexception_handlers);\n");
     }
     else{
-        write("auto ____P____TEMP=____P____VALUE.____mem____P____P______iterate__();\n");
+        write("auto ____P____TEMP=____P____VALUE.____mem____P____P______iterate__(____Pexception_handlers);\n");
         for (size_t i=0;i<node.variable().size();++i){
             auto x=node.variable()[i];
             write("auto ");
             x->accept(*this);
             write("=____P____TEMP.____mem____P____P______getitem__(");
             write(std::to_string(i));
-            write(");\n");
+            write(",____Pexception_handlers);\n");
         }
     }
     node.body()->accept(*this);
@@ -380,6 +384,7 @@ bool Codegen::visit(const ast::ReturnStatement& node) {
                 write(";\n");
             }
             write("}\n");
+            write("return 0;\n");
         }
     }
     else{
@@ -436,7 +441,7 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
         auto return_type=TurpleTypes(function->returnType());
         local_mangle_start();
         codegenFuncParams(function->parameters());
-        if(return_type.size()>0 && function->parameters().size()>0){
+        if(return_type.size()>0){
             write(",");
         }
         for(size_t i=0;i<return_type.size();i++){
@@ -447,12 +452,12 @@ bool Codegen::visit(const ast::DecoratorStatement& node) {
                 write(",");
             }
         }
-        write(")mutable->");
+        write(")mutable noexcept ->");
         if(return_type.size()==0){
             function->returnType()->accept(*this);
         }
         else{
-            write("void");
+            write("int");
         }
         write("{\n");
         if(!is_func_def){
@@ -509,7 +514,7 @@ bool Codegen::visit(const ast::ListOrDictAccess& node) {
         node.keyOrIndex()[1]->accept(*this);
     }
     handle_ref_end();
-    write(")");
+    write(",____Pexception_handlers)");
     return true;
 }
 
@@ -532,14 +537,14 @@ bool Codegen::visit(const ast::BinaryOperation& node) {
         node.right()->accept(*this);
         write(".____mem____P____P______contains__(");
         node.left()->accept(*this);
-        write("))");
+        write(",____Pexception_handlers))");
     }
     else if(node.token().tkType==tk_not_in){
         write("(not ");
         node.right()->accept(*this);
         write(".____mem____P____P______contains__(");
         node.left()->accept(*this);
-        write("))");
+        write(",____Pexception_handlers))");
     }
      else {
         write("(");
@@ -573,9 +578,10 @@ bool Codegen::visit(const ast::FunctionCall& node) {
                 write(", ");
             args[i]->accept(*this);
         }
+        write(",");
     }
     handle_ref_end()
-    write(")");
+    write("____Pexception_handlers)");
     return true;
 }
 
@@ -684,7 +690,7 @@ bool Codegen::visit(const ast::FunctionTypeExpr& node) {
         write("(");
     }
     else{
-        write("void(");
+        write("int(");
     }
     auto argTypes = node.argTypes();
     if (argTypes.size() > 0) {
@@ -693,15 +699,17 @@ bool Codegen::visit(const ast::FunctionTypeExpr& node) {
                 write(",");
             argTypes[i]->accept(*this);
         }
-        if(return_type.size()>0){
-            write(",");
-        }
+        write(",");
     }
-    for(size_t i=0;i<return_type.size();i++){
-        return_type[i]->accept(*this);
-        write("*");
-        if(i<return_type.size()-1){
-            write(",");
+    write("____P____exception_handler*");
+    if(return_type.size()>0){
+        write(",");
+        for(size_t i=0;i<return_type.size();i++){
+            return_type[i]->accept(*this);
+            write("*");
+            if(i<return_type.size()-1){
+                write(",");
+            }
         }
     }
     write(")>");
@@ -738,11 +746,16 @@ bool Codegen::visit(const ast::NoneLiteral& node) {
     return true;
 }
 bool Codegen::visit(const ast::AssertStatement& node){
-    write("if(not ");
+    write("if(!(");
     node.condition()->accept(*this);
-    write("){\n");
-    write("printf(\"AssertionError : in line "+std::to_string(node.token().line)+" in file "+m_filename+"\\n   "+node.token().statement+"\\n\");fflush(stdout);throw error________P____P____AssertionError;");
-    write("\n}");
+    write(")){\n");
+    write("if(____Pexception_handlers!=NULL){\n");
+    write("____Pexception_handlers->err=error________P____P____AssertionError;\n");
+    write("____Pexception_handlers->handler=");
+    write("[](){printf(\"Exception : in line "+std::to_string(node.token().line)+" in file "+m_filename+"\\n   "+node.token().statement+"\\n\");fflush(stdout);exit(1);}\n");
+    write(";longjmp(*(____Pexception_handlers->buf),1);\n}else{\n");
+    write("printf(\"Exception : in line "+std::to_string(node.token().line)+" in file "+m_filename+"\\n   "+node.token().statement+"\\n\");fflush(stdout);exit(1);}\n");
+    write("}\n");
     return true;
 }
 bool Codegen::visit(const ast::StaticStatement& node){
@@ -756,13 +769,19 @@ bool Codegen::visit(const ast::InlineStatement& node){
     return true;
 }
 bool Codegen::visit(const ast::RaiseStatement& node){
-    write("throw ");
+    write("if(____Pexception_handlers!=NULL){\n");
+    write("____Pexception_handlers->err=");
     if(node.value()->type()!=ast::KAstNoLiteral){
         node.value()->accept(*this);
     }
     else{
         write("0");
     }
+    write(";\n");
+    write("____Pexception_handlers->handler=");
+    write("[](){printf(\"Exception : in line "+std::to_string(node.token().line)+" in file "+m_filename+"\\n   "+node.token().statement+"\\n\");fflush(stdout);exit(1);}\n");
+    write(";longjmp(*(____Pexception_handlers->buf),1);\n}else{\n");
+    write("printf(\"Exception : in line "+std::to_string(node.token().line)+" in file "+m_filename+"\\n   "+node.token().statement+"\\n\");fflush(stdout);exit(1);}\n");
     return true;
 }
 bool Codegen::visit(const ast::UnionLiteral& node){
@@ -783,30 +802,28 @@ bool Codegen::visit(const ast::UnionLiteral& node){
     return true;
 }
 bool Codegen::visit(const ast::EnumLiteral& node){
-    write("typedef enum{\n");
+    write("enum ");
+    node.name()->accept(*this);
+    write("{\n");
     auto fields=node.fields();
     std::string name=std::dynamic_pointer_cast<ast::IdentifierExpression>(node.name())->value();
-    auto name_ast=node.name();
     enum_name.push_back(name);
+    local_mangle_start();
     for (size_t i=0;i<fields.size();++i){
         auto field=fields[i];        
-        name_ast->accept(*this);
-        write("____");
-        local_mangle_start();
-        field.first->accept(*this);
-        local_mangle_end();
+        std::string item=std::dynamic_pointer_cast<ast::IdentifierExpression>(field.first)->value();
+        write(m_symbolMap[name]+"________P____P____"+item);
+        m_symbolMap.set_local(item,m_symbolMap[name]+"________P____P____"+item);
         if (field.second->type()!=ast::KAstNoLiteral){
-            curr_enum_name=name;
             write(" = ");
             field.second->accept(*this);
-            curr_enum_name="";
         }
         if (i!=fields.size()-1){
             write(",\n");
         }
     }
+    local_mangle_end();
     write("\n}");
-    name_ast->accept(*this);
     return true;
 }
 bool Codegen::visit(const ast::CastStatement& node){
@@ -918,18 +935,18 @@ bool Codegen::visit(const ast::WithStatement& node) {
             variables[i]->accept(*this);
             write("=");
             write("CONTEXT____MANAGER____P____"+no_var.back());
-            write(".____mem____P____P______enter__()");
+            write(".____mem____P____P______enter__(____Pexception_handlers)");
         }
         else{
             write("CONTEXT____MANAGER____P____"+no_var.back());
-            write(".____mem____P____P______enter__()");
+            write(".____mem____P____P______enter__(____Pexception_handlers)");
         }
         write(";\n");
     }
     node.body()->accept(*this);
     for(auto& x:no_var){
         write("CONTEXT____MANAGER____P____"+x);
-        write(".____mem____P____P______end__();\n");
+        write(".____mem____P____P______end__(____Pexception_handlers);\n");
     }
     write("\n}\n");
     return true;
@@ -960,10 +977,22 @@ bool Codegen::visit(const ast::TernaryIf& node){
     return true;
 }
 bool Codegen::visit(const ast::TryExcept& node){
-    write("try{\n");
+    write("{\n");
+    write("auto& ____P_____temp_handler=____Pexception_handlers;\n");
+    write("{\n");
+    write(
+        "jmp_buf ____buf;\n"
+        "____P____exception_handler ____exception_handlers={&____buf};\n"
+        "____P____exception_handler* ____Pexception_handlers=&____exception_handlers;\n"
+    );
+    write("if(!setjmp(*(____Pexception_handlers->buf))){\n");
     node.body()->accept(*this);
-    //TODO:This should be base exception
-    write("}\ncatch(error __P__exception){\n");
+    write(" ____P_____temp_handler=____Pexception_handlers;\n");
+    write("}");
+    write("else{\n");
+    write("auto __P__exception=____Pexception_handlers->err;\n");
+    write("auto __P__to_call=____Pexception_handlers->handler;\n");
+    write("____P____exception_handler* ____Pexception_handlers=____P_____temp_handler;\n"); 
     if(node.except_clauses().size()>0){
         write("if (");
         auto x=node.except_clauses()[0];
@@ -1009,16 +1038,26 @@ bool Codegen::visit(const ast::TryExcept& node){
         }
     }
     else{
-        if(node.except_clauses().size()>0){
+         if(node.except_clauses().size()>0){
             write("else{");
-            write("throw __P__exception;\n");
+            write("if(____Pexception_handlers!=NULL){\n");
+            write("____Pexception_handlers->err=__P__exception;");
+            write("____Pexception_handlers->handler=__P__to_call;");
+            write(";longjmp(*(____Pexception_handlers->buf),1);\n}else{\n");
+            write("__P__to_call();}\n");    
             write("}\n");
         }
         else{
-            write("throw __P__exception;\n");
+            write("if(____Pexception_handlers!=NULL){\n");
+            write("____Pexception_handlers->err=__P__exception;");
+            write("____Pexception_handlers->handler=__P__to_call;");
+            write(";longjmp(*(____Pexception_handlers->buf),1);\n}else{\n");
+            write("__P__to_call();}\n"); 
         }
     }
-    write("}");
+    write("};\n");
+    write("};\n");
+    write("};\n");
     return true; 
 }
 bool Codegen::visit(const ast::MultipleAssign& node){
@@ -1056,7 +1095,7 @@ bool Codegen::visit(const ast::MethodDefinition& node){
             node.returnType()->accept(*this);
         }
         else{
-            write("void");
+            write("int");
         }
         write(" ");
         is_define=true;
@@ -1065,7 +1104,7 @@ bool Codegen::visit(const ast::MethodDefinition& node){
         write("(");
         local_mangle_start();
         codegenFuncParams(node.codegen_parameters());
-        if(return_type.size()>0 && node.codegen_parameters().size()>0){
+        if(return_type.size()>0){
             write(",");
         }
         for(size_t i=0;i<return_type.size();i++){
@@ -1075,7 +1114,7 @@ bool Codegen::visit(const ast::MethodDefinition& node){
                 write(",");
             }
         }
-        write(") {\n");
+        write(") noexcept  {\n");
         node.body()->accept(*this);
         write("\n}");
         local_mangle_end();
@@ -1089,7 +1128,7 @@ bool Codegen::visit(const ast::MethodDefinition& node){
         is_define=false;
         write("=[=](");
         codegenFuncParams(node.codegen_parameters());
-        if(return_type.size()>0 && node.codegen_parameters().size()>0){
+        if(return_type.size()>0 ){
             write(",");
         }
         for(size_t i=0;i<return_type.size();i++){
@@ -1099,12 +1138,12 @@ bool Codegen::visit(const ast::MethodDefinition& node){
                 write(",");
             }
         }
-        write(")mutable->");
+        write(")mutable noexcept ->");
         if(return_type.size()==0){
                 node.returnType()->accept(*this);
         }
         else{
-            write("void");
+            write("int");
         }
         write(" {\n");
         node.body()->accept(*this);

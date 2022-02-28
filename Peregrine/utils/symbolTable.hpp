@@ -63,7 +63,17 @@ class SymbolTable {
 class MangleName{
     std::map<std::string, std::string> m_global_names={
                                                         {"error","error"},
-                                                        {"printf","printf"}
+                                                        {"printf","printf"},
+                                                        {"i8","int8_t"},
+                                                        {"i16","int16_t"},
+                                                        {"i32","int32_t"},
+                                                        {"int","int64_t"},
+                                                        {"u8","uint8_t"},
+                                                        {"u16","uint16_t"},
+                                                        {"u32","uint32_t"},
+                                                        {"uint","uint64_t"},
+                                                        {"f32","float"},
+                                                        {"float","double"},
                                                         };
     std::map<std::string, std::string> m_local_names;
     public:

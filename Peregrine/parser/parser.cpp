@@ -1677,30 +1677,15 @@ AstNodePtr Parser::parseMethodDef() {
     advance();
     advance();
     parameter reciever;
+    reciever.p_default=std::make_shared<NoLiteral>();;
     reciever.p_name=parseName();
     if(next().tkType==tk_colon){
         advance();
         advance();
         reciever.p_type=parseType();
-        if(next().tkType==tk_assign){
-            advance();
-            advance();
-            reciever.p_default=parseExpression();
-        }
-        else{
-            reciever.p_default=std::make_shared<NoLiteral>();
-        }
     }
     else{
         reciever.p_type=std::make_shared<NoLiteral>();
-        if(next().tkType==tk_assign){
-            advance();
-            advance();
-            reciever.p_default=parseExpression();
-        }
-        else{
-            reciever.p_default=std::make_shared<NoLiteral>();
-        }
     }
     expect(tk_r_paren,"Expected ) but got "+next().keyword+" instead","","","");
     // advance();
