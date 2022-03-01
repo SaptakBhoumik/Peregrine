@@ -54,6 +54,7 @@ enum AstKind {
     KAstDecorator,
     KAstPassStatement,
     KAstUnion,
+    KAstExternUnion,
     KAstStatic,
     KAstInline,
     KAstEnum,
@@ -1132,6 +1133,27 @@ class ExternFuncDef : public AstNode {
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
 };
+class ExternUnionLiteral : public AstNode {
+    Token m_token;
+    std::string m_owner;
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> m_elements;
+    AstNodePtr m_name;
+
+  public:
+    ExternUnionLiteral(Token tok,
+                 std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,
+                 AstNodePtr name,std::string owner);
+
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> elements() const;
+
+    AstNodePtr name() const;
+    std::string owner() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
 } // namespace ast
 
 #endif

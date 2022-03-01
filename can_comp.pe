@@ -274,4 +274,11 @@ def main():
     assert variable_b==6
     printf("variable_b is %lld\n",variable_b)
     a=1&2
+    try:
+        try:divide(1,0)
+        except:
+            printf("Nested try\n")
+            divide(1,0)
+    except:
+        printf("Global try\n")
     

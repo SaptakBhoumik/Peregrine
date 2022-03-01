@@ -261,7 +261,9 @@ bool Codegen::visit(const ast::IfStatement& node) {
     write("if (");
     node.condition()->accept(*this);
     write(") {\n");
+    local_mangle_start();
     node.ifBody()->accept(*this);
+    local_mangle_end();
     write("}");
 
     auto elifNode = node.elifs();
@@ -271,7 +273,9 @@ bool Codegen::visit(const ast::IfStatement& node) {
             write("else if (");
             body.first->accept(*this);
             write(") {\n");
+            local_mangle_start();
             body.second->accept(*this);
+            local_mangle_end();
             write("}");
         }
     }
@@ -280,7 +284,9 @@ bool Codegen::visit(const ast::IfStatement& node) {
     if (elseNode->type() ==
         ast::KAstBlockStmt) { // making sure that else exists
         write("\nelse {\n");
+        local_mangle_start();
         elseNode->accept(*this);
+        local_mangle_end();
         write("}");
     }
     return true;
@@ -290,7 +296,9 @@ bool Codegen::visit(const ast::WhileStatement& node) {
     write("while (");
     node.condition()->accept(*this);
     write(") {\n");
+    local_mangle_start();
     node.body()->accept(*this);
+    local_mangle_end();
     write("}");
     return true;
 }
@@ -300,9 +308,12 @@ bool Codegen::visit(const ast::ForStatement& node) {
     node.sequence()->accept(*this);
     write(";\n");
     write("for (size_t ____P____i=0;____P____i<____P____VALUE.____mem____P____P______iter__(____Pexception_handlers);++____P____i){\n");
+    local_mangle_start();
     if (node.variable().size()==1){
         write("auto ");
+        is_define=true;
         node.variable()[0]->accept(*this);
+        is_define=false;
         write("=____P____VALUE.____mem____P____P______iterate__(____Pexception_handlers);\n");
     }
     else{
@@ -310,13 +321,16 @@ bool Codegen::visit(const ast::ForStatement& node) {
         for (size_t i=0;i<node.variable().size();++i){
             auto x=node.variable()[i];
             write("auto ");
+            is_define=true;
             x->accept(*this);
+            is_define=false;
             write("=____P____TEMP.____mem____P____P______getitem__(");
             write(std::to_string(i));
             write(",____Pexception_handlers);\n");
         }
     }
     node.body()->accept(*this);
+    local_mangle_end();
     write("\n}\n}");
     return true;
 }
@@ -327,6 +341,7 @@ bool Codegen::visit(const ast::MatchStatement& node) {
     auto defaultBody = node.defaultBody();
     write("\nwhile (true) {\n");
     for (size_t i = 0; i < cases.size(); ++i) {
+        local_mangle_start();
         auto currCase = cases[i];
         if (currCase.first.size() == 1 &&
             currCase.first[0]->type() == ast::KAstNoLiteral) {
@@ -351,10 +366,13 @@ bool Codegen::visit(const ast::MatchStatement& node) {
             currCase.second->accept(*this);
             write("\n}\n");
         }
+        local_mangle_end();
     }
 
     if (defaultBody->type() != ast::KAstNoLiteral) {
+        local_mangle_start();
         defaultBody->accept(*this);
+        local_mangle_end()
     }
     write("\nbreak;\n}");
     return true;
@@ -362,7 +380,9 @@ bool Codegen::visit(const ast::MatchStatement& node) {
 
 bool Codegen::visit(const ast::ScopeStatement& node) {
     write("{\n");
+    local_mangle_start();
     node.body()->accept(*this);
+    local_mangle_end();
     write("\n}");
     return true;
 }
@@ -923,6 +943,7 @@ bool Codegen::visit(const ast::WithStatement& node) {
     std::vector<ast::AstNodePtr> variables=node.variables();
     std::vector<ast::AstNodePtr> values=node.values();
     std::vector<std::string> no_var;
+    local_mangle_start();
     for(size_t i=0;i<values.size();++i){
         write("auto CONTEXT____MANAGER____P____");
         no_var.push_back(std::to_string(i));
@@ -932,7 +953,9 @@ bool Codegen::visit(const ast::WithStatement& node) {
         write(";\n");
         if(variables[i]->type()!=ast::KAstNoLiteral){
             write("auto ");
+            is_define=true;
             variables[i]->accept(*this);
+            is_define=false;
             write("=");
             write("CONTEXT____MANAGER____P____"+no_var.back());
             write(".____mem____P____P______enter__(____Pexception_handlers)");
@@ -944,6 +967,7 @@ bool Codegen::visit(const ast::WithStatement& node) {
         write(";\n");
     }
     node.body()->accept(*this);
+    local_mangle_end();
     for(auto& x:no_var){
         write("CONTEXT____MANAGER____P____"+x);
         write(".____mem____P____P______end__(____Pexception_handlers);\n");
@@ -986,7 +1010,9 @@ bool Codegen::visit(const ast::TryExcept& node){
         "____P____exception_handler* ____Pexception_handlers=&____exception_handlers;\n"
     );
     write("if(!setjmp(*(____Pexception_handlers->buf))){\n");
+    local_mangle_start();
     node.body()->accept(*this);
+    local_mangle_end();
     write(" ____P_____temp_handler=____Pexception_handlers;\n");
     write("}");
     write("else{\n");
@@ -995,6 +1021,7 @@ bool Codegen::visit(const ast::TryExcept& node){
     write("____P____exception_handler* ____Pexception_handlers=____P_____temp_handler;\n"); 
     if(node.except_clauses().size()>0){
         write("if (");
+        local_mangle_start();
         auto x=node.except_clauses()[0];
         for (size_t i=0;i<x.first.first.size();++i){
             write("__P__exception==");
@@ -1004,13 +1031,17 @@ bool Codegen::visit(const ast::TryExcept& node){
         write("){\n");
         if(x.first.second->type()!=ast::KAstNoLiteral){
             write("auto ");
+            is_define=true;
             x.first.second->accept(*this);
+            is_define=false;
             write("=__P__exception;\n");
         }
         x.second->accept(*this);
+        local_mangle_end();
         write("}\n");
         for(size_t i=1;i<node.except_clauses().size();++i){
             write("else if (");
+            local_mangle_start();
             auto x=node.except_clauses()[i];
             for (size_t i=0;i<x.first.first.size();++i){
                 write("__P__exception==");
@@ -1020,21 +1051,28 @@ bool Codegen::visit(const ast::TryExcept& node){
             write("){\n");
             if(x.first.second->type()!=ast::KAstNoLiteral){
                 write("auto ");
+                is_define=true;
                 x.first.second->accept(*this);
+                is_define=false;
                 write("=__P__exception;\n");
             }
             x.second->accept(*this);
             write("}\n");
+            local_mangle_end();
         }
     }
     if(node.else_body()->type()!=ast::KAstNoLiteral){
         if(node.except_clauses().size()>0){
             write("else{");
+            local_mangle_start();
             node.else_body()->accept(*this);
+            local_mangle_end();
             write("}\n");
         }
         else{
+            local_mangle_start();
             node.else_body()->accept(*this);
+            local_mangle_end();
         }
     }
     else{

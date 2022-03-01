@@ -221,13 +221,14 @@ static inline TokenType equal(std::string keyword) {
 }
 LEXEME lexer(std::string src, std::string filename) {
 
+    std::vector<Token> tokens;
     if (src == ""){
-        exit(1);
+        tokens.push_back(token_init(0,"", "", tk_eof, 0, 0, 0));
+        return tokens;
     }
 
     std::vector<std::string> seperate_lines(split_ln(src));
     Token token;
-    std::vector<Token> tokens;
     std::vector<size_t> identation_level;
     const std::vector<std::string> operators({">", "<", "!", "/", "//", "+",
                                               "-", "*", "%", "<<", ">>", "&",

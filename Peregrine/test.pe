@@ -125,3 +125,7 @@ def (i:int)method(a:int,b:int):return a+b
 def (i)method(a:int,b:int):return a+b
 def c.exit(int)
 def c.test(int)->int
+union c.incomplete_external
+union c.complete_external:
+    "Random comment"
+    a:int

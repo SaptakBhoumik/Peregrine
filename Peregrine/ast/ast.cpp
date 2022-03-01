@@ -1582,5 +1582,38 @@ std::string ExternFuncDef::stringify() const{
     return res;
 }
 
+ExternUnionLiteral::ExternUnionLiteral(
+    Token tok, std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,
+    AstNodePtr name,std::string  owner) {
+    m_token = tok;
+    m_name = name;
+    m_elements = elements;
+    m_owner=owner;
+}
 
+std::vector<std::pair<AstNodePtr, AstNodePtr>> ExternUnionLiteral::elements() const {
+    return m_elements;
+}
+
+Token ExternUnionLiteral::token() const { return m_token; }
+
+std::string ExternUnionLiteral::owner() const { return m_owner; }
+
+AstNodePtr ExternUnionLiteral::name() const { return m_name; }
+
+AstKind ExternUnionLiteral::type() const { return KAstExternUnion; }
+
+std::string ExternUnionLiteral::stringify() const {
+    std::string res = "union "+m_owner+".";
+    res += m_name->stringify() + ":\n";
+    for (size_t i = 0; i < m_elements.size(); i++) {
+        if (i)
+            res += "\n";
+        res += m_elements[i].second->stringify();
+        res += ":";
+        res += m_elements[i].first->stringify();
+    }
+
+    return res;
+}
 } // namespace ast
