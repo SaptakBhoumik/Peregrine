@@ -72,7 +72,8 @@ enum AstKind {
     KAstMultipleAssign,
     KAstAugAssign,
     KAstMethodDef,
-    KAstExternFuncDef
+    KAstExternFuncDef,
+    KAstExternStruct
 };
 
 class AstVisitor;
@@ -1141,6 +1142,27 @@ class ExternUnionLiteral : public AstNode {
 
   public:
     ExternUnionLiteral(Token tok,
+                 std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,
+                 AstNodePtr name,std::string owner);
+
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> elements() const;
+
+    AstNodePtr name() const;
+    std::string owner() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+class ExternStructLiteral : public AstNode {
+    Token m_token;
+    std::string m_owner;
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> m_elements;
+    AstNodePtr m_name;
+
+  public:
+    ExternStructLiteral(Token tok,
                  std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,
                  AstNodePtr name,std::string owner);
 

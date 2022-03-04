@@ -25,6 +25,9 @@ AstNodePtr Parser::parse() {
           comment=m_currentToken.keyword;
         }
         statements.push_back(parseStatement());
+        if(m_currentToken.tkType!=tk_new_line && m_currentToken.tkType!=tk_dedent){
+            error(m_currentToken,"Expected newline after statement");
+        }
         advance();
     }
     
@@ -265,7 +268,9 @@ AstNodePtr Parser::parseClassDefinition() {
 
     expect(tk_identifier,
                 "Expected the name of the class but got "+next().keyword+" instead","Add a name here","","e2");
-
+    if(next().tkType==tk_dot){
+        return parseExternStruct(tok);
+    }
     AstNodePtr name = parseName();
     std::vector<AstNodePtr> parent;
 
@@ -1825,4 +1830,42 @@ AstNodePtr Parser::parseExternUnion(Token tok) {
         }
     }
     return std::make_shared<ExternUnionLiteral>(tok, elements, union_name,owner);
+}
+
+AstNodePtr Parser::parseExternStruct(Token tok) {
+    auto owner=m_currentToken.keyword;
+    advance();
+    expect(tk_identifier, "Expected an identifier, got " +
+                                  next().keyword +
+                                  " instead");
+    AstNodePtr union_name = parseName();
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> elements;
+    if(next().tkType!=tk_colon){
+        //it is an incomplete defination
+        advanceOnNewLine();
+        return std::make_shared<ExternStructLiteral>(tok, elements, union_name,owner);
+    }
+    expect(tk_colon, "Expected : but got "+next().keyword+" instead","Add a : here","","");
+    expect(tk_ident, "Expected identation but got "+next().keyword+" instead","","","");
+    advance();
+    while (m_currentToken.tkType != tk_dedent) {
+        while(m_currentToken.tkType==tk_string){
+          advance();
+          if(m_currentToken.tkType==tk_new_line){advance();}
+        }
+        AstNodePtr name = parseName();
+        expect(tk_colon);
+        advance();
+        AstNodePtr type = parseType();
+        advance();
+        elements.push_back(std::pair(type, name));
+        if (m_currentToken.tkType == tk_new_line) {
+            advance();
+        }
+        else if(m_currentToken.tkType==tk_dedent){}
+        else{
+            error(m_currentToken, "Expected new line or dedent but got "+m_currentToken.keyword+" instead","","","");
+        }
+    }
+    return std::make_shared<ExternStructLiteral>(tok, elements, union_name,owner);
 }

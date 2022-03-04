@@ -1616,4 +1616,40 @@ std::string ExternUnionLiteral::stringify() const {
 
     return res;
 }
+
+ExternStructLiteral::ExternStructLiteral(
+    Token tok, std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,
+    AstNodePtr name,std::string  owner) {
+    m_token = tok;
+    m_name = name;
+    m_elements = elements;
+    m_owner=owner;
+}
+
+std::vector<std::pair<AstNodePtr, AstNodePtr>> ExternStructLiteral::elements() const {
+    return m_elements;
+}
+
+Token ExternStructLiteral::token() const { return m_token; }
+
+std::string ExternStructLiteral::owner() const { return m_owner; }
+
+AstNodePtr ExternStructLiteral::name() const { return m_name; }
+
+AstKind ExternStructLiteral::type() const { return KAstExternStruct; }
+
+std::string ExternStructLiteral::stringify() const {
+    std::string res = "class "+m_owner+".";
+    res += m_name->stringify() + ":\n";
+    for (size_t i = 0; i < m_elements.size(); i++) {
+        if (i)
+            res += "\n";
+        res += m_elements[i].second->stringify();
+        res += ":";
+        res += m_elements[i].first->stringify();
+    }
+
+    return res;
+}
+
 } // namespace ast

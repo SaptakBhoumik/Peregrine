@@ -71,6 +71,7 @@ class AstVisitor {
     virtual bool visit(const MethodDefinition& node) { return false; };
     virtual bool visit(const ExternFuncDef& node) { return false; };
     virtual bool visit(const ExternUnionLiteral& node) { return false; };
+    virtual bool visit(const ExternStructLiteral& node) { return false; };
 
 };
 

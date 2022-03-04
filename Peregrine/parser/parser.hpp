@@ -119,6 +119,7 @@ class Parser {
     AstNodePtr parseFunctionDef();
     AstNodePtr parseExternFuncDef(Token);
     AstNodePtr parseExternUnion(Token tok);
+    AstNodePtr parseExternStruct(Token tok);
     AstNodePtr parseMethodDef();
     AstNodePtr parseClassDefinition();
     AstNodePtr parseReturn();

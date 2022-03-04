@@ -125,7 +125,13 @@ def (i:int)method(a:int,b:int):return a+b
 def (i)method(a:int,b:int):return a+b
 def c.exit(int)
 def c.test(int)->int
-union c.incomplete_external
-union c.complete_external:
+union c.incomplete_external_union
+union c.complete_external_union:
     "Random comment"
     a:int
+class c.incomplete_external_struct
+class c.complete_external_struct:
+    "Random comment"
+    a:int
+
+print("Hello World") 

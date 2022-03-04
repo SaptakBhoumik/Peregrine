@@ -165,4 +165,5 @@ void MethodDefinition::accept(AstVisitor &visitor) const {visitor.visit(*this);}
 
 void ExternFuncDef::accept(AstVisitor &visitor) const {visitor.visit(*this);}
 void ExternUnionLiteral::accept(AstVisitor &visitor) const {visitor.visit(*this);}
+void ExternStructLiteral::accept(AstVisitor &visitor) const {visitor.visit(*this);}
 } // namespace ast
