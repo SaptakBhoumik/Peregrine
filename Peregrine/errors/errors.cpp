@@ -30,8 +30,7 @@ void display(PEError e) {
               << e.loc.code.substr(0, e.loc.code.length()) << "\n";
     std::cout << "  |";
     std::cout << std::string(e.loc.loc+1, ' ');
-    std::cout << fg("~", light_red);
-    std::cout << fg(style(" <----- " + e.submsg, bold), light_red) << "\n";
+    std::cout << fg(style(" ^----- " + e.submsg, bold), light_red) << "\n";
     std::cout << "  |\n  |\n";
     if (e.hint != "") {
         std::cout << "  ├- " << fg(style("Try: ", bold), blue) << e.hint

@@ -7,9 +7,10 @@ namespace ast {
 
 // TODO: have a default behaviour in case the visitor does not provide a visit
 // method for the node
-
 void Program::accept(AstVisitor& visitor) const {
-    visitor.visit(*this);
+    if (!visitor.visit(*this))
+        for (auto& stmt : m_statements)
+            stmt->accept(visitor);
 }
 
 void IntegerLiteral::accept(AstVisitor& visitor) const { visitor.visit(*this); }
@@ -72,11 +73,20 @@ void ConstDeclaration::accept(AstVisitor& visitor) const {
 }
 
 void BlockStatement::accept(AstVisitor& visitor) const {
-    visitor.visit(*this);
+    if (!visitor.visit(*this))
+        for (auto& stmt : m_statements)
+            stmt->accept(visitor);
 }
 
 void ClassDefinition::accept(AstVisitor& visitor) const {
-    visitor.visit(*this);
+    if (!visitor.visit(*this)) {
+        for (auto& stmt : m_attributes)
+            stmt->accept(visitor);
+        for (auto& stmt : m_methods)
+            stmt->accept(visitor);
+        for (auto& stmt : m_other)
+            stmt->accept(visitor);
+    }
 }
 
 void FunctionDefinition::accept(AstVisitor& visitor) const {
