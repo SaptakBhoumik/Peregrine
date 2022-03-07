@@ -49,6 +49,7 @@ class LEXER{
     void lex_equal();
     void lex_greater();
     void lex_less();
+    void lex_dot();
     public:
     LEXER(std::string input, std::string filename);
     LEXEME result();

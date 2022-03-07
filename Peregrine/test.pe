@@ -135,3 +135,11 @@ class c.complete_external_struct:
     a:int
 
 print("Hello World") 
+def x(...m):
+    return m
+def x(*m):
+    return m
+def x(**m):
+    return m
+def x(...):
+    return m

@@ -24,6 +24,7 @@ enum TokenType {
     tk_colon,      // :
     tk_dot,        // .
     tk_double_dot, // ..
+    tk_ellipses,   //...
     tk_l_paren,    // (
     tk_r_paren,    // )
     tk_comma,      // ,

@@ -571,27 +571,41 @@ LEXEME lexer(std::string src, std::string filename) {
                                    current_index, line);
         } else if (item == ".") {
             if (keyword == "") {
-                keyword = item;
-                start_index = current_index - 1;
-                token = token_init(current_index - last_line,statement, keyword, tk_dot, start_index,
-                                   current_index, line);
+                if(next(current_index,src)=="."){
+                    keyword=".";
+                }
+                else{
+                    keyword = item;
+                    start_index = current_index - 1;
+                    token = token_init(current_index - last_line,statement, keyword, tk_dot, start_index,
+                                    current_index, line);
+                }
             } else {
                 if (is_number(keyword) == tk_integer && next(current_index,src)!=".") {
                     keyword += item;
                 }
                 else if (next(current_index,src)=="."){
-                    token = token_init(current_index - last_line,
-                        statement, keyword,
-                        token_type(keyword, next(current_index - 1, src)),
-                        start_index, current_index - 1, line);
-                    tokens.emplace_back(token);
-                    token = Token();
-                    keyword=".";
-                    start_index = current_index;
+                    if(keyword=="."){
+                        keyword="..";
+                    }
+                    else{
+                        token = token_init(current_index - last_line,
+                            statement, keyword,
+                            token_type(keyword, next(current_index - 1, src)),
+                            start_index, current_index - 1, line);
+                        tokens.emplace_back(token);
+                        token = Token();
+                        keyword=".";
+                        start_index = current_index;
+                    }
                 }
                 else {
                     if (keyword=="."){
                         token = token_init(current_index - last_line,statement, "..", tk_double_dot, start_index,
+                                       current_index, line);
+                    }
+                    else if (keyword==".."){
+                        token = token_init(current_index - last_line,statement, "...", tk_ellipses, start_index,
                                        current_index, line);
                     }
                     else {

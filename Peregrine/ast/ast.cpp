@@ -650,8 +650,23 @@ std::string FunctionDefinition::stringify() const {
             if (i) {
                 res += ", ";
             }
-
-            res += param.p_name->stringify();
+            if(param.p_paramType==VarKwarg){
+                res += "**";
+                res += param.p_name->stringify();
+            }
+            else if(param.p_paramType==VarArg){
+                res += "*";
+                res += param.p_name->stringify();
+            }
+            else if(param.p_paramType==Ellipses){
+                res += "...";
+                if(param.p_name->type()!=KAstNoLiteral){
+                    res += param.p_name->stringify();
+                }
+            }
+            else{
+                res += param.p_name->stringify();
+            }
             if (param.p_type->type()!=KAstNoLiteral){
                 res += ":";
                 res += param.p_type->stringify();

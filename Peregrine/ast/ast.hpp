@@ -541,11 +541,17 @@ class BlockStatement : public AstNode {
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
 };
-
+enum ParamType{
+  Normal,//normal parameter
+  VarArg,//*args
+  VarKwarg,//**kwargs
+  Ellipses//...
+};
 struct parameter {
     AstNodePtr p_type;
     AstNodePtr p_name;
     AstNodePtr p_default;
+    ParamType p_paramType=Normal;
 };
 
 class ClassDefinition : public AstNode {

@@ -655,22 +655,7 @@ AstNodePtr Parser::parseFunctionDef() {
 
     advance();
     while (m_currentToken.tkType != tk_r_paren) {
-        AstNodePtr paramName = parseName();
-        AstNodePtr paramType = std::make_shared<NoLiteral>();
-        AstNodePtr paramDefault = std::make_shared<NoLiteral>();
-        if(next().tkType==tk_comma || next().tkType==tk_r_paren|| next().tkType==tk_assign){}
-        else{
-            expect(tk_colon,"Expected a : but got "+next().keyword+" instead");
-            advance();
-            paramType = parseType();
-        }
-        advance();
-        if(m_currentToken.tkType==tk_assign){
-            advance();
-            paramDefault=parseExpression();
-            advance();
-        }
-        parameters.push_back(parameter{paramType, paramName,paramDefault});
+        parameters.push_back(parseParameter());
         if (m_currentToken.tkType == tk_comma) {
             advance();
         } else {
@@ -1706,22 +1691,7 @@ AstNodePtr Parser::parseMethodDef() {
 
     advance();
     while (m_currentToken.tkType != tk_r_paren) {
-        AstNodePtr paramName = parseName();
-        AstNodePtr paramType = std::make_shared<NoLiteral>();
-        AstNodePtr paramDefault = std::make_shared<NoLiteral>();
-        if(next().tkType==tk_comma || next().tkType==tk_r_paren|| next().tkType==tk_assign){}
-        else{
-            expect(tk_colon,"Expected a : but got "+next().keyword+" instead");
-            advance();
-            paramType = parseType();
-        }
-        advance();
-        if(m_currentToken.tkType==tk_assign){
-            advance();
-            paramDefault=parseExpression();
-            advance();
-        }
-        parameters.push_back(parameter{paramType, paramName,paramDefault});
+        parameters.push_back(parseParameter());
         if (m_currentToken.tkType == tk_comma) {
             advance();
         } else {

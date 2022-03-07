@@ -100,3 +100,49 @@ std::map<TokenType, PrecedenceType> createMap() {
 
     return precedenceMap;
 }
+parameter Parser::parseParameter(){
+    AstNodePtr paramType = std::make_shared<NoLiteral>();
+    AstNodePtr paramDefault = std::make_shared<NoLiteral>();
+    AstNodePtr paramName = std::make_shared<NoLiteral>();
+    if(m_currentToken.tkType==tk_multiply){
+        advance();
+        ParamType x;
+        if(m_currentToken.tkType==tk_multiply){
+            expect(tk_identifier,"Expected identifier but got "+next().keyword,"","","");
+            x=VarKwarg;
+            paramName=parseName();
+        }
+        else if(m_currentToken.tkType==tk_identifier){
+            paramName=parseName();
+            x=VarArg;
+        }
+        else{
+            error(m_currentToken,"Expected identifier but got "+m_currentToken.keyword,"","","");
+        }
+        advance();
+        return parameter{paramType, paramName,paramDefault,x};
+    }
+    else if(m_currentToken.tkType==tk_ellipses){
+        ParamType x=Ellipses;
+        if(next().tkType==tk_identifier){
+            advance();
+            paramName=parseName();
+        }
+        advance();
+        return parameter{paramType, paramName,paramDefault,x};
+    }
+    paramName = parseName();
+    if(next().tkType==tk_comma || next().tkType==tk_r_paren|| next().tkType==tk_assign){}
+    else{
+        expect(tk_colon,"Expected a : but got "+next().keyword+" instead");
+        advance();
+        paramType = parseType();
+    }
+    advance();
+    if(m_currentToken.tkType==tk_assign){
+        advance();
+        paramDefault=parseExpression();
+        advance();
+    }
+    return parameter{paramType, paramName,paramDefault};
+}

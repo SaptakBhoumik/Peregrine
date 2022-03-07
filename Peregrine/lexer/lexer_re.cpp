@@ -403,34 +403,7 @@ void LEXER::lex(){
                 break;
             }
             case '.':{
-                if(is_int(m_keyword) && std::isdigit(next())){
-                    m_keyword+=m_curr_item;
-                    break;
-                }
-                add_unknown();
-                if(next()=='.'){
-                    advance(); 
-                    m_result.push_back(Token{
-                                m_loc,
-                                m_curr_line,
-                                "..",
-                                m_curr_index-1,
-                                m_curr_index+1,
-                                m_line,
-                                tk_double_dot
-                    });               
-                }
-                else{
-                    m_result.push_back(Token{
-                                m_loc,
-                                m_curr_line,
-                                std::string(1,m_curr_item),
-                                m_curr_index,
-                                m_curr_index+1,
-                                m_line,
-                                tk_dot
-                    });
-                }
+                lex_dot();
                 break;
             }
             case '+':{
@@ -1073,6 +1046,50 @@ void LEXER::lex_pipe(){
                     m_curr_index+1,
                     m_line,
                     tk_bit_or
+        });
+    }
+}
+void LEXER::lex_dot(){
+    if(is_int(m_keyword) && std::isdigit(next())){
+        m_keyword+=m_curr_item;
+        return;
+    }
+    add_unknown();
+    if(next()=='.'){
+        advance(); 
+        if (next()=='.'){
+            advance();
+            m_result.push_back(Token{
+                    m_loc,
+                    m_curr_line,
+                    "...",
+                    m_curr_index-2,
+                    m_curr_index+1,
+                    m_line,
+                    tk_ellipses
+            });
+        }
+        else{
+            m_result.push_back(Token{
+                m_loc,
+                m_curr_line,
+                "..",
+                m_curr_index-1,
+                m_curr_index+1,
+                m_line,
+                tk_double_dot
+            });
+        }               
+    }
+    else{
+        m_result.push_back(Token{
+            m_loc,
+            m_curr_line,
+            std::string(1,m_curr_item),
+            m_curr_index,
+            m_curr_index+1,
+            m_line,
+            tk_dot
         });
     }
 }

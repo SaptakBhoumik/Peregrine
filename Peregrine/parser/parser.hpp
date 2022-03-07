@@ -62,6 +62,8 @@ class Parser {
 
     void error(Token tok, std::string msg,std::string submsg="",std::string hint="",std::string ecode="");
 
+    parameter parseParameter();
+
     AstNodePtr parseInteger();
     AstNodePtr parseDecimal();
     AstNodePtr parseString(bool isFormatted, bool isRaw);
