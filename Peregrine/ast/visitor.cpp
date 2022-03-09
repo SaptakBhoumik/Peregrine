@@ -176,4 +176,8 @@ void MethodDefinition::accept(AstVisitor &visitor) const {visitor.visit(*this);}
 void ExternFuncDef::accept(AstVisitor &visitor) const {visitor.visit(*this);}
 void ExternUnionLiteral::accept(AstVisitor &visitor) const {visitor.visit(*this);}
 void ExternStructLiteral::accept(AstVisitor &visitor) const {visitor.visit(*this);}
+
+void VarArgTypeExpr::accept(AstVisitor &visitor) const {visitor.visit(*this);}
+void VarKwargTypeExpr::accept(AstVisitor &visitor) const {visitor.visit(*this);}
+void EllipsesTypeExpr::accept(AstVisitor &visitor) const {visitor.visit(*this);}
 } // namespace ast

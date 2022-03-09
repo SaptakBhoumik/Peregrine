@@ -23,6 +23,9 @@ enum AstKind {
     KAstListTypeExpr,
     KAstPointerTypeExpr,
     KAstRefTypeExpr,
+    KAstEllipsesTypeExpr,
+    KAstVarKwargTypeExpr,
+    KAstVarArgTypeExpr,
     KAstDictTypeExpr,
     KAstFuncTypeExpr,
     KAstList,
@@ -279,6 +282,40 @@ class DictTypeExpr : public AstNode {
 
     AstNodePtr keyType() const;
     AstNodePtr valueType() const;
+
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+class VarArgTypeExpr : public AstNode {
+    Token m_token;
+
+  public:
+    VarArgTypeExpr(Token tok);
+
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+
+class VarKwargTypeExpr : public AstNode {
+    Token m_token;
+
+  public:
+    VarKwargTypeExpr(Token tok);
+
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+class EllipsesTypeExpr : public AstNode {
+    Token m_token;
+
+  public:
+    EllipsesTypeExpr(Token tok);
 
     Token token() const;
     AstKind type() const;

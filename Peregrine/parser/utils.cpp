@@ -104,15 +104,18 @@ parameter Parser::parseParameter(){
     AstNodePtr paramType = std::make_shared<NoLiteral>();
     AstNodePtr paramDefault = std::make_shared<NoLiteral>();
     AstNodePtr paramName = std::make_shared<NoLiteral>();
+    auto tok=m_currentToken;
     if(m_currentToken.tkType==tk_multiply){
         advance();
         ParamType x;
         if(m_currentToken.tkType==tk_multiply){
+            paramType=std::make_shared<VarKwargTypeExpr>(tok);
             expect(tk_identifier,"Expected identifier but got "+next().keyword,"","","");
             x=VarKwarg;
             paramName=parseName();
         }
         else if(m_currentToken.tkType==tk_identifier){
+            paramType=std::make_shared<VarArgTypeExpr>(tok);
             paramName=parseName();
             x=VarArg;
         }
@@ -124,6 +127,7 @@ parameter Parser::parseParameter(){
     }
     else if(m_currentToken.tkType==tk_ellipses){
         ParamType x=Ellipses;
+        paramType=std::make_shared<EllipsesTypeExpr>(tok);
         if(next().tkType==tk_identifier){
             advance();
             paramName=parseName();

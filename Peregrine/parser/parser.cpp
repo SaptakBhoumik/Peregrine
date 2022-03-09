@@ -1110,11 +1110,45 @@ AstNodePtr Parser::parseFuncType() {
         advance();
         if (m_currentToken.tkType == tk_comma) {
             advance();
-            types.push_back(parseType());
+            if(m_currentToken.tkType==tk_multiply && (next().tkType==tk_comma||next().tkType==tk_r_paren)){
+                types.push_back(std::make_shared<VarArgTypeExpr>(m_currentToken));
+            }
+            else if(m_currentToken.tkType==tk_multiply && next().tkType==tk_multiply){
+                if(m_tokens[m_tokIndex+2].tkType==tk_comma||m_tokens[m_tokIndex+2].tkType==tk_r_paren){
+                    types.push_back(std::make_shared<VarKwargTypeExpr>(m_currentToken));
+                    advance();
+                }
+                else{
+                    types.push_back(parseType());
+                }   
+            }
+            else if(m_currentToken.tkType==tk_ellipses){
+                types.push_back(std::make_shared<EllipsesTypeExpr>(m_currentToken));
+            }
+            else{
+                types.push_back(parseType());
+            }
         } else if (m_currentToken.tkType == tk_r_paren) {
             break;
         } else {
-            types.push_back(parseType());
+            if(m_currentToken.tkType==tk_multiply && (next().tkType==tk_comma||next().tkType==tk_r_paren)){
+                types.push_back(std::make_shared<VarArgTypeExpr>(m_currentToken));
+            }
+            else if(m_currentToken.tkType==tk_multiply && next().tkType==tk_multiply){
+                if(m_tokens[m_tokIndex+2].tkType==tk_comma||m_tokens[m_tokIndex+2].tkType==tk_r_paren){
+                    types.push_back(std::make_shared<VarKwargTypeExpr>(m_currentToken));
+                    advance();
+                }
+                else{
+                    types.push_back(parseType());
+                }   
+            }
+            else if(m_currentToken.tkType==tk_ellipses){
+                types.push_back(std::make_shared<EllipsesTypeExpr>(m_currentToken));
+            }
+            else{
+                types.push_back(parseType());
+            }
         }
         advance();
     }

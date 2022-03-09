@@ -651,29 +651,29 @@ std::string FunctionDefinition::stringify() const {
                 res += ", ";
             }
             if(param.p_paramType==VarKwarg){
-                res += "**";
+                res += param.p_type->stringify();
                 res += param.p_name->stringify();
             }
             else if(param.p_paramType==VarArg){
-                res += "*";
+                res += param.p_type->stringify();
                 res += param.p_name->stringify();
             }
             else if(param.p_paramType==Ellipses){
-                res += "...";
+                res += param.p_type->stringify();
                 if(param.p_name->type()!=KAstNoLiteral){
                     res += param.p_name->stringify();
                 }
             }
             else{
                 res += param.p_name->stringify();
-            }
-            if (param.p_type->type()!=KAstNoLiteral){
-                res += ":";
-                res += param.p_type->stringify();
-            }
-            if (param.p_default->type()!=ast::KAstNoLiteral){
-                res+="=";
-                res+=param.p_default->stringify();
+                if (param.p_type->type()!=KAstNoLiteral){
+                    res += ":";
+                    res += param.p_type->stringify();
+                }
+                if (param.p_default->type()!=ast::KAstNoLiteral){
+                    res+="=";
+                    res+=param.p_default->stringify();
+                }
             }
         }
     }
@@ -1197,8 +1197,11 @@ AstNodePtr FunctionTypeExpr::returnTypes() const {
 std::string FunctionTypeExpr::stringify() const {
     std::string res = "def(";
     if (m_argTypes.size() > 0) {
-        for (auto& x : m_argTypes) {
-            res += x->stringify() + ",";
+        for(size_t i=0; i<m_argTypes.size(); i++) {
+            res += m_argTypes[i]->stringify();
+            if(i<m_argTypes.size()-1) {
+                res += ",";
+            }
         }
     }
     res += ")";
@@ -1666,5 +1669,25 @@ std::string ExternStructLiteral::stringify() const {
 
     return res;
 }
+EllipsesTypeExpr::EllipsesTypeExpr(Token tok) {
+    m_token = tok;
+}
+Token EllipsesTypeExpr::token() const { return m_token; }
+AstKind EllipsesTypeExpr::type() const { return KAstEllipsesTypeExpr; }
+std::string EllipsesTypeExpr::stringify() const { return m_token.keyword ; }
+
+VarKwargTypeExpr::VarKwargTypeExpr(Token tok) {
+    m_token = tok;
+}
+Token VarKwargTypeExpr::token() const { return m_token; }
+AstKind VarKwargTypeExpr::type() const { return KAstVarKwargTypeExpr; }
+std::string VarKwargTypeExpr::stringify() const { return "**" ; }
+
+VarArgTypeExpr::VarArgTypeExpr(Token tok) {
+    m_token = tok;
+}
+Token VarArgTypeExpr::token() const { return m_token; }
+AstKind VarArgTypeExpr::type() const { return KAstVarArgTypeExpr; }
+std::string VarArgTypeExpr::stringify() const { return m_token.keyword ; }
 
 } // namespace ast

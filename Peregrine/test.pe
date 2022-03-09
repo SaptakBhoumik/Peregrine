@@ -143,3 +143,10 @@ def x(**m):
     return m
 def x(...):
     return m
+
+type testing = def(*)->int
+type _1 = def(**)->int
+type _2 = def(...)->int
+type _3 = def(*ptr)->int
+type _5 = def(**ptr)->int
+type _6 = def(_1,_2)->int
