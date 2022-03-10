@@ -49,7 +49,7 @@ You can consider it to be a dialect of python which compiles to clean C++. It wi
 
 # Compilation instructions
 
-**1) Clone the rewrite branch of https://github.com/peregrine-lang/Peregrine.git**
+**1) Clone the main branch of https://github.com/peregrine-lang/Peregrine.git**
 ```bash
 git clone https://github.com/peregrine-lang/Peregrine.git
 ```
