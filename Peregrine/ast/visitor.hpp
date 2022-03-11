@@ -75,6 +75,7 @@ class AstVisitor {
     virtual bool visit(const VarArgTypeExpr& node) { return false; };
     virtual bool visit(const EllipsesTypeExpr& node) { return false; };
     virtual bool visit(const VarKwargTypeExpr& node) { return false; };
+    virtual bool visit(const CompileTimeExpression& node) { return false; };
 
 };
 

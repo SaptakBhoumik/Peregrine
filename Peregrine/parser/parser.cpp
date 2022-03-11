@@ -47,7 +47,13 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseStatement();
             break;
         }
-
+        case tk_dollar:{
+            auto tok=m_currentToken;
+            advance();
+            stmt=parseStatement();
+            stmt=std::make_shared<CompileTimeExpression>(tok,stmt);
+            break;
+        }
         case tk_static: {
             stmt = parseStatic();
             break;
@@ -763,7 +769,13 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
             left = parseInteger();
             break;
         }
-
+        case tk_dollar:{
+            auto tok=m_currentToken;
+            advance();
+            left=parseExpression(pr_prefix);
+            left=std::make_shared<CompileTimeExpression>(tok,left);
+            break;
+        }
         case tk_decimal: {
             left = parseDecimal();
             break;
@@ -969,7 +981,7 @@ AstNodePtr Parser::parseDotExpression(AstNodePtr left) {
 
 AstNodePtr Parser::parsePrefixExpression() {
     Token prefix = m_currentToken;
-    PrecedenceType precedence = precedenceMap[m_currentToken.tkType];
+    PrecedenceType precedence = pr_prefix;
 
     advance();
 
@@ -1207,7 +1219,6 @@ AstNodePtr Parser::parseName() {
 
 AstNodePtr Parser::parseMatch() {
     Token tok = m_currentToken;
-    // TODO: implement errors
     advance();
     std::vector<AstNodePtr> toMatch;
     while (m_currentToken.tkType != tk_colon) {
@@ -1929,7 +1940,7 @@ AstNodePtr Parser::parseExternStruct(Token tok) {
 }
 
 std::vector<AstNodePtr> Parser::parseGenericsDef(){
-    advance();//on the <
+    advance();//on the < after advance
     std::vector<AstNodePtr> generics;
     while(m_currentToken.tkType!=tk_greater){
         expect(tk_identifier,"Expected an identifier but got "+next().keyword+" instead","","","");

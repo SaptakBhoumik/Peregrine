@@ -589,6 +589,10 @@ bool Validator::visit(const EllipsesTypeExpr& node){
 bool Validator::visit(const VarKwargTypeExpr& node){
     return true;
 }
+bool Validator::visit(const CompileTimeExpression& node){
+    //TODO: validate compile time expression
+    return true;
+}
 void Validator::add_error(Token tok, std::string msg,
                 std::string submsg,std::string hint,
                 std::string ecode){

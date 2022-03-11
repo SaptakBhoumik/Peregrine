@@ -22,11 +22,23 @@
 #define handle_ref_start() bool curr_ref=is_ref;\
                            is_ref=false;
 #define handle_ref_end() is_ref=curr_ref;
-
+//TODO: make this better
 std::string global_name(std::string name)
 {
-    std::hash<std::string> hash;//TODO: Not the safest way to do this
-    return std::to_string(hash(name));
+    std::string res;
+    for (auto& c : name)
+    {
+        if(c=='\\'||c=='/'){
+            res+="____";
+        }
+        else if(c=='.'){
+            res+="___";
+        }
+        else{
+            res+=c;
+        }
+    }
+    return res;
 }
 
 namespace cpp {
@@ -42,17 +54,11 @@ Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast,std::string fil
             "};\n";
     m_file<<"____P____exception_handler* ____Pexception_handlers=NULL;\n";
     m_global_name=global_name(filename);
-    m_env = createEnv();
     ast->accept(*this);
     m_file.close();
 }
 
-std::shared_ptr<SymbolTable<ast::AstNodePtr>>
-Codegen::createEnv(std::shared_ptr<SymbolTable<ast::AstNodePtr>> parent) {
-    return std::make_shared<SymbolTable<ast::AstNodePtr>>(parent);
-}
 
-// TODO: buffer it
 std::string Codegen::write(std::string_view code) {
     if(save){
         res+=code;
@@ -61,10 +67,6 @@ std::string Codegen::write(std::string_view code) {
         m_file << code;
     }
     return res;
-}
-
-std::string Codegen::mangleName(ast::AstNodePtr astNode) {
-    return std::string("");
 }
 
 std::string Codegen::searchDefaultModule(std::string path,

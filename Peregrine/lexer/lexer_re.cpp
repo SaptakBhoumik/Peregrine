@@ -466,6 +466,11 @@ void LEXER::lex(){
                 lex_tilde();
                 break;
             }
+            case '$':{
+                add_unknown();
+                lex_dollar();
+                break;
+            }
             case '!':{
                 add_unknown();
                 lex_bang();
@@ -586,6 +591,17 @@ void LEXER::lex_space(){
 }
 void LEXER::add_dedent(){
     
+}
+void LEXER::lex_dollar(){
+    m_result.push_back(Token{
+        m_loc,
+        m_curr_line,
+        std::string(1,m_curr_item),
+        m_curr_index,
+        m_curr_index+1,
+        m_line,
+        tk_dollar
+    });
 }
 void LEXER::lex_tilde(){
     m_result.push_back(Token{

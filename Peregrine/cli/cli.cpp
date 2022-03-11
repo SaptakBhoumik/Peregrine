@@ -57,6 +57,14 @@ namespace cli{
             }else if(curr_arg=="compile"){
                 advance();
                 checkargs("input file");
+                if (curr_arg.substr(curr_arg.size()-3, 3)!=".pe"){
+                    println("Error: input file must be a .pe file");
+                    exit(1);
+                }
+                else if(m_state.input_filename!=""){
+                    println("Error: Only one input file can be specified");
+                    exit(1);
+                }
                 m_state.input_filename = curr_arg;
             }else if(curr_arg=="-dev_debug"){
                 m_state.dev_debug = true;
@@ -66,6 +74,10 @@ namespace cli{
             }else{
                 if (curr_arg.size() > 3){
                     if (curr_arg.substr(curr_arg.size()-3, 3)==".pe"){
+                        if(m_state.input_filename!=""){
+                            println("Error: Only one input file can be specified");
+                            exit(1);
+                        }
                         m_state.input_filename = curr_arg;
                     }
                     else{

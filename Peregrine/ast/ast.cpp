@@ -1761,5 +1761,14 @@ VarArgTypeExpr::VarArgTypeExpr(Token tok) {
 Token VarArgTypeExpr::token() const { return m_token; }
 AstKind VarArgTypeExpr::type() const { return KAstVarArgTypeExpr; }
 std::string VarArgTypeExpr::stringify() const { return m_token.keyword ; }
-
+CompileTimeExpression::CompileTimeExpression(Token tok, AstNodePtr expr_node) {
+    m_token = tok;
+    m_expr_node = expr_node;
+}
+AstNodePtr CompileTimeExpression::expression() const{return m_expr_node;}
+Token CompileTimeExpression::token() const { return m_token; }
+AstKind CompileTimeExpression::type() const { return KAstCompileTimeExpression; }
+std::string CompileTimeExpression::stringify() const {
+    return"$" + m_expr_node->stringify();
+}
 } // namespace ast

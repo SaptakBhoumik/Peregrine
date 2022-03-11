@@ -185,3 +185,7 @@ type x<T,R>=def(T)->T,R
 
 def (const i)method(const a:int,const x)->int:
     return a+i
+$if windows:
+    $for i in 0..10:
+        print($i)
+-9**10

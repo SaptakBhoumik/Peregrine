@@ -36,6 +36,7 @@ class LEXER{
     void lex_string();
     void lex_space();
     void add_unknown();
+    void lex_dollar();
     void lex_plus();
     void lex_star();
     void lex_tilde();

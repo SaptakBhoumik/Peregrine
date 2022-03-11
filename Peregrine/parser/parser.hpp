@@ -13,8 +13,10 @@ using namespace ast;
 
 enum PrecedenceType {
     pr_lowest,      // lowest possible precedence
+    pr_range,       // ..
     pr_conditional, // if...else
-    pr_and_or,      // and,or
+    pr_or,      // or
+    pr_and,      // and
     pr_not,         // not
     pr_compare,     // ==, !=, <, >, <=, >=
     pr_bit_or,      // |
@@ -28,7 +30,7 @@ enum PrecedenceType {
     pr_dot_arrow_ref,     // x.test(), x.prop ,x->y
     pr_list_access, // x[0], x["test"]
     pr_call,         // x()
-    pr_postfix      // ++x
+    pr_postfix      // x++
 };
 
 std::map<TokenType, PrecedenceType> createMap();

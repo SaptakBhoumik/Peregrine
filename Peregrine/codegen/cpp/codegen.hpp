@@ -19,7 +19,6 @@ class Codegen : public ast::AstVisitor {
   public:
     Codegen(std::string outputFilename, ast::AstNodePtr ast,std::string filename);
 
-    EnvPtr createEnv(EnvPtr parent = nullptr);
 
   private:
     MangleName m_symbolMap;
@@ -36,7 +35,6 @@ class Codegen : public ast::AstVisitor {
     std::ofstream m_file;
     bool is_func_def=false;
     std::string write(std::string_view code);
-    std::string mangleName(ast::AstNodePtr astNode);
 
     std::string searchDefaultModule(std::string path, std::string moduleName);
     std::vector<ast::AstNodePtr> TurpleTypes(ast::AstNodePtr node);

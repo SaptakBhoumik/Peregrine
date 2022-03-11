@@ -1041,7 +1041,22 @@ LEXEME lexer(std::string src, std::string filename) {
             keyword = item;
             token = token_init(current_index - last_line,statement, keyword, tk_at, start_index,
                                current_index, line);
-        } else {
+        }else if (item == "$") {
+            if (keyword != "") {
+                token = token_init(current_index - last_line,
+                    statement, keyword,
+                    token_type(keyword, next(current_index - 1, src)),
+                    start_index, current_index - 1, line);
+                tokens.emplace_back(token);
+                token = Token();
+                keyword = "";
+            }
+            start_index = current_index - 1;
+            keyword = item;
+            token = token_init(current_index - last_line,statement, keyword, tk_dollar, start_index,
+                               current_index, line);
+        } 
+        else {
             if (keyword == "") {
                 start_index = current_index;
             }
@@ -1054,6 +1069,7 @@ LEXEME lexer(std::string src, std::string filename) {
         }
         current_index++;
     }
+    
     if (keyword != "") {
         tokens.emplace_back(
             token_init(current_index - last_line,statement, keyword,

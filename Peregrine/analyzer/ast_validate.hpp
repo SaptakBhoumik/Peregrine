@@ -82,6 +82,7 @@ class Validator: public AstVisitor {
         bool visit(const VarArgTypeExpr& node);
         bool visit(const EllipsesTypeExpr& node);
         bool visit(const VarKwargTypeExpr& node);
+        bool visit(const CompileTimeExpression& node);
 };
 }
 #endif

@@ -76,7 +76,8 @@ enum AstKind {
     KAstAugAssign,
     KAstMethodDef,
     KAstExternFuncDef,
-    KAstExternStruct
+    KAstExternStruct,
+    KAstCompileTimeExpression
 };
 
 class AstVisitor;
@@ -1223,6 +1224,20 @@ class ExternStructLiteral : public AstNode {
 
     AstNodePtr name() const;
     std::string owner() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+class CompileTimeExpression : public AstNode {
+    Token m_token;
+    AstNodePtr m_expr_node;
+
+  public:
+    CompileTimeExpression(Token tok, AstNodePtr expr_node);
+
+    AstNodePtr expression() const;
+
     Token token() const;
     AstKind type() const;
     std::string stringify() const;
