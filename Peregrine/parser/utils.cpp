@@ -104,6 +104,11 @@ parameter Parser::parseParameter(){
     AstNodePtr paramType = std::make_shared<NoLiteral>();
     AstNodePtr paramDefault = std::make_shared<NoLiteral>();
     AstNodePtr paramName = std::make_shared<NoLiteral>();
+    bool is_const = false;
+    if(m_currentToken.tkType==tk_const){
+        is_const=true;
+        advance();
+    }
     auto tok=m_currentToken;
     if(m_currentToken.tkType==tk_multiply){
         advance();
@@ -123,7 +128,7 @@ parameter Parser::parseParameter(){
             error(m_currentToken,"Expected identifier but got "+m_currentToken.keyword,"","","");
         }
         advance();
-        return parameter{paramType, paramName,paramDefault,x};
+        return parameter{paramType, paramName,paramDefault,is_const,x};
     }
     else if(m_currentToken.tkType==tk_ellipses){
         ParamType x=Ellipses;
@@ -133,7 +138,7 @@ parameter Parser::parseParameter(){
             paramName=parseName();
         }
         advance();
-        return parameter{paramType, paramName,paramDefault,x};
+        return parameter{paramType, paramName,paramDefault,is_const,x};
     }
     paramName = parseName();
     if(next().tkType==tk_comma || next().tkType==tk_r_paren|| next().tkType==tk_assign){}
@@ -148,5 +153,5 @@ parameter Parser::parseParameter(){
         paramDefault=parseExpression();
         advance();
     }
-    return parameter{paramType, paramName,paramDefault};
+    return parameter{paramType, paramName,paramDefault,is_const};
 }

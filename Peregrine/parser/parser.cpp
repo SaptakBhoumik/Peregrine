@@ -272,6 +272,10 @@ AstNodePtr Parser::parseClassDefinition() {
         return parseExternStruct(tok);
     }
     AstNodePtr name = parseName();
+    std::vector<AstNodePtr> generics;
+    if(next().tkType==tk_less){
+        generics=parseGenericsDef();
+    }
     std::vector<AstNodePtr> parent;
 
     if (next().tkType == tk_l_paren) {
@@ -363,7 +367,7 @@ AstNodePtr Parser::parseClassDefinition() {
         advance();
     }
     return std::make_shared<ClassDefinition>(tok, name, parent, attributes,
-                                             methods, other,comment);
+                                             methods, other,comment,generics);
 }
 
 AstNodePtr Parser::parseVirtual() {
@@ -649,7 +653,10 @@ AstNodePtr Parser::parseFunctionDef() {
         return parseExternFuncDef(tok);
     }
     AstNodePtr name = parseName();
-
+    std::vector<AstNodePtr> generics;
+    if(next().tkType==tk_less){
+        generics=parseGenericsDef();
+    }
     expect(tk_l_paren,"Expected a ( but got "+next().keyword+" instead");
     std::vector<parameter> parameters;
 
@@ -696,7 +703,7 @@ AstNodePtr Parser::parseFunctionDef() {
       body = parseBlockStatement();
     }
     return std::make_shared<FunctionDefinition>(tok, returnType, name,
-                                                parameters, body,comment);
+                                                parameters, body,comment,generics);
 }
 
 AstNodePtr Parser::parseReturn() {
@@ -717,14 +724,35 @@ AstNodePtr Parser::parseTypeDef() {
     advance();
 
     AstNodePtr name = parseName();
-
-    expect(tk_assign, "Expected an = but got "+next().keyword+" instead","","","");
+    std::vector<AstNodePtr> generics;
+    if(next().tkType==tk_less){
+        advance();//on the <
+        while(m_currentToken.tkType!=tk_greater){
+            expect(tk_identifier,"Expected an identifier but got "+next().keyword+" instead","","","");
+            generics.push_back(parseName());
+            if(next().tkType==tk_comma||next().tkType==tk_greater){
+                advance();
+            }
+            else if(next().tkType==tk_gr_or_equ){
+                break;
+            }
+            else{
+                expect(tk_greater,"Expected '>' but got "+next().keyword+" instead","","","");
+            }
+        }
+    }
+    if(generics.size()>0 && next().tkType==tk_gr_or_equ){
+        advance();
+    }
+    else{
+        expect(tk_assign, "Expected an = but got "+next().keyword+" instead","","","");
+    }
     advance();
 
     AstNodePtr type = parseType();
 
     advanceOnNewLine();
-    return std::make_shared<TypeDefinition>(tok, name, type);
+    return std::make_shared<TypeDefinition>(tok, name, type, generics);
 }
 
 AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
@@ -742,7 +770,6 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
         }
 
         case tk_cast: {
-            // TODO: cast<type>(v)=9 maybe?
             left = parseCast();
             break;
         }
@@ -1150,7 +1177,12 @@ AstNodePtr Parser::parseFuncType() {
                 types.push_back(parseType());
             }
         }
-        advance();
+        if(next().tkType==tk_r_paren || next().tkType==tk_comma){
+            advance();
+        }
+        else{
+            expect(tk_r_paren,"Expected ) but got "+next().keyword+" instead","Add a ) here","","");
+        }
     }
     if (next().tkType == tk_arrow) {
         advance();
@@ -1208,6 +1240,15 @@ AstNodePtr Parser::parseMatch() {
             else{
                 error(m_currentToken, "Expected , or : but got "+m_currentToken.keyword+" instead","","","");
             }
+        }
+        if(cases_arg.size()>toMatch.size()){
+            error(m_currentToken, "Too many arguments in case","","","");
+        }
+        else if(cases_arg.size()==0){
+            error(m_currentToken, "Too few arguments in case","","","");
+        }
+        else if(cases_arg.size()<toMatch.size()&&cases_arg.back()->type()!=KAstNoLiteral){
+            error(m_currentToken, "Too few arguments in case","","","");
         }
         AstNodePtr body;
         size_t line=m_currentToken.line;
@@ -1306,6 +1347,10 @@ AstNodePtr Parser::parseUnion() {
         return parseExternUnion(tok);
     }
     AstNodePtr union_name = parseName();
+    std::vector<AstNodePtr> generics;
+    if(next().tkType==tk_less){
+        generics=parseGenericsDef();
+    }
     expect(tk_colon, "Expected : but got "+next().keyword+" instead","Add a : here","","");
     expect(tk_ident, "Expected identation but got "+next().keyword+" instead","","","");
     advance();
@@ -1333,7 +1378,7 @@ AstNodePtr Parser::parseUnion() {
             error(m_currentToken, "Expected new line or dedent but got "+m_currentToken.keyword+" instead","","","");
         }
     }
-    return std::make_shared<UnionLiteral>(tok, elements, union_name,comment);
+    return std::make_shared<UnionLiteral>(tok, elements, union_name,comment,generics);
 }
 
 AstNodePtr Parser::parseEnum() {
@@ -1703,6 +1748,11 @@ AstNodePtr Parser::parseMethodDef() {
     Token tok = m_currentToken;
     advance();
     advance();
+    bool is_const=false;
+    if(m_currentToken.tkType==tk_const){
+        advance();
+        is_const=true;
+    }
     parameter reciever;
     reciever.p_default=std::make_shared<NoLiteral>();;
     reciever.p_name=parseName();
@@ -1714,12 +1764,16 @@ AstNodePtr Parser::parseMethodDef() {
     else{
         reciever.p_type=std::make_shared<NoLiteral>();
     }
+    reciever.is_const=is_const;
     expect(tk_r_paren,"Expected ) but got "+next().keyword+" instead","","","");
     // advance();
     expect(tk_identifier, "Expected a name but got "+next().keyword+" instead","Add a name here","","");
 
     AstNodePtr name = parseName();
-
+    std::vector<AstNodePtr> generics;
+    if(next().tkType==tk_less){
+        generics=parseGenericsDef();
+    }
     expect(tk_l_paren,"Expected a ( but got "+next().keyword+" instead");
     std::vector<parameter> parameters;
 
@@ -1766,7 +1820,7 @@ AstNodePtr Parser::parseMethodDef() {
       body = parseBlockStatement();
     }
     return std::make_shared<MethodDefinition>(tok, returnType, name,
-                                                parameters,reciever, body,comment);
+                                                parameters,reciever, body,comment,generics);
 }
 AstNodePtr Parser::parseExternFuncDef(Token tok){
     auto owner=m_currentToken.keyword;
@@ -1872,4 +1926,20 @@ AstNodePtr Parser::parseExternStruct(Token tok) {
         }
     }
     return std::make_shared<ExternStructLiteral>(tok, elements, union_name,owner);
+}
+
+std::vector<AstNodePtr> Parser::parseGenericsDef(){
+    advance();//on the <
+    std::vector<AstNodePtr> generics;
+    while(m_currentToken.tkType!=tk_greater){
+        expect(tk_identifier,"Expected an identifier but got "+next().keyword+" instead","","","");
+        generics.push_back(parseName());
+        if(next().tkType==tk_comma||next().tkType==tk_greater){
+            advance();
+        }
+        else{
+            expect(tk_greater,"Expected '>' but got "+next().keyword+" instead","","","");
+        }
+    }
+    return generics;
 }

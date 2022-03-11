@@ -716,6 +716,14 @@ void LEXER::lex_string(){
                             .ecode = "e1"}));
             break;
         }
+        if(m_curr_item==quote){
+            if(str.size()>0){
+                if(str.back()=='\\'){
+                    str.push_back(m_curr_item);
+                    advance();
+                }
+            }
+        }
     }
     m_result.push_back(Token{
                 m_loc,

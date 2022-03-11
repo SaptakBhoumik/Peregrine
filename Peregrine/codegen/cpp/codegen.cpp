@@ -89,6 +89,9 @@ void Codegen::codegenFuncParams(std::vector<ast::parameter> parameters,size_t st
         for (size_t i = start; i < parameters.size(); ++i) {
             // if (i-start)
             //     write(", ");
+            if(parameters[i].is_const){
+                write("const ");
+            }
             if (parameters[i].p_type->type()==ast::KAstNoLiteral){
                 write("auto");
             }

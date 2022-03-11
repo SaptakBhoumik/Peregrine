@@ -6,6 +6,7 @@ def peregrine1()->int,int:
     def peregrine2()->int,int:
         return 2,2
     return 1,1
+    #error()
 type a_type=def()->int,int
 class decorate:
     def __init__(self):pass
@@ -171,6 +172,8 @@ union union_name:
     f:float
     i:int
 def (y:int)multiply(x:int)->int:
+    return x*y
+def (const y:int)multiply2(const x:int)->int:
     return x*y
 def main():
     switch:iterate_test=iterate_test(5)

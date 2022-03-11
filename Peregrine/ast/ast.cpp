@@ -208,13 +208,16 @@ std::string DictLiteral::stringify() const {
 
 UnionLiteral::UnionLiteral(
     Token tok, std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,
-    AstNodePtr name,std::string  comment) {
+    AstNodePtr name,std::string  comment,std::vector<AstNodePtr> generic) {
     m_token = tok;
     m_name = name;
     m_elements = elements;
     m_comment=comment;
+    m_generics=generic;
 }
-
+std::vector<AstNodePtr> UnionLiteral::generics() const{
+    return m_generics;
+}
 std::vector<std::pair<AstNodePtr, AstNodePtr>> UnionLiteral::elements() const {
     return m_elements;
 }
@@ -229,7 +232,18 @@ AstKind UnionLiteral::type() const { return KAstUnion; }
 
 std::string UnionLiteral::stringify() const {
     std::string res = "union ";
-    res += m_name->stringify() + ":\n";
+    res += m_name->stringify();
+    if(m_generics.size()>0){
+        res+="<";
+        for(size_t i=0;i<m_generics.size();i++){
+            res+=m_generics[i]->stringify();
+            if(i<m_generics.size()-1){
+                res+=",";
+            }
+        }
+        res+=">";
+    }
+    res+=+ ":\n";
     for (size_t i = 0; i < m_elements.size(); i++) {
         if (i)
             res += "\n";
@@ -549,7 +563,7 @@ ClassDefinition::ClassDefinition(Token tok, AstNodePtr name,
                                  std::vector<AstNodePtr> attributes,
                                  std::vector<AstNodePtr> methods,
                                  std::vector<AstNodePtr> other,
-                                 std::string comment) {
+                                 std::string comment,std::vector<AstNodePtr> generic) {
     m_token = tok;
     m_name = name;
     m_parent = parent;
@@ -557,10 +571,13 @@ ClassDefinition::ClassDefinition(Token tok, AstNodePtr name,
     m_methods = methods;
     m_other = other;
     m_comment=comment;
+    m_generics=generic;
 }
 
 AstNodePtr ClassDefinition::name() const { return m_name; }
-
+std::vector<AstNodePtr> ClassDefinition::generics() const{
+    return m_generics;
+}
 std::vector<AstNodePtr> ClassDefinition::parent() const { return m_parent; }
 
 std::string ClassDefinition::comment() const { return m_comment; }
@@ -581,7 +598,16 @@ std::string ClassDefinition::stringify() const {
 
     std::string res = "class ";
     res += m_name->stringify();
-
+    if(m_generics.size()>0){
+        res+="<";
+        for(size_t i=0;i<m_generics.size();i++){
+            res+=m_generics[i]->stringify();
+            if(i<m_generics.size()-1){
+                res+=",";
+            }
+        }
+        res+=">";
+    }
     res += "(";
     for (size_t i = 0; i < m_parent.size(); ++i) {
         res += m_parent[i]->stringify();
@@ -613,15 +639,18 @@ std::string ClassDefinition::stringify() const {
 FunctionDefinition::FunctionDefinition(Token tok, AstNodePtr returnType,
                                        AstNodePtr name,
                                        std::vector<parameter> parameters,
-                                       AstNodePtr body,std::string comment) {
+                                       AstNodePtr body,std::string comment,std::vector<AstNodePtr> generic) {
     m_token = tok;
     m_returnType = returnType;
     m_name = name;
     m_parameters = parameters;
     m_body = body;
     m_comment=comment;
+    m_generics=generic;
 }
-
+std::vector<AstNodePtr> FunctionDefinition::generics() const{
+    return m_generics;
+}
 AstNodePtr FunctionDefinition::returnType() const { return m_returnType; }
 
 AstNodePtr FunctionDefinition::name() const { return m_name; }
@@ -641,6 +670,16 @@ std::string FunctionDefinition::stringify() const {
     std::string res = "def ";
 
     res += m_name->stringify();
+    if(m_generics.size()>0){
+        res+="<";
+        for(size_t i=0;i<m_generics.size();i++){
+            res+=m_generics[i]->stringify();
+            if(i<m_generics.size()-1){
+                res+=",";
+            }
+        }
+        res+=">";
+    }
     res += "(";
 
     if (!m_parameters.empty()) {
@@ -649,6 +688,9 @@ std::string FunctionDefinition::stringify() const {
 
             if (i) {
                 res += ", ";
+            }
+            if(param.is_const){
+                res += "const ";
             }
             if(param.p_paramType==VarKwarg){
                 res += param.p_type->stringify();
@@ -1022,12 +1064,15 @@ std::string ScopeStatement::stringify() const {
     return res;
 }
 
-TypeDefinition::TypeDefinition(Token tok, AstNodePtr name, AstNodePtr type) {
+TypeDefinition::TypeDefinition(Token tok, AstNodePtr name, AstNodePtr type,std::vector<AstNodePtr> generic) {
     m_token = tok;
     m_name = name;
     m_type = type;
+    m_generics = generic;
 }
-
+std::vector<AstNodePtr> TypeDefinition::generics() const{
+    return m_generics;
+}
 AstNodePtr TypeDefinition::name() const { return m_name; }
 
 AstNodePtr TypeDefinition::baseType() const { return m_type; }
@@ -1038,7 +1083,16 @@ AstKind TypeDefinition::type() const { return KAstTypeDefinition; }
 
 std::string TypeDefinition::stringify() const {
     std::string res = "type " + m_name->stringify();
-
+    if(m_generics.size()>0){
+        res+="<";
+        for(size_t i=0;i<m_generics.size();i++){
+            res+=m_generics[i]->stringify();
+            if(i<m_generics.size()-1){
+                res+=",";
+            }
+        }
+        res+=">";
+    }
     res += " = ";
 
     res += m_type->stringify();
@@ -1497,7 +1551,7 @@ std::string AugAssign::stringify() const{
     return res;
 }
 MethodDefinition::MethodDefinition(Token tok, AstNodePtr returnType, AstNodePtr name,
-                       std::vector<parameter> parameters,parameter reciever, AstNodePtr body,std::string comment) {
+                       std::vector<parameter> parameters,parameter reciever, AstNodePtr body,std::string comment,std::vector<AstNodePtr> generic) {
     m_token = tok;
     m_returnType = returnType;
     m_name = name;
@@ -1505,8 +1559,11 @@ MethodDefinition::MethodDefinition(Token tok, AstNodePtr returnType, AstNodePtr 
     m_body = body;
     m_comment=comment;
     m_reciever=reciever;
+    m_generics=generic;
 }
-
+std::vector<AstNodePtr> MethodDefinition::generics() const{
+    return m_generics;
+}
 AstNodePtr MethodDefinition::returnType() const { return m_returnType; }
 
 parameter MethodDefinition::reciever() const { return m_reciever; }
@@ -1531,6 +1588,9 @@ AstKind MethodDefinition::type() const { return KAstMethodDef; }
 
 std::string MethodDefinition::stringify() const {
     std::string res = "def (";
+    if(m_reciever.is_const){
+        res+="const ";
+    }
     res += m_reciever.p_name->stringify();
     if (m_reciever.p_type->type()!=KAstNoLiteral){
         res += ":";
@@ -1542,6 +1602,16 @@ std::string MethodDefinition::stringify() const {
     }
     res+=")";
     res += m_name->stringify();
+    if(m_generics.size()>0){
+        res+="<";
+        for(size_t i=0;i<m_generics.size();i++){
+            res+=m_generics[i]->stringify();
+            if(i<m_generics.size()-1){
+                res+=",";
+            }
+        }
+        res+=">";
+    }
     res += "(";
 
     if (!m_parameters.empty()) {
@@ -1551,7 +1621,9 @@ std::string MethodDefinition::stringify() const {
             if (i) {
                 res += ", ";
             }
-
+            if(param.is_const){
+                res += "const ";
+            }
             res += param.p_name->stringify();
             if (param.p_type->type()!=KAstNoLiteral){
                 res += ":";

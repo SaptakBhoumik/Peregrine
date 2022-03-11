@@ -380,18 +380,20 @@ class UnionLiteral : public AstNode {
     std::string  m_comment;//For generating docs
     // first is the key, second is the value
     std::vector<std::pair<AstNodePtr, AstNodePtr>> m_elements;
+    std::vector<AstNodePtr> m_generics;
     AstNodePtr m_name;
 
   public:
     UnionLiteral(Token tok,
                  std::vector<std::pair<AstNodePtr, AstNodePtr>> elements,
-                 AstNodePtr name,std::string  comment);
+                 AstNodePtr name,std::string  comment,std::vector<AstNodePtr> generic);
 
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elements() const;
 
     AstNodePtr name() const;
 
     Token token() const;
+    std::vector<AstNodePtr> generics() const;
     AstKind type() const;
     std::string comment() const;
     std::string stringify() const;
@@ -588,6 +590,7 @@ struct parameter {
     AstNodePtr p_type;
     AstNodePtr p_name;
     AstNodePtr p_default;
+    bool is_const=false;
     ParamType p_paramType=Normal;
 };
 
@@ -597,6 +600,7 @@ class ClassDefinition : public AstNode {
     std::vector<AstNodePtr> m_parent; // NOTE:class test(parent1,parent2)
     std::vector<AstNodePtr> m_attributes;
     std::vector<AstNodePtr> m_methods;
+    std::vector<AstNodePtr> m_generics;
     std::vector<AstNodePtr> m_other;
     std::string m_comment;//For generating docs
   public:
@@ -604,7 +608,7 @@ class ClassDefinition : public AstNode {
                     std::vector<AstNodePtr> attributes,
                     std::vector<AstNodePtr> methods,
                     std::vector<AstNodePtr> other,
-                    std::string comment);
+                    std::string comment,std::vector<AstNodePtr> generic);
 
     AstNodePtr name() const;
     std::string comment() const;
@@ -612,7 +616,7 @@ class ClassDefinition : public AstNode {
     std::vector<AstNodePtr> attributes() const;
     std::vector<AstNodePtr> methods() const;
     std::vector<AstNodePtr> other() const;
-
+    std::vector<AstNodePtr> generics() const;
     Token token() const;
     AstKind type() const;
     std::string stringify() const;
@@ -627,10 +631,11 @@ class FunctionDefinition : public AstNode {
     std::vector<parameter> m_parameters;
     std::string m_comment;//For generating docs
     AstNodePtr m_body;
+    std::vector<AstNodePtr> m_generics;
 
   public:
     FunctionDefinition(Token tok, AstNodePtr returnType, AstNodePtr name,
-                       std::vector<parameter> parameters, AstNodePtr body,std::string comment);
+                       std::vector<parameter> parameters, AstNodePtr body,std::string comment,std::vector<AstNodePtr> generic);
 
     AstNodePtr returnType() const;
     AstNodePtr name() const;
@@ -638,6 +643,7 @@ class FunctionDefinition : public AstNode {
     AstNodePtr body() const;
     std::string comment() const;
     Token token() const;
+    std::vector<AstNodePtr> generics() const;
     AstKind type() const;
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
@@ -910,17 +916,19 @@ class ScopeStatement : public AstNode {
 
 class TypeDefinition : public AstNode {
     Token m_token;
+    std::vector<AstNodePtr> m_generics;
     AstNodePtr m_name;
     AstNodePtr m_type;
 
   public:
-    TypeDefinition(Token tok, AstNodePtr name, AstNodePtr type);
+    TypeDefinition(Token tok, AstNodePtr name, AstNodePtr type,std::vector<AstNodePtr> generic);
 
     AstNodePtr name() const;
     AstNodePtr baseType() const;
 
     Token token() const;
     AstKind type() const;
+    std::vector<AstNodePtr> generics() const;
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
 };
@@ -1140,10 +1148,11 @@ class MethodDefinition : public AstNode {
     parameter m_reciever;
     std::string m_comment;//For generating docs
     AstNodePtr m_body;
+    std::vector<AstNodePtr> m_generics;
 
   public:
     MethodDefinition(Token tok, AstNodePtr returnType, AstNodePtr name,
-                       std::vector<parameter> parameters,parameter reciever, AstNodePtr body,std::string comment);
+                       std::vector<parameter> parameters,parameter reciever, AstNodePtr body,std::string comment,std::vector<AstNodePtr> generic);
 
     AstNodePtr returnType() const;
     AstNodePtr name() const;
@@ -1151,6 +1160,7 @@ class MethodDefinition : public AstNode {
     std::vector<parameter> parameters() const;
     std::vector<parameter> codegen_parameters() const;
     AstNodePtr body() const;
+    std::vector<AstNodePtr> generics() const;
     std::string comment() const;
     Token token() const;
     AstKind type() const;

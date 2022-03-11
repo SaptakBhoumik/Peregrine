@@ -3,7 +3,11 @@
 #include "ast_validate.hpp"
 #include <map>
 #include <iostream>
-//TODO: Dont visit unnecessary nodes
+/*
+TODO: Make sure that things like the following is made invalid
+virtual def (x)func(x):pass
+virtual def C.func(x)
+*/
 namespace astValidator{
 std::map<AstKind, std::string> keyword={
                                             {KAstPassStatement,"'pass'"},
@@ -84,7 +88,9 @@ bool Validator::visit(const Program& node){
     return true;
 }
 bool Validator::visit(const BlockStatement& node){
-    for (auto& stmt : node.statements()) {
+    auto statements = node.statements();
+    for (size_t i = 0; i < statements.size(); i++) {
+        auto stmt=statements[i];
         switch(stmt->type()){
             case KAstExpressionTuple:
             case KAstPrefixExpr:
@@ -112,6 +118,18 @@ bool Validator::visit(const BlockStatement& node){
                 add_error(stmt->token(), "SyntaxError: Nested inline function are not allowed");
                 break;
             }
+            case KAstExternFuncDef:{
+                add_error(stmt->token(), "Syntax error: External function definition is not allowed inside a function");
+                break;
+            }
+            case KAstExternStruct:{
+                add_error(stmt->token(), "Syntax error: External struct definition is not allowed inside a function");
+                break;
+            }
+            case KAstExternUnion:{
+                add_error(stmt->token(), "Syntax error: External union definition is not allowed inside a function");
+                break;
+            }
             case KAstExport:{
                 add_error(stmt->token(), "SyntaxError: Can't export nested function");
                 break;
@@ -120,7 +138,17 @@ bool Validator::visit(const BlockStatement& node){
                 add_error(stmt->token(), "SyntaxError: Extern statement cant be inside function");
                 break;
             }
-
+            //It should be at the last
+            case KAstContinueStatement:
+            case KAstBreakStatement:
+            case KAstPassStatement:
+            case KAstReturnStatement:{
+                //it is not the last statement
+                if(i<(statements.size()-1)){
+                    add_error(statements[i+1]->token(), "SyntaxError: Anything after "+keyword[stmt->type()]+"statement is not executed","Remove it");
+                    break;
+                }
+            }
             default:{
                 stmt->accept(*this);
             }
@@ -135,13 +163,37 @@ bool Validator::visit(const ClassDefinition& node){
         parents[i]->accept(*this);
     }
     for (auto& x : node.other()){
-        x->accept(*this);
+        switch(x->type()){
+            case KAstExternStruct:{
+                add_error(x->token(), "Syntax error: External struct definition is not allowed inside a function");
+                break;
+            }
+            case KAstExternUnion:{
+                add_error(x->token(), "Syntax error: External union definition is not allowed inside a function");
+                break;
+            }
+            default:{
+                x->accept(*this);
+            }
+        }
     }
     for (auto& x : node.attributes()){
         x->accept(*this);
     }
     for (auto& x : node.methods()){
-        x->accept(*this);
+        switch (x->type()) {
+            case KAstMethodDef:{
+                add_error(x->token(), "Syntax error: method definition is not allowed inside a class");
+                break;
+            }
+            case KAstExternFuncDef:{
+                add_error(x->token(), "Syntax error: External function definition is not allowed inside a class");
+                break;
+            }
+            default:{
+                x->accept(*this);
+            }
+        }
     }
     return true;
 }
@@ -316,9 +368,7 @@ bool Validator::visit(const DictTypeExpr& node){
 }
 bool Validator::visit(const FunctionTypeExpr& node){
     node.returnTypes()->accept(*this);
-    for(auto&x:node.argTypes()){
-        x->accept(*this);
-    }
+    validate_parameters(node.argTypes());
     return true;
 }
 bool Validator::visit(const NoLiteral& node){return true;}
@@ -354,7 +404,19 @@ bool Validator::visit(const WithStatement& node){
     return true;
 }
 bool Validator::visit(const VirtualStatement& node){
-    node.body()->accept(*this);
+    switch (node.body()->type()) {
+        case KAstMethodDef:{
+            add_error(node.body()->token(), "Syntax error: method definition is not allowed inside a class");
+            break;
+        }
+        case KAstExternFuncDef:{
+            add_error(node.body()->token(), "Syntax error: External function definition is not allowed inside a class");
+            break;
+        }
+        default:{
+            node.body()->accept(*this);
+        }
+    }
     return true;
 }
 bool Validator::visit(const CastStatement& node){
@@ -425,12 +487,107 @@ bool Validator::visit(const AugAssign& node){
     node.value()->accept(*this);
     return true;
 }
-void Validator::validate_parameters(std::vector<parameter> items){
-    for(auto& x:items){
-        x.p_type->accept(*this);
+void Validator::validate_parameters(std::vector<parameter> param){
+    bool has_vargs = false;
+    for (size_t i=0;i<param.size();i++){
+        auto x=param[i];
         x.p_default->accept(*this);
         x.p_name->accept(*this);
+        if(x.p_type->type()==KAstVarArgTypeExpr){
+            if(i<param.size()-1){
+                if(param[i+1].p_type->type()!=KAstVarKwargTypeExpr){
+                    add_error(x.p_type->token(),"Either there should not be any parameter after VarArg or it has to be VarKwarg");
+                }
+            }
+            //def x(*,**,*)
+            else if(has_vargs){
+                add_error(x.p_type->token(), "More than one '*' parameter is not allowed");
+            }
+            has_vargs = true;
+        }
+        else if(x.p_type->type()==KAstVarKwargTypeExpr){
+            if(i<param.size()-1){
+                add_error(x.p_type->token(),"'**' has to be the last parameter of the function");
+            }
+        }
+        else if(x.p_type->type()==KAstEllipsesTypeExpr){
+            if(i<param.size()-1){
+                add_error(x.p_type->token(),"'...' has to be the last parameter of the function");
+            }
+        }
+        x.p_type->accept(*this);
     }
+}
+void Validator::validate_parameters(std::vector<AstNodePtr> param){
+    bool has_vargs = false;
+    for (size_t i=0;i<param.size();i++){
+        auto x=param[i];
+        // stf::cout<<"validating parameter "<<x->to_string()<<"\n";
+        if(x->type()==KAstVarArgTypeExpr){            
+            if(i<param.size()-1){
+                if(param[i+1]->type()!=KAstVarKwargTypeExpr){
+                    add_error(param[i+1]->token(),"Either there should not be any parameter after VarArg or it has to be VarKwarg");
+                }
+            }
+            //def x(*,**,*)
+            else if(has_vargs){
+                add_error(x->token(), "More than one '*' parameter is not allowed");
+            }
+            has_vargs = true;
+        }
+        else if(x->type()==KAstVarKwargTypeExpr){
+            if(i<param.size()-1){
+                add_error(param[i+1]->token(),"'**' has to be the last parameter of the function");
+            }
+        }
+        else if(x->type()==KAstEllipsesTypeExpr){
+            if(i<param.size()-1){
+                add_error(param[i+1]->token(),"'...' has to be the last parameter of the function");
+            }
+        }
+        x->accept(*this);
+    }
+}
+bool Validator::visit(const MethodDefinition& node){
+    node.returnType()->accept(*this);
+    node.name()->accept(*this);
+    node.body()->accept(*this);
+    node.reciever().p_type->accept(*this);
+    node.reciever().p_default->accept(*this);
+    node.reciever().p_name->accept(*this);
+    validate_parameters(node.parameters());
+    return true;
+}
+bool Validator::visit(const ExternFuncDef& node){
+    node.returnType()->accept(*this);
+    node.name()->accept(*this);
+    validate_parameters(node.parameters());
+    return true;
+}
+bool Validator::visit(const ExternUnionLiteral& node){
+    node.name()->accept(*this);
+    for(auto& x:node.elements()){
+        x.first->accept(*this);
+        x.second->accept(*this);
+    }
+    return true;
+}
+bool Validator::visit(const ExternStructLiteral& node){
+    node.name()->accept(*this);
+    for(auto& x:node.elements()){
+        x.first->accept(*this);
+        x.second->accept(*this);
+    }
+    return true;
+}
+bool Validator::visit(const VarArgTypeExpr& node){
+    return true;
+}
+bool Validator::visit(const EllipsesTypeExpr& node){
+    return true;
+}
+bool Validator::visit(const VarKwargTypeExpr& node){
+    return true;
 }
 void Validator::add_error(Token tok, std::string msg,
                 std::string submsg,std::string hint,

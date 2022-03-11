@@ -12,9 +12,10 @@ class Validator: public AstVisitor {
         std::vector<PEError> m_errors;
         std::string m_filename;
     public:
-        Validator(ast::AstNodePtr ast,std::string filename);
+        Validator(AstNodePtr ast,std::string filename);
         void add_error(Token tok, std::string msg,std::string submsg="",std::string hint="",std::string ecode="");
-        void validate_parameters(std::vector<parameter> items);
+        void validate_parameters(std::vector<parameter> param);
+        void validate_parameters(std::vector<AstNodePtr> param);
         bool visit(const Program& node);
         bool visit(const BlockStatement& node);
         bool visit(const ClassDefinition& node);
@@ -74,6 +75,13 @@ class Validator: public AstVisitor {
         bool visit(const SumType& node);
         bool visit(const MultipleAssign& node);
         bool visit(const AugAssign& node);
+        bool visit(const MethodDefinition& node);
+        bool visit(const ExternFuncDef& node);
+        bool visit(const ExternUnionLiteral& node);
+        bool visit(const ExternStructLiteral& node);
+        bool visit(const VarArgTypeExpr& node);
+        bool visit(const EllipsesTypeExpr& node);
+        bool visit(const VarKwargTypeExpr& node);
 };
 }
 #endif

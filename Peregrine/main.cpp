@@ -15,18 +15,6 @@
 #include <vector>
 
 
-bool check_file_existence(std::string fname){
-    FILE *file; 
-
-    file = fopen( fname.c_str() , "r");
-
-   if (file != NULL) {
-      fclose(file);
-      return true;
-   } else {
-      return false;
-   }
-}
 
 
 void compile(cli::state s){
@@ -48,9 +36,8 @@ void compile(cli::state s){
         TypeChecker typeChecker(program);
     }
     else{
-
-        if (check_file_existence(s.input_filename)){
-            std::ifstream file(s.input_filename);
+        std::ifstream file(s.input_filename);
+        if (file){
             std::stringstream buf;
             buf << file.rdbuf();
             auto filename=s.input_filename;
@@ -82,7 +69,8 @@ void compile(cli::state s){
             }
         }
         else{
-            std::cout << "error: file with name of \"" << s.input_filename << "\" does not exist\n";
+            std::cout << "error: file with name of \"" << s.input_filename << "\" does not exist"<<std::endl;
+            exit(1);
         }
         
     }
