@@ -28,10 +28,12 @@ Token Parser::next() {
 }
 
 PrecedenceType Parser::nextPrecedence() {
-    if (precedenceMap.count(next().tkType) > 0) {
+    if(m_currentToken.tkType == tk_new_line) {
+        return pr_lowest;
+    }
+    else if (precedenceMap.count(next().tkType) > 0) {
         return precedenceMap[next().tkType];
     }
-
     return pr_lowest;
 }
 
