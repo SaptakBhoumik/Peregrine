@@ -13,8 +13,8 @@ using namespace ast;
 
 enum PrecedenceType {
     pr_lowest,      // lowest possible precedence
-    pr_range,       // ..
     pr_conditional, // if...else
+    pr_range,       // ..
     pr_or,      // or
     pr_and,      // and
     pr_not,         // not
@@ -93,6 +93,7 @@ class Parser {
 
     AstNodePtr parseBinaryOperation(AstNodePtr left);
     AstNodePtr parseTernaryIf(AstNodePtr left);
+    AstNodePtr parseTernaryFor(AstNodePtr left);
     AstNodePtr parseFunctionCall(AstNodePtr left);
     AstNodePtr parseListOrDictAccess(AstNodePtr left);
     AstNodePtr parseDotExpression(AstNodePtr left);

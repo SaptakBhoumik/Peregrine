@@ -67,6 +67,7 @@ enum AstKind {
     KAstDefaultArg,
     KAstExport,
     KAstTernaryIf,
+    KAstTernaryFor,
     KAstTryExcept,
     KAstExpressionTuple,
     KAstTypeTuple,
@@ -1243,7 +1244,22 @@ class CompileTimeExpression : public AstNode {
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
 };
+class TernaryFor : public AstNode {
+    Token m_token;
+    AstNodePtr m_for_value;
+    AstNodePtr m_for_iterate;
+    std::vector<AstNodePtr> m_for_variable;
+  public:
+    TernaryFor(Token token,AstNodePtr for_value,AstNodePtr for_iterate,std::vector<AstNodePtr> for_variable);
+    AstNodePtr for_value() const;
+    AstNodePtr for_iterate() const;
+    std::vector<AstNodePtr> for_variable() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 
+};
 } // namespace ast
 
 #endif

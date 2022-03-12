@@ -878,10 +878,14 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
                 left = parseFunctionCall(left);
                 break;
             }
-           case tk_if:{
-               left = parseTernaryIf(left);
-               break;
-           }
+            case tk_if:{
+                left = parseTernaryIf(left);
+                break;
+            }
+            case tk_for:{
+                left = parseTernaryFor(left);
+                break;
+            }
             case tk_list_open: {
                 left = parseListOrDictAccess(left);
                 break;
@@ -1953,4 +1957,25 @@ std::vector<AstNodePtr> Parser::parseGenericsDef(){
         }
     }
     return generics;
+}
+AstNodePtr Parser::parseTernaryFor(AstNodePtr left){
+    auto tok=m_currentToken;
+    advance();
+
+    std::vector<AstNodePtr> variable;
+    while (m_currentToken.tkType != tk_in) {
+        variable.push_back(parseName());
+        advance();
+        if (m_currentToken.tkType == tk_comma) {
+            advance();
+        } else if (m_currentToken.tkType != tk_in) {
+            error(m_currentToken,
+                "Expected an in after the variable but got "+m_currentToken.keyword+" instead","Add an in here","","e5");
+        }
+    }
+    advance();
+
+    AstNodePtr sequence = parseExpression(pr_conditional);
+    advanceOnNewLine();
+    return std::make_shared<TernaryFor>(tok,left,sequence,variable);
 }

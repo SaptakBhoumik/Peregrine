@@ -1385,7 +1385,7 @@ AstNodePtr TernaryIf::else_value() const{return m_else_value;}
 Token TernaryIf::token() const{return m_token;}
 AstKind TernaryIf::type() const{return KAstTernaryIf;}
 std::string TernaryIf::stringify() const{
-  std::string res=m_if_value->stringify()+" if("+m_if_value->stringify()+") else "+m_else_value->stringify();
+  std::string res="("+m_if_value->stringify()+" if("+m_if_condition->stringify()+") else "+m_else_value->stringify()+")";
   return res;
 }
 TryExcept::TryExcept(Token token,AstNodePtr body,std::vector<except_type>  except_clauses,AstNodePtr else_body){
@@ -1770,5 +1770,31 @@ Token CompileTimeExpression::token() const { return m_token; }
 AstKind CompileTimeExpression::type() const { return KAstCompileTimeExpression; }
 std::string CompileTimeExpression::stringify() const {
     return"$" + m_expr_node->stringify();
+}
+TernaryFor::TernaryFor(Token token,AstNodePtr for_value,AstNodePtr for_iterate,std::vector<AstNodePtr> for_variable){
+    m_token=token;
+    m_for_value=for_value;
+    m_for_iterate=for_iterate;
+    m_for_variable=for_variable;
+}
+AstNodePtr TernaryFor::for_value()const{return m_for_value;}
+AstNodePtr TernaryFor::for_iterate()const{return m_for_iterate;}
+std::vector<AstNodePtr> TernaryFor::for_variable()const{return m_for_variable;}
+Token TernaryFor::token()const{return m_token;}
+AstKind TernaryFor::type()const{return KAstTernaryFor;}
+std::string TernaryFor::stringify()const{
+    std::string res;
+    res+="("+m_for_value->stringify();
+    res+=" for ";
+    for(size_t i=0;i<m_for_variable.size();++i){
+        res+=m_for_variable[i]->stringify();
+        if(i<m_for_variable.size()-1){
+            res+=",";
+        }
+    }
+    res+=" in ";
+    res+=m_for_iterate->stringify();
+    res+=")";
+    return res;
 }
 } // namespace ast

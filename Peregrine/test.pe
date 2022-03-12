@@ -188,4 +188,6 @@ def (const i)method(const a:int,const x)->int:
 $if windows:
     $for i in 0..10:
         print($i)
--9**10
+x=5..5 if False else 6
+
+g=[4 for i in 0..10 ]

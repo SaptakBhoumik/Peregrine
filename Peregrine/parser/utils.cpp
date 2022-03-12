@@ -63,6 +63,7 @@ void Parser::expect(TokenType expectedType, std::string msg,std::string submsg,s
 
 std::map<TokenType, PrecedenceType> createMap() {
     std::map<TokenType, PrecedenceType> precedenceMap;
+    precedenceMap[tk_for] = pr_conditional;
     precedenceMap[tk_double_dot] = pr_range;
     precedenceMap[tk_dollar] = pr_prefix;
     precedenceMap[tk_bit_not] = pr_prefix;
