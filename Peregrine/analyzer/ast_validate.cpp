@@ -139,7 +139,7 @@ bool Validator::visit(const BlockStatement& node){
                 break;
             }
             case KAstPrivate:{
-                add_error(stmt->token(), "SyntaxError: Function within block statement are already private");
+                add_error(stmt->token(), "SyntaxError: Any kind of definition within block statement are already private");
                 break;
             }
             //It should be at the last
