@@ -135,6 +135,7 @@ class Parser {
     AstNodePtr parseTypeDef();
     AstNodePtr parseDefaultArg();
     AstNodePtr parseTryExcept();
+    AstNodePtr parsePrivate(bool is_class=false);
 
   public:
     Parser(const std::vector<Token>& tokens,std::string filename);

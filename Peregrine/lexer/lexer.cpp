@@ -179,6 +179,8 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_class;
     }else if (item == "export") {
         return tk_export;
+    }else if (item == "private") {
+        return tk_private;
     }else {
         return is_number(item);
     }

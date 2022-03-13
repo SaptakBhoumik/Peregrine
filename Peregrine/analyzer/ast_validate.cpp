@@ -138,6 +138,10 @@ bool Validator::visit(const BlockStatement& node){
                 add_error(stmt->token(), "SyntaxError: Extern statement cant be inside function");
                 break;
             }
+            case KAstPrivate:{
+                add_error(stmt->token(), "SyntaxError: Function within block statement are already private");
+                break;
+            }
             //It should be at the last
             case KAstContinueStatement:
             case KAstBreakStatement:

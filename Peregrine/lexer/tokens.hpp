@@ -63,6 +63,7 @@ enum TokenType {
     tk_identifier, // foo, bar
 
     // keywords tokens
+    tk_private,   // private
     tk_static,    // static
     tk_scope,     // scope
     tk_union,     // union

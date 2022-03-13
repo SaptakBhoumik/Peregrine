@@ -78,7 +78,8 @@ enum AstKind {
     KAstMethodDef,
     KAstExternFuncDef,
     KAstExternStruct,
-    KAstCompileTimeExpression
+    KAstCompileTimeExpression,
+    KAstPrivate
 };
 
 class AstVisitor;
@@ -1259,6 +1260,20 @@ class TernaryFor : public AstNode {
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
 
+};
+class PrivateDef: public AstNode {
+    Token m_token;
+    AstNodePtr m_definition;
+
+  public:
+    PrivateDef(Token tok, AstNodePtr definition);
+
+    AstNodePtr definition() const;
+
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 } // namespace ast
 

@@ -191,3 +191,8 @@ $if windows:
 x=5..5 if False else 6
 
 g=[4 for i in 0..10 ]
+class x:
+    private static x=2
+    private static const x=2
+    private static def (i:int)method(a:int,b:int):
+        return a+b

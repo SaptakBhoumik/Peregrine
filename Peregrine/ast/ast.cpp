@@ -1797,4 +1797,14 @@ std::string TernaryFor::stringify()const{
     res+=")";
     return res;
 }
+PrivateDef::PrivateDef(Token tok, AstNodePtr definition) {
+    m_token = tok;
+    m_definition = definition;
+}
+AstNodePtr PrivateDef::definition() const{return m_definition;}
+Token PrivateDef::token() const { return m_token; }
+AstKind PrivateDef::type() const { return KAstPrivate; }
+std::string PrivateDef::stringify() const {
+    return"private " + m_definition->stringify();
+}
 } // namespace ast

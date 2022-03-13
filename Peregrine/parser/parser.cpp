@@ -58,7 +58,10 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseStatic();
             break;
         }
-
+        case tk_private: {
+            stmt = parsePrivate();
+            break;
+        }
         case tk_with: {
             stmt = parseWith();
             break;
@@ -311,6 +314,35 @@ AstNodePtr Parser::parseClassDefinition() {
             case tk_string: { // multiline comment
                 while (m_currentToken.tkType == tk_string) {
                     advance();
+                }
+                break;
+            }
+            case tk_private:{
+                if(next().tkType==tk_identifier){
+                    attributes.push_back(parsePrivate(true));
+                }
+                else if(next().tkType==tk_const){
+                    attributes.push_back(parsePrivate(true));
+                }
+                else if(next().tkType==tk_union){
+                    other.push_back(parsePrivate(true));
+                }
+                else if(next().tkType==tk_class){
+                    other.push_back(parsePrivate(true));
+                }
+                else if (next().tkType==tk_enum) {
+                    other.push_back(parsePrivate(true));
+                }
+                else if (next().tkType==tk_static) {
+                    if(m_tokens[m_tokIndex+2].tkType==tk_const||m_tokens[m_tokIndex+2].tkType==tk_identifier){
+                        attributes.push_back(parsePrivate(true));
+                    }
+                    else{
+                        methods.push_back(parsePrivate(true));
+                    }
+                }
+                else{
+                    methods.push_back(parsePrivate(true));
                 }
                 break;
             }
@@ -1978,4 +2010,58 @@ AstNodePtr Parser::parseTernaryFor(AstNodePtr left){
     AstNodePtr sequence = parseExpression(pr_conditional);
     advanceOnNewLine();
     return std::make_shared<TernaryFor>(tok,left,sequence,variable);
+}
+AstNodePtr Parser::parsePrivate(bool is_class){
+    auto tok=m_currentToken;
+    advance();
+    AstNodePtr exp;
+    switch (m_currentToken.tkType){
+        case tk_identifier:{
+            exp=parseVariableStatement();
+            break;
+        }
+        case tk_static:{
+            exp=parseStatic();
+            break;
+        }
+        case tk_union:{
+            exp=parseUnion();
+            break;
+        }
+        case tk_inline:{
+            exp=parseInline();
+            break;
+        }
+        case tk_def:{
+            exp=parseFunctionDef();
+            break;
+        }
+        case tk_class:{
+            exp=parseClassDefinition();
+            break;
+        }
+        case tk_type:{
+            exp=parseTypeDef();
+            break;
+        }
+        case tk_const:{
+            exp=parseConstDeclaration();
+            break;
+        }
+        case tk_enum:{
+            exp=parseEnum();
+            break;
+        }
+        case tk_virtual:{
+            if(!is_class){
+                error(m_currentToken,"Virtual statement not allowed outside class","","","");
+            }
+            exp=parseVirtual();
+            break;
+        }
+        default:{
+            error(m_currentToken,"Expected a defination of a class,function,union or variable but got "+m_currentToken.keyword+" instead","","","");
+        }
+    }
+    return std::make_shared<PrivateDef>(tok,exp);
 }
