@@ -184,7 +184,8 @@ def (const y:int)multiply2(const x:int)->int:
     return x*y
 private def private_func():
     printf("Hello from private function\n")
-
+#platform dependent stuff
+"
 def inline_asm():
     arg1:int=45
     arg2:int=50
@@ -194,8 +195,11 @@ def inline_asm():
         "a"=arg1
         "b"=arg2
     printf("%lld + %lld = %lld\n",arg1,arg2,add)
+"
 def main():
+    "
     inline_asm()
+    "
     private_func()
     switch:iterate_test=iterate_test(5)
     switch2:int=switch.__add__(test(5))
