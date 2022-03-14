@@ -789,7 +789,7 @@ bool Codegen::visit(const ast::StaticStatement& node){
     return true;
 }
 bool Codegen::visit(const ast::InlineStatement& node){
-    write("inline ");
+    write("inline __attribute__((always_inline)) ");
     node.body()->accept(*this);
     return true;
 }
@@ -900,6 +900,9 @@ bool Codegen::visit(const ast::ClassDefinition& node){
                 x = std::dynamic_pointer_cast<ast::StaticStatement>(x)->body();
                 write("static ");
             }
+            else if(x->type()==ast::KAstPrivate){
+                x = std::dynamic_pointer_cast<ast::PrivateDef>(x)->definition();
+            }
             switch(x->type()){
                 case ast::KAstVariableStmt:{
                     std::shared_ptr<ast::VariableStatement> var = std::dynamic_pointer_cast<ast::VariableStatement>(x);
@@ -936,8 +939,11 @@ bool Codegen::visit(const ast::ClassDefinition& node){
         local_mangle_end();
     }
     for (auto& x : node.methods()){
+        if(x->type()==ast::KAstPrivate){
+            x = std::dynamic_pointer_cast<ast::PrivateDef>(x)->definition();
+        }
         magic_method(x,name);
-         write(";\n");
+        write(";\n");
     }
     write("\n}");
     local_mangle_end();
@@ -1195,4 +1201,66 @@ bool Codegen::visit(const ast::MethodDefinition& node){
     }
     return true;
 }
+bool Codegen::visit(const ast::ExternStructLiteral& node){
+    write("extern \"C\" struct ");
+    std::string s_name=std::dynamic_pointer_cast<ast::IdentifierExpression>(node.name())->value();
+    write(s_name);
+    if(node.elements().size()>0){
+        write("{\n");
+        auto elm=node.elements();
+        for(auto& x:elm){
+            x.first->accept(*this);
+            write(" ");
+            std::string f_name=std::dynamic_pointer_cast<ast::IdentifierExpression>(x.second)->value();
+            write(f_name);
+            write(";\n");
+        }
+        write("};\n");
+    }
+    return true;
+}
+bool Codegen::visit(const ast::ExternUnionLiteral& node){
+    write("extern \"C\" union ");
+    std::string s_name=std::dynamic_pointer_cast<ast::IdentifierExpression>(node.name())->value();
+    write(s_name);
+    if(node.elements().size()>0){
+        write("{\n");
+        auto elm=node.elements();
+        for(auto& x:elm){
+            x.first->accept(*this);
+            write(" ");
+            std::string f_name=std::dynamic_pointer_cast<ast::IdentifierExpression>(x.second)->value();
+            write(f_name);
+            write(";\n");
+        }
+        write("};\n");
+    }
+    return true;
+}
+bool Codegen::visit(const ast::ExternFuncDef& node){
+    write("extern \"C\" ");
+    node.returnType()->accept(*this);
+    std::string s_name=std::dynamic_pointer_cast<ast::IdentifierExpression>(node.name())->value();
+    write(" "+s_name);
+    write("(");
+    auto param=node.parameters();
+    for(size_t i=0;i<param.size();i++){
+        if(param[i]->type()==ast::KAstEllipsesTypeExpr){
+            write("...");
+        }
+        else{
+            param[i]->accept(*this);
+        }
+        if(i<param.size()-1){
+            write(",");
+        }
+    }
+    write(")");
+    return true;
+}
+bool Codegen::visit(const ast::PrivateDef& node){
+    node.definition()->accept(*this);
+    return true;
+}
+
 } // namespace cpp

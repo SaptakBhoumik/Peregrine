@@ -100,6 +100,10 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::TryExcept& node);
     bool visit(const ast::MultipleAssign& node);
     bool visit(const ast::AugAssign& node);
+    bool visit(const ast::ExternStructLiteral& node);
+    bool visit(const ast::ExternUnionLiteral& node);
+    bool visit(const ast::ExternFuncDef& node);
+    bool visit(const ast::PrivateDef&);
     EnvPtr m_env;
 };
 

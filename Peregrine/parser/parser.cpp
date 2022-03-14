@@ -1878,7 +1878,13 @@ AstNodePtr Parser::parseExternFuncDef(Token tok){
     std::vector<AstNodePtr> parameters;
     advance();
     while (m_currentToken.tkType != tk_r_paren) {
-        parameters.push_back(parseType());
+        if(m_currentToken.tkType==tk_ellipses){
+            parameters.push_back(std::make_shared<EllipsesTypeExpr>(m_currentToken));
+            advance();
+            break;
+        }else{
+            parameters.push_back(parseType());
+        }
         advance();
         if(m_currentToken.tkType==tk_comma){
             advance();

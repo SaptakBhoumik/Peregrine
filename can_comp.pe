@@ -25,6 +25,13 @@ def peregrine3()->int,int:
     def peregrine2()->int,int:
         return 3,3
     return 4,4
+class x.x
+class x.x:
+    xx:int
+union x.y
+union x.y:
+    xx:int
+def x.b(int,...)->int
 def unknown_type(var):
     var.__add__(1)
     for x in var:
@@ -175,7 +182,10 @@ def (y:int)multiply(x:int)->int:
     return x*y
 def (const y:int)multiply2(const x:int)->int:
     return x*y
+private def private_func():
+    printf("Hello from private function\n")
 def main():
+    private_func()
     switch:iterate_test=iterate_test(5)
     switch2:int=switch.__add__(test(5))
     switch3:*iterate_test=&switch
