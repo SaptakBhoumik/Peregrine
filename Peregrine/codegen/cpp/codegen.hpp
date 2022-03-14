@@ -103,7 +103,8 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::ExternStructLiteral& node);
     bool visit(const ast::ExternUnionLiteral& node);
     bool visit(const ast::ExternFuncDef& node);
-    bool visit(const ast::PrivateDef&);
+    bool visit(const ast::PrivateDef& node);
+    bool visit(const ast::InlineAsm& node);
     EnvPtr m_env;
 };
 

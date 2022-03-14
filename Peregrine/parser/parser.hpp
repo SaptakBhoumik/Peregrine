@@ -105,6 +105,7 @@ class Parser {
     AstNodePtr parseExtern();
     AstNodePtr parseMultipleAssign(AstNodePtr);
     AstNodePtr parseVirtual();
+    AstNodePtr parseAsm();
     AstNodePtr parseCast();
     AstNodePtr parseStatement();
     AstNodePtr parseWith();

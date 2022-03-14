@@ -156,6 +156,10 @@ AstNodePtr Parser::parseStatement() {
             stmt = parseTypeDef();
             break;
         }
+        case tk_asm: {
+            stmt = parseAsm();
+            break;
+        }
 
         case tk_class: {
             stmt = parseClassDefinition();
@@ -2070,4 +2074,48 @@ AstNodePtr Parser::parsePrivate(bool is_class){
         }
     }
     return std::make_shared<PrivateDef>(tok,exp);
+}
+AstNodePtr Parser::parseAsm(){
+    auto tok=m_currentToken;
+    expect(tk_colon,"Expected an ':' but got "+next().keyword+" instead","","","");
+    expect(tk_ident,"Expected an indentation but got "+next().keyword+" instead","","","");
+    advance();
+    std::string assembly="";
+    AstNodePtr output=std::make_shared<NoLiteral>();
+    std::vector<std::pair<std::string,AstNodePtr>> inputs;
+    while(m_currentToken.tkType!=tk_dedent){
+        if(m_currentToken.tkType==tk_identifier){
+            output=parseExpression();
+            expect(tk_assign,"Expected an '=' but got "+next().keyword+" instead","","","");
+            advance();
+            if(assembly.size()!=0){
+                error(m_currentToken,"Error: Can't have multiple result variable","","","");
+            }
+            else{
+                assembly=m_currentToken.keyword;
+            }
+        }
+        else if(m_currentToken.tkType==tk_string){
+            if(assembly.size()!=0 && next().tkType!=tk_assign){
+                error(m_currentToken,"Error: Can't have multiple result variable","","","");
+            }
+            else if(next().tkType==tk_assign){
+                auto reg=m_currentToken.keyword;
+                advance();
+                advance();
+                auto exp=parseExpression();
+                inputs.push_back(std::make_pair(reg,exp));
+            }
+            else{
+                assembly=m_currentToken.keyword;
+            }
+        }
+        else{
+            error(m_currentToken,"Expected an identifier or string but got "+m_currentToken.keyword+" instead","","","");
+        }
+        advance();
+        if(m_currentToken.tkType==tk_dedent){break;}
+        if(m_currentToken.tkType==tk_new_line){advance();}
+    }
+    return std::make_shared<InlineAsm>(tok,assembly,output,inputs);
 }

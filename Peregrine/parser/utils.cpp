@@ -28,7 +28,7 @@ Token Parser::next() {
 }
 
 PrecedenceType Parser::nextPrecedence() {
-    if(m_currentToken.tkType == tk_new_line) {
+    if(m_currentToken.tkType == tk_new_line||m_currentToken.tkType == tk_dedent) {
         return pr_lowest;
     }
     else if (precedenceMap.count(next().tkType) > 0) {

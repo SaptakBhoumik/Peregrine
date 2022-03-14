@@ -79,7 +79,8 @@ enum AstKind {
     KAstExternFuncDef,
     KAstExternStruct,
     KAstCompileTimeExpression,
-    KAstPrivate
+    KAstPrivate,
+    KAstInlineAsm
 };
 
 class AstVisitor;
@@ -1270,6 +1271,21 @@ class PrivateDef: public AstNode {
 
     AstNodePtr definition() const;
 
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+};
+class InlineAsm: public AstNode {
+    Token m_token;
+    std::string m_assembly;
+    AstNodePtr m_output;
+    std::vector<std::pair<std::string,AstNodePtr>> m_inputs;
+  public:
+    InlineAsm(Token token,std::string assembly,AstNodePtr output,std::vector<std::pair<std::string,AstNodePtr>>inputs);
+    std::string assembly() const;
+    AstNodePtr output() const;
+    std::vector<std::pair<std::string,AstNodePtr>> inputs() const;
     Token token() const;
     AstKind type() const;
     std::string stringify() const;

@@ -81,7 +81,8 @@ void LEXER::add_unknown(){
         {"inline",tk_inline},
         {"virtual",tk_virtual},
         {"class",tk_class},
-        {"export",tk_export}
+        {"export",tk_export},
+        {"__asm__",tk_asm}
     };
     if(m_keyword=="f" && (m_curr_item=='"'||m_curr_item=='\'')){
         type=tk_format;

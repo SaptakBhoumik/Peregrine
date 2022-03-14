@@ -1807,4 +1807,28 @@ AstKind PrivateDef::type() const { return KAstPrivate; }
 std::string PrivateDef::stringify() const {
     return"private " + m_definition->stringify();
 }
+InlineAsm::InlineAsm(Token token,std::string assembly,AstNodePtr output,std::vector<std::pair<std::string,AstNodePtr>>inputs){
+    m_token=token;
+    m_assembly=assembly;
+    m_output=output;
+    m_inputs=inputs;
+}
+std::string InlineAsm::assembly() const{return m_assembly;}
+AstNodePtr InlineAsm::output() const{return m_output;}
+std::vector<std::pair<std::string,AstNodePtr>> InlineAsm::inputs() const{return m_inputs;}
+Token InlineAsm::token() const { return m_token; }
+AstKind InlineAsm::type() const { return KAstInlineAsm; }
+std::string InlineAsm::stringify() const{
+    std::string res ="__asm__:\n";
+    if(m_output->type()==KAstNoLiteral){
+        res+="    "+m_assembly+"\n";
+    }
+    else{
+        res+="    "+m_output->stringify()+" = "+m_assembly+"\n";
+    }
+    for(size_t i=0;i<m_inputs.size();++i){
+        res+="    "+m_inputs[i].first+" = "+m_inputs[i].second->stringify()+"\n";
+    }
+    return res;
+}
 } // namespace ast

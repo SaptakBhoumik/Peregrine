@@ -1262,5 +1262,29 @@ bool Codegen::visit(const ast::PrivateDef& node){
     node.definition()->accept(*this);
     return true;
 }
-
+bool Codegen::visit(const ast::InlineAsm& node){
+    write("__asm__(\""+node.assembly()+"\"\n");
+    if(node.output()->type()!=ast::KAstNoLiteral){
+        write(": \"=r\" (");
+        node.output()->accept(*this);
+        write(")\n");
+    }
+    auto in=node.inputs();
+    if(in.size()!=0){
+        write(": ");
+    }
+    for(size_t i=0;i<in.size();i++){
+        auto x=in[i];
+        write("\"");
+        write(x.first);
+        write("\" (");
+        x.second->accept(*this);
+        write(")\n");
+        if(i<in.size()-1){
+            write(",");
+        }
+    }
+    write(")");
+    return true;
+}
 } // namespace cpp

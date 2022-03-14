@@ -196,3 +196,9 @@ class x:
     private static const x=2
     private static def (i:int)method(a:int,b:int):
         return a+b
+__asm__:
+    ";your assambly code here"
+    "0"=reg_value
+__asm__:
+    res=";your assambly code here"
+    "0"=reg_value
