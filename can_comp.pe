@@ -185,7 +185,7 @@ def (const y:int)multiply2(const x:int)->int:
 private def private_func():
     printf("Hello from private function\n")
 #platform dependent stuff
-"
+'
 def inline_asm():
     arg1:int=45
     arg2:int=50
@@ -195,7 +195,7 @@ def inline_asm():
         "a"=arg1
         "b"=arg2
     printf("%lld + %lld = %lld\n",arg1,arg2,add)
-"
+'
 def main():
     "
     inline_asm()
