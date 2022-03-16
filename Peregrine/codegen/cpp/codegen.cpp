@@ -46,7 +46,7 @@ namespace cpp {
 Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast,std::string filename) {
     m_filename=filename;
     m_file.open(outputFilename);
-    m_file << "#include <setjmp.h>\n#include <cstdlib>\n#include <stdio.h>\n#include <stdint.h>\n#include <functional>\ntypedef enum{error________P____P____AssertionError,error________P____P____ZeroDivisionError} error;\n";
+    m_file << "#include <setjmp.h>\n#include <cstdlib>\n#include <stdio.h>\n#include <stdint.h>\n#include <functional>\ntypedef enum{error________P____P____Error,error________P____P____AssertionError,error________P____P____ZeroDivisionError} error;\n";
     m_file<<"struct ____P____exception_handler{\n"
             "jmp_buf* buf;\n"
             "std::function<void(void)> handler;\n"
@@ -800,7 +800,7 @@ bool Codegen::visit(const ast::RaiseStatement& node){
         node.value()->accept(*this);
     }
     else{
-        write("0");
+        write("error________P____P____Error");
     }
     write(";\n");
     write("____Pexception_handlers->handler=");
