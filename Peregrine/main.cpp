@@ -45,7 +45,7 @@ void compile(cli::state s){
             std::vector<Token> tokens = lexer(buf.str(), path);
             Parser parser(tokens,path);
             ast::AstNodePtr program = parser.parse();
-            astValidator::Validator val(program,filename);
+            astValidator::Validator val(program,path);
             auto output=s.output_filename;
             
             if (s.emit_js){

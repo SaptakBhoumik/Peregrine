@@ -195,7 +195,9 @@ bool Validator::visit(const ClassDefinition& node){
                 break;
             }
             default:{
+                is_class=true;
                 x->accept(*this);
+                is_class=false;
             }
         }
     }
@@ -206,6 +208,19 @@ bool Validator::visit(const FunctionDefinition& node){
     node.returnType()->accept(*this);
     node.name()->accept(*this);
     node.body()->accept(*this);
+    if(is_class){
+        if(node.parameters().size()==0){
+            add_error(node.name()->token(),"Error: Methods defined in a class must have atleast one parameter to take in the instance of the object");
+        }
+        else{
+            if(node.parameters()[0].p_type->type()!=KAstNoLiteral){
+                add_error(node.parameters()[0].p_type->token(),"Error: The first parameter of methods defined in a class takes in the instance of the object so it is not necessary of specify the type");
+            }
+            if(node.parameters()[0].p_default->type()!=KAstNoLiteral){
+                add_error(node.parameters()[0].p_default->token(),"Error: The first parameter of methods defined in a class takes in the instance of the object so it cant have default value");
+            }
+        }
+    }
     validate_parameters(node.parameters());
     return true;
 }

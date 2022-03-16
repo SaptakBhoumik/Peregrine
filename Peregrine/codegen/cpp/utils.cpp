@@ -42,7 +42,13 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
     switch(item->type()){
         case ast::KAstIdentifier:{
             item->accept(*this);
-            var+=res+"("+contains+",____Pexception_handlers)";
+            var+=res+"("+contains;
+            if(is_func_def){
+                var+=",____Pexception_handlers)";
+            }
+            else{
+                var+=",NULL)";
+            }
             res="";
             break;
         }
@@ -59,7 +65,13 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
                     args[i]->accept(*this);
                 }
             }
-            var+=res+",____Pexception_handlers)";
+            var+=res;
+            if(is_func_def){
+                var+=",____Pexception_handlers)";
+            }
+            else{
+                var+=",NULL)";
+            }
             res="";
             break;
         }
@@ -74,7 +86,13 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
             if (member->type()==ast::KAstIdentifier){
                 auto attribute=std::dynamic_pointer_cast<ast::IdentifierExpression>(member)->value();
                 write("____mem____P____P____"+attribute);
-                var+=res+"("+contains+",____Pexception_handlers)";
+                var+=res+"("+contains;
+                if(is_func_def){
+                    var+=",____Pexception_handlers)";
+                }
+                else{
+                    var+=",NULL)";
+                }
                 res="";
             }
             else if(member->type()==ast::KAstFunctionCall){
@@ -91,7 +109,13 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
                         args[i]->accept(*this);
                     }
                 }
-                var+=res+",____Pexception_handlers)";
+                var+=res;
+                if(is_func_def){
+                    var+=",____Pexception_handlers)";
+                }
+                else{
+                    var+=",NULL)";
+                }
                 res="";
             }
             break;
@@ -107,7 +131,13 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
             if (member->type()==ast::KAstIdentifier){
                 auto attribute=std::dynamic_pointer_cast<ast::IdentifierExpression>(member)->value();
                 write("____mem____P____P____"+attribute);
-                var+=res+"("+contains+",____Pexception_handlers)";
+                var+=res+"("+contains;
+                if(is_func_def){
+                    var+=",____Pexception_handlers)";
+                }
+                else{
+                    var+=",NULL)";
+                }
                 res="";
             }
             else if(member->type()==ast::KAstFunctionCall){
@@ -124,7 +154,13 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
                         args[i]->accept(*this);
                     }
                 }
-                var+=res+",____Pexception_handlers)";
+                var+=res;
+                if(is_func_def){
+                    var+=",____Pexception_handlers)";
+                }
+                else{
+                    var+=",NULL)";
+                }
                 res="";
             }
             break;
@@ -204,6 +240,7 @@ void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
                 write("~"+name+"(");
                 local_mangle_start();
                 write(") noexcept {\n");
+                write("static ____P____exception_handler* ____Pexception_handlers=NULL;\n");
                 write("auto& ");
                 is_define=true;
                 function->parameters()[0].p_name->accept(*this);
@@ -256,6 +293,7 @@ void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
                 write("~"+name+"(");
                 local_mangle_start();
                 write(") noexcept {\n");
+                write("static ____P____exception_handler* ____Pexception_handlers=NULL;\n");
                 write("auto& ");
                 is_define=true;
                 function->parameters()[0].p_name->accept(*this);
@@ -308,6 +346,7 @@ void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
                 write("~"+name+"(");
                 local_mangle_start();
                 write(") noexcept {\n");
+                write("static ____P____exception_handler* ____Pexception_handlers=NULL;\n");
                 write("auto& ");
                 is_define=true;
                 function->parameters()[0].p_name->accept(*this);

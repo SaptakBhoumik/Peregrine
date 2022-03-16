@@ -52,7 +52,6 @@ Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast,std::string fil
             "std::function<void(void)> handler;\n"
             "error err;\n"
             "};\n";
-    m_file<<"____P____exception_handler* ____Pexception_handlers=NULL;\n";
     m_global_name=global_name(filename);
     ast->accept(*this);
     m_file.close();
@@ -143,6 +142,7 @@ bool Codegen::visit(const ast::FunctionDefinition& node) {
             // we want the main function to always return 0 if success
             write("int main () noexcept {\n");
             m_symbolMap.set_global("main","main");
+            write("static ____P____exception_handler* ____Pexception_handlers=NULL;\n");
             local_mangle_start();
             node.body()->accept(*this);
             write("return 0;\n}");
@@ -539,7 +539,12 @@ bool Codegen::visit(const ast::ListOrDictAccess& node) {
         node.keyOrIndex()[1]->accept(*this);
     }
     handle_ref_end();
-    write(",____Pexception_handlers)");
+    if(is_func_def){
+        write(",____Pexception_handlers)");
+    }
+    else{
+        write(",NULL)");
+    }
     return true;
 }
 
@@ -562,14 +567,24 @@ bool Codegen::visit(const ast::BinaryOperation& node) {
         node.right()->accept(*this);
         write(".____mem____P____P______contains__(");
         node.left()->accept(*this);
-        write(",____Pexception_handlers))");
+        if(is_func_def){
+            write(",____Pexception_handlers))");
+        }
+        else{
+            write(",NULL))");
+        }
     }
     else if(node.token().tkType==tk_not_in){
         write("(not ");
         node.right()->accept(*this);
         write(".____mem____P____P______contains__(");
         node.left()->accept(*this);
-        write(",____Pexception_handlers))");
+        if(is_func_def){
+            write(",____Pexception_handlers))");
+        }
+        else{
+            write(",NULL))");
+        }
     }
      else {
         write("(");
@@ -606,7 +621,12 @@ bool Codegen::visit(const ast::FunctionCall& node) {
         write(",");
     }
     handle_ref_end()
-    write("____Pexception_handlers)");
+    if(is_func_def){
+        write("____Pexception_handlers)");
+    }
+    else{
+        write("NULL)");
+    }
     return true;
 }
 
