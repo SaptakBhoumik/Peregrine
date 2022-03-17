@@ -38,6 +38,7 @@ std::map<TokenType, PrecedenceType> createMap();
 class Parser {
   private:
     size_t m_tokIndex{0};
+    bool is_compile_time=false;
     Token m_currentToken;
     std::vector<Token> m_tokens;
     std::string m_filename;

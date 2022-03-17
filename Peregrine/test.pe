@@ -212,3 +212,16 @@ from os5 import t as d8,y6
 from os6 import t8 as y8 ,yy as u8
 from os7 import t6,y0
 from os8 import t86
+$if False:
+    pass
+$elif False:
+    pass
+$elif False:
+    pass
+$else:
+    ...
+
+$if False:
+    pass
+$else:
+    ...

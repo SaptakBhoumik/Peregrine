@@ -1028,7 +1028,7 @@ Token PassStatement::token() const { return m_token; }
 
 AstKind PassStatement::type() const { return KAstPassStatement; }
 
-std::string PassStatement::stringify() const { return "pass"; }
+std::string PassStatement::stringify() const { return m_token.keyword; }
 
 ContinueStatement::ContinueStatement(Token tok) { m_token = tok; }
 

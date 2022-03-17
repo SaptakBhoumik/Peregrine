@@ -50,7 +50,10 @@ AstNodePtr Parser::parseStatement() {
         case tk_dollar:{
             auto tok=m_currentToken;
             advance();
+            auto x=is_compile_time;
+            is_compile_time=true;
             stmt=parseStatement();
+            is_compile_time=x;
             stmt=std::make_shared<CompileTimeExpression>(tok,stmt);
             break;
         }
@@ -572,7 +575,23 @@ AstNodePtr Parser::parseIf() {
       ifBody = parseBlockStatement();
     }
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs;
-
+    AstNodePtr elseBody = std::make_shared<NoLiteral>();
+    if(is_compile_time){
+        if(next().tkType==tk_dollar){
+            if(m_tokens[m_tokIndex+2].tkType==tk_elif){
+                advance();
+            }
+            else if(m_tokens[m_tokIndex+2].tkType==tk_else){}
+            else{
+                return std::make_shared<IfStatement>(tok, condition, ifBody, elseBody,
+                                         elifs);
+            }
+        }
+        else{
+             return std::make_shared<IfStatement>(tok, condition, ifBody, elseBody,
+                                         elifs);
+        }
+    }
     while (next().tkType == tk_elif) {
         advance();
         advance();
@@ -598,10 +617,40 @@ AstNodePtr Parser::parseIf() {
         }
 
         elifs.push_back(std::pair(condition, body));
+        if(is_compile_time){
+            if(next().tkType==tk_dollar){
+                if(m_tokens[m_tokIndex+2].tkType==tk_elif){
+                    advance();
+                }
+                else if (m_tokens[m_tokIndex+2].tkType==tk_else){
+                    break;
+                }
+                else{
+                    return std::make_shared<IfStatement>(tok, condition, ifBody, elseBody,
+                                            elifs);
+                }
+            }
+            else{
+                return std::make_shared<IfStatement>(tok, condition, ifBody, elseBody,
+                                            elifs);
+            }
+        }
     }
-
-    AstNodePtr elseBody = std::make_shared<NoLiteral>();
-
+    if(is_compile_time){
+        if(next().tkType==tk_dollar){
+            if(m_tokens[m_tokIndex+2].tkType==tk_else){
+                advance();
+            }
+            else{
+                return std::make_shared<IfStatement>(tok, condition, ifBody, elseBody,
+                                         elifs);
+            }
+        }
+        else{
+             return std::make_shared<IfStatement>(tok, condition, ifBody, elseBody,
+                                         elifs);
+        }
+    }
     if (next().tkType == tk_else) {
         advance();
         if (next().tkType!=tk_colon){
