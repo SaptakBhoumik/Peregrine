@@ -220,6 +220,7 @@ bool Validator::visit(const FunctionDefinition& node){
                 add_error(node.parameters()[0].p_default->token(),"Error: The first parameter of methods defined in a class takes in the instance of the object so it cant have default value");
             }
         }
+        is_class=false;
     }
     validate_parameters(node.parameters());
     return true;
