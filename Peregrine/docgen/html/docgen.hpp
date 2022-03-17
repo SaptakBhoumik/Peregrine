@@ -27,6 +27,7 @@ class Docgen : public ast::AstVisitor {
     bool visit(const ast::VirtualStatement& node);
     bool visit(const ast::EnumLiteral& node);
     bool visit(const ast::UnionLiteral& node);
+    bool visit(const ast::MethodDefinition& node);
     void write(std::string_view code);
 };
 };

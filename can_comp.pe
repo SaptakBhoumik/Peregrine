@@ -53,7 +53,10 @@ def unknown_type(var):
     printf("var.__getitem__(7,8) = %lld\n",var.__getitem__(7,index2=8))
 def peregrine4():printf("Global function\n")
 self:int=7
-class iterate_test:
+class inherit:
+    def __init__(self):...
+    virtual def __type__(self):printf("\e[1m\e[91mInherit\n\e[0m\e[0m")
+class iterate_test(inherit):
     i:int=0
     x:int
     i_ref:&int=i
@@ -65,6 +68,8 @@ class iterate_test:
     union nested_union:
         x:int
         y:int
+    def __init__(self):...
+    def __type__(self):printf("\e[1m\e[91mIterate_test\n\e[0m\e[0m")
     def __init__(self,c):
         self.i=c
         self.x=self.i
@@ -202,6 +207,11 @@ def main():
     "
     private_func()
     switch:iterate_test=iterate_test(5)
+    virtual_test:*inherit=&switch
+    virtual_test->__type__()
+    _in:inherit=inherit()
+    virtual_test=&_in
+    virtual_test->__type__()
     switch2:int=switch.__add__(test(5))
     switch3:*iterate_test=&switch
     switch2=switch3->__add__(test(5))

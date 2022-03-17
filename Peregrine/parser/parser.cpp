@@ -125,6 +125,7 @@ AstNodePtr Parser::parseStatement() {
             break;
         }
 
+        case tk_ellipses:
         case tk_pass: {
             stmt = std::make_shared<PassStatement>(m_currentToken);
             advanceOnNewLine();
@@ -427,25 +428,52 @@ AstNodePtr Parser::parseImport() {
 
     advance(); // skip from or import token
 
-    std::pair<AstNodePtr, AstNodePtr> moduleName;
+    AstNodePtr moduleName=std::make_shared<NoLiteral>();
+    std::pair<AstNodePtr, AstNodePtr> tmpmoduleName={std::make_shared<NoLiteral>(),std::make_shared<NoLiteral>()};
     std::vector<std::pair<AstNodePtr, AstNodePtr>> importedSymbols;
-
-    moduleName.first = parseName();
-
-    if (!hasFrom) {
-        if (next().tkType == tk_as) {
+    do {
+        if (m_currentToken.tkType==tk_comma){
             advance();
-            advance();
-
-            moduleName.second = parseName();
         }
-        advanceOnNewLine();
+        tmpmoduleName.first = parseName();
+        if(next().tkType==tk_dot){
+            advance();
+            while(m_currentToken.tkType==tk_dot){
+                auto tok=m_currentToken;
+                expect(tk_identifier,next().keyword+" is not a identifier","","","");
+                tmpmoduleName.first=std::make_shared<DotExpression>(tok,tmpmoduleName.first,parseName());
+                advance();
+                if(m_currentToken.tkType!=tk_dot){
+                    break;
+                }
+            }
+            
+        }
+        if (!hasFrom) {
+            if (next().tkType == tk_as) {
+                advance();
+                advance();
+                tmpmoduleName.second = parseName();
+            }
+            else{
+                tmpmoduleName.second = std::make_shared<NoLiteral>();
+            }
+            advanceOnNewLine();
+            importedSymbols.push_back(tmpmoduleName);
+            if(next().tkType==tk_comma){
+                advance();
+            }
+        }
+        else{
+            break;
+        }
+    }while (m_currentToken.tkType == tk_comma);
+    if(!hasFrom){
         return std::make_shared<ImportStatement>(tok, moduleName,
-                                                 importedSymbols);
+                                                    importedSymbols);
     }
-
+    moduleName=tmpmoduleName.first;
     expect(tk_import);
-
     do {
         advance();
 
@@ -459,7 +487,9 @@ AstNodePtr Parser::parseImport() {
 
             importedSymbol.second = parseName();
         }
-
+        else{
+            importedSymbol.second = std::make_shared<NoLiteral>();
+        }
         importedSymbols.push_back(importedSymbol);
 
         if (next().tkType == tk_comma)

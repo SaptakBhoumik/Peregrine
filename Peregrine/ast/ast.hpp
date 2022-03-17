@@ -498,16 +498,15 @@ class ListOrDictAccess : public AstNode {
 class ImportStatement : public AstNode {
     Token m_token;
     // first is the module name and the second is the alias
-    std::pair<AstNodePtr, AstNodePtr> m_moduleName;
-
+    AstNodePtr m_moduleName;    
     std::vector<std::pair<AstNodePtr, AstNodePtr>> m_importedSymbols;
 
   public:
     ImportStatement(
-        Token tok, std::pair<AstNodePtr, AstNodePtr> moduleName,
+        Token tok, AstNodePtr moduleName,
         std::vector<std::pair<AstNodePtr, AstNodePtr>> importedSymbols);
 
-    std::pair<AstNodePtr, AstNodePtr> moduleName() const;
+    AstNodePtr moduleName() const;
     std::vector<std::pair<AstNodePtr, AstNodePtr>> importedSymbols() const;
 
     Token token() const;

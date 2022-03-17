@@ -58,12 +58,12 @@ void compile(cli::state s){
                 cpp::Codegen codegen(output, program,path);
             }else if(s.emit_obj){
                 cpp::Codegen codegen("temp.cc", program,path);
-                auto cmd=s.cpp_compiler+" -fno-exceptions -c -std=c++20 temp.cc -fpermissive -w "+s.cpp_arg+" -o "+output;
+                auto cmd=s.cpp_compiler+" -fno-exceptions -fno-rtti -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-ident -c -std=c++20 temp.cc -fpermissive -w "+s.cpp_arg+" -o "+output;
                 system(cmd.c_str());
                 system("rm temp.cc");
             }else{
                 cpp::Codegen codegen("temp.cc", program,path);
-                auto cmd=s.cpp_compiler+" -fno-exceptions -std=c++2a temp.cc -fpermissive -w "+s.cpp_arg+" -o "+output;
+                auto cmd=s.cpp_compiler+" -fno-exceptions -fno-rtti -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-ident -std=c++2a temp.cc -fpermissive -w "+s.cpp_arg+" -o "+output;
                 system(cmd.c_str());
                 system("rm temp.cc");
             }

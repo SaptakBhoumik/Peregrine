@@ -1,3 +1,5 @@
+#if you want to take a look at the syntax then check can_comp.pe 
+#this file is just for testing the parser and the syntax may not be valid
 val = [45, 3]
 val2 = cast<int>(val)
 
@@ -202,3 +204,11 @@ __asm__:
 __asm__:
     res=";your assambly code here"
     "0"=reg_value
+import os1
+import os2,sys6
+import os3 as f8,sys8 as dec6
+import os4 as t8
+from os5 import t as d8,y6
+from os6 import t8 as y8 ,yy as u8
+from os7 import t6,y0
+from os8 import t86

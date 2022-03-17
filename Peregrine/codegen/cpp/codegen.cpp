@@ -109,7 +109,7 @@ void Codegen::codegenFuncParams(std::vector<ast::parameter> parameters,size_t st
         }
         write(",");
     }
-    write("____P____exception_handler* ____Pexception_handlers");
+    write("____P____exception_handler* ____Pexception_handlers=NULL");
 }
 
 bool Codegen::visit(const ast::Program& node) {

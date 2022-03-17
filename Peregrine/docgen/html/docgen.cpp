@@ -68,6 +68,7 @@ bool Docgen::visit(const ast::Program& node) {
         case KAstUnion:
         case KAstEnum:
         case KAstDecorator:
+        case KAstMethodDef:
         case KAstClassDef:{
           stmt->accept(*this);
           break;
@@ -341,6 +342,37 @@ bool Docgen::visit(const UnionLiteral& node) {
       res+="<font color=#45a4a0>&emsp;"+x.second->stringify()+"</font>:";
       res+="<font color=#45a4a0> "+x.first->stringify()+"</font>";
       res+="<br>";
+    }
+    res+="</div></"+smaller+">";
+    if(node.comment()!=""){
+      res+=node.comment();
+    }
+    else{
+      res+="None";
+    }
+    res+="<hr>";
+    return true;
+}
+bool Docgen::visit(const MethodDefinition& node) {
+    id++;
+    auto str="id"+std::to_string(id);
+    std::string larger;
+    std::string smaller;
+    larger="h2";
+    smaller="h3";
+    res+="<"+larger +" id=\""+str+"\">"+"def ("+node.reciever().p_name->stringify();
+    if(node.reciever().p_type->type()!=KAstNoLiteral){
+      res+=":";
+      res+=node.reciever().p_type->stringify();
+    }
+    res+=")"+node.name()->stringify();
+    res+="<a href=\"#"+str+"\" class=\"local\"> #</a>"+"</"+smaller+">"+"<hr>";
+    res+="<"+smaller+"><div class=\"code\"><font color=#63b3ed>def</font> ";
+    res+="<font color=#45a4a0>"+node.name()->stringify()+"</font>(";
+    funcParams(node.parameters());
+    res+=")";
+    if(node.returnType()->stringify()!="void"){
+      res+="-><font color=#45a4a0>"+node.returnType()->stringify()+"</font>";
     }
     res+="</div></"+smaller+">";
     if(node.comment()!=""){
