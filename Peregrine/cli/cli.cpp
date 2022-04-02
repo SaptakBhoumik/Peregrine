@@ -8,6 +8,7 @@ namespace cli{
         println("\tcompile          - compiles a given file");
         println("\thelp             - prints out help");
         println("\nPeregrine Options:");
+        println("\t-release         - create release builds");
         println("\t-cc              - select the c++ compiler with which you want to compile the resultant code");
         println("\t-cc_flag         - add flags with which you want to compile the generated c++ code");
         println("\t-emit_cpp        - generates C++ code and exits (skips C++ compilation phase)");
@@ -39,7 +40,7 @@ namespace cli{
             }else if (curr_arg=="-cc_flag"){
                 advance();
                 checkargs("C++ compiler flag");
-                m_state.cpp_arg = curr_arg;
+                m_state.cpp_arg +=" "+curr_arg;
             }else if (curr_arg=="-emit_cpp"){
                 m_state.emit_cpp = true;
             }else if (curr_arg=="-obj"){
@@ -50,6 +51,8 @@ namespace cli{
                 m_state.emit_html = true;
             }else if (curr_arg=="-doc_html"){
                 m_state.doc_html = true;
+            }else if(curr_arg=="-release"){
+                m_state.cpp_arg+=" -O2 -flto -s ";
             }else if (curr_arg=="-o"){
                 advance();
                 checkargs("output file");
@@ -163,7 +166,7 @@ namespace cli{
             check_state++;
         }
         if(m_state.cpp_compiler==""){
-            m_state.cpp_compiler="g++";//it will use clang that we are shiping with in the future
+            m_state.cpp_compiler="clang++";//it will use clang that we are shiping with in the future
         }
     }
 }

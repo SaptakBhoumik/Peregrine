@@ -3,11 +3,6 @@
 #include "ast_validate.hpp"
 #include <map>
 #include <iostream>
-/*
-TODO: Make sure that things like the following is made invalid
-virtual def (x)func(x):pass
-virtual def C.func(x)
-*/
 namespace astValidator{
 std::map<AstKind, std::string> keyword={
                                             {KAstPassStatement,"'pass'"},
@@ -24,7 +19,8 @@ std::map<AstKind, std::string> keyword={
                                             {KAstRaiseStmt,"'raise'"},
                                             {KAstTryExcept,"'try"}
                                             };
-Validator::Validator(AstNodePtr ast,std::string filename){
+Validator::Validator(AstNodePtr ast,std::string filename,bool is_js){
+    m_is_js=is_js;
     m_filename = filename;
     ast->accept(*this);
     if(m_errors.size()>0){
@@ -259,10 +255,16 @@ bool Validator::visit(const AssertStatement& node){
     return true;
 }
 bool Validator::visit(const StaticStatement& node){
+    if(m_is_js){
+        add_error(node.token(), "SyntaxError: Static statement is not allowed in javascript");
+    }
     node.body()->accept(*this);
     return true;
 }
 bool Validator::visit(const InlineStatement& node){
+    if(m_is_js){
+        add_error(node.token(), "SyntaxError: Inline statement is not allowed in javascript");
+    }
     node.body()->accept(*this);
     return true;
 }
@@ -398,11 +400,16 @@ bool Validator::visit(const DecimalLiteral& node){return true;}
 bool Validator::visit(const BoolLiteral& node){return true;}
 bool Validator::visit(const NoneLiteral& node){return true;}
 bool Validator::visit(const UnionLiteral& node){
-    for (auto& x:node.elements()){
-        x.first->accept(*this);
-        x.second->accept(*this);
+    if(m_is_js){
+        add_error(node.token(), "SyntaxError: Union literal is not allowed in javascript");
     }
-    node.name()->accept(*this);
+    else{
+        for (auto& x:node.elements()){
+            x.first->accept(*this);
+            x.second->accept(*this);
+        }
+        node.name()->accept(*this);
+    }
     return true;
 }
 bool Validator::visit(const EnumLiteral& node){
@@ -424,6 +431,9 @@ bool Validator::visit(const WithStatement& node){
     return true;
 }
 bool Validator::visit(const VirtualStatement& node){
+    if(m_is_js){
+        add_error(node.token(), "SyntaxError: Virtual statement is not allowed in javascript");
+    }
     switch (node.body()->type()) {
         case KAstMethodDef:{
             add_error(node.body()->token(), "Syntax error: method definition is not allowed inside a class");
@@ -445,11 +455,21 @@ bool Validator::visit(const CastStatement& node){
     return true;
 }
 bool Validator::visit(const PointerTypeExpr& node){
-    node.baseType()->accept(*this);
+    if(m_is_js){
+        add_error(node.token(), "SyntaxError: Pointer type is not allowed in javascript");
+    }
+    else{
+        node.baseType()->accept(*this);
+    }
     return true;
 }
 bool Validator::visit(const RefTypeExpr& node){
-    node.baseType()->accept(*this);
+    if(m_is_js){
+        add_error(node.token(), "SyntaxError: Reference type is not allowed in javascript");
+    }
+    else{
+        node.baseType()->accept(*this);
+    }
     return true;
 }
 bool Validator::visit(const DefaultArg& node){
@@ -585,10 +605,15 @@ bool Validator::visit(const ExternFuncDef& node){
     return true;
 }
 bool Validator::visit(const ExternUnionLiteral& node){
-    node.name()->accept(*this);
-    for(auto& x:node.elements()){
-        x.first->accept(*this);
-        x.second->accept(*this);
+    if(m_is_js){
+        add_error(node.token(), "SyntaxError: Union type is not allowed in javascript");
+    }
+    else{    
+        node.name()->accept(*this);
+        for(auto& x:node.elements()){
+            x.first->accept(*this);
+            x.second->accept(*this);
+        }
     }
     return true;
 }

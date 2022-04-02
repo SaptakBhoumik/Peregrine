@@ -11,6 +11,7 @@ using namespace ast;
 class Validator: public AstVisitor {
         std::vector<PEError> m_errors;
         std::string m_filename;
+        bool m_is_js=false;
         bool is_class=false;
         void add_error(Token tok, std::string msg,std::string submsg="",std::string hint="",std::string ecode="");
         void validate_parameters(std::vector<parameter> param);
@@ -83,7 +84,7 @@ class Validator: public AstVisitor {
         bool visit(const VarKwargTypeExpr& node);
         bool visit(const CompileTimeExpression& node);
     public:
-        Validator(AstNodePtr ast,std::string filename);
+        Validator(AstNodePtr ast,std::string filename,bool is_js=false);
 };
 }
 #endif

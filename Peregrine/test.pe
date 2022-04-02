@@ -3,7 +3,7 @@
 val = [45, 3]
 val2 = cast<int>(val)
 
-while True:#Infinite loop lol
+while True:
     pass
 def test(a,b):
     raise
@@ -152,36 +152,7 @@ type _2 = def(...)->int
 type _3 = def(*ptr)->int
 type _5 = def(**ptr)->int
 type _6 = def(_1,_2)->int
-class x<T>:
-    union u<T>:
-        a:T
-        b:T
-    union u<T1,T2>:
-        a:T2
-        b:T1
-    def x<T1>():
-        pass
-    def x<T1,T2>():
-        pass
-    def (i:int)x<T1>():
-        pass
-    def (i:int)x<T1,T2>():
-        pass
-class x<T,R>:
-    union u<T>:
-        a:T
-        b:T
-    union u<T1,T2>:
-        a:T2
-        b:T1
-    def x<T1>():
-        pass
-    def x<T1,T2>():
-        pass
-    def (i:int)x<T1>():
-        pass
-    def (i:int)x<T1,T2>():
-        pass
+
 type x<T>=def(T)->T
 type x<T,R>=def(T)->T,R
 
@@ -225,3 +196,35 @@ $if False:
     pass
 $else:
     ...
+class x<T>:
+    union u<T>:
+        a:T
+        b:T
+    union u<T1,T2>:
+        a:T2
+        b:T1
+    def x<T1>():
+        pass
+    def x<T1,T2>():
+        pass
+def (i:int)x<T1>():
+    pass
+@decorator
+def (i:int)x<T1,T2>():
+    pass
+class x<T,R>:
+    union u<T>:
+        a:T
+        b:T
+    union u<T1,T2>:
+        a:T2
+        b:T1
+    def x<T1>():
+        pass
+    @decorator_in_class
+    def x<T1,T2>():
+        pass
+def (i:int)x<T1>():
+    pass
+def (i:int)x<T1,T2>():
+    pass

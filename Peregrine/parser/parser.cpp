@@ -378,6 +378,10 @@ AstNodePtr Parser::parseClassDefinition() {
                 methods.push_back(parseVirtual());
                 break;
             }
+            case tk_at:{
+                methods.push_back(parseDecoratorCall());
+                break;
+            }
             case tk_inline: {
                 methods.push_back(parseInline());
                 break;
@@ -394,6 +398,7 @@ AstNodePtr Parser::parseClassDefinition() {
                 other.push_back(parseEnum());
                 break;
             }
+            case tk_ellipses:
             case tk_pass:{
                 advance();
                 break;
