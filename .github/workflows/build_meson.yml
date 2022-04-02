@@ -12,7 +12,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     - name: Setup Meson
-      run: sudo apt-get update && sudo apt-get clang-13 install python3 python3-pip python3-setuptools python3-wheel ninja-build && pip3 install meson
+      run: sudo apt-get update && sudo apt-get install clang-13  python3 python3-pip python3-setuptools python3-wheel ninja-build && pip3 install meson
     - name: Meson
       run: meson builddir
     - name: Ninja
