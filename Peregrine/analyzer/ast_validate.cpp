@@ -349,6 +349,11 @@ bool Validator::visit(const BinaryOperation& node){
 }
 bool Validator::visit(const PrefixExpression& node){
     node.right()->accept(*this);
+    if(m_is_js){ 
+        if(node.prefix().tkType==tk_ampersand||node.prefix().tkType==tk_multiply){
+            add_error(node.prefix(),"SyntaxError: Pointers are not allowed in javascript");
+        }
+    }
     return true;
 }
 bool Validator::visit(const PostfixExpression& node){
@@ -638,6 +643,11 @@ bool Validator::visit(const CompileTimeExpression& node){
     //TODO: validate compile time expression
     return true;
 }
+bool Validator::visit(const PrivateDef& node){
+    node.definition()->accept(*this); 
+    return true;
+}
+
 void Validator::add_error(Token tok, std::string msg,
                 std::string submsg,std::string hint,
                 std::string ecode){

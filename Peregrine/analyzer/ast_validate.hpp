@@ -83,6 +83,7 @@ class Validator: public AstVisitor {
         bool visit(const EllipsesTypeExpr& node);
         bool visit(const VarKwargTypeExpr& node);
         bool visit(const CompileTimeExpression& node);
+        bool visit(const PrivateDef& node);     
     public:
         Validator(AstNodePtr ast,std::string filename,bool is_js=false);
 };
