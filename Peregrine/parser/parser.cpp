@@ -430,7 +430,6 @@ AstNodePtr Parser::parseVirtual() {
 }
 
 AstNodePtr Parser::parseImport() {
-    //TODO: Show error
     Token tok = m_currentToken;
     bool hasFrom = m_currentToken.tkType == tk_from;
 
@@ -482,6 +481,12 @@ AstNodePtr Parser::parseImport() {
     }
     moduleName=tmpmoduleName.first;
     expect(tk_import);
+    if(next().tkType==tk_multiply){
+        advance();
+        advance();
+        return std::make_shared<ImportStatement>(tok, moduleName,
+                                                    importedSymbols,true);
+    }
     do {
         advance();
 

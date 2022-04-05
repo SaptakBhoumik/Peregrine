@@ -12,6 +12,8 @@ class Validator: public AstVisitor {
         std::vector<PEError> m_errors;
         std::string m_filename;
         bool m_is_js=false;
+        bool m_should_contain_main=false;
+        bool m_has_main=false;
         bool is_class=false;
         void add_error(Token tok, std::string msg,std::string submsg="",std::string hint="",std::string ecode="");
         void validate_parameters(std::vector<parameter> param);
@@ -85,7 +87,7 @@ class Validator: public AstVisitor {
         bool visit(const CompileTimeExpression& node);
         bool visit(const PrivateDef& node);     
     public:
-        Validator(AstNodePtr ast,std::string filename,bool is_js=false);
+        Validator(AstNodePtr ast,std::string filename,bool is_js=false,bool should_contain_main=false);
 };
 }
 #endif

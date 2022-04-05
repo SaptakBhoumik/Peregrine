@@ -9,6 +9,7 @@ namespace cli{
         println("\thelp             - prints out help");
         println("\nPeregrine Options:");
         println("\t-release         - create release builds");
+        println("\t-static          - create statically linked builds");
         println("\t-cc              - select the c++ compiler with which you want to compile the resultant code");
         println("\t-cc_flag         - add flags with which you want to compile the generated c++ code");
         println("\t-emit_cpp        - generates C++ code and exits (skips C++ compilation phase)");
@@ -53,6 +54,8 @@ namespace cli{
                 m_state.doc_html = true;
             }else if(curr_arg=="-release"){
                 m_state.cpp_arg+=" -O2 -flto -s ";
+            }else if(curr_arg=="-static"){
+                m_state.cpp_arg+=" -static ";
             }else if (curr_arg=="-o"){
                 advance();
                 checkargs("output file");
@@ -131,6 +134,7 @@ namespace cli{
                 m_state.output_filename=m_state.input_filename.substr(0, m_state.input_filename.size()-3)+".exe";
                 #else
                 m_state.output_filename=m_state.input_filename.substr(0, m_state.input_filename.size()-3);
+                m_state.has_main=true;
                 #endif
             }
         }

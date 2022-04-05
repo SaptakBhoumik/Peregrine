@@ -13,7 +13,7 @@
 #include <sstream>
 #include <string.h>
 #include <vector>
-
+#include <sys/stat.h>
 
 
 
@@ -41,11 +41,18 @@ void compile(cli::state s){
             std::stringstream buf;
             buf << file.rdbuf();
             auto filename=s.input_filename;
-            std::string path = realpath(filename.c_str(), NULL);
+            char* path = realpath(filename.c_str(), NULL);
             std::vector<Token> tokens = lexer(buf.str(), path);
+            struct stat st;
+            if( stat(path,&st) == 0 ){
+                if( st.st_mode & S_IFDIR ){
+                    std::cout<<"Error: "<<path<<" is a directory"<<std::endl;
+                    exit(1);
+                }
+            }
             Parser parser(tokens,path);
             ast::AstNodePtr program = parser.parse();
-            astValidator::Validator val(program,path,s.emit_js);
+            astValidator::Validator val(program,path,s.emit_js,s.has_main);
             auto output=s.output_filename;
             
             if (s.emit_js){
@@ -67,6 +74,7 @@ void compile(cli::state s){
                 system(cmd.c_str());
                 system("rm temp.cc");
             }
+            free(path);
         }
         else{
             std::cout << "error: file with name of \"" << s.input_filename << "\" does not exist"<<std::endl;

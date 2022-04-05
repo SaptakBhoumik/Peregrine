@@ -2,6 +2,7 @@
 #include "lexer/tokens.hpp"
 #include "ast_validate.hpp"
 #include <map>
+#include <filesystem>
 #include <iostream>
 namespace astValidator{
 std::map<AstKind, std::string> keyword={
@@ -19,13 +20,19 @@ std::map<AstKind, std::string> keyword={
                                             {KAstRaiseStmt,"'raise'"},
                                             {KAstTryExcept,"'try"}
                                             };
-Validator::Validator(AstNodePtr ast,std::string filename,bool is_js){
+Validator::Validator(AstNodePtr ast,std::string filename,bool is_js,bool should_contain_main){
     m_is_js=is_js;
     m_filename = filename;
+    m_should_contain_main=should_contain_main;
     ast->accept(*this);
-    if(m_errors.size()>0){
+    if(m_errors.size()>0||(m_should_contain_main && !m_has_main)){
         for(auto& e:m_errors){
             display(e);
+        }
+        if(m_should_contain_main){
+            if(!m_has_main){
+                std::cout<<"\e[91m"<<"Error: "<<m_filename<<" does not contain a main function"<<"\e[0m"<<std::endl;
+            }
         }
         exit(1);
     }
@@ -199,9 +206,28 @@ bool Validator::visit(const ClassDefinition& node){
     }
     return true;
 }
-bool Validator::visit(const ImportStatement& node){return true;}//nothing to check
+bool Validator::visit(const ImportStatement& node){
+    auto module=node.moduleName();
+    auto symbols=node.importedSymbols();
+    switch (module->type()) {
+        case KAstIdentifier:{
+            auto name=std::dynamic_pointer_cast<IdentifierExpression>(module)->value();
+            std::cout<<"Importing module "<<name<<std::endl;
+            break;
+        }
+        case KAstDotExpression:{
+            break;
+        }
+        default:{/*not possible*/}
+    }
+    return true;
+}
 bool Validator::visit(const FunctionDefinition& node){
     node.returnType()->accept(*this);
+    auto name=std::dynamic_pointer_cast<IdentifierExpression>(node.name())->value();
+    if(name=="main"){
+        m_has_main=true;
+    }
     node.name()->accept(*this);
     node.body()->accept(*this);
     if(is_class){

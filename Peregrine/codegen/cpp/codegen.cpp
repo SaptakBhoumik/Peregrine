@@ -29,10 +29,16 @@ std::string global_name(std::string name)
     for (auto& c : name)
     {
         if(c=='\\'||c=='/'){
-            res+="____";
+            res+="$$$$$";
         }
         else if(c=='.'){
-            res+="___";
+            res+="$$$$";
+        }
+        else if(c=='-'){
+            res+="$$$";
+        }
+        else if(c==' '){
+            res+="$$$$$$$";
         }
         else{
             res+=c;

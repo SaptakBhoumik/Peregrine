@@ -11,6 +11,7 @@ class state{
     std::string input_filename="";
     std::string output_filename="";
     std::string cpp_arg="";
+    bool has_main=false;
     bool emit_cpp=false;
     bool emit_obj=false;
     bool emit_js=false;

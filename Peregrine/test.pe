@@ -228,3 +228,4 @@ def (i:int)x<T1>():
     pass
 def (i:int)x<T1,T2>():
     pass
+from x import *

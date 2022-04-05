@@ -402,16 +402,19 @@ std::string ListOrDictAccess::stringify() const {
 
 ImportStatement::ImportStatement(
     Token tok, AstNodePtr moduleName,
-    std::vector<std::pair<AstNodePtr, AstNodePtr>> importedSymbols) {
+    std::vector<std::pair<AstNodePtr, AstNodePtr>> importedSymbols,bool importAll) {
     m_token = tok;
     m_moduleName = moduleName;
     m_importedSymbols = importedSymbols;
+    m_importAll=importAll;
 }
 
 AstNodePtr ImportStatement::moduleName() const {
     return m_moduleName;
 }
-
+bool ImportStatement::importAll() const {
+    return m_importAll;
+}
 std::vector<std::pair<AstNodePtr, AstNodePtr>>
 ImportStatement::importedSymbols() const {
     return m_importedSymbols;
@@ -432,14 +435,19 @@ std::string ImportStatement::stringify() const {
         res += m_moduleName->stringify();
         res += " import ";
     }
-    for(size_t i=0;i<m_importedSymbols.size();i++){
-        res += m_importedSymbols[i].first->stringify();
-        if(m_importedSymbols[i].second->type()!=KAstNoLiteral){
-            res += " as ";
-            res += m_importedSymbols[i].second->stringify();
-        }
-        if(i!=m_importedSymbols.size()-1){
-            res += ", ";
+    if(m_importAll){
+        res+="*";
+    }
+    else{
+        for(size_t i=0;i<m_importedSymbols.size();i++){
+            res += m_importedSymbols[i].first->stringify();
+            if(m_importedSymbols[i].second->type()!=KAstNoLiteral){
+                res += " as ";
+                res += m_importedSymbols[i].second->stringify();
+            }
+            if(i!=m_importedSymbols.size()-1){
+                res += ", ";
+            }
         }
     }
     return res;
