@@ -17,7 +17,7 @@ executable(
     'peregrine.elf',
     sources: cpp_src, 
     include_directories: include,
-    link_with: [lexer, parser, ast, analyzer, codegen,docgen,cli]
+    link_with: [lexer, parser, ast, analyzer, codegen,docgen,cli,utils]
 )
 
 if build_tests

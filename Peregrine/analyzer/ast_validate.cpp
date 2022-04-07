@@ -207,6 +207,7 @@ bool Validator::visit(const ClassDefinition& node){
     return true;
 }
 bool Validator::visit(const ImportStatement& node){
+    //TODO:complete it
     auto module=node.moduleName();
     auto symbols=node.importedSymbols();
     switch (module->type()) {
@@ -666,7 +667,117 @@ bool Validator::visit(const VarKwargTypeExpr& node){
     return true;
 }
 bool Validator::visit(const CompileTimeExpression& node){
-    //TODO: validate compile time expression
+    auto exp=node.expression();
+    auto token=exp->token();
+    switch(exp->type()){
+        case KAstList:
+        case KAstExpressionTuple:
+        case KAstDict:
+        case KAstInteger:
+        case KAstDecimal:
+        case KAstString:
+        case KAstBool:
+        case KAstNone:{
+            add_error(token, "SyntaxError: Compile time expression cannot be a literal");
+            break;
+        }
+        case KAstImportStmt:{
+            add_error(token, "SyntaxError: Imports are already done at compile time so they can't be used in compile time expressions");
+            break;
+        }
+        case KAstConstDecl:
+        case KAstAugAssign:
+        case KAstMultipleAssign:
+        case KAstVariableStmt:{
+            //TODO: Maybe allow this
+            add_error(token, "SyntaxError: Compile time defination or reassignment are not allowed");
+            break;
+        }
+        case KAstFunctionDef:{
+            //TODO: Maybe allow this
+            add_error(token, "SyntaxError: Compile time functions are not allowed");
+            break;
+        }
+        case KAstClassDef:{
+            add_error(token, "SyntaxError: Compile time classes are not allowed");
+            break;
+        }
+        case KAstReturnStatement:{
+            add_error(token, "SyntaxError: Compile time return statements are not allowed","Just use return instead of $return");
+            break;
+        }
+        case KAstScopeStmt:{
+            add_error(token, "SyntaxError: Compile time scope statements are not allowed");
+            break;
+        }
+        case KAstTypeDefinition:{
+            add_error(token, "SyntaxError: Compile time type definitions are not allowed");
+            break;
+        }
+        case KAstDecorator:{
+            add_error(token, "SyntaxError: Compile time decorators are not allowed");
+            break;
+        }
+        case KAstPassStatement:{
+            add_error(token, "SyntaxError: Compile time pass statements are not allowed","You can just use pass instead of $pass");
+            break;
+        }
+        
+        case KAstUnion:{
+            add_error(token, "SyntaxError: Compile time union types are not allowed");
+            break;
+        }
+        case KAstStatic:
+        case KAstInline:{
+            add_error(token, "SyntaxError: Compile time static and inline functions are not allowed");
+            break;
+        }
+        case KAstExternStatement:{
+            add_error(token, "SyntaxError: Compile time extern statements are not allowed");
+            break;
+        }
+        case KAstEnum:{
+            add_error(token, "SyntaxError: Compile time enums are not allowed");
+            break;
+        }
+        case KAstCast:{
+            add_error(token, "SyntaxError: Can't cast at compile time");
+            break;
+        }
+        case KAstExport:{
+            add_error(token, "SyntaxError: Can't export compile time statements");
+            break;
+        }
+        case KAstRaiseStmt:{
+            add_error(token, "SyntaxError: Can't raise at compile time");
+            break;
+        }
+        case KAstTryExcept:{
+            add_error(token, "SyntaxError: Try except block not allowed at compile time");
+            break;
+        }
+        case KAstExternStruct:
+        case KAstExternUnion:
+        case KAstExternFuncDef:{
+            add_error(token, "SyntaxError: Can't define external function or struct or union at compile time");
+            break;
+        }
+        case KAstCompileTimeExpression:{
+            add_error(token, "SyntaxError: Unexpected token $");
+            break;
+        }
+        case KAstPrivate:{
+            add_error(token, "SyntaxError: Unexpected token private");
+            break;
+        }
+        case KAstInlineAsm:{
+            add_error(token, "SyntaxError: Inline assembly not allowed at compile time");
+            break;
+        }
+        default:{
+            exp->accept(*this);
+        }
+    }
     return true;
 }
 bool Validator::visit(const PrivateDef& node){

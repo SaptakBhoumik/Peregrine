@@ -6,6 +6,7 @@ Peregrine/test
 .idea
 **/output
 **.out
+__pycache__
 temp.cc
 **.exe
 *.so
