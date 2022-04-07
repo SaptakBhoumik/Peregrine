@@ -38,6 +38,7 @@ Validator::Validator(AstNodePtr ast,std::string filename,bool is_js,bool should_
     }
 }
 bool Validator::visit(const Program& node){
+    //TODO: check for more cases
     for (auto& stmt : node.statements()) {
         switch(stmt->type()){
             case KAstTryExcept:
@@ -91,6 +92,7 @@ bool Validator::visit(const Program& node){
     return true;
 }
 bool Validator::visit(const BlockStatement& node){
+    //TODO: check for more cases
     auto statements = node.statements();
     for (size_t i = 0; i < statements.size(); i++) {
         auto stmt=statements[i];
@@ -784,7 +786,23 @@ bool Validator::visit(const PrivateDef& node){
     node.definition()->accept(*this); 
     return true;
 }
-
+bool Validator::visit(const InlineAsm& node){
+    node.output()->accept(*this);
+    auto inputs=node.inputs();
+    for(auto& x:inputs){
+        x.second->accept(*this);
+    }
+    return true;
+} 
+bool Validator::visit(const TernaryFor& node){
+    node.for_value()->accept(*this);
+    node.for_iterate()->accept(*this);
+    auto variable=node.for_variable();
+    for(auto& x:variable){
+        x->accept(*this);
+    }
+    return true;
+}
 void Validator::add_error(Token tok, std::string msg,
                 std::string submsg,std::string hint,
                 std::string ecode){
