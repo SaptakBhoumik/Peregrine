@@ -201,11 +201,14 @@ def inline_asm():
         "b"=arg2
     printf("%lld + %lld = %lld\n",arg1,arg2,add)
 '
+type lambda_type=def(int)->int
 def main():
     "
     inline_asm()
     "
     private_func()
+    square:lambda_type=def(x:int):x*x
+    printf("Square of 4 is %lld\n",square(4))
     switch:iterate_test=iterate_test(5)
     virtual_test:*inherit=&switch
     virtual_test->__type__()

@@ -14,8 +14,7 @@
 #include <string.h>
 #include <vector>
 #include <sys/stat.h>
-
-
+#include <filesystem>
 
 void compile(cli::state s){
     if (s.dev_debug){
@@ -41,10 +40,10 @@ void compile(cli::state s){
             std::stringstream buf;
             buf << file.rdbuf();
             auto filename=s.input_filename;
-            char* path = realpath(filename.c_str(), NULL);
+            std::string path = std::filesystem::canonical(filename).string();
             std::vector<Token> tokens = lexer(buf.str(), path);
             struct stat st;
-            if( stat(path,&st) == 0 ){
+            if( stat(path.c_str(),&st) == 0 ){
                 if( st.st_mode & S_IFDIR ){
                     std::cout<<"Error: "<<path<<" is a directory"<<std::endl;
                     exit(1);
@@ -74,7 +73,6 @@ void compile(cli::state s){
                 system(cmd.c_str());
                 system("rm temp.cc");
             }
-            free(path);
         }
         else{
             std::cout << "error: file with name of \"" << s.input_filename << "\" does not exist"<<std::endl;

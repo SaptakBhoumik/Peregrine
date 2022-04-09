@@ -45,7 +45,6 @@ You can consider it to be a dialect of python which compiles to clean C++. It wi
 
 ### Requirements to build from source
 
-- [Gcc compiler](https://gcc.gnu.org/)
 - [clang compiler](https://clang.llvm.org/)
 
 # Compilation instructions

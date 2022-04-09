@@ -652,4 +652,12 @@ bool Codegen::visit(const ast::AugAssign& node){
     node.value()->accept(*this);
     return true;
 }
+bool Codegen::visit(const ast::LambdaDefinition& node){
+    write("function(");
+    codegenFuncParams(node.parameters());
+    write("){return");
+    node.body()->accept(*this);
+    write(";}");
+    return true;
+}
 } // namespace js

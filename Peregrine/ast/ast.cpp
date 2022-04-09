@@ -1833,4 +1833,63 @@ std::string InlineAsm::stringify() const{
     }
     return res;
 }
+LambdaDefinition::LambdaDefinition(Token tok,std::vector<parameter> parameters, AstNodePtr body){
+    m_tok=tok;
+    m_parameters=parameters;
+    m_body=body;
+}
+std::vector<parameter> LambdaDefinition::parameters() const{
+    return m_parameters;
+}
+AstNodePtr LambdaDefinition::body() const{
+    return m_body;
+}
+Token LambdaDefinition::token() const{
+    return m_tok;
+}
+AstKind LambdaDefinition::type() const{
+    return KAstLambda;
+}
+std::string LambdaDefinition::stringify() const{
+    std::string res="def(";
+    if (!m_parameters.empty()) {
+        for (size_t i = 0; i < m_parameters.size(); i++) {
+            parameter param = m_parameters[i];
+
+            if (i) {
+                res += ", ";
+            }
+            if(param.is_const){
+                res += "const ";
+            }
+            if(param.p_paramType==VarKwarg){
+                res += param.p_type->stringify();
+                res += param.p_name->stringify();
+            }
+            else if(param.p_paramType==VarArg){
+                res += param.p_type->stringify();
+                res += param.p_name->stringify();
+            }
+            else if(param.p_paramType==Ellipses){
+                res += param.p_type->stringify();
+                if(param.p_name->type()!=KAstNoLiteral){
+                    res += param.p_name->stringify();
+                }
+            }
+            else{
+                res += param.p_name->stringify();
+                if (param.p_type->type()!=KAstNoLiteral){
+                    res += ":";
+                    res += param.p_type->stringify();
+                }
+                if (param.p_default->type()!=ast::KAstNoLiteral){
+                    res+="=";
+                    res+=param.p_default->stringify();
+                }
+            }
+        }
+    }
+    res+="):"+m_body->stringify();
+    return res;
+}
 } // namespace ast

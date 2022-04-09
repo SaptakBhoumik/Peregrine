@@ -968,6 +968,10 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
             left = parsePrefixExpression();
             break;
         }
+        case tk_def:{
+            left=parseLambda();
+            break;
+        }
         case tk_ident: {
             error(m_currentToken,
                   "IndentationError: unexpected indent");
@@ -2207,4 +2211,27 @@ AstNodePtr Parser::parseAsm(){
         if(m_currentToken.tkType==tk_new_line){advance();}
     }
     return std::make_shared<InlineAsm>(tok,assembly,output,inputs);
+}
+AstNodePtr Parser::parseLambda(){
+    auto tok=m_currentToken;
+    expect(tk_l_paren,"Expected a ( but got "+next().keyword+" instead");
+    std::vector<parameter> parameters;
+
+    advance();
+    while (m_currentToken.tkType != tk_r_paren) {
+        parameters.push_back(parseParameter());
+        if (m_currentToken.tkType == tk_comma) {
+            advance();
+        } else {
+            break;
+        }
+    }
+    if (m_currentToken.tkType != tk_r_paren) {
+        error(m_currentToken,
+              "expected ), got " + m_currentToken.keyword + " instead");
+    }
+    expect(tk_colon,"Expected a : but got "+next().keyword+" instead","Add a : here","","");
+    advance();
+    AstNodePtr body=parseExpression(pr_lambda);
+    return std::make_shared<LambdaDefinition>(tok,parameters,body);
 }

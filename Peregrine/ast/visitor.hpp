@@ -79,6 +79,7 @@ class AstVisitor {
     virtual bool visit(const TernaryFor& node) { return false; };
     virtual bool visit(const PrivateDef& node) { return false; };
     virtual bool visit(const InlineAsm& node) { return false; };
+    virtual bool visit(const LambdaDefinition& node) { return false; };
 
 };
 

@@ -125,3 +125,6 @@ def main():
     variable_b += variable_a
     assert variable_b==6
     printf("variable_b is %d\n",variable_b)
+    type lambda_type=def(int)->int
+    square:lambda_type=def(x:int):x*x
+    printf("Square of 4 is %d\n",square(4))

@@ -184,4 +184,5 @@ void CompileTimeExpression::accept(AstVisitor &visitor) const {visitor.visit(*th
 void TernaryFor::accept(AstVisitor &visitor) const {visitor.visit(*this);}
 void PrivateDef::accept(AstVisitor &visitor) const {visitor.visit(*this);}
 void InlineAsm::accept(AstVisitor &visitor) const {visitor.visit(*this);}
+void LambdaDefinition::accept(AstVisitor &visitor) const {visitor.visit(*this);}
 } // namespace ast

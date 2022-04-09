@@ -13,6 +13,7 @@ using namespace ast;
 
 enum PrecedenceType {
     pr_lowest,      // lowest possible precedence
+    pr_lambda,
     pr_conditional, // if...else
     pr_range,       // ..
     pr_or,      // or
@@ -137,6 +138,7 @@ class Parser {
     AstNodePtr parseTypeDef();
     AstNodePtr parseDefaultArg();
     AstNodePtr parseTryExcept();
+    AstNodePtr parseLambda();
     AstNodePtr parsePrivate(bool is_class=false);
 
   public:

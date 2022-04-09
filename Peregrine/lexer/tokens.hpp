@@ -21,7 +21,6 @@ enum TokenType {
     tk_bit_or,     // |
     tk_bit_not,    // ~
     tk_assign,     // =
-    tk_excl,       // !
     tk_colon,      // :
     tk_dot,        // .
     tk_double_dot, // ..

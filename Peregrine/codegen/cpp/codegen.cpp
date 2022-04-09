@@ -109,11 +109,12 @@ void Codegen::codegenFuncParams(std::vector<ast::parameter> parameters,size_t st
             is_define=true;
             parameters[i].p_name->accept(*this);
             is_define=false;
-            
-            if(i < parameters.size()-1)
-                write(",");
+            if(parameters[i].p_default->type()!=ast::KAstNoLiteral){
+                write("=");
+                parameters[i].p_default->accept(*this);
+            }
+            write(",");
         }
-        write(",");
     }
     write("____P____exception_handler* ____Pexception_handlers=NULL");
 }
@@ -1313,4 +1314,19 @@ bool Codegen::visit(const ast::InlineAsm& node){
     write(")");
     return true;
 }
+bool Codegen::visit(const ast::LambdaDefinition& node){
+    if(is_func_def){
+        write("[](");
+    }
+    else{
+        write("[=](");
+    }
+    codegenFuncParams(node.parameters());
+    write(")mutable noexcept ->auto");
+    write(" {\nreturn ");
+    node.body()->accept(*this);
+    write(";\n}");
+    return true;
+}
+
 } // namespace cpp
