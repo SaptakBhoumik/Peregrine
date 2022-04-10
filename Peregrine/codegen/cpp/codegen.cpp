@@ -556,6 +556,7 @@ bool Codegen::visit(const ast::ListOrDictAccess& node) {
 }
 
 bool Codegen::visit(const ast::BinaryOperation& node) {
+    /*
     if (node.op().keyword == "**") {
         write("_P_POWER(");
         node.left()->accept(*this);
@@ -568,6 +569,10 @@ bool Codegen::visit(const ast::BinaryOperation& node) {
         write("/");
         node.right()->accept(*this);
         write(")");
+    }
+    */
+    if(node.token().tkType==tk_pipeline){
+        return pipeline(node);
     }
     else if(node.token().tkType==tk_in){
         write("(");
@@ -1328,5 +1333,123 @@ bool Codegen::visit(const ast::LambdaDefinition& node){
     write(";\n}");
     return true;
 }
-
+bool Codegen::pipeline(const ast::BinaryOperation& node){
+    auto right=node.right();
+    switch(right->type()){
+        case ast::KAstIdentifier:{
+            right->accept(*this);
+            write("(");
+            node.left()->accept(*this);
+            if(is_func_def){
+                write(",____Pexception_handlers)");
+            }
+            else{
+                write(",NULL)");
+            }
+            break;
+        }
+        case ast::KAstFunctionCall:{
+            auto function = std::dynamic_pointer_cast<ast::FunctionCall>(right);
+            function->name()->accept(*this);
+            write("(");
+            node.left()->accept(*this);
+            auto args = function->arguments();
+            if (args.size()) {
+                write(",");
+                for (size_t i = 0; i < args.size(); ++i) {
+                    if (i)
+                        write(", ");
+                    args[i]->accept(*this);
+                }
+            }
+            if(is_func_def){
+                write(",____Pexception_handlers)");
+            }
+            else{
+                write(",NULL)");
+            }
+            break;
+        }
+        case ast::KAstDotExpression:{
+            auto exp = std::dynamic_pointer_cast<ast::DotExpression>(right);
+            exp->owner()->accept(*this);
+            write(".");
+            ast::AstNodePtr member=exp->referenced();
+            if (member->type()==ast::KAstIdentifier){
+                auto attribute=std::dynamic_pointer_cast<ast::IdentifierExpression>(member)->value();
+                write("____mem____P____P____"+attribute+"(");
+                node.left()->accept(*this);
+                if(is_func_def){
+                    write(",____Pexception_handlers)");
+                }
+                else{
+                    write(",NULL)");
+                }
+            }
+            else if(member->type()==ast::KAstFunctionCall){
+                auto function = std::dynamic_pointer_cast<ast::FunctionCall>(member);
+                auto attribute=std::dynamic_pointer_cast<ast::IdentifierExpression>(function->name())->value();
+                write("____mem____P____P____"+attribute+"(");
+                node.left()->accept(*this);
+                auto args = function->arguments();
+                if (args.size()) {
+                    write(", ");
+                    for (size_t i = 0; i < args.size(); ++i) {
+                        if (i)
+                            write(", ");
+                        args[i]->accept(*this);
+                    }
+                }
+                if(is_func_def){
+                    write(",____Pexception_handlers)");
+                }
+                else{
+                    write(",NULL)");
+                }
+            }
+            break;
+        }
+        case ast::KAstArrowExpression:{
+            auto exp = std::dynamic_pointer_cast<ast::ArrowExpression>(right);
+            exp->owner()->accept(*this);
+            write("->");
+            ast::AstNodePtr member=exp->referenced();
+            if (member->type()==ast::KAstIdentifier){
+                auto attribute=std::dynamic_pointer_cast<ast::IdentifierExpression>(member)->value();
+                write("____mem____P____P____"+attribute+"(");
+                node.left()->accept(*this);
+                if(is_func_def){
+                    write(",____Pexception_handlers)");
+                }
+                else{
+                    write(",NULL)");
+                }
+            }
+            else if(member->type()==ast::KAstFunctionCall){
+                auto function = std::dynamic_pointer_cast<ast::FunctionCall>(member);
+                auto attribute=std::dynamic_pointer_cast<ast::IdentifierExpression>(function->name())->value();
+                write("____mem____P____P____"+attribute+"(");
+                node.left()->accept(*this);
+                auto args = function->arguments();
+                if (args.size()) {
+                    write(", ");
+                    for (size_t i = 0; i < args.size(); ++i) {
+                        if (i)
+                            write(", ");
+                        args[i]->accept(*this);
+                    }
+                }
+                if(is_func_def){
+                    write(",____Pexception_handlers)");
+                }
+                else{
+                    write(",NULL)");
+                }
+            }
+            break;
+        }
+        default:{}
+    }
+    return true;
+}
 } // namespace cpp

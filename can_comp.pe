@@ -19,8 +19,8 @@ ooo_ptr:*decorate=&ooo
 @ooo.dec
 def some_random_name()->int,int:
     return 4,4
-def dec(x:a_type)->a_type:return x
-@dec
+def dec(x:a_type,i:int=5)->a_type:return x
+@dec(8)
 def peregrine3()->int,int:
     def peregrine2()->int,int:
         return 3,3
@@ -209,6 +209,7 @@ def main():
     private_func()
     square:lambda_type=def(x:int):x*x
     printf("Square of 4 is %lld\n",square(4))
+    printf("Square of 4 is %lld\n",4|>square)
     switch:iterate_test=iterate_test(5)
     virtual_test:*inherit=&switch
     virtual_test->__type__()

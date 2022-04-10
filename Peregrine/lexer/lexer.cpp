@@ -664,7 +664,7 @@ LEXEME lexer(std::string src, std::string filename) {
                                    current_index, line);
             }
         } else if (item == ">") {
-            if (keyword != "" && keyword != ">" && keyword != "-") {
+            if (keyword != "" && keyword != ">" && keyword != "|" && keyword != "-") {
                 token = token_init(current_index - last_line,
                     statement, keyword,
                     token_type(keyword, next(current_index - 1, src)),
@@ -682,6 +682,9 @@ LEXEME lexer(std::string src, std::string filename) {
                 }
             } else if (keyword == "-") {
                 token = token_init(current_index - last_line,statement, "->", tk_arrow, start_index,
+                                   current_index, line);
+            } else if (keyword == "|") {
+                token = token_init(current_index - last_line,statement, "|>", tk_pipeline, start_index,
                                    current_index, line);
             } else if (next(current_index, src) == ">" ||
                        next(current_index, src) == "=") {
@@ -921,7 +924,7 @@ LEXEME lexer(std::string src, std::string filename) {
                 token = Token();
                 keyword = "";
             }
-            if (next(current_index, src) == "=") {
+            if (next(current_index, src) == "="||next(current_index, src) == ">") {
                 keyword = item;
                 start_index = current_index;
             } else {

@@ -230,3 +230,4 @@ def (i:int)x<T1,T2>():
     pass
 from x import *
 lambda_test = def(x:int):x*x
+var1 |> methord1 |> methord2 

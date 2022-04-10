@@ -59,6 +59,7 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
             res="";
             auto args = function->arguments();
             if (args.size()) {
+                write(", ");
                 for (size_t i = 0; i < args.size(); ++i) {
                     if (i)
                         write(", ");
@@ -103,6 +104,7 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
                 res="";
                 auto args = function->arguments();
                 if (args.size()) {
+                    write(", ");
                     for (size_t i = 0; i < args.size(); ++i) {
                         if (i)
                             write(", ");
@@ -148,6 +150,7 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
                 res="";
                 auto args = function->arguments();
                 if (args.size()) {
+                    write(", ");
                     for (size_t i = 0; i < args.size(); ++i) {
                         if (i)
                             write(", ");

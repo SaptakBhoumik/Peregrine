@@ -8,6 +8,7 @@ enum TokenType {
     tk_eof, // end of file
     // Some operators
     tk_dollar,     // $
+    tk_pipeline,   // |>
     tk_plus,       // +
     tk_at,         // @
     tk_minus,      // -

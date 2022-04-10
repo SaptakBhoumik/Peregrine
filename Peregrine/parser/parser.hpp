@@ -23,7 +23,7 @@ enum PrecedenceType {
     pr_bit_or,      // |
     pr_bit_xor,     // ^
     pr_bit_and,     // &
-    pr_bit_shift,   // >> , <<
+    pr_bit_shift_pipeline,   // >> , <<
     pr_sum_minus,   // +, -
     pr_mul_div,     // *, /, %, //
     pr_expo,        // **

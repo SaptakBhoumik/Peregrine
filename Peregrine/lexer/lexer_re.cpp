@@ -455,7 +455,7 @@ void LEXER::lex(){
             }
             case '|':{
                 add_unknown();
-                lex_pipe();
+                lex_pipeline();
                 break;
             }
             case '*':{
@@ -1049,7 +1049,7 @@ void LEXER::lex_caret(){
         });
     }
 }
-void LEXER::lex_pipe(){
+void LEXER::lex_pipeline(){
     size_t start_index=m_curr_index;
     if(next()=='='){
         advance();
@@ -1061,6 +1061,18 @@ void LEXER::lex_pipe(){
                     m_curr_index+1,
                     m_line,
                     tk_bit_or_equal
+        });
+    }
+    else if(next()=='>'){
+        advance();
+        m_result.push_back(Token{
+                    m_loc,
+                    m_curr_line,
+                    "|>",
+                    start_index,
+                    m_curr_index+1,
+                    m_line,
+                    tk_pipeline
         });
     }
     else{

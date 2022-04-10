@@ -87,8 +87,9 @@ std::map<TokenType, PrecedenceType> createMap() {
     precedenceMap[tk_bit_or] = pr_bit_or;
     precedenceMap[tk_xor] = pr_bit_xor;
     precedenceMap[tk_ampersand] = pr_bit_and;
-    precedenceMap[tk_shift_left] = pr_bit_shift;
-    precedenceMap[tk_shift_right] = pr_bit_shift;
+    precedenceMap[tk_shift_left] = pr_bit_shift_pipeline;
+    precedenceMap[tk_shift_right] = pr_bit_shift_pipeline;
+    precedenceMap[tk_pipeline] = pr_bit_shift_pipeline;
     precedenceMap[tk_plus] = pr_sum_minus;
     precedenceMap[tk_minus] = pr_sum_minus;
     precedenceMap[tk_multiply] = pr_mul_div;

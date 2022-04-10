@@ -106,6 +106,7 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::PrivateDef& node);
     bool visit(const ast::InlineAsm& node);
     bool visit(const ast::LambdaDefinition& node);
+    bool pipeline(const ast::BinaryOperation& node);
     EnvPtr m_env;
 };
 
