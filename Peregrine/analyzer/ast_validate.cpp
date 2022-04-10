@@ -64,7 +64,6 @@ bool Validator::visit(const Program& node){
             case KAstPrefixExpr:
             case KAstCast:
             case KAstTernaryIf:
-            case KAstBinaryOp:
             case KAstDict:
             case KAstList:
             case KAstIdentifier:
@@ -73,6 +72,12 @@ bool Validator::visit(const Program& node){
             case KAstDecimal:
             case KAstInteger:{
                 add_error(stmt->token(), "SyntaxError: Expression result unused","Assign the value to a variable ");
+                break;
+            }
+            case KAstBinaryOp:{
+                if(stmt->token().tkType!=tk_pipeline){
+                    add_error(stmt->token(), "SyntaxError: Expression result unused","Assign the value to a variable ");
+                }
                 break;
             }
             case KAstFunctionCall:{
@@ -100,7 +105,6 @@ bool Validator::visit(const BlockStatement& node){
             case KAstExpressionTuple:
             case KAstPrefixExpr:
             case KAstTernaryIf:
-            case KAstBinaryOp:
             case KAstDict:
             case KAstList:
             case KAstIdentifier:
@@ -109,6 +113,12 @@ bool Validator::visit(const BlockStatement& node){
             case KAstDecimal:
             case KAstInteger:{
                 add_error(stmt->token(), "SyntaxError: Expression result unused","Assign the value to a variable ");
+                break;
+            }
+            case KAstBinaryOp:{
+                if(stmt->token().tkType!=tk_pipeline){
+                    add_error(stmt->token(), "SyntaxError: Expression result unused","Assign the value to a variable ");
+                }
                 break;
             }
             case KAstImportStmt:{
