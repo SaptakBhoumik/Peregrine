@@ -17,13 +17,10 @@ class LEXER{
     size_t m_loc=0;
     std::vector<std::string> m_statments;
     std::vector<PEError> m_error;
-    std::vector<size_t> m_identation_level;
     size_t m_first_bracket_count = 0;
     size_t m_second_bracket_count = 0;
     size_t m_third_bracket_count = 0;
     size_t m_curr_identation_level=0;
-    size_t m_previous_identation = 0;
-    size_t m_tab_count=0;
     char m_curr_item='\0';
     bool m_is_tab = false;
 
@@ -46,7 +43,7 @@ class LEXER{
     void lex_caret();
     void lex_percent();
     void lex_ampersand();
-    void lex_pipe();
+    void lex_pipeline();
     void lex_equal();
     void lex_greater();
     void lex_less();

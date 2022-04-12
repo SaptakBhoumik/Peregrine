@@ -69,15 +69,10 @@ bool Validator::visit(const Program& node){
             case KAstIdentifier:
             case KAstNone:
             case KAstBool:
+            case KAstBinaryOp:
             case KAstDecimal:
             case KAstInteger:{
                 add_error(stmt->token(), "SyntaxError: Expression result unused","Assign the value to a variable ");
-                break;
-            }
-            case KAstBinaryOp:{
-                if(stmt->token().tkType!=tk_pipeline){
-                    add_error(stmt->token(), "SyntaxError: Expression result unused","Assign the value to a variable ");
-                }
                 break;
             }
             case KAstFunctionCall:{
