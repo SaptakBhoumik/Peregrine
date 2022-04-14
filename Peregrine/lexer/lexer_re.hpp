@@ -22,7 +22,7 @@ class LEXER{
     size_t m_third_bracket_count = 0;
     size_t m_curr_identation_level=0;
     char m_curr_item='\0';
-    bool m_is_tab = false;
+    bool m_is_tab = true;
 
     void lex();
     char next();

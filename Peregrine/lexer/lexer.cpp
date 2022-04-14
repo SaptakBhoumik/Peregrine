@@ -123,9 +123,7 @@ static inline TokenType token_type(std::string item, std::string next_item) {
         return tk_while;
     } else if (item == "for") {
         return tk_for;
-    }else if (item == ".") {
-        return tk_dot;
-    } else if (item == "break") {
+    }else if (item == "break") {
         return tk_break;
     } else if (item == "assert") {
         return tk_assert;
@@ -581,6 +579,9 @@ LEXEME lexer(std::string src, std::string filename) {
                 else{
                     keyword = item;
                     start_index = current_index - 1;
+                    if(tokens.back().tkType==tk_new_line){
+                        tokens.pop_back();
+                    }
                     token = token_init(current_index - last_line,statement, keyword, tk_dot, start_index,
                                     current_index, line);
                 }
@@ -621,6 +622,9 @@ LEXEME lexer(std::string src, std::string filename) {
                         token = Token();
                         keyword = item;
                         start_index = current_index - 1;
+                        if(tokens.back().tkType==tk_new_line){
+                            tokens.pop_back();
+                        }
                         token = token_init(current_index - last_line,statement, keyword, tk_dot, start_index,
                                         current_index, line);
                     }
@@ -681,9 +685,15 @@ LEXEME lexer(std::string src, std::string filename) {
                                        start_index, current_index, line);
                 }
             } else if (keyword == "-") {
+                if(tokens.back().tkType==tk_new_line){
+                    tokens.pop_back();
+                }
                 token = token_init(current_index - last_line,statement, "->", tk_arrow, start_index,
                                    current_index, line);
             } else if (keyword == "|") {
+                if(tokens.back().tkType==tk_new_line){
+                    tokens.pop_back();
+                }
                 token = token_init(current_index - last_line,statement, "|>", tk_pipeline, start_index,
                                    current_index, line);
             } else if (next(current_index, src) == ">" ||

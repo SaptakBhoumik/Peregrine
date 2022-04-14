@@ -360,19 +360,23 @@ bool Codegen::visit(const ast::ListOrDictAccess& node) {
 }
 
 bool Codegen::visit(const ast::BinaryOperation& node) {
-    if (node.op().keyword == "**") {
-        write("_P_POWER(");
-        node.left()->accept(*this);
-        write(",");
-        node.right()->accept(*this);
-        write(")");
-    } else if (node.op().keyword == "//") {
-        write("_P_FLOOR(");
-        node.left()->accept(*this);
-        write("/");
-        node.right()->accept(*this);
-        write(")");
-    } else {
+    // if (node.op().keyword == "**") {
+    //     write("_P_POWER(");
+    //     node.left()->accept(*this);
+    //     write(",");
+    //     node.right()->accept(*this);
+    //     write(")");
+    // } else if (node.op().keyword == "//") {
+    //     write("_P_FLOOR(");
+    //     node.left()->accept(*this);
+    //     write("/");
+    //     node.right()->accept(*this);
+    //     write(")");
+    // }
+    if(node.token().tkType==tk_pipeline){
+        return pipeline(node);
+    }
+    else {
         write("(");
         node.left()->accept(*this);
         if (node.op().keyword=="=="){
@@ -395,15 +399,7 @@ bool Codegen::visit(const ast::PrefixExpression& node) {
 }
 
 bool Codegen::visit(const ast::FunctionCall& node) {
-    auto functionName =
-        std::dynamic_pointer_cast<ast::IdentifierExpression>(node.name())
-            ->value();
-    if (functionName=="print"||functionName=="printf"){
-        write("console.log");
-    }
-    else{
-        node.name()->accept(*this);
-    }
+    node.name()->accept(*this);
     write("(");
 
     auto args = node.arguments();
@@ -455,7 +451,14 @@ bool Codegen::visit(const ast::IdentifierExpression& node) {
     if (is_enum){
         write(enum_name.back()+"___");
     }
-    write(node.value());
+    auto name=node.value();
+    ///TODO: Use use the symbol table to get the name
+    if (name=="print"||name=="printf"){
+        write("console.log");
+    }
+    else{
+        write(node.value());
+    }
     return true;
 }
 
@@ -658,6 +661,65 @@ bool Codegen::visit(const ast::LambdaDefinition& node){
     write("){return");
     node.body()->accept(*this);
     write(";}");
+    return true;
+}
+bool Codegen::pipeline(const ast::BinaryOperation& node){
+    auto right=node.right();
+    switch(right->type()){
+        case ast::KAstIdentifier:{
+            right->accept(*this);
+            write("(");
+            node.left()->accept(*this);
+            write(")");
+            break;
+        }
+        case ast::KAstFunctionCall:{
+            auto function = std::dynamic_pointer_cast<ast::FunctionCall>(right);
+            function->name()->accept(*this);
+            write("(");
+            node.left()->accept(*this);
+            auto args = function->arguments();
+            if (args.size()) {
+                write(",");
+                for (size_t i = 0; i < args.size(); ++i) {
+                    if (i)
+                        write(", ");
+                    args[i]->accept(*this);
+                }
+            }
+            write(")");
+            break;
+        }
+        case ast::KAstDotExpression:{
+            auto exp = std::dynamic_pointer_cast<ast::DotExpression>(right);
+            exp->owner()->accept(*this);
+            write(".");
+            ast::AstNodePtr member=exp->referenced();
+            member->accept(*this);
+            if (member->type()==ast::KAstIdentifier){
+                write("(");
+                node.left()->accept(*this);
+                write(")");
+            }
+            else if(member->type()==ast::KAstFunctionCall){
+                auto function = std::dynamic_pointer_cast<ast::FunctionCall>(member);
+                write("(");
+                node.left()->accept(*this);
+                auto args = function->arguments();
+                if (args.size()) {
+                    write(", ");
+                    for (size_t i = 0; i < args.size(); ++i) {
+                        if (i)
+                            write(", ");
+                        args[i]->accept(*this);
+                    }
+                }
+                write(")");
+            }
+            break;
+        }
+        default:{}
+    }
     return true;
 }
 } // namespace js

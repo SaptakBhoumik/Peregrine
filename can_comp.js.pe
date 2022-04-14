@@ -43,6 +43,11 @@ def lambda_test(x:a):
 def func(g:int )->int:
     return g
 export def fun():pass
+type lambda_type=def(i32)->i32
+def print_int(i:i32):
+    printf("Square is %d\n",i)
+    
+
 def main():
     dec_test(4)
     def z():
@@ -128,3 +133,7 @@ def main():
     type lambda_type=def(int)->int
     square:lambda_type=def(x:int):x*x
     printf("Square of 4 is %d\n",square(4))
+    #long chained function call
+    print_int(square(4))
+    #the above is same as folows
+    4|>square|>print_int

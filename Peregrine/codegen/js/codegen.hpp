@@ -83,6 +83,7 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::AugAssign& node);
     bool visit(const ast::PostfixExpression& node);
     bool visit(const ast::LambdaDefinition& node);
+    bool pipeline(const ast::BinaryOperation& node);
     EnvPtr m_env;
 };
 

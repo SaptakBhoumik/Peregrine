@@ -323,4 +323,11 @@ def main():
             divide(1,0)
     except:
         printf("Global try\n")
-    
+    def print_int(i:i32):
+        printf("Square is %d\n",i)
+    #long chained function call
+    print_int(square(4))
+    #the above is same as folows
+    4
+    |>square
+    |>print_int

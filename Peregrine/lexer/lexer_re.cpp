@@ -532,7 +532,6 @@ void LEXER::lex(){
                 m_line++;
                 m_loc=0;
                 m_curr_line=m_statments[m_line-2];
-                m_curr_identation_level = 0;
                 if(m_result.size()>0){
                     if (m_result.back().tkType!=tk_new_line && m_result.back().tkType!=tk_colon
                         && m_result.back().tkType!=tk_dedent
@@ -560,7 +559,6 @@ void LEXER::lex(){
                 m_line++;
                 m_loc=0;
                 m_curr_line=m_statments[m_line-2];
-                m_curr_identation_level = 0;
                 if(m_result.size()>0){
                     if (m_result.back().tkType!=tk_new_line && m_result.back().tkType!=tk_colon
                         && m_result.back().tkType!=tk_dedent

@@ -792,10 +792,15 @@ bool Validator::visit(const PrivateDef& node){
     return true;
 }
 bool Validator::visit(const InlineAsm& node){
-    node.output()->accept(*this);
-    auto inputs=node.inputs();
-    for(auto& x:inputs){
-        x.second->accept(*this);
+    if(m_is_js){
+        add_error(node.token(), "SyntaxError: Inline assembly is not allowed in javascript");
+    }
+    else{
+        node.output()->accept(*this);
+        auto inputs=node.inputs();
+        for(auto& x:inputs){
+            x.second->accept(*this);
+        }
     }
     return true;
 } 
