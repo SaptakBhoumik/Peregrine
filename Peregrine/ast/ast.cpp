@@ -7,10 +7,8 @@
 
 namespace ast {
 
-Program::Program(std::vector<AstNodePtr> statements,std::string  comment) {
-    m_statements = statements;
-    m_comment=comment;
-}
+Program::Program(std::vector<AstNodePtr> statements, std::string comment)
+    : m_statements(statements), m_comment(comment) {}
 
 std::vector<AstNodePtr> Program::statements() const { return m_statements; }
 
