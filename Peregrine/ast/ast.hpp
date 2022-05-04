@@ -29,7 +29,6 @@ enum AstKind {
     KAstDictTypeExpr,
     KAstFuncTypeExpr,
     KAstList,
-    
     KAstDict,
     KAstBinaryOp,
     KAstPrefixExpr,
@@ -82,7 +81,8 @@ enum AstKind {
     KAstCompileTimeExpression,
     KAstPrivate,
     KAstInlineAsm,
-    KAstLambda
+    KAstLambda,
+    KAstGenericCall
 };
 
 class AstVisitor;
@@ -1308,6 +1308,20 @@ class LambdaDefinition : public AstNode {
     AstKind type() const;
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
+};
+class GenericCall : public AstNode{
+    Token m_tok;
+    std::vector<AstNodePtr> m_generic_types;
+    AstNodePtr m_identifier;
+    public:
+    GenericCall(Token tok,std::vector<AstNodePtr> generic_types,AstNodePtr identifier);
+    AstNodePtr identifier() const;
+    std::vector<AstNodePtr> generic_types() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
+
 };
 } // namespace ast
 

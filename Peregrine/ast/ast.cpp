@@ -1890,4 +1890,34 @@ std::string LambdaDefinition::stringify() const{
     res+="):"+m_body->stringify();
     return res;
 }
+GenericCall::GenericCall(Token tok,std::vector<AstNodePtr> generic_types,AstNodePtr identifier){
+    m_tok=tok;
+    m_generic_types=generic_types;
+    m_identifier=identifier;
+}
+std::vector<AstNodePtr> GenericCall::generic_types() const{
+    return m_generic_types;
+}
+AstNodePtr GenericCall::identifier() const{
+    return m_identifier;
+}
+Token GenericCall::token() const{
+    return m_tok;
+}
+AstKind GenericCall::type() const{
+    return KAstGenericCall;
+}
+std::string GenericCall::stringify() const{
+    std::string res=m_identifier->stringify();
+    res+="<";
+    for(size_t i=0;i<m_generic_types.size();++i){
+        res+=m_generic_types[i]->stringify();
+        if(i<m_generic_types.size()-1){
+            res+=",";
+        }
+    }
+    res+=">";
+    return res;
+}
+
 } // namespace ast
