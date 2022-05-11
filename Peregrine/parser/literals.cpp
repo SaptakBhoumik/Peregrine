@@ -84,7 +84,24 @@ AstNodePtr Parser::parseDict() {
     return std::make_shared<DictLiteral>(tok, elements);
 }
 
+AstNodePtr Parser::parseIdentifier() {
+    if (m_currentToken.tkType!=tk_identifier){
+        error(m_currentToken,
+              "Expected identifier but got " + m_currentToken.keyword + " instead");
+    }
+    return std::make_shared<IdentifierExpression>(m_currentToken,
+                                                  m_currentToken.keyword);
+}
 
+AstNodePtr Parser::parseName() {
+    if (m_currentToken.tkType != tk_identifier) {
+        error(m_currentToken, "expected an identifier, got " +
+                                  m_currentToken.keyword +
+                                  " instead");
+    }
+
+    return parseIdentifier();
+}
 
 AstNodePtr Parser::parseNone() {
     return std::make_shared<NoneLiteral>(m_currentToken);

@@ -67,8 +67,8 @@ class Parser {
     void error(Token tok, std::string msg,std::string submsg="",std::string hint="",std::string ecode="");
 
     parameter parseParameter();
-    std::vector<AstNodePtr> parseGenericsDef();
 
+    //defined in literals.cpp
     AstNodePtr parseInteger();
     AstNodePtr parseDecimal();
     AstNodePtr parseString(bool isFormatted, bool isRaw);
@@ -79,20 +79,18 @@ class Parser {
     AstNodePtr parseList();
     AstNodePtr parseDict();
 
-    AstNodePtr parseType(bool var_dec=false, 
-                         bool* has_value=nullptr,
-                         bool can_be_sumtype=true
-                          );
-    AstNodePtr parseImportedType(bool var_dec,bool* has_value);
-    AstNodePtr parsePointerType(bool var_dec,bool* has_value);
-    AstNodePtr parseRefType(bool var_dec,bool* has_value);
-    AstNodePtr parseListType(bool var_dec,bool* has_value);
+    //defined in types.cpp
+    AstNodePtr parseType(bool can_be_sumtype=true);
+    AstNodePtr parseImportedType();
+    AstNodePtr parsePointerType();
+    AstNodePtr parseRefType();
+    AstNodePtr parseListType();
     AstNodePtr parseFuncType();
 
+    //defined in expressions.cpp
     AstNodePtr parseExpression(PrecedenceType type = pr_lowest);
     AstNodePtr parsePrefixExpression();
     AstNodePtr parseGroupedExpr();
-
     AstNodePtr parseBinaryOperation(AstNodePtr left);
     AstNodePtr parseTernaryIf(AstNodePtr left);
     AstNodePtr parseTernaryFor(AstNodePtr left);
@@ -101,44 +99,51 @@ class Parser {
     AstNodePtr parseDotExpression(AstNodePtr left);
     AstNodePtr parseArrowExpression(AstNodePtr left);
     AstNodePtr parsePostfixExpression(AstNodePtr left);
-
     AstNodePtr parseReturnExprTurple(AstNodePtr item);
     AstNodePtr parseReturnTypeTurple(AstNodePtr item);
-    AstNodePtr parseExtern();
-    AstNodePtr parseMultipleAssign(AstNodePtr);
-    AstNodePtr parseVirtual();
-    AstNodePtr parseAsm();
     AstNodePtr parseCast();
-    AstNodePtr parseStatement();
+    AstNodePtr parseLambda();
+    AstNodePtr parseGeneric(AstNodePtr identifier);
+
+    //defined in statement.cpp
+    AstNodePtr parseAsm();
     AstNodePtr parseWith();
-    AstNodePtr parseDecoratorCall();
-    AstNodePtr parseBlockStatement();
-    AstNodePtr parseImport();
     AstNodePtr parseRaise();
-    AstNodePtr parseStatic();
-    AstNodePtr parseInline();
-    AstNodePtr parseVariableStatement();
-    AstNodePtr parseConstDeclaration();
     AstNodePtr parseIf();
     AstNodePtr parseAssert();
     AstNodePtr parseMatch();
     AstNodePtr parseScope();
     AstNodePtr parseWhile();
-    AstNodePtr parseFor();
-    AstNodePtr parseFunctionDef();
-    AstNodePtr parseExternFuncDef(Token);
-    AstNodePtr parseExternUnion(Token tok);
-    AstNodePtr parseExternStruct(Token tok);
-    AstNodePtr parseMethodDef();
-    AstNodePtr parseClassDefinition();
     AstNodePtr parseReturn();
+    AstNodePtr parseTryExcept();
+    AstNodePtr parseFor();
+
+    //defined in define.cpp
+    AstNodePtr parseFunctionDef();
+    AstNodePtr parseMultipleAssign(AstNodePtr);
+    AstNodePtr parseDecoratorCall();
+    AstNodePtr parseVariableStatement();
+    AstNodePtr parseConstDeclaration();
+    AstNodePtr parseExternUnion(Token tok);
+    AstNodePtr parseExternFuncDef(Token);
+    AstNodePtr parseExternStruct(Token tok);
+    AstNodePtr parseClassDefinition();
+    AstNodePtr parseMethodDef();
     AstNodePtr parseUnion();
     AstNodePtr parseEnum();
-    AstNodePtr parseExport();
     AstNodePtr parseTypeDef();
+    std::vector<AstNodePtr> parseGenericsDef();
+
+    //defined in parser.cpp
+    AstNodePtr parseImport();
+    AstNodePtr parseStatement();
+    AstNodePtr parseExtern();
+    AstNodePtr parseVirtual();
+    AstNodePtr parseBlockStatement();
+    AstNodePtr parseStatic();
+    AstNodePtr parseInline();
+    AstNodePtr parseExport();
     AstNodePtr parseDefaultArg();
-    AstNodePtr parseTryExcept();
-    AstNodePtr parseLambda();
     AstNodePtr parsePrivate(bool is_class=false);
 
   public:

@@ -134,14 +134,14 @@ AstKind TypeExpression::type() const { return KAstTypeExpr; }
 std::string TypeExpression::stringify() const { 
     auto res= m_value;
     if(m_generic_type.size()>0){
-        res+="<";
+        res+="{";
         for(size_t i=0;i<m_generic_type.size();i++){
             res+=m_generic_type[i]->stringify();
             if(i<m_generic_type.size()-1){
                 res+=",";
             }
         }
-        res+=">";
+        res+="}";
     } 
     return res;
 }
@@ -232,14 +232,14 @@ std::string UnionLiteral::stringify() const {
     std::string res = "union ";
     res += m_name->stringify();
     if(m_generics.size()>0){
-        res+="<";
+        res+="{";
         for(size_t i=0;i<m_generics.size();i++){
             res+=m_generics[i]->stringify();
             if(i<m_generics.size()-1){
                 res+=",";
             }
         }
-        res+=">";
+        res+="}";
     }
     res+=+ ":\n";
     for (size_t i = 0; i < m_elements.size(); i++) {
@@ -599,14 +599,14 @@ std::string ClassDefinition::stringify() const {
     std::string res = "class ";
     res += m_name->stringify();
     if(m_generics.size()>0){
-        res+="<";
+        res+="{";
         for(size_t i=0;i<m_generics.size();i++){
             res+=m_generics[i]->stringify();
             if(i<m_generics.size()-1){
                 res+=",";
             }
         }
-        res+=">";
+        res+="}";
     }
     res += "(";
     for (size_t i = 0; i < m_parent.size(); ++i) {
@@ -671,14 +671,14 @@ std::string FunctionDefinition::stringify() const {
 
     res += m_name->stringify();
     if(m_generics.size()>0){
-        res+="<";
+        res+="{";
         for(size_t i=0;i<m_generics.size();i++){
             res+=m_generics[i]->stringify();
             if(i<m_generics.size()-1){
                 res+=",";
             }
         }
-        res+=">";
+        res+="}";
     }
     res += "(";
 
@@ -1084,14 +1084,14 @@ AstKind TypeDefinition::type() const { return KAstTypeDefinition; }
 std::string TypeDefinition::stringify() const {
     std::string res = "type " + m_name->stringify();
     if(m_generics.size()>0){
-        res+="<";
+        res+="{";
         for(size_t i=0;i<m_generics.size();i++){
             res+=m_generics[i]->stringify();
             if(i<m_generics.size()-1){
                 res+=",";
             }
         }
-        res+=">";
+        res+="}";
     }
     res += " = ";
 
@@ -1603,14 +1603,14 @@ std::string MethodDefinition::stringify() const {
     res+=")";
     res += m_name->stringify();
     if(m_generics.size()>0){
-        res+="<";
+        res+="{";
         for(size_t i=0;i<m_generics.size();i++){
             res+=m_generics[i]->stringify();
             if(i<m_generics.size()-1){
                 res+=",";
             }
         }
-        res+=">";
+        res+="}";
     }
     res += "(";
 
@@ -1909,14 +1909,14 @@ AstKind GenericCall::type() const{
 }
 std::string GenericCall::stringify() const{
     std::string res=m_identifier->stringify();
-    res+="<";
+    res+="{";
     for(size_t i=0;i<m_generic_types.size();++i){
         res+=m_generic_types[i]->stringify();
         if(i<m_generic_types.size()-1){
             res+=",";
         }
     }
-    res+=">";
+    res+="}";
     return res;
 }
 

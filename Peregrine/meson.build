@@ -6,7 +6,11 @@ lexer_src = [
 parser_src = [
     'parser/parser.cpp',
     'parser/utils.cpp',
-    'parser/literals.cpp'
+    'parser/literals.cpp',
+    'parser/types.cpp',
+    'parser/expression.cpp',
+    'parser/statement.cpp',
+    'parser/define.cpp',
 ]
 
 ast_src = [
