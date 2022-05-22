@@ -1068,12 +1068,10 @@ class TryExcept : public AstNode {
 };
 
 class TypeTuple : public AstNode {
-    bool m_multiple_return;// return it in a more effecient way if it has no ()
     std::vector<AstNodePtr> m_items;
   public:
-    TypeTuple(bool multiple_return,std::vector<AstNodePtr> items);
+    TypeTuple(std::vector<AstNodePtr> items);
     std::vector<AstNodePtr> items() const;
-    bool multiple_return() const;
     Token token() const;
     AstKind type() const;
     std::string stringify() const;
@@ -1081,12 +1079,10 @@ class TypeTuple : public AstNode {
 };
 
 class ExpressionTuple : public AstNode {
-    bool m_multiple_return;// return it in a more effecient way if it has no ()
     std::vector<AstNodePtr> m_items;
   public:
-    ExpressionTuple(bool multiple_return,std::vector<AstNodePtr> items);
+    ExpressionTuple(std::vector<AstNodePtr> items);
     std::vector<AstNodePtr> items() const;
-    bool multiple_return() const;
     Token token() const;
     AstKind type() const;
     std::string stringify() const;

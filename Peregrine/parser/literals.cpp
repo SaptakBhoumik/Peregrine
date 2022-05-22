@@ -2,30 +2,37 @@
 #include "parser.hpp"
 
 #include <memory>
+namespace Parser{
 
 using namespace ast;
 
 AstNodePtr Parser::parseInteger() {
+    //746
     return std::make_shared<IntegerLiteral>(m_currentToken,
                                             m_currentToken.keyword);
 }
 
 AstNodePtr Parser::parseDecimal() {
+    //2.56
     return std::make_shared<DecimalLiteral>(m_currentToken,
                                             m_currentToken.keyword);
 }
 
 AstNodePtr Parser::parseString(bool isFormatted, bool isRaw) {
+    //"string "
     return std::make_shared<StringLiteral>(
         m_currentToken, m_currentToken.keyword, isFormatted, isRaw);
 }
 
 AstNodePtr Parser::parseBool() {
+    //True or False
     return std::make_shared<BoolLiteral>(m_currentToken,
                                          m_currentToken.keyword);
 }
 
 AstNodePtr Parser::parseList() {
+    //list defination
+    //[1,2,3,4]
     Token tok = m_currentToken;
     std::vector<AstNodePtr> elements;
 
@@ -54,6 +61,8 @@ AstNodePtr Parser::parseList() {
 }
 
 AstNodePtr Parser::parseDict() {
+    //dictionary literalstderr
+    //{"key1":"value1","key2":"value2"}
     Token tok = m_currentToken;
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elements;
 
@@ -85,6 +94,7 @@ AstNodePtr Parser::parseDict() {
 }
 
 AstNodePtr Parser::parseIdentifier() {
+    //identifier name
     if (m_currentToken.tkType!=tk_identifier){
         error(m_currentToken,
               "Expected identifier but got " + m_currentToken.keyword + " instead");
@@ -94,6 +104,7 @@ AstNodePtr Parser::parseIdentifier() {
 }
 
 AstNodePtr Parser::parseName() {
+    //identifier name
     if (m_currentToken.tkType != tk_identifier) {
         error(m_currentToken, "expected an identifier, got " +
                                   m_currentToken.keyword +
@@ -104,5 +115,7 @@ AstNodePtr Parser::parseName() {
 }
 
 AstNodePtr Parser::parseNone() {
+    //None
     return std::make_shared<NoneLiteral>(m_currentToken);
+}
 }

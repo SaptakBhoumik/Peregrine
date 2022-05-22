@@ -28,11 +28,11 @@ void compile(cli::state s){
             std::cout << "Keyword= " << token.keyword
                       << " Type= " << token.tkType <<" Line= "<<token.line<<" Loc="<<token.location<<"\n";
         }
-        Parser parser(tokens, "test");
+        Parser::Parser parser(tokens, "test");
         ast::AstNodePtr program = parser.parse();
         std::cout << program->stringify() << "\n";
         // astValidator::Validator val(program,"test");
-        TypeChecker typeChecker(program);
+        TypeCheck::TypeChecker typeChecker(program);
     }
     else{
         std::ifstream file(s.input_filename);
@@ -49,7 +49,7 @@ void compile(cli::state s){
                     exit(1);
                 }
             }
-            Parser parser(tokens,path);
+            Parser::Parser parser(tokens,path);
             ast::AstNodePtr program = parser.parse();
             astValidator::Validator val(program,path,s.emit_js,s.has_main);
             auto output=s.output_filename;
@@ -69,6 +69,9 @@ void compile(cli::state s){
                 system("rm temp.cc");
             }else{
                 cpp::Codegen codegen("temp.cc", program,path);
+                if(s.is_release){
+                    s.cpp_arg+=" -flto -s ";
+                }
                 auto cmd=s.cpp_compiler+" -std=c++2a temp.cc -fpermissive -w "+s.cpp_arg+" -o "+output;
                 system(cmd.c_str());
                 system("rm temp.cc");

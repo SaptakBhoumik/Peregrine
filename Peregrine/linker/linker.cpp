@@ -43,7 +43,7 @@
 #include "llvm/Support/Path.h"
 #include "llvm/Support/PluginLoader.h"
 #include <cstdlib>
-
+namespace Linker{
 using namespace lld;
 using namespace llvm;
 using namespace llvm::sys;
@@ -262,6 +262,7 @@ void linker::auto_flavor(){
     #ifdef _WIN32
     set_flavor(WinLink);
     #endif
+}
 }
 /*Example usage
 int main(int argc ,const char** argv){

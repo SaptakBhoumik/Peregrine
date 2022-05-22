@@ -7,13 +7,29 @@
 #include <memory>
 #include <string>
 #include <vector>
+namespace Parser{
+
 AstNodePtr Parser::parseFunctionDef() {
+    /*
+    Parses function defination
+    def function_name(arg:arg_type,arg_without_type)->return_type:
+        return value    
+    */
     if(next().tkType==tk_l_paren){
+        /*
+        It's a method
+        def (arg:typename)method(another_arg)->return_type:
+          return value  
+        */
         return parseMethodDef();
     }
     Token tok = m_currentToken;
     expect(tk_identifier, "Expected a name but got "+next().keyword+" instead","Add a name here","","");
     if(next().tkType==tk_dot){
+        /*
+        It's an external function
+        def c.method(another_arg)->return_type
+        */
         return parseExternFuncDef(tok);
     }
     AstNodePtr name = parseName();
@@ -71,6 +87,11 @@ AstNodePtr Parser::parseFunctionDef() {
 }
 
 AstNodePtr Parser::parseMultipleAssign(AstNodePtr left){
+    /*
+    Parses multiple assign statements
+    a,b=9,8
+    c,d=multiple_return_funr()
+    */
     std::vector<AstNodePtr> names;
     std::vector<AstNodePtr> values;
     names.push_back(left);
@@ -97,6 +118,11 @@ AstNodePtr Parser::parseMultipleAssign(AstNodePtr left){
 }
 
 AstNodePtr Parser::parseMethodDef() {
+    /*
+    Parses method
+    def (arg:typename)method(another_arg)->return_type:
+      return value  
+    */
     Token tok = m_currentToken;
     advance();
     advance();
@@ -177,6 +203,10 @@ AstNodePtr Parser::parseMethodDef() {
 
 
 AstNodePtr Parser::parseExternFuncDef(Token tok){
+    /*
+    Parses external function from a c library
+    def c.external_function(another_arg)->return_type
+    */
     auto owner=m_currentToken.keyword;
     advance();
     expect(tk_identifier,"Expected identifier but got "+next().keyword+" instead","","","");
@@ -213,6 +243,13 @@ AstNodePtr Parser::parseExternFuncDef(Token tok){
     return std::make_shared<ExternFuncDef>(tok,returnType,name,parameters,owner);
 }
 AstNodePtr Parser::parseExternUnion(Token tok) {
+    /*
+    Parses external union from a c library definition
+    union c.IncompleteDefination
+    union c.CompleteDefination:
+        item1:type1
+        item2:type2
+    */
     auto owner=m_currentToken.keyword;
     advance();
     expect(tk_identifier, "Expected an identifier, got " +
@@ -251,6 +288,13 @@ AstNodePtr Parser::parseExternUnion(Token tok) {
 }
 
 AstNodePtr Parser::parseExternStruct(Token tok) {
+    /*
+    Parses external struct from a c library definition
+    class c.IncompleteDefination
+    class c.CompleteDefination:
+        item1:type1
+        item2:type2
+    */
     auto owner=m_currentToken.keyword;
     advance();
     expect(tk_identifier, "Expected an identifier, got " +
@@ -288,6 +332,15 @@ AstNodePtr Parser::parseExternStruct(Token tok) {
     return std::make_shared<ExternStructLiteral>(tok, elements, union_name,owner);
 }
 AstNodePtr Parser::parseClassDefinition() {
+    /*
+    Parses class definition
+    class ClassName:
+        item1:type1
+        item2:type2
+        def __init__(self):
+            #constructor
+            ...
+    */
     Token tok = m_currentToken;
 
     std::vector<AstNodePtr> other; // nested union and class
@@ -434,6 +487,12 @@ AstNodePtr Parser::parseClassDefinition() {
 }
 
 AstNodePtr Parser::parseVariableStatement() {
+    /*
+    Parses variable definitions
+    var_name:var_type=value
+    var_name=value
+    var_name:var_type
+    */
     Token tok = m_currentToken;
     AstNodePtr varType = std::make_shared<NoLiteral>();
     AstNodePtr name = parseName();
@@ -463,6 +522,10 @@ AstNodePtr Parser::parseVariableStatement() {
 }
 
 AstNodePtr Parser::parseConstDeclaration() {
+    /*
+    Parses constant definitions
+    const var_name:var_type=value
+    */
     Token tok = m_currentToken;
     expect(tk_identifier);
     AstNodePtr name = parseName();
@@ -480,6 +543,12 @@ AstNodePtr Parser::parseConstDeclaration() {
     return std::make_shared<ConstDeclaration>(tok, constType, name, value);
 }
 AstNodePtr Parser::parseDecoratorCall() {
+    /*
+    Parses function decorator
+    @decorator_name
+    def name():
+        ...
+    */
     auto tok = m_currentToken;
     std::vector<AstNodePtr> decorators;
     AstNodePtr body;
@@ -511,6 +580,12 @@ AstNodePtr Parser::parseDecoratorCall() {
     return std::make_shared<DecoratorStatement>(tok, decorators, body);
 }
 AstNodePtr Parser::parseUnion() {
+    /*
+    Parses union declarations
+    union name:
+        item1:type1
+        item2:type2
+    */
     auto tok = m_currentToken;
     expect(tk_identifier, "Expected an identifier, got " +
                                   next().keyword +
@@ -554,6 +629,12 @@ AstNodePtr Parser::parseUnion() {
 }
 
 AstNodePtr Parser::parseEnum() {
+    /*
+    parses enum
+    enum name:
+        item1,
+        item2
+    */
     auto token = m_currentToken;
     expect(tk_identifier, "Expected an identifier, got " +
                                   next().keyword +
@@ -602,6 +683,10 @@ AstNodePtr Parser::parseEnum() {
     return std::make_shared<EnumLiteral>(token, fields, enum_name,comment);
 }
 AstNodePtr Parser::parseTypeDef() {
+    /*
+    parses type definition
+    type name=other_type
+    */
     Token tok = m_currentToken;
     advance();
 
@@ -625,6 +710,11 @@ AstNodePtr Parser::parseTypeDef() {
 }
 
 std::vector<AstNodePtr> Parser::parseGenericsDef(){
+    /*
+    Parses generic defination
+    def name{type1,type2}():...
+    Only the {type1,type2} part
+    */
     advance();//on the { after advance
     std::vector<AstNodePtr> generics;
     while(m_currentToken.tkType!=tk_dict_close){
@@ -638,4 +728,5 @@ std::vector<AstNodePtr> Parser::parseGenericsDef(){
         }
     }
     return generics;
+}
 }

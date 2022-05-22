@@ -11,7 +11,7 @@
 #include <string_view>
 
 namespace js {
-
+using namespace Utils;
 typedef std::shared_ptr<SymbolTable<ast::AstNodePtr>> EnvPtr;
 
 class Codegen : public ast::AstVisitor {

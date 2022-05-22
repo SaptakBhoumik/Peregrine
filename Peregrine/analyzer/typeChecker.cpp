@@ -6,8 +6,7 @@
 #include <cassert>
 #include <iostream>
 #include <memory>
-
-using namespace types;
+namespace TypeCheck{
 
 TypeChecker::TypeChecker(ast::AstNodePtr ast) {
     m_env = createEnv();
@@ -394,3 +393,4 @@ bool TypeChecker::visit(const ast::DefaultArg& node) { return true; }
 bool TypeChecker::visit(const ast::TernaryIf& node) { return true; }
 
 bool TypeChecker::visit(const ast::TryExcept& node) { return true; }
+}

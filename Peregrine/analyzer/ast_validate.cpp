@@ -696,13 +696,7 @@ bool Validator::visit(const CompileTimeExpression& node){
         case KAstAugAssign:
         case KAstMultipleAssign:
         case KAstVariableStmt:{
-            //TODO: Maybe allow this
-            add_error(token, "SyntaxError: Compile time defination or reassignment are not allowed");
-            break;
-        }
-        case KAstFunctionDef:{
-            //TODO: Maybe allow this
-            add_error(token, "SyntaxError: Compile time functions are not allowed");
+            add_error(token, "SyntaxError: Compile time defination or reassignment of variable is not allowed");
             break;
         }
         case KAstClassDef:{

@@ -1,5 +1,5 @@
 #include "symbolTable.hpp"
-
+namespace Utils{
 MangleName::MangleName(MangleName const &other){
     *this=other;
 }
@@ -42,4 +42,5 @@ void MangleName::print(){
         std::cout<<"    "<<p.first<<":"<<p.second<<std::endl;
     }
     std::cout<<"}";
+}
 }

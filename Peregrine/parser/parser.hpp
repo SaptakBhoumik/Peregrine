@@ -8,7 +8,7 @@
 #include <map>
 #include <string>
 #include <vector>
-
+namespace Parser{
 using namespace ast;
 
 enum PrecedenceType {
@@ -152,5 +152,5 @@ class Parser {
 
     AstNodePtr parse();
 };
-
+}
 #endif

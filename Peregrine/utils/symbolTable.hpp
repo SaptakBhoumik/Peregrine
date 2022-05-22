@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <string>
 #include <optional>
-
+namespace Utils{
 template<typename T>
 class SymbolTable {
     std::map<std::string, T> m_symbols;
@@ -87,5 +87,6 @@ class MangleName{
     std::string operator[](std::string name);
     void print();
 };
+}
 
 #endif

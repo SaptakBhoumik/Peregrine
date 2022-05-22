@@ -9,6 +9,7 @@ namespace cli{
         println("\thelp             - prints out help");
         println("\nPeregrine Options:");
         println("\t-release         - create release builds");
+        println("\t-debug           - create debug builds");
         println("\t-static          - create statically linked builds");
         println("\t-cc              - select the c++ compiler with which you want to compile the resultant code");
         println("\t-cc_flag         - add flags with which you want to compile the generated c++ code");
@@ -53,9 +54,13 @@ namespace cli{
             }else if (curr_arg=="-doc_html"){
                 m_state.doc_html = true;
             }else if(curr_arg=="-release"){
-                m_state.cpp_arg+=" -O2 -flto -s ";
+                m_state.cpp_arg+=" -O2 ";
+                m_state.is_release=true;
             }else if(curr_arg=="-static"){
                 m_state.cpp_arg+=" -static ";
+            }else if(curr_arg=="-debug"){
+                m_state.debug=true;
+                m_state.cpp_arg+=" -ggdb -glldb ";
             }else if (curr_arg=="-o"){
                 advance();
                 checkargs("output file");
@@ -108,6 +113,10 @@ namespace cli{
     }
     void state::validate_state(){
         auto& m_state=*this;
+        if(m_state.debug&&m_state.is_release){
+            println("You can't create a release and debug build at the same time");
+            exit(1);
+        }
         if (m_state.input_filename=="" && !m_state.dev_debug){
             println("No input file specified.\nUse 'peregrine help' for more information");
             exit(1);

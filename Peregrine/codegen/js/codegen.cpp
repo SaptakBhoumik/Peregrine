@@ -11,7 +11,6 @@
 #include <string_view>
 
 namespace js {
-
 Codegen::Codegen(std::string outputFilename, ast::AstNodePtr ast, bool html, std::string  filename) {
     m_filename = filename;
     m_file.open(outputFilename);

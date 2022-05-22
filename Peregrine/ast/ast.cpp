@@ -1421,50 +1421,34 @@ std::string TryExcept::stringify() const{
     res+="except:\n"+m_else_body->stringify();
     return res;
 }
-ExpressionTuple::ExpressionTuple(bool multiple_return,std::vector<AstNodePtr> items){
-    m_multiple_return=multiple_return;
+ExpressionTuple::ExpressionTuple(std::vector<AstNodePtr> items){
     m_items=items;
 }
 std::vector<AstNodePtr> ExpressionTuple::items() const{return m_items;}
-bool ExpressionTuple::multiple_return() const{return m_multiple_return;}
 AstKind ExpressionTuple::type() const{return KAstExpressionTuple;}
 std::string ExpressionTuple::stringify() const{
     std::string res;
-    if(!m_multiple_return){
-        res+="(";
-    }
     for (size_t i=0;i<m_items.size();++i){
         res+=m_items[i]->stringify();
         if(i<m_items.size()-1){
             res+=",";
         }
-    }
-    if(!m_multiple_return){
-        res+=")";
     }
     return res;
 }
 Token ExpressionTuple::token() const { return m_items[0]->token(); }
-TypeTuple::TypeTuple(bool multiple_return,std::vector<AstNodePtr> items){
-    m_multiple_return=multiple_return;
+TypeTuple::TypeTuple(std::vector<AstNodePtr> items){
     m_items=items;
 }
 std::vector<AstNodePtr> TypeTuple::items() const{return m_items;}
-bool TypeTuple::multiple_return() const{return m_multiple_return;}
 AstKind TypeTuple::type() const{return KAstTypeTuple;}
 std::string TypeTuple::stringify() const{
     std::string res;
-    if(!m_multiple_return){
-        res+="(";
-    }
     for (size_t i=0;i<m_items.size();++i){
         res+=m_items[i]->stringify();
         if(i<m_items.size()-1){
             res+=",";
         }
-    }
-    if(!m_multiple_return){
-        res+=")";
     }
     return res;
 }

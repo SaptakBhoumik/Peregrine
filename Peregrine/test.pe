@@ -104,11 +104,8 @@ a:int
 type p=def()->a,a
 def i()->p,int:
     return 1,3
-type turple_test=(int,int)
-a:turple_test=(1,2)
 extern c=import("test1","test2")
 a,b,c.d=1,2+3,3
-(a,b),c.d=(1,2+3),3
 a**=b
 x:&int=adsa
 x.b=9
@@ -225,3 +222,4 @@ var1 |> methord1 |> methord2
 func{int}()+9
 a:generic{T1,T2}= 0
 type sumtype=int|float|*int|[]int|generic{int,int}
+def x()->a,b:return 1,2

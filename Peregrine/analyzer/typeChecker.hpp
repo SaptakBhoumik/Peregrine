@@ -8,9 +8,9 @@
 
 #include <memory>
 #include <vector>
-
+namespace TypeCheck{
 using namespace types;
-
+using namespace Utils;
 using EnvPtr = std::shared_ptr<SymbolTable<TypePtr>>;
 
 class TypeChecker : public ast::AstVisitor {
@@ -81,5 +81,5 @@ class TypeChecker : public ast::AstVisitor {
     // the function whose body is being currently checked
     std::shared_ptr<FunctionType> m_currentFunction;
 };
-
+}
 #endif

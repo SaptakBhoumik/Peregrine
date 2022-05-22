@@ -17,6 +17,8 @@ class state{
     bool emit_js=false;
     bool emit_html=false;
     bool doc_html=false;
+    bool is_release=false;
+    bool debug=false;
     bool dev_debug=false;//Will be removed later. It is for debugging the parser
     void validate_state();
 };

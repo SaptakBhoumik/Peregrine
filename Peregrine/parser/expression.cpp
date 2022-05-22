@@ -7,8 +7,10 @@
 #include <memory>
 #include <string>
 #include <vector>
+namespace Parser{
 
 AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
+    //regular expression
     AstNodePtr left;
 
     switch (m_currentToken.tkType) {
@@ -172,6 +174,7 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
 }
 
 AstNodePtr Parser::parseBinaryOperation(AstNodePtr left) {
+    //binary operator
     Token op = m_currentToken;
     PrecedenceType precedence = precedenceMap[m_currentToken.tkType];
 
@@ -181,6 +184,8 @@ AstNodePtr Parser::parseBinaryOperation(AstNodePtr left) {
 }
 
 AstNodePtr Parser::parseFunctionCall(AstNodePtr left) {
+    //calling function
+    //function(arg1,arg2)
     Token tok = m_currentToken;
     std::vector<AstNodePtr> arguments;
 
@@ -211,6 +216,12 @@ AstNodePtr Parser::parseFunctionCall(AstNodePtr left) {
 }
 
 AstNodePtr Parser::parseListOrDictAccess(AstNodePtr left) {
+    //access list or dictionary
+    /*
+    dict["key"] = value
+    list[1]
+    list[0:9] #from item 0 to 9
+    */
     Token tok = m_currentToken;
     advance();
     std::vector<AstNodePtr> keyOrIndex;
@@ -228,6 +239,8 @@ AstNodePtr Parser::parseListOrDictAccess(AstNodePtr left) {
 }
 
 AstNodePtr Parser::parseDotExpression(AstNodePtr left) {
+    //dot expression
+    //object.attribute
     Token tok = m_currentToken;
     PrecedenceType currentPrecedence = precedenceMap[tok.tkType];
     advance();
@@ -238,6 +251,7 @@ AstNodePtr Parser::parseDotExpression(AstNodePtr left) {
 }
 
 AstNodePtr Parser::parsePrefixExpression() {
+    //prefix
     Token prefix = m_currentToken;
     PrecedenceType precedence = pr_prefix;
 
@@ -249,30 +263,25 @@ AstNodePtr Parser::parsePrefixExpression() {
 }
 
 AstNodePtr Parser::parsePostfixExpression(AstNodePtr left) {
+    //increment and decrement
+    //i++
+    //i--
     Token prefix = m_currentToken;
     return std::make_shared<PostfixExpression>(prefix, prefix, left);
 }
 
 AstNodePtr Parser::parseGroupedExpr() {
+    //Within brackets
     advance();
 
     AstNodePtr expr = parseExpression();
-    if (next().tkType == tk_comma) {
-        advance();
-        std::vector<AstNodePtr> items;
-        items.push_back(expr);
-        while(m_currentToken.tkType==tk_comma){
-            advance();
-            items.push_back(parseExpression());
-        }
-        expect(tk_r_paren, "Expected ), got "+next().keyword+" instead","Add a ) here","","");
-        return std::make_shared<ExpressionTuple>(false,items);
-    }
     expect(tk_r_paren, "Expected ) but got "+next().keyword+" instead","Add a ) here","","");
 
     return expr;
 }
 AstNodePtr Parser::parseTernaryIf(AstNodePtr left){
+    //Terenary if
+    //if_true_value if condition else if_false_value
     auto tok=m_currentToken;
     advance();
     AstNodePtr if_condition=parseExpression(pr_conditional);
@@ -296,6 +305,8 @@ AstNodePtr Parser::parseTernaryIf(AstNodePtr left){
     return std::make_shared<TernaryIf>(tok,left,if_condition,else_value);
 }
 AstNodePtr Parser::parseTernaryFor(AstNodePtr left){
+    //terenary for
+    // uses_x(x) for x in iterable
     auto tok=m_currentToken;
     advance();
 
@@ -317,6 +328,8 @@ AstNodePtr Parser::parseTernaryFor(AstNodePtr left){
     return std::make_shared<TernaryFor>(tok,left,sequence,variable);
 }
 AstNodePtr Parser::parseArrowExpression(AstNodePtr left) {
+    //arrow
+    //ptr->attribute
     Token tok = m_currentToken;
     PrecedenceType currentPrecedence = precedenceMap[tok.tkType];
     advance();
@@ -326,6 +339,7 @@ AstNodePtr Parser::parseArrowExpression(AstNodePtr left) {
     return std::make_shared<ArrowExpression>(tok, left, referenced);
 }
 AstNodePtr Parser::parseReturnExprTurple(AstNodePtr item){
+    //returns in the fore of 1,2,3
     advance();
     std::vector<AstNodePtr> items;
     items.push_back(item);
@@ -336,10 +350,11 @@ AstNodePtr Parser::parseReturnExprTurple(AstNodePtr item){
             advance();
         }
     }
-    return std::make_shared<ExpressionTuple>(true,items);
+    return std::make_shared<ExpressionTuple>(items);
 }
 
 AstNodePtr Parser::parseReturnTypeTurple(AstNodePtr item){
+    //return types as int,float
     advance();
     std::vector<AstNodePtr> items;
     items.push_back(item);
@@ -350,9 +365,11 @@ AstNodePtr Parser::parseReturnTypeTurple(AstNodePtr item){
             advance();
         }
     }
-    return std::make_shared<TypeTuple>(true,items);
+    return std::make_shared<TypeTuple>(items);
 }
 AstNodePtr Parser::parseCast() {
+    //parsing cast expression
+    //cast<type>(expr)
     auto tok = m_currentToken;
     expect(tk_less, "Expected < but got " +
                          next().keyword +
@@ -370,6 +387,8 @@ AstNodePtr Parser::parseCast() {
     return std::make_shared<CastStatement>(tok, type, value);
 }
 AstNodePtr Parser::parseLambda(){
+    //parses lambda expression
+    //def (arg1,arg2:type):value_to_return
     auto tok=m_currentToken;
     expect(tk_l_paren,"Expected a ( but got "+next().keyword+" instead");
     std::vector<parameter> parameters;
@@ -395,6 +414,10 @@ AstNodePtr Parser::parseLambda(){
 
 
 AstNodePtr Parser::parseGeneric(AstNodePtr identifier){
+    /*
+    Parses generic
+    name{type1,type2}
+    */
     auto tok=m_currentToken;
     advance();
     advance();
@@ -411,4 +434,5 @@ AstNodePtr Parser::parseGeneric(AstNodePtr identifier){
         }
     }
     return std::make_shared<GenericCall>(tok,generic_types,identifier);
+}
 }

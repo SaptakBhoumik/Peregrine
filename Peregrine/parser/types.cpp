@@ -7,29 +7,12 @@
 #include <memory>
 #include <string>
 #include <vector>
-
+namespace Parser{
 AstNodePtr Parser::parseType(bool can_be_sumtype) {
+    //parse types
     ast::AstNodePtr res;
     switch (m_currentToken.tkType) {
-        case tk_l_paren: {
-            advance();
-            std::vector<AstNodePtr> types;
-            AstNodePtr curr_type = parseType();
-            types.push_back(curr_type);
-            if(next().tkType==tk_comma){
-                advance();
-            }
-            while(m_currentToken.tkType==tk_comma){
-                advance();
-                types.push_back(parseType());
-                if(next().tkType==tk_comma){
-                    advance();
-                }
-            }
-            expect(tk_r_paren, "Expected ) but got "+next().keyword+" instead","Add a ) here","","");
-            res=std::make_shared<TypeTuple>(false,types);
-            break;
-        }
+        
         case tk_def:{
             res = parseFuncType();
             break;
@@ -97,6 +80,9 @@ AstNodePtr Parser::parseType(bool can_be_sumtype) {
 }
 
 AstNodePtr Parser::parseListType() {
+    //list TypeExpression
+    //[]typename
+    //[fixed_val]typename
     Token tok = m_currentToken;
     AstNodePtr size=std::make_shared<NoLiteral>();
     if (next().tkType != tk_list_close) {   
@@ -111,6 +97,8 @@ AstNodePtr Parser::parseListType() {
 }
 
 AstNodePtr Parser::parsePointerType() {
+    //pointer type
+    //*type
     Token tok = m_currentToken;
     advance();
     AstNodePtr typePtr = parseType(false);
@@ -118,12 +106,16 @@ AstNodePtr Parser::parsePointerType() {
 }
 
 AstNodePtr Parser::parseRefType() {
+    //reference type
+    //&type
     Token tok = m_currentToken;
     advance();
     AstNodePtr typePtr = parseType(false);
     return std::make_shared<RefTypeExpr>(tok, typePtr);
 }
 AstNodePtr Parser::parseImportedType(){
+    //imported type name
+    //module.type
     AstNodePtr name=parseName();
     advance();
     while(m_currentToken.tkType==tk_dot){
@@ -142,6 +134,8 @@ AstNodePtr Parser::parseImportedType(){
 }
 
 AstNodePtr Parser::parseFuncType() {
+    //lambda types
+    //def(arg_type)->return_type
     auto tok = m_currentToken;
     expect(tk_l_paren,"Expected ( but got "+next().keyword+" instead","Add a ( here","","");
     std::vector<AstNodePtr> types; // arg types
@@ -206,4 +200,5 @@ AstNodePtr Parser::parseFuncType() {
         }
     }
     return std::make_shared<FunctionTypeExpr>(tok, types, returnTypes);
+}
 }

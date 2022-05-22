@@ -7,10 +7,10 @@
 #include <memory>
 #include <string>
 #include <vector>
-
-using namespace ast;
+namespace Parser{
 
 Parser::Parser(const std::vector<Token>& tokens,std::string filename) : m_tokens(tokens) {
+    //initializer of parser class
     m_currentToken = tokens[0];
     m_filename=filename;
 }
@@ -18,6 +18,7 @@ Parser::Parser(const std::vector<Token>& tokens,std::string filename) : m_tokens
 Parser::~Parser() {}
 
 AstNodePtr Parser::parse() {
+    //start parsing
     std::vector<AstNodePtr> statements;
     std::string comment;
     while (m_currentToken.tkType != tk_eof) {
@@ -36,6 +37,7 @@ AstNodePtr Parser::parse() {
 }
 
 AstNodePtr Parser::parseStatement() {
+    //statements
     AstNodePtr stmt;
 
     switch (m_currentToken.tkType) {
@@ -258,6 +260,7 @@ AstNodePtr Parser::parseStatement() {
 }
 
 AstNodePtr Parser::parseBlockStatement() {
+    //anything that is indented
     advance(); // when this is called, we are on the tk_ident token
 
     std::vector<AstNodePtr> statements;
@@ -276,6 +279,8 @@ AstNodePtr Parser::parseBlockStatement() {
 }
 
 AstNodePtr Parser::parseVirtual() {
+    //Defines a virtual function. Should be in a class
+    //virtual def function()->return_type:...
     auto tok = m_currentToken;
     expect(tk_def,
            "Expected a function declaration but got "+next().keyword+" instead","Declare a function here","","e4");
@@ -284,6 +289,10 @@ AstNodePtr Parser::parseVirtual() {
 }
 
 AstNodePtr Parser::parseImport() {
+    //import something
+    //import os
+    //from os import system
+    //from os import * # * means all
     Token tok = m_currentToken;
     bool hasFrom = m_currentToken.tkType == tk_from;
 
@@ -369,6 +378,7 @@ AstNodePtr Parser::parseImport() {
 }
 
 AstNodePtr Parser::parseStatic() {
+    //Static function and variable
     auto tok = m_currentToken;
     advance();
     AstNodePtr body;
@@ -401,6 +411,8 @@ AstNodePtr Parser::parseStatic() {
 }
 
 AstNodePtr Parser::parseInline() {
+    //inline function
+    //inline def function()->type:...
     auto tok = m_currentToken;
     expect(tk_def, "Expected function defination but got " +
                           next().keyword +
@@ -411,6 +423,8 @@ AstNodePtr Parser::parseInline() {
 }
 
 AstNodePtr Parser::parseDefaultArg(){
+    //args with default values
+    //def function(default_arg=0)
     auto tok=m_currentToken;
     AstNodePtr name=parseName();
     advance();
@@ -420,6 +434,8 @@ AstNodePtr Parser::parseDefaultArg(){
 }
 
 AstNodePtr Parser::parseExport() {
+    //exported function i.e non mangled function for other languages to use
+    //export def function():...
     auto tok = m_currentToken;
     expect(tk_def, "Expected function defination but got " +
                           next().keyword +
@@ -429,6 +445,8 @@ AstNodePtr Parser::parseExport() {
 }
 
 AstNodePtr Parser::parseExtern(){
+    //use external c library
+    //extern c=import("lib1","lib2")
     auto tok=m_currentToken;
     expect(tk_identifier,"Expected identifier but got "+next().keyword+" instead","","","");
     auto name=m_currentToken.keyword;
@@ -446,6 +464,7 @@ AstNodePtr Parser::parseExtern(){
 }
 
 AstNodePtr Parser::parsePrivate(bool is_class){
+    //private defination
     auto tok=m_currentToken;
     advance();
     AstNodePtr exp;
@@ -498,4 +517,5 @@ AstNodePtr Parser::parsePrivate(bool is_class){
         }
     }
     return std::make_shared<PrivateDef>(tok,exp);
+}
 }

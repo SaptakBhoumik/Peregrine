@@ -388,6 +388,10 @@ void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
             }
             break;
         }
+        case ast::KAstDecorator:{
+            node->accept(*this);
+            break;
+        }
         default:{}
     }
 }
@@ -395,9 +399,7 @@ std::vector<ast::AstNodePtr> Codegen::TurpleTypes(ast::AstNodePtr node){
     std::vector<ast::AstNodePtr> turple_types;
     if(node->type()==ast::KAstTypeTuple){
         std::shared_ptr<ast::TypeTuple> turple =std::dynamic_pointer_cast<ast::TypeTuple>(node);
-        if(turple->multiple_return()){
-            turple_types=turple->items();
-        }
+        turple_types=turple->items();
     }
     
     return turple_types;
@@ -406,9 +408,7 @@ std::vector<ast::AstNodePtr> Codegen::TurpleExpression(ast::AstNodePtr node){
     std::vector<ast::AstNodePtr> turple_exp;
     if(node->type()==ast::KAstExpressionTuple){
         std::shared_ptr<ast::ExpressionTuple> turple =std::dynamic_pointer_cast<ast::ExpressionTuple>(node);
-        if(turple->multiple_return()){
-            turple_exp=turple->items();
-        }
+        turple_exp=turple->items();
     }
     
     return turple_exp;

@@ -7,8 +7,15 @@
 #include <memory>
 #include <string>
 #include <vector>
-
+namespace Parser{
 AstNodePtr Parser::parseAsm(){
+    //inline assembly code
+    /*
+    __asm__:
+        add="addl %%ebx,%%eax"
+        "a"=arg1
+        "b"=arg2
+    */
     auto tok=m_currentToken;
     expect(tk_colon,"Expected an ':' but got "+next().keyword+" instead","","","");
     expect(tk_ident,"Expected an indentation but got "+next().keyword+" instead","","","");
@@ -53,6 +60,11 @@ AstNodePtr Parser::parseAsm(){
     return std::make_shared<InlineAsm>(tok,assembly,output,inputs);
 }
 AstNodePtr Parser::parseWith() {
+    /* 
+    with statement
+    with class_ins():...
+    with class_ins() as name:...
+    */
     auto tok = m_currentToken;
     advance();
     std::vector<AstNodePtr> variables;
@@ -91,6 +103,9 @@ AstNodePtr Parser::parseWith() {
     return std::make_shared<WithStatement>(tok, variables, values, body);
 }
 AstNodePtr Parser::parseRaise() {
+    //raise an error
+    //raise
+    //raise error_name
     auto tok = m_currentToken;
     advance();
     AstNodePtr value = std::make_shared<NoLiteral>();
@@ -100,6 +115,10 @@ AstNodePtr Parser::parseRaise() {
     return std::make_shared<RaiseStatement>(tok, value);
 }
 AstNodePtr Parser::parseIf() {
+    //if statements
+    //if condition1:...
+    //elif condition2:...
+    //else:...
     Token tok = m_currentToken;
     advance(); // skip the if token
 
@@ -125,6 +144,10 @@ AstNodePtr Parser::parseIf() {
     std::vector<std::pair<AstNodePtr, AstNodePtr>> elifs;
     AstNodePtr elseBody = std::make_shared<NoLiteral>();
     if(is_compile_time){
+        //compile time if else
+        //$if condition1:...
+        //$elif condition2:...
+        //$else:...
         if(next().tkType==tk_dollar){
             if(m_tokens[m_tokIndex+2].tkType==tk_elif){
                 advance();
@@ -225,6 +248,8 @@ AstNodePtr Parser::parseIf() {
 }
 
 AstNodePtr Parser::parseAssert() {
+    //assert statements which if true will throw an error
+    //assert condition
     auto tok = m_currentToken;
     advance();
     auto condition = parseExpression();
@@ -232,6 +257,25 @@ AstNodePtr Parser::parseAssert() {
 }
 
 AstNodePtr Parser::parseMatch() {
+    //patern matching
+    /*
+    match a,b,c:
+        case 5,7,8:
+            printf("a is 5,b is 7 and c is 8")
+        case 4,7,_:#c can be anything
+            printf("a is 4 but b is 7")
+            break  #we dont want default to execute
+        case 4,_,7:#b can be anything
+            printf("a is 4 but c is 7")
+            break  #we dont want default to execute
+        case 8,_:#b and c can be anything
+            printf("a is 8")
+        case _:
+            printf("idk")
+        #optional
+        default:#will be executed at the end if no break
+            printf("\nHello\n")
+    */
     Token tok = m_currentToken;
     advance();
     std::vector<AstNodePtr> toMatch;
@@ -314,6 +358,8 @@ AstNodePtr Parser::parseMatch() {
     return std::make_shared<MatchStatement>(tok, toMatch, cases, default_body);
 }
 AstNodePtr Parser::parseScope() {
+    //create new scope
+    //scope:...
     Token tok = m_currentToken;
     if (next().tkType!=tk_colon){
             error(next(),
@@ -337,6 +383,8 @@ AstNodePtr Parser::parseScope() {
 
 
 AstNodePtr Parser::parseWhile() {
+    //while statements
+    //while condition:...
     Token tok = m_currentToken;
     advance(); // skip the while token
 
@@ -364,6 +412,8 @@ AstNodePtr Parser::parseWhile() {
 }
 
 AstNodePtr Parser::parseFor() {
+    //for statements
+    //for i in iterable:...
     Token tok = m_currentToken;
     advance();
 
@@ -403,6 +453,9 @@ AstNodePtr Parser::parseFor() {
 }
 
 AstNodePtr Parser::parseReturn() {
+    //return something from the function
+    //return value
+    //return value1,value2
     Token tok = m_currentToken;
     AstNodePtr returnValue=std::make_shared<NoLiteral>();
     advance();
@@ -416,6 +469,21 @@ AstNodePtr Parser::parseReturn() {
 }
 
 AstNodePtr Parser::parseTryExcept(){
+    //try except statement
+    /*
+    try:
+        assert r==0
+    except error.AssertionError:
+        printf("Assertion error\n")
+    try:
+        printf("%lld",divide(6,0))
+    except error.AssertionError,error.ZeroDivisionError:pass
+    except:
+        printf("Exception caught\n")
+    try:assert False
+    except error.AssertionError,error.ZeroDivisionError as e:
+        printf("Exception caught %lld\n",e)
+    */
     auto tok=m_currentToken;
     expect(tk_colon,"Expected : but got "+next().keyword+" instead","Add a : here","","");
     auto line=m_currentToken.line;
@@ -493,4 +561,5 @@ AstNodePtr Parser::parseTryExcept(){
         }
     }
     return std::make_shared<TryExcept>(tok,try_body,m_except_clauses,else_body);
+}
 }

@@ -2,8 +2,10 @@
 #include <iostream>
 #include <algorithm>
 
+namespace Parser{
 
 void Parser::advance() {
+    //go to next token
     m_tokIndex++;
 
     if (m_tokIndex < m_tokens.size()) {
@@ -12,12 +14,14 @@ void Parser::advance() {
 }
 
 void Parser::advanceOnNewLine() {
+    //go to next line
     if (next().tkType == tk_new_line) {
         advance();
     }
 }
 
 Token Parser::next() {
+    //check the next token
     Token token;
 
     if (m_tokIndex + 1 < m_tokens.size()) {
@@ -28,6 +32,7 @@ Token Parser::next() {
 }
 
 PrecedenceType Parser::nextPrecedence() {
+    //get the precedence of next operator
     if(m_currentToken.tkType == tk_new_line||m_currentToken.tkType == tk_dedent) {
         return pr_lowest;
     }
@@ -38,7 +43,8 @@ PrecedenceType Parser::nextPrecedence() {
 }
 
 void Parser::error(Token tok, std::string msg,std::string submsg,std::string hint,std::string ecode) {
-    PEError err = {{tok.line, tok.start,tok.location, m_filename, tok.statement},
+    //display error
+    PEError err = {{tok.line, tok.location,tok.location, m_filename, tok.statement},
                    std::string(msg),
                    submsg,
                    hint,
@@ -49,6 +55,7 @@ void Parser::error(Token tok, std::string msg,std::string submsg,std::string hin
 }
 
 void Parser::expect(TokenType expectedType, std::string msg,std::string submsg,std::string hint,std::string ecode) {
+    //check if the next toke is what we expect or else show error
     if (next().tkType != expectedType) {
         if(msg==""){
             msg="expected token of type " + std::to_string(expectedType) +", got " + std::to_string(next().tkType) + " instead";
@@ -64,6 +71,7 @@ void Parser::expect(TokenType expectedType, std::string msg,std::string submsg,s
 }
 
 std::map<TokenType, PrecedenceType> createMap() {
+    //precedence map
     std::map<TokenType, PrecedenceType> precedenceMap;
     precedenceMap[tk_for] = pr_conditional;
     precedenceMap[tk_double_dot] = pr_range;
@@ -107,6 +115,7 @@ std::map<TokenType, PrecedenceType> createMap() {
     return precedenceMap;
 }
 parameter Parser::parseParameter(){
+    //parse function parameter
     AstNodePtr paramType = std::make_shared<NoLiteral>();
     AstNodePtr paramDefault = std::make_shared<NoLiteral>();
     AstNodePtr paramName = std::make_shared<NoLiteral>();
@@ -160,4 +169,5 @@ parameter Parser::parseParameter(){
         advance();
     }
     return parameter{paramType, paramName,paramDefault,is_const};
+}
 }

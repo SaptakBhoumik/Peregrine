@@ -1,7 +1,7 @@
 #ifndef PEREGRINE_LINKER
 #define PEREGRINE_LINKER
 #include <iostream>
-
+namespace Linker{
 enum Flavor {
   Invalid,
   Gnu,       // -flavor gnu
@@ -22,5 +22,5 @@ class linker{
     void auto_flavor();
 
 };
-
+}
 #endif //PEREGRINE_LINKER
