@@ -4,6 +4,8 @@
 #include <iostream>
 #include <map>
 #include <regex>
+#define not_tab()   m_is_tab=false;
+
 std::vector<std::string> split_ln(std::string code) {
     std::vector<std::string> split_code;
     std::string character;
@@ -123,7 +125,8 @@ void LEXER::add_unknown(){
                         m_curr_index-m_keyword.length(),
                         m_curr_index+1,
                         m_line,
-                        type
+                        type,
+                        m_tab_count
         };
         if(m_result.size()>0 && type==tk_in){
             if(m_result.back().tkType==tk_not){
@@ -153,6 +156,82 @@ void LEXER::add_unknown(){
     }
     m_keyword = "";
 }
+void LEXER::add_ident(){
+    auto result=m_result;
+    m_result.clear();
+    std::vector<size_t> tabs;
+    size_t previous_ident=0;
+    size_t current_ident=0;
+    for(auto item:result){
+        current_ident=item.tab;
+        if(current_ident>previous_ident){
+            m_result.push_back(Token{
+                item.location,
+                item.statement,
+                "<ident>",
+                item.start,
+                item.end,
+                item.line,
+                tk_ident,
+            });
+            m_result.push_back(item);
+            previous_ident=item.tab;
+            tabs.push_back(item.tab);
+        }
+        else if(current_ident<previous_ident){
+            m_result.push_back(item);
+            while (current_ident < previous_ident) {
+                tabs.pop_back();
+                m_result.push_back(Token{
+                    item.location,
+                    item.statement,
+                    "<dedent>",
+                    item.start,
+                    item.end,
+                    item.line,
+                    tk_dedent,
+                });
+                if (tabs.size() != 0) {
+                    if (current_ident >=tabs.back()) {
+                        break;
+                    }
+                    previous_ident = tabs.back();
+                } else {
+                    previous_ident = 0;
+                }
+            }    
+        }
+        else{
+            m_result.push_back(item);
+        }
+    }
+    auto item=result.back();
+    if(m_result.back().tkType!=tk_new_line
+            && m_result.back().tkType!=tk_dedent
+            ){
+            m_result.push_back(Token{
+                m_loc,
+                m_curr_line,
+                "<tk_new_line>",
+                m_curr_index,
+                m_curr_index+1,
+                m_line,
+                tk_new_line,
+                m_tab_count
+            });
+        }
+    for(auto&_:tabs){
+        m_result.push_back(Token{
+            item.location,
+            item.statement,
+            "<dedent>",
+            item.start,
+            item.end,
+            item.line,
+            tk_dedent,
+        });
+    }
+}
 LEXER::LEXER(std::string input, std::string filename){
     m_input = input;
     m_filename = filename;
@@ -161,6 +240,7 @@ LEXER::LEXER(std::string input, std::string filename){
         m_curr_item=m_input[0];
         m_curr_line=m_statments[m_line-1];
         lex();
+        add_ident();
     }
     if(m_keyword!=""){
         add_unknown();
@@ -218,7 +298,8 @@ LEXER::LEXER(std::string input, std::string filename){
                 m_curr_index,
                 m_curr_index+1,
                 m_line,
-                tk_new_line
+                tk_new_line,
+                m_tab_count
             });
         }
     }
@@ -229,7 +310,8 @@ LEXER::LEXER(std::string input, std::string filename){
             m_curr_index,
             m_curr_index+1,
             m_line,
-            tk_eof
+            tk_eof,
+            m_tab_count
     });
 }
 
@@ -256,6 +338,7 @@ void LEXER::lex(){
     while (true){
         switch(m_curr_item){
             case '#':{
+                not_tab();
                 add_unknown();
                 while(m_curr_item!='\n' && m_curr_item!='\r'){
                     if(!advance()){
@@ -278,7 +361,8 @@ void LEXER::lex(){
                             m_curr_index,
                             m_curr_index+1,
                             m_line,
-                            tk_new_line
+                            tk_new_line,
+                            m_tab_count
                         });
                     }
                 }
@@ -286,11 +370,13 @@ void LEXER::lex(){
             }
             case '\"':
             case '\'':{
+                not_tab();
                 add_unknown();
                 lex_string();
                 break;
             }
             case '(':{
+                not_tab();
                 add_unknown();
                 m_first_bracket_count++;
                 m_result.push_back(Token{
@@ -300,11 +386,13 @@ void LEXER::lex(){
                             m_curr_index,
                             m_curr_index+1,
                             m_line,
-                            tk_l_paren
+                            tk_l_paren,
+                            m_tab_count
                 });
                 break;
             }
             case '{':{
+                not_tab();
                 add_unknown();
                 m_second_bracket_count++;
                 m_result.push_back(Token{
@@ -314,11 +402,13 @@ void LEXER::lex(){
                             m_curr_index,
                             m_curr_index+1,
                             m_line,
-                            tk_dict_open
+                            tk_dict_open,
+                            m_tab_count
                 });
                 break;
             }
             case '[':{
+                not_tab();
                 add_unknown();
                 m_third_bracket_count++;
                 m_result.push_back(Token{
@@ -328,11 +418,13 @@ void LEXER::lex(){
                             m_curr_index,
                             m_curr_index+1,
                             m_line,
-                            tk_list_open
+                            tk_list_open,
+                            m_tab_count
                 });
                 break;
             }
             case ')':{
+                not_tab();
                 add_unknown();
                 if(m_first_bracket_count==0){
                     m_error.push_back(PEError({.loc = Location({.line = m_line,
@@ -352,11 +444,13 @@ void LEXER::lex(){
                             m_curr_index,
                             m_curr_index+1,
                             m_line,
-                            tk_r_paren
+                            tk_r_paren,
+                            m_tab_count
                 });
                 break;
             }
             case '}':{
+                not_tab();
                 add_unknown();
                 if(m_second_bracket_count==0){
                     m_error.push_back(PEError({.loc = Location({.line = m_line,
@@ -376,11 +470,13 @@ void LEXER::lex(){
                             m_curr_index,
                             m_curr_index+1,
                             m_line,
-                            tk_dict_close
+                            tk_dict_close,
+                            m_tab_count
                 });
                 break;
             }
             case ']':{
+                not_tab();
                 add_unknown();
                 if(m_third_bracket_count==0){
                     m_error.push_back(PEError({.loc = Location({.line = m_line,
@@ -400,85 +496,102 @@ void LEXER::lex(){
                             m_curr_index,
                             m_curr_index+1,
                             m_line,
-                            tk_list_close
+                            tk_list_close,
+                            m_tab_count
                 });
                 break;
             }
             case '.':{
+                not_tab();
                 lex_dot();
                 break;
             }
             case '+':{
+                not_tab();
                 add_unknown();
                 lex_plus();
                 break;
             }
             case '>':{
+                not_tab();
                 add_unknown();
                 lex_greater();
                 break;
             }
             case '<':{
+                not_tab();
                 add_unknown();
                 lex_less();
                 break;
             }
             case '-':{
+                not_tab();
                 add_unknown();
                 lex_minus();
                 break;
             }
             case '=':{
+                not_tab();
                 add_unknown();
                 lex_equal();
                 break;
             }
             case '/':{
+                not_tab();
                 add_unknown();
                 lex_slash();
                 break;
             }
             case '^':{
+                not_tab();
                 add_unknown();
                 lex_caret();
                 break;
             }
             case '%':{
+                not_tab();
                 add_unknown();
                 lex_percent();
                 break;
             }
             case '&':{
+                not_tab();
                 add_unknown();
                 lex_ampersand();
                 break;
             }
             case '|':{
+                not_tab();
                 add_unknown();
                 lex_pipeline();
                 break;
             }
             case '*':{
+                not_tab();
                 add_unknown();
                 lex_star();
                 break;
             }
             case '~':{
+                not_tab();
                 add_unknown();
                 lex_tilde();
                 break;
             }
             case '$':{
+                not_tab();
                 add_unknown();
                 lex_dollar();
                 break;
             }
             case '!':{
+                not_tab();
                 add_unknown();
                 lex_bang();
                 break;
             }
             case ':':{
+                not_tab();
                 add_unknown();
                 m_result.push_back(Token{
                             m_loc,
@@ -487,11 +600,13 @@ void LEXER::lex(){
                             m_curr_index,
                             m_curr_index+1,
                             m_line,
-                            tk_colon
+                            tk_colon,
+                            m_tab_count
                 });
                 break;
             }
             case ',':{
+                not_tab();
                 add_unknown();
                 m_result.push_back(Token{
                             m_loc,
@@ -500,11 +615,13 @@ void LEXER::lex(){
                             m_curr_index,
                             m_curr_index+1,
                             m_line,
-                            tk_comma
+                            tk_comma,
+                            m_tab_count
                 });
                 break;
             }
             case '@':{
+                not_tab();
                 add_unknown();
                 m_result.push_back(Token{
                             m_loc,
@@ -513,21 +630,27 @@ void LEXER::lex(){
                             m_curr_index,
                             m_curr_index+1,
                             m_line,
-                            tk_at
+                            tk_at,
+                            m_tab_count
                 });
                 break;
             }
             case ' ':{
-                //TODO:Tabs
                 add_unknown();
+                if(m_is_tab){
+                    m_tab_count++;
+                }
                 break;
             }
             case '\t':{
-                //TODO:Tabs
+                if(m_is_tab){
+                    m_tab_count++;
+                }
                 add_unknown();
                 break;
             }
             case '\n':{
+                m_is_tab=true;
                 add_unknown();
                 m_line++;
                 m_loc=0;
@@ -545,13 +668,16 @@ void LEXER::lex(){
                             m_curr_index,
                             m_curr_index+1,
                             m_line,
-                            tk_new_line
+                            tk_new_line,
+                            m_tab_count
                         });
                     }
                 }
+                m_tab_count=0;
                 break;
             }
             case '\r':{
+                m_is_tab=true;
                 add_unknown();
                 if (next()=='\n'){// \r\n
                     advance();
@@ -572,13 +698,16 @@ void LEXER::lex(){
                             m_curr_index,
                             m_curr_index+1,
                             m_line,
-                            tk_new_line
+                            tk_new_line,
+                            m_tab_count
                         });
                     }
                 }
+                m_tab_count=0;
                 break;
             }
             default:{
+                not_tab();
                 m_keyword+=m_curr_item;
             }
         }
@@ -600,7 +729,8 @@ void LEXER::lex_dollar(){
         m_curr_index,
         m_curr_index+1,
         m_line,
-        tk_dollar
+        tk_dollar,
+        m_tab_count
     });
 }
 void LEXER::lex_tilde(){
@@ -611,7 +741,8 @@ void LEXER::lex_tilde(){
                     m_curr_index,
                     m_curr_index+1,
                     m_line,
-                    tk_bit_not
+                    tk_bit_not,
+                    m_tab_count
         });
 }
 void LEXER::lex_ampersand(){
@@ -625,7 +756,8 @@ void LEXER::lex_ampersand(){
                     start_index,
                     m_curr_index+1,
                     m_line,
-                    tk_bit_and_equal
+                    tk_bit_and_equal,
+                    m_tab_count
         });
     }
     else{
@@ -636,7 +768,8 @@ void LEXER::lex_ampersand(){
                     start_index,
                     m_curr_index+1,
                     m_line,
-                    tk_ampersand
+                    tk_ampersand,
+                     m_tab_count
         });
     }
 }
@@ -651,7 +784,8 @@ void LEXER::lex_bang(){
                     start_index,
                     m_curr_index+1,
                     m_line,
-                    tk_not_equal
+                    tk_not_equal,
+                    m_tab_count
         });
     }
     else{
@@ -675,7 +809,8 @@ void LEXER::lex_percent(){
                     start_index,
                     m_curr_index+1,
                     m_line,
-                    tk_mod_equal
+                    tk_mod_equal,
+                    m_tab_count
         });
     }
     else{
@@ -686,7 +821,8 @@ void LEXER::lex_percent(){
                     start_index,
                     m_curr_index+1,
                     m_line,
-                    tk_modulo
+                    tk_modulo,
+                    m_tab_count
         });
     }
 }
@@ -748,7 +884,8 @@ void LEXER::lex_string(){
                 start_index,
                 m_curr_index+1,
                 m_line,
-                tk_string
+                tk_string,
+                m_tab_count
             });
 }
 void LEXER::lex_plus(){
@@ -762,7 +899,8 @@ void LEXER::lex_plus(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_increment
+            tk_increment,
+            m_tab_count
         });
     }
     else if(next()=='='){
@@ -774,7 +912,8 @@ void LEXER::lex_plus(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_plus_equal
+            tk_plus_equal,
+            m_tab_count
         });
     }
     else{
@@ -785,7 +924,8 @@ void LEXER::lex_plus(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_plus
+            tk_plus,
+            m_tab_count
         });
     }
 }
@@ -800,7 +940,8 @@ void LEXER::lex_minus(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_decrement
+            tk_decrement,
+            m_tab_count
         });
     }
     else if(next()=='='){
@@ -812,7 +953,8 @@ void LEXER::lex_minus(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_minus_equal
+            tk_minus_equal,
+            m_tab_count
         });
     }
     else if(next()=='>'){
@@ -824,7 +966,8 @@ void LEXER::lex_minus(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_arrow
+            tk_arrow,
+            m_tab_count
         });
     }
     else{
@@ -835,7 +978,8 @@ void LEXER::lex_minus(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_minus
+            tk_minus,
+            m_tab_count
         });
     }
 }
@@ -850,7 +994,8 @@ void LEXER::lex_greater(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_gr_or_equ
+            tk_gr_or_equ,
+            m_tab_count
         });
     }
     else if(next()=='>'){
@@ -864,7 +1009,8 @@ void LEXER::lex_greater(){
                 start_index,
                 m_curr_index+1,
                 m_line,
-                tk_shift_right_equal
+                tk_shift_right_equal,
+                m_tab_count
             });
         }
         else{
@@ -875,7 +1021,8 @@ void LEXER::lex_greater(){
                 start_index,
                 m_curr_index+1,
                 m_line,
-                tk_shift_right
+                tk_shift_right,
+                m_tab_count
             });
         }
     }
@@ -887,7 +1034,8 @@ void LEXER::lex_greater(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_greater
+            tk_greater,
+            m_tab_count
         });
     }
 }
@@ -902,7 +1050,8 @@ void LEXER::lex_less(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_less_or_equ
+            tk_less_or_equ,
+            m_tab_count
         });
     }
     else if(next()=='<'){
@@ -916,7 +1065,8 @@ void LEXER::lex_less(){
                 start_index,
                 m_curr_index+1,
                 m_line,
-                tk_shift_left_equal
+                tk_shift_left_equal,
+                m_tab_count
             });
         }
         else{
@@ -927,7 +1077,8 @@ void LEXER::lex_less(){
                 start_index,
                 m_curr_index+1,
                 m_line,
-                tk_shift_left
+                tk_shift_left,
+                m_tab_count
             });
         }
     }
@@ -939,7 +1090,8 @@ void LEXER::lex_less(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_less
+            tk_less,
+            m_tab_count
         });
     }
 }
@@ -954,7 +1106,8 @@ void LEXER::lex_equal(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_equal
+            tk_equal,
+            m_tab_count
         });
     }
     else{
@@ -965,7 +1118,8 @@ void LEXER::lex_equal(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_assign
+            tk_assign,
+            m_tab_count
         });
     }
 }
@@ -980,7 +1134,8 @@ void LEXER::lex_slash(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_slash_equal
+            tk_slash_equal,
+            m_tab_count
         });
     }
     else if(next()=='/'){
@@ -994,7 +1149,8 @@ void LEXER::lex_slash(){
                 start_index,
                 m_curr_index+1,
                 m_line,
-                tk_floor_equal
+                tk_floor_equal,
+                m_tab_count
             });
         }
         else{
@@ -1005,7 +1161,8 @@ void LEXER::lex_slash(){
                 start_index,
                 m_curr_index+1,
                 m_line,
-                tk_floor
+                tk_floor,
+                m_tab_count
             });
         }
     }
@@ -1017,7 +1174,8 @@ void LEXER::lex_slash(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_divide
+            tk_divide,
+            m_tab_count
         });
     }
 }
@@ -1032,7 +1190,8 @@ void LEXER::lex_caret(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_bit_xor_equal
+            tk_bit_xor_equal,
+            m_tab_count
         });
     }
     else{
@@ -1043,7 +1202,8 @@ void LEXER::lex_caret(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_xor
+            tk_xor,
+            m_tab_count
         });
     }
 }
@@ -1058,7 +1218,8 @@ void LEXER::lex_pipeline(){
                     start_index,
                     m_curr_index+1,
                     m_line,
-                    tk_bit_or_equal
+                    tk_bit_or_equal,
+                    m_tab_count
         });
     }
     else if(next()=='>'){
@@ -1070,7 +1231,8 @@ void LEXER::lex_pipeline(){
                     start_index,
                     m_curr_index+1,
                     m_line,
-                    tk_pipeline
+                    tk_pipeline,
+                    m_tab_count
         });
     }
     else{
@@ -1081,7 +1243,8 @@ void LEXER::lex_pipeline(){
                     start_index,
                     m_curr_index+1,
                     m_line,
-                    tk_bit_or
+                    tk_bit_or,
+                    m_tab_count
         });
     }
 }
@@ -1102,7 +1265,8 @@ void LEXER::lex_dot(){
                     m_curr_index-2,
                     m_curr_index+1,
                     m_line,
-                    tk_ellipses
+                    tk_ellipses,
+                    m_tab_count
             });
         }
         else{
@@ -1113,7 +1277,8 @@ void LEXER::lex_dot(){
                 m_curr_index-1,
                 m_curr_index+1,
                 m_line,
-                tk_double_dot
+                tk_double_dot,
+                m_tab_count
             });
         }               
     }
@@ -1125,7 +1290,8 @@ void LEXER::lex_dot(){
             m_curr_index,
             m_curr_index+1,
             m_line,
-            tk_dot
+            tk_dot,
+            m_tab_count
         });
     }
 }
@@ -1153,7 +1319,8 @@ void LEXER::lex_star(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_multiply
+            tk_multiply,
+            m_tab_count
         });  
     }
     else if(next()=='='){
@@ -1165,7 +1332,8 @@ void LEXER::lex_star(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_times_equal
+            tk_times_equal,
+            m_tab_count
         });
     }
     else if(next()=='*'){
@@ -1179,7 +1347,8 @@ void LEXER::lex_star(){
                 start_index,
                 m_curr_index+1,
                 m_line,
-                tk_exponent_equal
+                tk_exponent_equal,
+                m_tab_count
             });
         }
         else{
@@ -1190,7 +1359,8 @@ void LEXER::lex_star(){
                 start_index,
                 m_curr_index+1,
                 m_line,
-                tk_exponent
+                tk_exponent,
+                m_tab_count
             });
         }
     }
@@ -1202,7 +1372,8 @@ void LEXER::lex_star(){
             start_index,
             m_curr_index+1,
             m_line,
-            tk_multiply
+            tk_multiply,
+            m_tab_count
         });
     }
 }
@@ -1210,6 +1381,7 @@ void LEXER::lex_star(){
 LEXEME LEXER::result(){
     return m_result;
 }
+
 LEXEME lexer(std::string src, std::string filename){
     LEXER a(src, filename);
     return a.result();

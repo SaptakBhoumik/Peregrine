@@ -130,6 +130,7 @@ struct Token {
     size_t end;
     size_t line;
     TokenType tkType;
+    size_t tab=0;
 };
 
 namespace TokenUtils {

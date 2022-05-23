@@ -23,6 +23,7 @@ class LEXER{
     size_t m_curr_identation_level=0;
     char m_curr_item='\0';
     bool m_is_tab = true;
+    size_t m_tab_count = 0;
 
     void lex();
     char next();
@@ -48,6 +49,7 @@ class LEXER{
     void lex_greater();
     void lex_less();
     void lex_dot();
+    void add_ident();
     public:
     LEXER(std::string input, std::string filename);
     LEXEME result();
