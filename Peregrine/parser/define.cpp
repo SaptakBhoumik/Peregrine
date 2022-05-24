@@ -463,8 +463,7 @@ AstNodePtr Parser::parseClassDefinition() {
                 other.push_back(parseEnum());
                 break;
             }
-            case tk_ellipses:
-            case tk_pass:{
+            case tk_ellipses:{
                 advance();
                 break;
             }

@@ -95,7 +95,6 @@ enum TokenType {
     tk_case,      // case
     tk_default,   // default
     tk_def,       // def
-    tk_pass,      // pass
     tk_return,    // return
     tk_and,       // and
     tk_or,        // or

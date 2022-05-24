@@ -1,7 +1,7 @@
 type a = def(int)->int
 type g = def(int)
 def unknown_type(variable):
-    pass
+    ...
 enum colours:
     RED = 144,
     GREEN,
@@ -42,7 +42,7 @@ def lambda_test(x:a):
     printf("The value is %d",x(5))
 def func(g:int )->int:
     return g
-export def fun():pass
+export def fun():...
 type lambda_type=def(i32)->i32
 def print_int(i:i32):
     printf("Square is %d\n",i)
@@ -69,7 +69,7 @@ def main():
     y:bool
     y=True
     if x==y:
-        pass
+        ...
     printf("%d",test(0))
     a:int=0
     b:int=7
@@ -114,7 +114,7 @@ def main():
     try:
         #should terminate the program
         printf("%d",divide(6,0))
-    except error.AssertionError:pass
+    except error.AssertionError:...
     except:
         printf("Exception caught\n")
     try:assert False

@@ -9,7 +9,7 @@ def peregrine1()->int,int:
     #error()
 type a_type=def()->int,int
 class decorate:
-    def __init__(self):pass
+    def __init__(self):...
     def dec(self,x:a_type)->a_type:return x
 ooo:decorate=decorate()
 ooo_ptr:*decorate=&ooo
@@ -41,7 +41,7 @@ def unknown_type(var):
     with var as y:
         printf("Y is %lld\n",y)
     with var:
-        pass
+        ...
     with var as y,var as x:
         printf("Y is %lld\n",y)
         printf("X is %lld\n",x)
@@ -61,7 +61,7 @@ class iterate_test(inherit):
     x:int
     i_ref:&int=i
     class nested_class:
-        def __init__(self):pass
+        def __init__(self):...
     enum nested_enum:x,y,z
     enum nested_enum2:x,y,z=nested_enum.z
     xyz:nested_enum=nested_enum.x
@@ -251,7 +251,7 @@ def main():
     y:bool
     y=True
     if x==y:
-        pass
+        ...
     printf("%lld\n",test(0))
     a:int =0
     b:int =7
@@ -298,7 +298,7 @@ def main():
         printf("Assertion error\n")
     try:
         printf("%lld",divide(6,0))
-    except error.AssertionError,error.ZeroDivisionError:pass
+    except error.AssertionError,error.ZeroDivisionError:...
     except:
         printf("Exception caught\n")
     try:assert False

@@ -137,8 +137,7 @@ AstNodePtr Parser::parseStatement() {
             break;
         }
 
-        case tk_ellipses:
-        case tk_pass: {
+        case tk_ellipses:{
             stmt = std::make_shared<PassStatement>(m_currentToken);
             advanceOnNewLine();
             break;

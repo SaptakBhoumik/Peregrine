@@ -4,12 +4,12 @@ val = [45, 3]
 val2 = cast<int>(val)
 
 while True:
-    pass
+    ...
 def test(a,b):
     raise
 for x in y:
     for i , j in x:
-        pass
+        ...
 
 c = [3, 54, 76]
 c[2] = 4
@@ -25,11 +25,11 @@ def hey(a: [2]int):
 
 hey(arr)
 with c:
-    pass
+    ...
 with x as c:
-    pass
+    ...
 with x as c,y as u:
-    pass
+    ...
 class test(parent1,parent2):
     "multi line
     comment"
@@ -53,14 +53,14 @@ class test(parent1,parent2):
         return self.a * self.b
 
 def test_x(a=0,b:int=9):
-    pass
+    ...
 test_x(7)
 
 static const gg=5
 static const gg:int=5
 
 export def test2():
-    pass
+    ...
 
 union n:
   "comment1"
@@ -69,36 +69,44 @@ union n:
   g:int
 x = 3 if a==2 else 0
 scope:
-  pass
-def v():pass
-for x in y:pass
-while True:pass
-scope:pass
-if True:pass
-elif False:pass
-elif True:pass
-else:pass
+  ...
+def v():...
+for x in y:...
+while True:...
+scope:...
+if True:...
+elif False:...
+elif True:...
+else:...
 enum b:x,h=0
-with x as y:pass
+with x as y:...
+
 match x:
     case t:
-        pass
-    case y:pass
-    default:pass
+        ...
+
+    case y:...
+
+    default:...
+
 i++
 i--
 def v():
     return 1,2
 try:
-    pass
+    ...
+
 except a:
-    pass
+    ...
+
 except a as b:
-    pass
+    ...
+
 except a,c as b:
-    pass
+    ...
+
 except:
-    pass
+    ...
 a:i.h.g=0
 a:int
 type p=def()->a,a
@@ -168,16 +176,16 @@ from os6 import t8 as y8 ,yy as u8
 from os7 import t6,y0
 from os8 import t86
 $if False:
-    pass
+    ...
 $elif False:
-    pass
+    ...
 $elif False:
-    pass
+    ...
 $else:
     ...
 
 $if False:
-    pass
+    ...
 $else:
     ...
 
@@ -192,14 +200,14 @@ class x{T}:
         a:T2
         b:T1
     def x{T1}():
-        pass
+        ...
     def x{T1,T2}():
-        pass
+        ...
 def (i:int)x{T1}():
-    pass
+    ...
 @decorator
 def (i:int)x{T1,T2}():
-    pass
+    ...
 class x{T,R}:
     union u{T}:
         a:T
@@ -208,14 +216,14 @@ class x{T,R}:
         a:T2
         b:T1
     def x{T1}():
-        pass
+        ...
     @decorator_in_class
     def x{T1,T2}():
-        pass
+        ...
 def (i:int)x{T1}():
-    pass
+    ...
 def (i:int)x{T1,T2}():
-    pass
+    ...
 from x import *
 lambda_test = def(x:int):x*x
 var1 |> methord1 |> methord2 

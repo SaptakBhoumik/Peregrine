@@ -51,7 +51,6 @@ void LEXER::add_unknown(){
         {"static",tk_static},
         {"def",tk_def},
         {"private",tk_private},
-        {"pass",tk_pass},
         {"return",tk_return},
         {"as",tk_as},
         {"enum",tk_enum},
