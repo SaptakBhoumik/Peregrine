@@ -557,20 +557,25 @@ void LEXER::lex(){
             }
             case ' ':{
                 add_unknown();
-                if(m_is_tab){
+                if(m_is_tab&&
+                    m_first_bracket_count==0&&
+                    m_second_bracket_count==0&&
+                    m_third_bracket_count==0){
                     m_tab_count++;
                 }
                 break;
             }
             case '\t':{
-                if(m_is_tab){
+                if(m_is_tab&&
+                    m_first_bracket_count==0&&
+                    m_second_bracket_count==0&&
+                    m_third_bracket_count==0){
                     m_tab_count+=8;
                 }
                 add_unknown();
                 break;
             }
             case '\n':{
-                m_is_tab=true;
                 add_unknown();
                 if(m_result.size()>0){
                     if (m_result.back().tkType!=tk_new_line && m_result.back().tkType!=tk_colon
@@ -593,11 +598,15 @@ void LEXER::lex(){
                 m_line++;
                 m_loc=0;
                 m_curr_line=m_statments[m_line-1];
-                m_tab_count=0;
+                if(m_first_bracket_count==0&&
+                    m_second_bracket_count==0&&
+                    m_third_bracket_count==0){
+                    m_is_tab=true;
+                    m_tab_count=0;
+                }
                 break;
             }
             case '\r':{
-                m_is_tab=true;
                 add_unknown();
                 if (next()=='\n'){// \r\n
                     advance();
@@ -620,7 +629,12 @@ void LEXER::lex(){
                         });
                     }
                 }
-                m_tab_count=0;
+                if(m_first_bracket_count==0&&
+                    m_second_bracket_count==0&&
+                    m_third_bracket_count==0){
+                    m_is_tab=true;
+                    m_tab_count=0;
+                }
                 m_line++;
                 m_loc=0;
                 m_curr_line=m_statments[m_line-1];

@@ -223,3 +223,4 @@ func{int}()+9
 a:generic{T1,T2}= 0
 type sumtype=int|float|*int|[]int|generic{int,int}
 def x()->a,b:return 1,2
+a=f"hellp {y+z}"

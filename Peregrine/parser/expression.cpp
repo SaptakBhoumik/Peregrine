@@ -41,7 +41,6 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
         }
 
         case tk_format: {
-            advance(); // making it a string
             left = parseFormatString();
             break;
         }
