@@ -24,6 +24,13 @@ AstNodePtr Parser::parse() {
     while (m_currentToken.tkType != tk_eof) {
         if(m_currentToken.tkType==tk_string && statements.size()==0 && comment==""){
           comment=m_currentToken.keyword;
+          if(next().tkType==tk_new_line){
+            advance();
+            advance();
+            if(m_currentToken.tkType==tk_eof){
+                break;
+            }
+          }
         }
         statements.push_back(parseStatement());
         if(m_currentToken.tkType!=tk_new_line && m_currentToken.tkType!=tk_dedent){

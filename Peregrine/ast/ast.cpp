@@ -56,17 +56,13 @@ AstKind DecimalLiteral::type() const { return KAstDecimal; }
 
 std::string DecimalLiteral::stringify() const { return m_value; }
 
-StringLiteral::StringLiteral(Token tok, std::string_view value, bool formatted,
-                             bool raw) {
+StringLiteral::StringLiteral(Token tok, std::string_view value, bool raw) {
     m_token = tok;
     m_value = value;
-    m_formatted = formatted;
     m_raw = raw;
 }
 
 std::string StringLiteral::value() const { return m_value; }
-
-bool StringLiteral::formatted() const { return m_formatted; }
 
 bool StringLiteral::raw() const { return m_raw; }
 
@@ -74,7 +70,13 @@ Token StringLiteral::token() const { return m_token; }
 
 AstKind StringLiteral::type() const { return KAstString; }
 
-std::string StringLiteral::stringify() const { return m_value; }
+std::string StringLiteral::stringify() const { 
+    std::string x=m_value.c_str();
+    if(m_raw){
+        return "r\""+x+"\"";
+    }
+    return "\""+x+"\""; 
+}
 
 BoolLiteral::BoolLiteral(Token tok, std::string_view value) {
     m_token = tok;
@@ -1903,5 +1905,34 @@ std::string GenericCall::stringify() const{
     res+="}";
     return res;
 }
-
+FormatedStr::FormatedStr(Token tok,std::vector<AstNodePtr> items){
+    m_tok=tok;
+    m_items=items;
+}
+std::vector<AstNodePtr> FormatedStr::items() const{
+    return m_items;
+}
+Token FormatedStr::token() const{
+    return m_tok;
+}
+AstKind FormatedStr::type() const{
+    return KAstFormatedStr;
+}
+std::string FormatedStr::stringify() const{
+    std::string res="f\"";
+    for(size_t i=0;i<m_items.size();++i){
+        res+=m_items[i]->stringify();
+        if(m_items[i]->type()==KAstString){
+            if(i!=0){
+                res+="}";
+            }
+            res+="{";
+        }
+    }
+    if(m_items.back()->type()!=KAstString){
+        res+="}";
+    }
+    res+="\"";
+    return res;
+}
 } // namespace ast

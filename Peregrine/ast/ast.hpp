@@ -82,7 +82,8 @@ enum AstKind {
     KAstPrivate,
     KAstInlineAsm,
     KAstLambda,
-    KAstGenericCall
+    KAstGenericCall,
+    KAstFormatedStr
 };
 
 class AstVisitor;
@@ -146,14 +147,12 @@ class DecimalLiteral : public AstNode {
 class StringLiteral : public AstNode {
     Token m_token;
     std::string m_value;
-    bool m_formatted;
     bool m_raw;
 
   public:
-    StringLiteral(Token tok, std::string_view value, bool formatted, bool raw);
+    StringLiteral(Token tok, std::string_view value, bool raw);
 
     std::string value() const;
-    bool formatted() const;
     bool raw() const;
 
     Token token() const;
@@ -1318,6 +1317,18 @@ class GenericCall : public AstNode{
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
 
+};
+
+class FormatedStr: public AstNode{
+    std::vector<AstNodePtr> m_items;
+    Token m_tok;
+    public:
+    FormatedStr(Token tok,std::vector<AstNodePtr> items);
+    std::vector<AstNodePtr> items() const;
+    Token token() const;
+    AstKind type() const;
+    std::string stringify() const;
+    void accept(AstVisitor& visitor) const;
 };
 } // namespace ast
 

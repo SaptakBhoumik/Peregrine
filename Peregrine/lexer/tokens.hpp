@@ -120,6 +120,8 @@ enum TokenType {
 
     tk_raw,    // raw string i.e. r
     tk_format, // formatted string i.e. f
+    tk_format_str, // anything after f
+    tk_format_str_stopper //end of formated str
 };
 
 struct Token {

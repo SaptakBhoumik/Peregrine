@@ -18,10 +18,10 @@ AstNodePtr Parser::parseDecimal() {
                                             m_currentToken.keyword);
 }
 
-AstNodePtr Parser::parseString(bool isFormatted, bool isRaw) {
+AstNodePtr Parser::parseString(bool isRaw) {
     //"string "
     return std::make_shared<StringLiteral>(
-        m_currentToken, m_currentToken.keyword, isFormatted, isRaw);
+        m_currentToken, m_currentToken.keyword,isRaw);
 }
 
 AstNodePtr Parser::parseBool() {

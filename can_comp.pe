@@ -328,6 +328,4 @@ def main():
     #long chained function call
     print_int(square(4))
     #the above is same as folows
-    4
-    |>square
-    |>print_int
+    4|>square|>print_int

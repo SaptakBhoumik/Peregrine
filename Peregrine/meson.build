@@ -1,5 +1,6 @@
 lexer_src = [
     'lexer/lexer.cpp',
+    'lexer/utils.cpp',
     'lexer/tokens.cpp'
 ]
 

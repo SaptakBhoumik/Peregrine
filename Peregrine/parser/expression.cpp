@@ -42,18 +42,19 @@ AstNodePtr Parser::parseExpression(PrecedenceType currPrecedence) {
 
         case tk_format: {
             advance(); // making it a string
-            left = parseString(true, false);
+            left = parseFormatString();
             break;
         }
 
         case tk_raw: {
             advance(); // making it a string
-            left = parseString(false, true);
+            left = parseString(true);
             break;
         }
 
+        case tk_format_str: 
         case tk_string: {
-            left = parseString(false, false);
+            left = parseString(false);
             break;
         }
 
@@ -435,4 +436,15 @@ AstNodePtr Parser::parseGeneric(AstNodePtr identifier){
     }
     return std::make_shared<GenericCall>(tok,generic_types,identifier);
 }
+AstNodePtr Parser::parseFormatString(){
+    auto tok = m_currentToken;
+    std::vector<AstNodePtr> items;
+    advance();
+    while (m_currentToken.tkType!=tk_format_str_stopper){
+        items.push_back(parseExpression());
+        advance();
+    }
+    return std::make_shared<FormatedStr>(tok,items);
+}
+
 }

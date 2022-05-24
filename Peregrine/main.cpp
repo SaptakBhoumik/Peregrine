@@ -22,7 +22,8 @@ void compile(cli::state s){
         std::stringstream buf;
         buf << file.rdbuf();
 
-        std::vector<Token> tokens = lexer(buf.str(), "test");
+        auto lex=LEXER(buf.str(), "test");
+        std::vector<Token> tokens = lex.result(); 
 
         for (auto& token : tokens) {
             std::cout << "Keyword= " << token.keyword
@@ -41,7 +42,8 @@ void compile(cli::state s){
             buf << file.rdbuf();
             auto filename=s.input_filename;
             std::string path = std::filesystem::canonical(filename).string();
-            std::vector<Token> tokens = lexer(buf.str(), path);
+            auto lex=LEXER(buf.str(), path);
+            std::vector<Token> tokens = lex.result(); 
             struct stat st;
             if( stat(path.c_str(),&st) == 0 ){
                 if( st.st_mode & S_IFDIR ){

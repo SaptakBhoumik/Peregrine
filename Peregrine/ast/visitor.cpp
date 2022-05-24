@@ -186,4 +186,5 @@ void PrivateDef::accept(AstVisitor &visitor) const {visitor.visit(*this);}
 void InlineAsm::accept(AstVisitor &visitor) const {visitor.visit(*this);}
 void LambdaDefinition::accept(AstVisitor &visitor) const {visitor.visit(*this);}
 void GenericCall::accept(AstVisitor& visitor) const { visitor.visit(*this); }
+void FormatedStr::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 } // namespace ast

@@ -71,7 +71,8 @@ class Parser {
     //defined in literals.cpp
     AstNodePtr parseInteger();
     AstNodePtr parseDecimal();
-    AstNodePtr parseString(bool isFormatted, bool isRaw);
+    AstNodePtr parseString(bool isRaw);
+    AstNodePtr parseFormatString();
     AstNodePtr parseBool();
     AstNodePtr parseNone();
     AstNodePtr parseIdentifier();
