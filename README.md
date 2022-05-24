@@ -66,12 +66,12 @@ ninja
 This will create the binary of the compiler named ``./peregrine.elf`` in the builddir folder
 
 **C++ backend**
-To compile it using the c++ backing just run ``./peregrine.elf compile path_to_file.pe`` .It will create the executable named ``./path_to_file``. Run it to see the result. Check the [can_comp.pe](https://github.com/peregrine-lang/Peregrine/blob/rewrite/can_comp.pe) file in the root directory to know what you can do with the c++ backend at this point
+To compile it using the c++ backing just run ``./peregrine.elf compile path_to_file.pe`` .It will create the executable named ``./path_to_file``. Run it to see the result. Check the [can_comp.pe](https://github.com/peregrine-lang/Peregrine/blob/main/can_comp.pe) file in the root directory to know what you can do with the c++ backend at this point
 
 **JS Backend**
 To use the javascript backend use the following command
 ``./peregrine.elf compile path_to_file.js.pe -js``.
-It will create the javascript file named ``path_to_file.js``. Run the generated javascript using ``node path_to_file.js``. Check the [can_comp.js.pe](https://github.com/peregrine-lang/Peregrine/blob/rewrite/can_comp.js.pe) file in the root directory to know what you can do with the js backend at this point
+It will create the javascript file named ``path_to_file.js``. Run the generated javascript using ``node path_to_file.js``. Check the [can_comp.js.pe](https://github.com/peregrine-lang/Peregrine/blob/main/can_comp.js.pe) file in the root directory to know what you can do with the js backend at this point
 
 
 ## Progress
