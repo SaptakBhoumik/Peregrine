@@ -327,8 +327,6 @@ bool TypeChecker::visit(const ast::ListTypeExpr& node) {
     return true;
 }
 
-bool TypeChecker::visit(const ast::DictTypeExpr& node) { return true; }
-
 bool TypeChecker::visit(const ast::FunctionTypeExpr& node) { return true; }
 
 bool TypeChecker::visit(const ast::PointerTypeExpr& node) {

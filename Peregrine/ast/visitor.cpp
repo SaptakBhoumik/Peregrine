@@ -36,8 +36,6 @@ void UnionLiteral::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 void EnumLiteral::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 void ListTypeExpr::accept(AstVisitor& visitor) const { visitor.visit(*this); }
 
-void DictTypeExpr::accept(AstVisitor& visitor) const { visitor.visit(*this); }
-
 void FunctionTypeExpr::accept(AstVisitor& visitor) const {
     visitor.visit(*this);
 }

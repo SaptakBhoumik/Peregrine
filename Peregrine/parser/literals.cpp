@@ -55,8 +55,6 @@ AstNodePtr Parser::parseList() {
 
     advanceOnNewLine();
 
-    // TODO: remove the type member? im not sure
-
     return std::make_shared<ListLiteral>(tok, elements);
 }
 
@@ -70,7 +68,6 @@ AstNodePtr Parser::parseDict() {
         do {
             advance();
 
-            // TODO: keys should not be made out of any type of expression
             AstNodePtr key = parseExpression(pr_lowest);
             expect(tk_colon);
             advance();

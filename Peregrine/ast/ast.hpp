@@ -73,7 +73,7 @@ enum AstKind {
     KAstTypeTuple,
     KAstExternStatement,
     KAstSumType,
-    KAstMultipleAssign,
+    KAstMultipleAssign,//
     KAstAugAssign,
     KAstMethodDef,
     KAstExternFuncDef,
@@ -277,22 +277,7 @@ class RefTypeExpr : public AstNode {
     void accept(AstVisitor& visitor) const;
 };
 
-class DictTypeExpr : public AstNode {
-    Token m_token;
-    AstNodePtr m_keyType;
-    AstNodePtr m_valueType;
 
-  public:
-    DictTypeExpr(Token tok, AstNodePtr keyType, AstNodePtr valueType);
-
-    AstNodePtr keyType() const;
-    AstNodePtr valueType() const;
-
-    Token token() const;
-    AstKind type() const;
-    std::string stringify() const;
-    void accept(AstVisitor& visitor) const;
-};
 class VarArgTypeExpr : public AstNode {
     Token m_token;
 

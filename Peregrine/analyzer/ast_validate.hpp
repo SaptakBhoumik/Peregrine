@@ -14,7 +14,7 @@ class Validator: public AstVisitor {
         bool m_is_js=false;
         bool m_should_contain_main=false;
         bool m_has_main=false;
-        bool is_class=false;
+        bool is_static_class_member=false;
         void add_error(Token tok, std::string msg,std::string submsg="",std::string hint="",std::string ecode="");
         void validate_parameters(std::vector<parameter> param);
         void validate_parameters(std::vector<AstNodePtr> param);
@@ -53,7 +53,6 @@ class Validator: public AstVisitor {
         bool visit(const IdentifierExpression& node);
         bool visit(const TypeExpression& node);
         bool visit(const ListTypeExpr& node);
-        bool visit(const DictTypeExpr& node);
         bool visit(const FunctionTypeExpr& node);
         bool visit(const NoLiteral& node);
         bool visit(const IntegerLiteral& node);
@@ -88,6 +87,9 @@ class Validator: public AstVisitor {
         bool visit(const PrivateDef& node);  
         bool visit(const InlineAsm& node);  
         bool visit(const TernaryFor& node);
+        bool visit(const LambdaDefinition& node);
+        bool visit(const GenericCall& node);
+        bool visit(const FormatedStr& node);
     public:
         Validator(AstNodePtr ast,std::string filename,bool is_js=false,bool should_contain_main=false);
 };

@@ -1211,29 +1211,6 @@ std::string RefTypeExpr::stringify() const {
     return res;
 }
 
-DictTypeExpr::DictTypeExpr(Token tok, AstNodePtr keyType,
-                           AstNodePtr valueType) {
-    m_token = tok;
-    m_keyType = keyType;
-    m_valueType = valueType;
-}
-
-AstNodePtr DictTypeExpr::keyType() const { return m_keyType; }
-
-AstNodePtr DictTypeExpr::valueType() const { return m_valueType; }
-
-Token DictTypeExpr::token() const { return m_token; }
-
-AstKind DictTypeExpr::type() const { return KAstDictTypeExpr; }
-
-// may change
-std::string DictTypeExpr::stringify() const {
-    std::string res = "dict[" + m_keyType->stringify();
-
-    res += "]" + m_valueType->stringify();
-
-    return res;
-}
 
 FunctionTypeExpr::FunctionTypeExpr(Token tok, std::vector<AstNodePtr> argTypes,
                                    AstNodePtr returnTypes) {

@@ -397,6 +397,16 @@ AstNodePtr Parser::parseClassDefinition() {
                 else if(next().tkType==tk_const){
                     attributes.push_back(parsePrivate(true));
                 }
+                else if (next().tkType==tk_static) {
+                    if(m_tokens[m_tokIndex+2].tkType==tk_const||m_tokens[m_tokIndex+2].tkType==tk_identifier){
+                        attributes.push_back(parsePrivate(true));
+                    }
+                    else{
+                        methods.push_back(parsePrivate(true));
+                    }
+                }
+                //We will show all the error from here at once at ast_validate because defined in a class is always private
+                //So no need of private here
                 else if(next().tkType==tk_union){
                     other.push_back(parsePrivate(true));
                 }
@@ -405,14 +415,6 @@ AstNodePtr Parser::parseClassDefinition() {
                 }
                 else if (next().tkType==tk_enum) {
                     other.push_back(parsePrivate(true));
-                }
-                else if (next().tkType==tk_static) {
-                    if(m_tokens[m_tokIndex+2].tkType==tk_const||m_tokens[m_tokIndex+2].tkType==tk_identifier){
-                        attributes.push_back(parsePrivate(true));
-                    }
-                    else{
-                        methods.push_back(parsePrivate(true));
-                    }
                 }
                 else{
                     methods.push_back(parsePrivate(true));
@@ -461,10 +463,6 @@ AstNodePtr Parser::parseClassDefinition() {
             }
             case tk_enum: {
                 other.push_back(parseEnum());
-                break;
-            }
-            case tk_ellipses:{
-                advance();
                 break;
             }
             case tk_eof:{

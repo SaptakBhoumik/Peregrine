@@ -245,7 +245,6 @@ AstNodePtr Parser::parseDotExpression(AstNodePtr left) {
     PrecedenceType currentPrecedence = precedenceMap[tok.tkType];
     advance();
     AstNodePtr referenced;
-    // TODO: validate output of parseExpression
     referenced = parseExpression(currentPrecedence);
     return std::make_shared<DotExpression>(tok, left, referenced);
 }
@@ -334,7 +333,6 @@ AstNodePtr Parser::parseArrowExpression(AstNodePtr left) {
     PrecedenceType currentPrecedence = precedenceMap[tok.tkType];
     advance();
     AstNodePtr referenced;
-    // TODO: validate output of parseExpression
     referenced = parseExpression(currentPrecedence);
     return std::make_shared<ArrowExpression>(tok, left, referenced);
 }

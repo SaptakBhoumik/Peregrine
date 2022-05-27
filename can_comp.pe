@@ -3,14 +3,16 @@ Hello"
 "Another Multiline comment
 Hello"
 def peregrine1()->int,int:
-    def peregrine2()->int,int:
+    static def peregrine2()->int,int:
         return 2,2
     return 1,1
     #error()
 type a_type=def()->int,int
 class decorate:
     def __init__(self):...
-    def dec(self,x:a_type)->a_type:return x
+    def dec(self,x:a_type)->a_type:
+        static a:int=9
+        return x
 ooo:decorate=decorate()
 ooo_ptr:*decorate=&ooo
 @ooo_ptr->dec()

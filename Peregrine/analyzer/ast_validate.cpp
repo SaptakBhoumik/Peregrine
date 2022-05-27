@@ -38,7 +38,6 @@ Validator::Validator(AstNodePtr ast,std::string filename,bool is_js,bool should_
     }
 }
 bool Validator::visit(const Program& node){
-    //TODO: check for more cases
     for (auto& stmt : node.statements()) {
         switch(stmt->type()){
             case KAstTryExcept:
@@ -54,10 +53,14 @@ bool Validator::visit(const Program& node){
             case KAstIfStmt:
             case KAstBreakStatement:
             case KAstPassStatement:{
-                add_error(stmt->token(), "SyntaxError: "+keyword[stmt->type()]+" statement outside function");
+                add_error(stmt->token(),"SyntaxError: "+keyword[stmt->type()]+" statement outside function",
+                                        "In Peregrine the program stars executing from the main function and not from the global scope",
+                                        "Defining this inside a function");
                 break;
             }
-            case KAstExpressionTuple:
+            case KAstGenericCall:
+            case KAstFormatedStr:
+            case KAstLambda:
             case KAstDotExpression:
             case KAstArrowExpression:
             case KAstListOrDictAccess:
@@ -79,9 +82,8 @@ bool Validator::visit(const Program& node){
                 add_error(stmt->token(), "SyntaxError: Function call outside function", "Either assign the value to a variable or call it inside a function");
                 break;
             }
-            case KAstAugAssign:
-            case KAstMultipleAssign:{
-                add_error(stmt->token(), "SyntaxError: Reassignment outside function", "Use it inside a function");
+            case KAstAugAssign:{
+                add_error(stmt->token(), "SyntaxError: Reassignment outside function", "Use it inside a function because data can't be mutated outside a function");
                 break;
             }
             default:{
@@ -92,15 +94,15 @@ bool Validator::visit(const Program& node){
     return true;
 }
 bool Validator::visit(const BlockStatement& node){
-    //TODO: check for more cases
     auto statements = node.statements();
     for (size_t i = 0; i < statements.size(); i++) {
         auto stmt=statements[i];
         switch(stmt->type()){
-            case KAstExpressionTuple:
             case KAstPrefixExpr:
             case KAstTernaryIf:
             case KAstDict:
+            case KAstFormatedStr:
+            case KAstLambda:
             case KAstList:
             case KAstIdentifier:
             case KAstNone:
@@ -121,35 +123,45 @@ bool Validator::visit(const BlockStatement& node){
                 break;
             }
             case KAstStatic:{
-                add_error(stmt->token(), "SyntaxError: Nested static function are not allowed");
+                std::shared_ptr<StaticStatement> x =std::dynamic_pointer_cast<StaticStatement>(stmt);
+                if(x->body()->type()==KAstInline){
+                    add_error(stmt->token(),"SyntaxError: Nested inline function are not allowed",
+                                            "Instead of making the code faster it just makes it less readable");
+                }
                 break;
             }
             case KAstInline:{
-                add_error(stmt->token(), "SyntaxError: Nested inline function are not allowed");
+                add_error(stmt->token(),"SyntaxError: Nested inline function are not allowed",
+                                            "Instead of making the code faster it just makes it less readable");
                 break;
             }
             case KAstExternFuncDef:{
-                add_error(stmt->token(), "Syntax error: External function definition is not allowed inside a function");
+                add_error(stmt->token(),"Syntax error: External function definition is not allowed inside a function",
+                                        "Define it at the global scale");
                 break;
             }
             case KAstExternStruct:{
-                add_error(stmt->token(), "Syntax error: External struct definition is not allowed inside a function");
+                add_error(stmt->token(),"Syntax error: External struct definition is not allowed inside a function",
+                                        "Define it at the global scale");
                 break;
             }
             case KAstExternUnion:{
-                add_error(stmt->token(), "Syntax error: External union definition is not allowed inside a function");
+                add_error(stmt->token(),"Syntax error: External union definition is not allowed inside a function",
+                                        "Define it at the global scale");
                 break;
             }
             case KAstExport:{
-                add_error(stmt->token(), "SyntaxError: Can't export nested function");
+                add_error(stmt->token(),"SyntaxError: Can't export nested function",
+                                        "Anything inside a function is always private");
                 break;
             }
             case KAstExternStatement:{
-                add_error(stmt->token(), "SyntaxError: Extern statement cant be inside function");
+                add_error(stmt->token(),"SyntaxError: Extern statement cant be inside function",
+                                        "Define it at the global scale");
                 break;
             }
             case KAstPrivate:{
-                add_error(stmt->token(), "SyntaxError: Any kind of definition within block statement are already private");
+                add_error(stmt->token(), "SyntaxError: Any kind of definition inside a function always private");
                 break;
             }
             //It should be at the last
@@ -159,7 +171,7 @@ bool Validator::visit(const BlockStatement& node){
             case KAstReturnStatement:{
                 //it is not the last statement
                 if(i<(statements.size()-1)){
-                    add_error(statements[i+1]->token(), "SyntaxError: Anything after "+keyword[stmt->type()]+"statement is not executed","Remove it");
+                    add_error(statements[i+1]->token(), "SyntaxError: Anything after "+keyword[stmt->type()]+" statement is not executed","Remove it");
                     break;
                 }
             }
@@ -178,12 +190,19 @@ bool Validator::visit(const ClassDefinition& node){
     }
     for (auto& x : node.other()){
         switch(x->type()){
+            case KAstPrivate:{
+                add_error(x->token(), "SyntaxError: Any kind of type definition within class defination is always private",
+                                      "No need of specifying it as private");
+                break;
+            }
             case KAstExternStruct:{
-                add_error(x->token(), "Syntax error: External struct definition is not allowed inside a function");
+                add_error(x->token(), "Syntax error: External struct definition is not allowed inside a class",
+                                      "Define it at the global scale");
                 break;
             }
             case KAstExternUnion:{
-                add_error(x->token(), "Syntax error: External union definition is not allowed inside a function");
+                add_error(x->token(), "Syntax error: External union definition is not allowed inside a class"
+                                      "Define it at the global scale");
                 break;
             }
             default:{
@@ -195,19 +214,42 @@ bool Validator::visit(const ClassDefinition& node){
         x->accept(*this);
     }
     for (auto& x : node.methods()){
+        auto type=x->type();
+        switch (x->type()) {
+            case KAstStatic:{
+                x =std::dynamic_pointer_cast<StaticStatement>(x)->body();
+                break;
+            }
+            case KAstInline:{
+                x=std::dynamic_pointer_cast<InlineStatement>(x)->body();
+                break;
+            }
+            default:{}
+        }
+        if(x->type()==KAstInline){
+            /*
+            When it is "static inline" function
+            static inline def function():...
+            */
+            x=std::dynamic_pointer_cast<InlineStatement>(x)->body();
+        }
         switch (x->type()) {
             case KAstMethodDef:{
-                add_error(x->token(), "Syntax error: method definition is not allowed inside a class");
+                add_error(x->token(), "Syntax error: Can't extend a type with custom methords inside a class",
+                                      "Define it outside of the class");
                 break;
             }
             case KAstExternFuncDef:{
-                add_error(x->token(), "Syntax error: External function definition is not allowed inside a class");
+                add_error(x->token(), "Syntax error: External function definition is not allowed inside a class",
+                                      "Define it at the global scope");
                 break;
             }
             default:{
-                is_class=true;
+                if(type!=KAstStatic){
+                    is_static_class_member=true;
+                }
                 x->accept(*this);
-                is_class=false;
+                is_static_class_member=false;
             }
         }
     }
@@ -238,9 +280,9 @@ bool Validator::visit(const FunctionDefinition& node){
     }
     node.name()->accept(*this);
     node.body()->accept(*this);
-    if(is_class){
+    if(is_static_class_member){
         if(node.parameters().size()==0){
-            add_error(node.name()->token(),"Error: Methods defined in a class must have atleast one parameter to take in the instance of the object");
+            add_error(node.name()->token(),"Error: Non static Methods defined in a class must have atleast one parameter to take in the instance of the object");
         }
         else{
             if(node.parameters()[0].p_type->type()!=KAstNoLiteral){
@@ -250,7 +292,7 @@ bool Validator::visit(const FunctionDefinition& node){
                 add_error(node.parameters()[0].p_default->token(),"Error: The first parameter of methods defined in a class takes in the instance of the object so it cant have default value");
             }
         }
-        is_class=false;
+        is_static_class_member=false;
     }
     validate_parameters(node.parameters());
     return true;
@@ -299,11 +341,33 @@ bool Validator::visit(const InlineStatement& node){
     if(m_is_js){
         add_error(node.token(), "SyntaxError: Inline statement is not allowed in javascript");
     }
-    node.body()->accept(*this);
+    switch (node.type()){
+        case KAstExternFuncDef:{
+            add_error(node.body()->token(), "Syntax error: Inline external function is not possible");
+            break;
+        }
+        default:{
+            node.body()->accept(*this);
+        }
+    }
     return true;
 }
 bool Validator::visit(const ExportStatement& node){
-    node.body()->accept(*this);
+    switch (node.body()->type()){
+        case KAstMethodDef:{
+            add_error(node.body()->token(),"Error: Method that is modifying a type can't be exported to other language",
+                                            "Define a regular function instead");
+            break;
+        }
+        case KAstExternFuncDef:{
+            add_error(node.body()->token(),"Error: Defination of external function can't be exported to other languages from peregrine",
+                                            "Use the library directly in that language");
+            break;
+        }
+        default:{
+            node.body()->accept(*this);
+        }
+    }
     return true;
 }
 bool Validator::visit(const RaiseStatement& node){
@@ -403,12 +467,38 @@ bool Validator::visit(const FunctionCall& node){
 }
 bool Validator::visit(const DotExpression& node){
     node.owner()->accept(*this);
-    node.referenced()->accept(*this);
+    switch(node.referenced()->type()){
+        case KAstIdentifier:
+        case KAstCompileTimeExpression:
+        case KAstFunctionCall:
+        case KAstArrowExpression:
+        case KAstDotExpression:{
+            node.referenced()->accept(*this);
+            break;
+        }
+        default:{
+            auto tok=node.referenced()->token();
+            add_error(tok,"Unexpected token "+ tok.keyword);
+        }
+    }
     return true;
 }
 bool Validator::visit(const ArrowExpression& node){
     node.owner()->accept(*this);
-    node.referenced()->accept(*this);
+    switch(node.referenced()->type()){
+        case KAstIdentifier:
+        case KAstCompileTimeExpression:
+        case KAstFunctionCall:
+        case KAstArrowExpression:
+        case KAstDotExpression:{
+            node.referenced()->accept(*this);
+            break;
+        }
+        default:{
+            auto tok=node.referenced()->token();
+            add_error(tok,"Unexpected token "+ tok.keyword);
+        }
+    }
     return true;
 }
 bool Validator::visit(const IdentifierExpression& node){return true;}
@@ -423,10 +513,7 @@ bool Validator::visit(const ListTypeExpr& node){
     node.size()->accept(*this);
     return true;
 }
-bool Validator::visit(const DictTypeExpr& node){
-    //TODO: remove it
-    return false;
-}
+
 bool Validator::visit(const FunctionTypeExpr& node){
     node.returnTypes()->accept(*this);
     validate_parameters(node.argTypes());
@@ -475,11 +562,12 @@ bool Validator::visit(const VirtualStatement& node){
     }
     switch (node.body()->type()) {
         case KAstMethodDef:{
-            add_error(node.body()->token(), "Syntax error: method definition is not allowed inside a class");
+            add_error(node.body()->token(), "Syntax error: Can't extend a type with custom methords inside a class",
+                                      "Define it outside of the class");
             break;
         }
         case KAstExternFuncDef:{
-            add_error(node.body()->token(), "Syntax error: External function definition is not allowed inside a class");
+            add_error(node.body()->token(), "Syntax error: External virtual function definition is not allowed inside a class");
             break;
         }
         default:{
@@ -676,6 +764,9 @@ bool Validator::visit(const VarKwargTypeExpr& node){
 bool Validator::visit(const CompileTimeExpression& node){
     auto exp=node.expression();
     auto token=exp->token();
+    if(exp->type()==KAstPrivate){
+        exp=std::dynamic_pointer_cast<PrivateDef>(exp)->definition();
+    }
     switch(exp->type()){
         case KAstList:
         case KAstExpressionTuple:
@@ -689,7 +780,7 @@ bool Validator::visit(const CompileTimeExpression& node){
             break;
         }
         case KAstImportStmt:{
-            add_error(token, "SyntaxError: Imports are already done at compile time so they can't be used in compile time expressions");
+            add_error(token, "SyntaxError: Imports are already done at compile time so '$' is not necessary");
             break;
         }
         case KAstConstDecl:
@@ -708,19 +799,19 @@ bool Validator::visit(const CompileTimeExpression& node){
             break;
         }
         case KAstScopeStmt:{
-            add_error(token, "SyntaxError: Compile time scope statements are not allowed");
+            add_error(token, "SyntaxError: Compile time scope statements are not allowed","It doesnt make sense");
             break;
         }
         case KAstTypeDefinition:{
-            add_error(token, "SyntaxError: Compile time type definitions are not allowed");
+            add_error(token, "SyntaxError: Compile time type definitions are not allowed","It doesnt make sense");
             break;
         }
         case KAstDecorator:{
-            add_error(token, "SyntaxError: Compile time decorators are not allowed");
+            add_error(token, "SyntaxError: Compile time decorators are not allowed","It doesnt make sense");
             break;
         }
         case KAstPassStatement:{
-            add_error(token, "SyntaxError: Compile time pass statements are not allowed","You can just use pass instead of $pass");
+            add_error(token, "SyntaxError: Compile time pass statements are not allowed","You can just use '...' instead of '$...'");
             break;
         }
         
@@ -730,7 +821,7 @@ bool Validator::visit(const CompileTimeExpression& node){
         }
         case KAstStatic:
         case KAstInline:{
-            add_error(token, "SyntaxError: Compile time static and inline functions are not allowed");
+            add_error(token, "SyntaxError: Compile time static and inline functions/variable are not allowed");
             break;
         }
         case KAstExternStatement:{
@@ -767,10 +858,7 @@ bool Validator::visit(const CompileTimeExpression& node){
             add_error(token, "SyntaxError: Unexpected token $");
             break;
         }
-        case KAstPrivate:{
-            add_error(token, "SyntaxError: Unexpected token private");
-            break;
-        }
+        
         case KAstInlineAsm:{
             add_error(token, "SyntaxError: Inline assembly not allowed at compile time");
             break;
@@ -782,7 +870,17 @@ bool Validator::visit(const CompileTimeExpression& node){
     return true;
 }
 bool Validator::visit(const PrivateDef& node){
-    node.definition()->accept(*this); 
+    switch(node.definition()->type()){
+        case KAstExternStruct:
+        case KAstExternUnion:
+        case KAstExternFuncDef:{
+            add_error(node.definition()->token(), "SyntaxError: External function or struct or union are already private to that file so no need of using the 'private' keyword");
+            break;
+        }
+        default:{
+            node.definition()->accept(*this);
+        }
+    } 
     return true;
 }
 bool Validator::visit(const InlineAsm& node){
@@ -807,6 +905,30 @@ bool Validator::visit(const TernaryFor& node){
     }
     return true;
 }
+
+bool Validator::visit(const LambdaDefinition& node){
+    node.body()->accept(*this);
+    validate_parameters(node.parameters());
+    return true;
+}
+
+bool Validator::visit(const GenericCall& node){
+    node.identifier()->accept(*this);
+    auto types=node.generic_types();
+    for(auto& x:types){
+        x->accept(*this);
+    }
+    return true;
+}
+
+bool Validator::visit(const FormatedStr& node){
+    auto items=node.items();
+    for(auto& x:items){
+        x->accept(*this);
+    }
+    return true;
+}
+
 void Validator::add_error(Token tok, std::string msg,
                 std::string submsg,std::string hint,
                 std::string ecode){

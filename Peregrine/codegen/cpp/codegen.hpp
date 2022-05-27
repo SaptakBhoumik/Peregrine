@@ -41,7 +41,7 @@ class Codegen : public ast::AstVisitor {
     std::vector<ast::AstNodePtr> TurpleExpression(ast::AstNodePtr node);
     void codegenFuncParams(std::vector<ast::parameter> parameters,size_t start=0);
     void magic_method(ast::AstNodePtr& node,std::string name);
-    void write_name(std::shared_ptr<ast::FunctionDefinition> node,std::string name,std::string virtual_static_inline="");
+    void write_name(std::shared_ptr<ast::FunctionDefinition> node,std::string name,std::string virtual_static_inline="",bool is_static=false);
     void matchArg(std::vector<ast::AstNodePtr> matchItem,
                   std::vector<ast::AstNodePtr> caseItem);
     std::string wrap(ast::AstNodePtr item,std::string contains);
@@ -78,7 +78,6 @@ class Codegen : public ast::AstVisitor {
     bool visit(const ast::IdentifierExpression& node);
     bool visit(const ast::TypeExpression& node);
     bool visit(const ast::ListTypeExpr& node);
-    bool visit(const ast::DictTypeExpr& node);
     bool visit(const ast::FunctionTypeExpr& node);
     bool visit(const ast::NoLiteral& node);
     bool visit(const ast::IntegerLiteral& node);

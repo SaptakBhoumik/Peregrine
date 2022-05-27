@@ -468,8 +468,6 @@ bool Codegen::visit(const ast::TypeExpression& node) {
 
 bool Codegen::visit(const ast::ListTypeExpr& node) { return true; }
 
-bool Codegen::visit(const ast::DictTypeExpr& node) { return true; }
-
 bool Codegen::visit(const ast::FunctionTypeExpr& node) {
     //no types in js
     return true;

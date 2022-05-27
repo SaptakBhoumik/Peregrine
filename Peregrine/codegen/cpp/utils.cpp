@@ -172,10 +172,9 @@ std::string Codegen::wrap(ast::AstNodePtr item,std::string contains){
     }
     return var;
 }
-void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::string name,std::string virtual_static_inline){
+void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::string name,std::string virtual_static_inline,bool is_static){
     auto return_type=TurpleTypes(node->returnType());
     
-    assert(node->parameters().size()>0);
     if(return_type.size()==0){
         node->returnType()->accept(*this);
     }
@@ -184,7 +183,13 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
     }
     write(" ____mem____P____P____"+name+"(");
     local_mangle_start();
-    codegenFuncParams(node->parameters(),1);
+    if(is_static){
+        //It is a static function
+        codegenFuncParams(node->parameters(),0);
+    }
+    else{
+        codegenFuncParams(node->parameters(),1);
+    }
     if(return_type.size()>0){
         write(",");
     }
@@ -196,11 +201,13 @@ void Codegen::write_name(std::shared_ptr<ast::FunctionDefinition> node,std::stri
         }
     }
     write(") noexcept {\n");
-    write("auto& ");
-    is_define=true;
-    node->parameters()[0].p_name->accept(*this);
-    is_define=false;
-    write("=*this;\n");
+    if(!is_static){
+        write("auto& ");
+        is_define=true;
+        node->parameters()[0].p_name->accept(*this);
+        is_define=false;
+        write("=*this;\n");
+    }
     if(not is_func_def){
         is_func_def=true;
         node->body()->accept(*this);
@@ -377,14 +384,14 @@ void Codegen::magic_method(ast::AstNodePtr& node,std::string name){
             if (static_function->body()->type()==ast::KAstFunctionDef){
                 std::shared_ptr<ast::FunctionDefinition> function =std::dynamic_pointer_cast<ast::FunctionDefinition>(static_function->body());
                 auto func_name =std::dynamic_pointer_cast<ast::IdentifierExpression>(function->name())->value();
-                write_name(function,func_name,"static");
+                write_name(function,func_name,"static",true);
             }
             else if (static_function->body()->type()==ast::KAstInline){
                 write("inline ");
                 std::shared_ptr<ast::InlineStatement> inline_function =std::dynamic_pointer_cast<ast::InlineStatement>(static_function->body());
                 std::shared_ptr<ast::FunctionDefinition> function =std::dynamic_pointer_cast<ast::FunctionDefinition>(inline_function->body());
                 auto func_name =std::dynamic_pointer_cast<ast::IdentifierExpression>(function->name())->value();
-                write_name(function,func_name,"static inline");
+                write_name(function,func_name,"static inline",true);
             }
             break;
         }
