@@ -6,7 +6,7 @@
 #include <iostream>
 namespace astValidator{
 std::map<AstKind, std::string> keyword={
-                                            {KAstPassStatement,"'pass'"},
+                                            {KAstPassStatement,"'...'"},
                                             {KAstIfStmt,"'if'"},
                                             {KAstReturnStatement,"'return'"},
                                             {KAstWhileStmt,"'while'"},
