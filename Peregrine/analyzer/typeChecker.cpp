@@ -1,7 +1,6 @@
 #include "typeChecker.hpp"
 #include "ast/ast.hpp"
 #include "ast/types.hpp"
-#include "errors/error.hpp"
 
 #include <cassert>
 #include <iostream>
@@ -12,17 +11,23 @@ TypeChecker::TypeChecker(ast::AstNodePtr ast) {
     m_env = createEnv();
     m_currentFunction = nullptr;
     ast->accept(*this);
+    if(m_errors.size()!=0) {
+        for(auto& err : m_errors) {
+            display(err);
+        }
+        exit(1);
+    }
 }
 
-void TypeChecker::error(Token tok, std::string_view msg) {
+void TypeChecker::add_error(Token tok, std::string_view msg) {
     PEError err = {
         {tok.line, tok.start, tok.location, m_filename, tok.statement},
         std::string(msg),
         "TypeError",
         "",
         ""};
-    display(err);
-    exit(1);
+    m_errors.push_back(err);
+    
 }
 
 EnvPtr TypeChecker::createEnv(EnvPtr parent) {
@@ -43,7 +48,7 @@ void TypeChecker::check(ast::AstNodePtr expr, const Type& expectedType) {
     if (exprType != expectedType) {
         if (!exprType.isConvertibleTo(expectedType) &&
             !expectedType.isConvertibleTo(exprType)) {
-            error(expr->token(), "expected type " + expectedType.stringify() +
+            add_error(expr->token(), "expected type " + expectedType.stringify() +
                                      ", got " + exprType.stringify() +
                                      " instead");
         }
@@ -166,7 +171,10 @@ bool TypeChecker::visit(const ast::IfStatement& node) {
     return true;
 }
 
-bool TypeChecker::visit(const ast::AssertStatement& node) { return true; }
+bool TypeChecker::visit(const ast::AssertStatement& node) { 
+    check(node.condition(), *TypeProducer::boolean());
+    return true; 
+}
 
 bool TypeChecker::visit(const ast::StaticStatement& node) { return true; }
 
@@ -202,7 +210,7 @@ bool TypeChecker::visit(const ast::ScopeStatement& node) {
 
 bool TypeChecker::visit(const ast::ReturnStatement& node) {
     if (!m_currentFunction) {
-        error(node.token(), "can not use return outside of a function");
+        add_error(node.token(), "can not use return outside of a function");
     }
 
     node.returnValue()->accept(*this);
@@ -214,6 +222,13 @@ bool TypeChecker::visit(const ast::ReturnStatement& node) {
 bool TypeChecker::visit(const ast::DecoratorStatement& node) { return true; }
 
 bool TypeChecker::visit(const ast::ListLiteral& node) {
+    //TODO: If the variable is empty do something for the variable
+    //val=[]
+    //Infer it properly
+    if(node.elements().size() == 0) {
+        // m_result = TypeProducer::list();
+        return true;
+    }
     node.elements()[0]->accept(*this); // TODO: check to see if its not empty
     TypePtr listType = m_result;
 
@@ -237,7 +252,7 @@ bool TypeChecker::visit(const ast::BinaryOperation& node) {
     TypePtr result = leftType->infixOperatorResult(node.op(), m_result);
 
     if (!result) {
-        error(node.token(),
+        add_error(node.token(),
               "operator " + node.op().keyword + " can not be used with types " +
                   leftType->stringify() + " and " + m_result->stringify());
     }
@@ -251,7 +266,7 @@ bool TypeChecker::visit(const ast::PrefixExpression& node) {
     TypePtr result = m_result->prefixOperatorResult(node.prefix());
 
     if (!result) {
-        error(node.token(), "operator " + node.prefix().keyword +
+        add_error(node.token(), "operator " + node.prefix().keyword +
                                 " can not be used with type " +
                                 m_result->stringify());
     }
@@ -266,12 +281,12 @@ bool TypeChecker::visit(const ast::FunctionCall& node) {
     node.name()->accept(*this);
 
     if (m_result->category() != TypeCategory::Function)
-        error(node.token(), identifierName(node.name()) + " is not a function");
+        add_error(node.token(), identifierName(node.name()) + " is not a function");
 
     auto functionType = std::dynamic_pointer_cast<FunctionType>(m_result);
 
     if (functionType->parameterTypes().size() != node.arguments().size())
-        error(node.token(), "invalid number of arguments passed to " +
+        add_error(node.token(), "invalid number of arguments passed to " +
                                 identifierName(node.name()));
 
     for (size_t i = 0; i < node.arguments().size(); i++) {
@@ -291,7 +306,7 @@ bool TypeChecker::visit(const ast::IdentifierExpression& node) {
 
     if (!identifierType ||
         identifierType.value()->category() == TypeCategory::UserDefined) {
-        error(node.token(), "undeclared identifier: " + node.value());
+        add_error(node.token(), "undeclared identifier: " + node.value());
     }
 
     m_result = identifierType.value();
@@ -303,7 +318,7 @@ bool TypeChecker::visit(const ast::TypeExpression& node) {
         auto type = m_env->get(node.value());
 
         if (!type || type.value()->category() != TypeCategory::UserDefined) {
-            error(node.token(),
+            add_error(node.token(),
                   node.value() + " is not a type"); // return or not return?
         }
 
@@ -379,7 +394,7 @@ bool TypeChecker::visit(const ast::CastStatement& node) {
     node.value()->accept(*this);
 
     if (!m_result->isCastableTo(*castType)) {
-        error(node.token(), m_result->stringify() + " can not be casted to " +
+        add_error(node.token(), m_result->stringify() + " can not be casted to " +
                                 castType->stringify());
     }
 

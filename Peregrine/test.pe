@@ -1,6 +1,7 @@
+assert 123
 #if you want to take a look at the syntax then check can_comp.pe 
 #this file is just for testing the parser and the syntax may not be valid
-val = [45, 3]
+val = []
 val2 = cast<int>(val)
 
 while True:

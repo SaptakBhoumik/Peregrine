@@ -5,6 +5,7 @@
 #include "ast/types.hpp"
 #include "ast/visitor.hpp"
 #include "utils/symbolTable.hpp"
+#include "errors/error.hpp"
 
 #include <memory>
 #include <vector>
@@ -14,11 +15,12 @@ using namespace Utils;
 using EnvPtr = std::shared_ptr<SymbolTable<TypePtr>>;
 
 class TypeChecker : public ast::AstVisitor {
-  public:
+    public:
     TypeChecker(ast::AstNodePtr ast);
 
-  private:
-    void error(Token tok, std::string_view msg);
+    private:
+    std::vector<PEError> m_errors;
+    void add_error(Token tok, std::string_view msg);
     EnvPtr createEnv(EnvPtr parent = nullptr);
     std::string identifierName(ast::AstNodePtr identifier);
     void checkBody(ast::AstNodePtr body);
