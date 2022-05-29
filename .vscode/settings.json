@@ -91,7 +91,8 @@
         "ios": "cpp",
         "locale": "cpp",
         "queue": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "*.ipp": "cpp"
     },
     "mesonbuild.configureOnOpen": true
 }

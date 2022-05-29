@@ -29,7 +29,7 @@ def peregrine3()->int,int:
     return 4,4
 "class x.x
 class x.x:
-    xx:int
+    xx:f128
 union x.y
 union x.y:
     xx:int

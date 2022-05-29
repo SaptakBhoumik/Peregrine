@@ -74,6 +74,7 @@ class MangleName{
                                                         {"uint","uint64_t"},
                                                         {"f32","float"},
                                                         {"float","double"},
+                                                        {"f128","long double"},
                                                         };
     std::map<std::string, std::string> m_local_names;
     public:

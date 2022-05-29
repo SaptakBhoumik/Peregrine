@@ -7,7 +7,6 @@
 #include <string>
 #include <string_view>
 #include <vector>
-
 namespace ast {
 
 enum AstKind {
@@ -524,7 +523,7 @@ class VariableStatement : public AstNode {
     AstNodePtr value() const;
 
     types::TypePtr processedType() const;
-    void setProcessedType(types::TypePtr processedType);
+    void setProcessedType(types::TypePtr processedType,bool defined_before=false);
 
     Token token() const;
     AstKind type() const;

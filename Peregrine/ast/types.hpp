@@ -9,8 +9,12 @@
 #include <string>
 #include <vector>
 
-namespace types {
+namespace ast{
+    class AstNode;
+    using AstNodePtr = std::shared_ptr<AstNode>;
+}
 
+namespace types {
 enum TypeCategory {
     Integer,
     Decimal,
@@ -32,6 +36,8 @@ using TypePtr = std::shared_ptr<Type>;
 class Type {
   public:
     virtual ~Type() = default;
+
+    virtual ast::AstNodePtr getTypeAst() const = 0;
 
     virtual TypeCategory category() const = 0;
 
@@ -67,9 +73,10 @@ class IntType : public Type {
 
     enum class Modifier { Signed, Unsigned };
 
-    IntType(IntSizes intSize = IntSizes::Int32,
+    IntType(IntSizes intSize = IntSizes::Int64,
             Modifier modifier = Modifier::Signed);
 
+    ast::AstNodePtr getTypeAst() const;
     TypeCategory category() const;
     IntSizes size() const;
     Modifier modifier() const;
@@ -89,10 +96,11 @@ class IntType : public Type {
 
 class DecimalType : public Type {
   public:
-    enum DecimalSize { Float, Double };
+    enum DecimalSize { Float32, Float64,Float128 };
 
-    DecimalType(DecimalSize decimalSize = DecimalSize::Float);
+    DecimalType(DecimalSize decimalSize = DecimalSize::Float64);
 
+    ast::AstNodePtr getTypeAst() const;
     TypeCategory category() const;
     DecimalSize size() const;
     bool isConvertibleTo(const Type& type) const;
@@ -114,6 +122,7 @@ class StringType : public Type {
   public:
     StringType() = default;
 
+    ast::AstNodePtr getTypeAst() const;
     TypeCategory category() const;
     bool isConvertibleTo(const Type& type) const;
     bool isCastableTo(const Type& type) const;
@@ -127,6 +136,7 @@ class BoolType : public Type {
   public:
     BoolType() = default;
 
+    ast::AstNodePtr getTypeAst() const;
     TypeCategory category() const;
     bool isConvertibleTo(const Type& type) const;
     bool isCastableTo(const Type& type) const;
@@ -139,6 +149,7 @@ class PointerType : public Type {
   public:
     PointerType(TypePtr baseType);
 
+    ast::AstNodePtr getTypeAst() const;
     TypeCategory category() const;
     TypePtr baseType() const;
     bool isConvertibleTo(const Type& type) const;
@@ -153,6 +164,7 @@ class VoidType : public Type {
   public:
     VoidType() = default;
 
+    ast::AstNodePtr getTypeAst() const;
     TypeCategory category() const;
     bool isConvertibleTo(const Type& type) const;
     bool isCastableTo(const Type& type) const;
@@ -166,6 +178,7 @@ class ListType : public Type {
   public:
     ListType(TypePtr elemType, std::string size);
 
+    ast::AstNodePtr getTypeAst() const;
     TypeCategory category() const;
     TypePtr elemType() const;
     std::string size() const;
@@ -182,6 +195,7 @@ class UserDefinedType : public Type {
   public:
     UserDefinedType(TypePtr baseType);
 
+    ast::AstNodePtr getTypeAst() const;
     TypeCategory category() const;
     TypePtr baseType() const;
     bool isConvertibleTo(const Type& type) const;
@@ -198,6 +212,7 @@ class FunctionType : public Type {
   public:
     FunctionType(std::vector<TypePtr> parameterTypes, TypePtr returnType);
 
+    ast::AstNodePtr getTypeAst() const;
     TypeCategory category() const;
     const std::vector<TypePtr>& parameterTypes() const;
     TypePtr returnType() const;
@@ -210,7 +225,7 @@ class FunctionType : public Type {
 
 class TypeProducer {
     static std::array<TypePtr, 8> m_integer;
-    static std::array<TypePtr, 2> m_decimal;
+    static std::array<TypePtr, 3> m_decimal;
 
     static TypePtr m_bool;
     static TypePtr m_string;
@@ -218,10 +233,10 @@ class TypeProducer {
 
   public:
     static TypePtr
-    integer(IntType::IntSizes intSize = IntType::IntSizes::Int32,
+    integer(IntType::IntSizes intSize = IntType::IntSizes::Int64,
             IntType::Modifier modifier = IntType::Modifier::Signed);
     static TypePtr decimal(
-        DecimalType::DecimalSize decimalSize = DecimalType::DecimalSize::Float);
+        DecimalType::DecimalSize decimalSize = DecimalType::DecimalSize::Float64);
     static TypePtr string();
     static TypePtr boolean();
     static TypePtr voidT();

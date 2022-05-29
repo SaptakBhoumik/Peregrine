@@ -109,28 +109,38 @@ bool TypeChecker::visit(const ast::FunctionDefinition& node) {
 }
 
 bool TypeChecker::visit(const ast::VariableStatement& node) {
-    // not very proud of this
-    auto nonConstNode = const_cast<ast::VariableStatement&>(node);
+    auto& nonConstNode = const_cast<ast::VariableStatement&>(node);
 
     node.varType()->accept(*this);
     TypePtr varType = m_result;
+    bool defined_before=true;
+    
+    {
+        if(node.name()->type()==ast::KAstIdentifier){
+            auto identifierType = m_env->get(identifierName(node.name()));
+            if (identifierType==std::nullopt) {
+                defined_before=false;
+            }
+        }
+    }
 
     if (varType->category() == TypeCategory::Void) {
         // inferring the type of the variable
         node.value()->accept(*this);
-        nonConstNode.setProcessedType(m_result);
+        nonConstNode.setProcessedType(m_result,defined_before);
         varType = m_result;
     } else {
         check(node.value(), *varType);
-        nonConstNode.setProcessedType(varType);
+        nonConstNode.setProcessedType(varType,defined_before);
     }
 
+    //TODO:Check if it is an identifier
     m_env->set(identifierName(node.name()), varType);
     return true;
 }
 
 bool TypeChecker::visit(const ast::ConstDeclaration& node) {
-    auto nonConstNode = const_cast<ast::ConstDeclaration&>(node);
+    auto& nonConstNode = const_cast<ast::ConstDeclaration&>(node);
 
     node.constType()->accept(*this);
     TypePtr constType = m_result;
@@ -235,9 +245,7 @@ bool TypeChecker::visit(const ast::ListLiteral& node) {
     for (auto& elem : node.elements()) {
         check(elem, *listType);
     }
-
-    m_result =
-        TypeProducer::list(listType, std::to_string(node.elements().size()));
+    m_result = TypeProducer::list(listType, std::to_string(node.elements().size()));
     return true;
 }
 
@@ -307,6 +315,7 @@ bool TypeChecker::visit(const ast::IdentifierExpression& node) {
     if (!identifierType ||
         identifierType.value()->category() == TypeCategory::UserDefined) {
         add_error(node.token(), "undeclared identifier: " + node.value());
+        return true;
     }
 
     m_result = identifierType.value();
@@ -333,12 +342,18 @@ bool TypeChecker::visit(const ast::TypeExpression& node) {
 bool TypeChecker::visit(const ast::ListTypeExpr& node) {
     node.elemType()->accept(*this);
     auto listType = m_result;
-
-    check(node.size(), *TypeProducer::integer());
-
+    if(node.size()->type()!=ast::KAstNoLiteral){
+        check(node.size(), *TypeProducer::integer());
+    }
+    std::string size="";
+    if(node.size()->type()==ast::KAstNoLiteral){
+        size = "-1";
+    }
+    else{
+        size = std::dynamic_pointer_cast<ast::IntegerLiteral>(node.size())->value();
+    }
     m_result = TypeProducer::list(
-        listType,
-        std::dynamic_pointer_cast<ast::IntegerLiteral>(node.size())->value());
+        listType,size);
     return true;
 }
 

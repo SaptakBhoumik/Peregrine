@@ -4,6 +4,7 @@
 #include <string>
 std::string add_space(std::string& str,size_t s){
     std::string res;
+    if(s==0) return str;
     if(str.size()>(s+1)){
         for(auto& c:str){
             if(c=='\t'){

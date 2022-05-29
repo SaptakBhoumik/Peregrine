@@ -25,15 +25,15 @@ void compile(cli::state s){
         auto lex=LEXER(buf.str(), "test");
         std::vector<Token> tokens = lex.result(); 
 
+        Parser::Parser parser(tokens, "test");
+        ast::AstNodePtr program = parser.parse();
+        TypeCheck::TypeChecker typeChecker(program);
         for (auto& token : tokens) {
             std::cout << "Keyword= " << token.keyword
                       << " Type= " << token.tkType <<" Line= "<<token.line<<" Loc="<<token.location<<"\n";
         }
-        Parser::Parser parser(tokens, "test");
-        ast::AstNodePtr program = parser.parse();
         std::cout << program->stringify() << "\n";
         // astValidator::Validator val(program,"test");
-        TypeCheck::TypeChecker typeChecker(program);
     }
     else{
         std::ifstream file(s.input_filename);

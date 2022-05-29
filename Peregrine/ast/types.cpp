@@ -1,5 +1,6 @@
 #include "types.hpp"
 #include "lexer/tokens.hpp"
+#include "ast.hpp"
 
 #include <memory>
 
@@ -115,6 +116,32 @@ bool IntType::operator==(const Type& type) const {
     return false;
 }
 
+ast::AstNodePtr IntType::getTypeAst() const {
+    std::string res;
+    if(m_modifier==Modifier::Unsigned)
+        res = "u";
+    else
+        res = "i";
+    switch (m_intSize) {
+        case IntType::Int8:
+            res += "8";
+            break;
+        case IntType::Int16:
+            res += "16";
+            break;
+        case IntType::Int32:
+            res += "32";
+            break;
+        case IntType::Int64:
+            if(m_modifier==Modifier::Unsigned)
+                res = "uint";
+            else
+                res = "int";
+            break;
+    }
+    return std::make_shared<ast::TypeExpression>((Token){}, res);
+}
+
 DecimalType::DecimalType(DecimalSize decimalSize) {
     m_decimalSize = decimalSize;
 }
@@ -157,11 +184,32 @@ bool DecimalType::isCastableTo(const Type& type) const {
 }
 
 std::string DecimalType::stringify() const {
-    return (isFloat()) ? "float" : "double";
+    if(m_decimalSize==DecimalSize::Float64)
+        return "float";
+    else if(m_decimalSize==DecimalSize::Float32)
+        return "f32";
+    else
+        return "f128";
+}
+
+ast::AstNodePtr DecimalType::getTypeAst() const {
+    std::string res;
+    switch (m_decimalSize) {
+        case DecimalSize::Float64:
+            res += "float";
+            break;
+        case DecimalSize::Float32:
+            res += "f32";
+            break;
+        case DecimalSize::Float128:
+            res += "f128";
+            break;
+    }
+    return std::make_shared<ast::TypeExpression>((Token){}, res);
 }
 
 bool DecimalType::isFloat() const {
-    return (m_decimalSize == DecimalSize::Float);
+    return (m_decimalSize == DecimalSize::Float64);
 }
 
 TypePtr DecimalType::prefixOperatorResult(Token op) const {
@@ -264,6 +312,9 @@ TypePtr StringType::infixOperatorResult(Token op, const TypePtr type) const {
             return nullptr;
     }
 }
+ast::AstNodePtr StringType::getTypeAst() const {
+    return std::make_shared<ast::TypeExpression>((Token){}, "str");
+}
 
 TypeCategory BoolType::category() const { return TypeCategory::Bool; }
 
@@ -292,6 +343,10 @@ bool BoolType::isCastableTo(const Type& type) const {
 }
 
 std::string BoolType::stringify() const { return "bool"; }
+
+ast::AstNodePtr BoolType::getTypeAst() const {
+    return std::make_shared<ast::TypeExpression>((Token){}, "bool");
+}
 
 PointerType::PointerType(TypePtr baseType) { m_baseType = baseType; }
 
@@ -352,6 +407,10 @@ TypePtr PointerType::infixOperatorResult(Token op, const TypePtr type) const {
     return nullptr;
 }
 
+ast::AstNodePtr PointerType::getTypeAst() const {
+    return std::make_shared<ast::PointerTypeExpr>((Token){}, m_baseType->getTypeAst());
+}
+
 TypeCategory VoidType::category() const { return TypeCategory::Void; }
 
 bool VoidType::isConvertibleTo(const Type& type) const { return false; }
@@ -359,6 +418,10 @@ bool VoidType::isConvertibleTo(const Type& type) const { return false; }
 bool VoidType::isCastableTo(const Type& type) const { return false; }
 
 std::string VoidType::stringify() const { return "void"; }
+
+ast::AstNodePtr VoidType::getTypeAst() const {
+    return std::make_shared<ast::TypeExpression>((Token){}, "void");
+}
 
 ListType::ListType(TypePtr elemType, std::string size) {
     m_elemType = elemType;
@@ -412,10 +475,21 @@ bool ListType::operator==(const Type& type) const {
 
     auto listType = dynamic_cast<const ListType&>(type);
     if (m_elemType->operator==(*listType.elemType()) &&
-        m_size == listType.size())
+        (m_size == listType.size()||listType.size() == "-1"))
         return true;
 
     return false;
+}
+
+ast::AstNodePtr ListType::getTypeAst() const {
+    ast::AstNodePtr size;
+    if(m_size=="-1"){
+        size=std::make_shared<ast::NoLiteral>();
+    }
+    else{
+        size=std::make_shared<ast::IntegerLiteral>((Token){}, m_size);
+    }
+    return std::make_shared<ast::ListTypeExpr>((Token){}, m_elemType->getTypeAst(),size);
 }
 
 UserDefinedType::UserDefinedType(TypePtr baseType) { m_baseType = baseType; }
@@ -435,12 +509,16 @@ bool UserDefinedType::isCastableTo(const Type& type) const {
 }
 
 // TODO
-std::string UserDefinedType::stringify() const { return ""; }
+std::string UserDefinedType::stringify() const { return m_baseType->stringify(); }
 
 bool UserDefinedType::operator==(const Type& type) const {
     if (m_baseType->operator==(type))
         return true;
     return false;
+}
+
+ast::AstNodePtr UserDefinedType::getTypeAst() const {
+    return m_baseType->getTypeAst();
 }
 
 FunctionType::FunctionType(std::vector<TypePtr> parameterTypes,
@@ -484,6 +562,13 @@ bool FunctionType::isCastableTo(const Type& type) const { return false; }
 
 std::string FunctionType::stringify() const { return "function"; }
 
+ast::AstNodePtr FunctionType::getTypeAst() const {
+    std::vector<ast::AstNodePtr> params;
+    for (auto& paramType : m_parameterTypes)
+        params.push_back(paramType->getTypeAst());
+    return std::make_shared<ast::FunctionTypeExpr>((Token){},params, m_returnType->getTypeAst());
+}
+
 bool FunctionType::operator==(const Type& type) const {
     if (type.category() != TypeCategory::Function)
         return false;
@@ -515,9 +600,10 @@ std::array<TypePtr, 8> TypeProducer::m_integer = {
     std::make_shared<IntType>(IntType::IntSizes::Int64,
                               IntType::Modifier::Unsigned)};
 
-std::array<TypePtr, 2> TypeProducer::m_decimal = {
-    std::make_shared<DecimalType>(DecimalType::DecimalSize::Float),
-    std::make_shared<DecimalType>(DecimalType::DecimalSize::Double)};
+std::array<TypePtr, 3> TypeProducer::m_decimal = {
+    std::make_shared<DecimalType>(DecimalType::DecimalSize::Float64),
+    std::make_shared<DecimalType>(DecimalType::DecimalSize::Float32),
+    std::make_shared<DecimalType>(DecimalType::DecimalSize::Float128)};
 
 TypePtr TypeProducer::m_bool = std::make_shared<BoolType>();
 TypePtr TypeProducer::m_string = std::make_shared<StringType>();
@@ -555,7 +641,6 @@ std::map<std::string, TypePtr> identifierToTypeMap = {
     {"i16", TypeProducer::integer(IntType::IntSizes::Int16)},
     {"i32", TypeProducer::integer()},
     {"int", TypeProducer::integer()},
-    {"i64", TypeProducer::integer(IntType::IntSizes::Int64)},
     {"u8", TypeProducer::integer(IntType::IntSizes::Int8,
                                  IntType::Modifier::Unsigned)},
     {"u16", TypeProducer::integer(IntType::IntSizes::Int16,
@@ -564,10 +649,9 @@ std::map<std::string, TypePtr> identifierToTypeMap = {
                                   IntType::Modifier::Unsigned)},
     {"uint", TypeProducer::integer(IntType::IntSizes::Int32,
                                    IntType::Modifier::Unsigned)},
-    {"u64", TypeProducer::integer(IntType::IntSizes::Int64,
-                                  IntType::Modifier::Unsigned)},
     {"float", TypeProducer::decimal()},
-    {"double", TypeProducer::decimal(DecimalType::DecimalSize::Double)},
+    {"f32", TypeProducer::decimal(DecimalType::DecimalSize::Float32)},
+    {"f128", TypeProducer::decimal(DecimalType::DecimalSize::Float128)},
     {"str", TypeProducer::string()},
     {"bool", TypeProducer::boolean()},
     {"void", TypeProducer::voidT()}};
