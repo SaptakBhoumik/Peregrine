@@ -1,6 +1,15 @@
-assert 123
-#if you want to take a look at the syntax then check can_comp.pe 
 #this file is just for testing the parser and the syntax may not be valid
+#if you want to take a look at the syntax then check can_comp.pe 
+a="1" if 2 else u+1
+    
+match 1,2,3:
+    case True,_:
+        ...
+    case False,_,"fgd":
+        ...
+    case gg,"fa","Afa":
+        ...
+assert 123
 val = []
 val2 = cast<int>(val)
 
@@ -212,24 +221,23 @@ def (i:int)x{T1,T2}():
 class x{T,R}:
     union u{T}:
         a:T
-        b:T
     union u{T1,T2}:
-        a:T2
+        b:T
         b:T1
-    def x{T1}():
-        ...
+        a:T2
+    def x{T1}():...
+    def x{T1,T2}():...
     @decorator_in_class
-    def x{T1,T2}():
+    def (i:int)x{T1}():
         ...
-def (i:int)x{T1}():
-    ...
-def (i:int)x{T1,T2}():
-    ...
+    def (i:int)x{T1,T2}():
+        ...
 from x import *
-lambda_test = def(x:int):x*x
 var1 |> methord1 |> methord2 
-func{int}()+9
+lambda_test = def(x:int):x*x
 a:generic{T1,T2}= 0
-type sumtype=int|float|*int|[]int|generic{int,int}
+func{int}()+9
 def x()->a,b:return 1,2
+type sumtype=int|float|*int|[]int|generic{int,int}
+
 a=f"hellp {y+z}"

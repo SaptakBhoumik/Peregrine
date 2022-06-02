@@ -27,13 +27,14 @@ void compile(cli::state s){
 
         Parser::Parser parser(tokens, "test");
         ast::AstNodePtr program = parser.parse();
-        TypeCheck::TypeChecker typeChecker(program);
-        for (auto& token : tokens) {
-            std::cout << "Keyword= " << token.keyword
-                      << " Type= " << token.tkType <<" Line= "<<token.line<<" Loc="<<token.location<<"\n";
-        }
         std::cout << program->stringify() << "\n";
+        TypeCheck::TypeChecker typeChecker(program);
+        // for (auto& token : tokens) {
+        //     std::cout << "Keyword= " << token.keyword
+        //               << " Type= " << token.tkType <<" Line= "<<token.line<<" Loc="<<token.location<<"\n";
+        // }
         // astValidator::Validator val(program,"test");
+        std::cout <<"Typed Ast:- \n"<<program->stringify() << "\n";
     }
     else{
         std::ifstream file(s.input_filename);

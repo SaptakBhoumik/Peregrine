@@ -1,3 +1,4 @@
+#Note:-This file is ment for tests so it is a bit verbose and hard to read
 type a = def(int)->int
 type g = def(int)
 def unknown_type(variable):

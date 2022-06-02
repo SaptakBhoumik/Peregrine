@@ -43,6 +43,9 @@ void TypeChecker::checkBody(ast::AstNodePtr body) {
 
 void TypeChecker::check(ast::AstNodePtr expr, const Type& expectedType) {
     expr->accept(*this);
+    if(m_result==NULL){
+        return;
+    }
     const Type& exprType = *m_result;
 
     if (exprType != expectedType) {
@@ -211,7 +214,29 @@ bool TypeChecker::visit(const ast::ForStatement& node) {
     return true;
 }
 
-bool TypeChecker::visit(const ast::MatchStatement& node) { return true; }
+bool TypeChecker::visit(const ast::MatchStatement& node) { 
+    std::vector<TypePtr> types;
+    auto match_item=node.matchItem();
+    for(auto& item:match_item){
+        item->accept(*this);
+        types.push_back(m_result);
+    }
+    auto cases=node.caseBody();
+    for(auto& case_item:cases){
+        checkBody(case_item.second);
+        auto case_exp=case_item.first;
+        for(size_t i=0;i<types.size();i++){
+            if(i>(case_exp.size()-1)){
+                //The last item is _. This has being checked in the parser
+                break;
+            }
+            else if(case_exp[i]->type()!=ast::KAstNoLiteral){
+                check(case_exp[i],*types[i]);
+            }
+        }
+    }
+    return true; 
+}
 
 bool TypeChecker::visit(const ast::ScopeStatement& node) {
     checkBody(node.body());
@@ -257,6 +282,10 @@ bool TypeChecker::visit(const ast::BinaryOperation& node) {
     node.left()->accept(*this);
     TypePtr leftType = m_result;
     node.right()->accept(*this);
+    if(m_result==NULL||leftType==NULL){
+        m_result=NULL;//If left or right is null, the result is null
+        return true;
+    }
     TypePtr result = leftType->infixOperatorResult(node.op(), m_result);
 
     if (!result) {
@@ -315,6 +344,7 @@ bool TypeChecker::visit(const ast::IdentifierExpression& node) {
     if (!identifierType ||
         identifierType.value()->category() == TypeCategory::UserDefined) {
         add_error(node.token(), "undeclared identifier: " + node.value());
+        m_result=NULL;
         return true;
     }
 
@@ -399,7 +429,11 @@ bool TypeChecker::visit(const ast::UnionLiteral& node) { return true; }
 
 bool TypeChecker::visit(const ast::EnumLiteral& node) { return true; }
 
-bool TypeChecker::visit(const ast::WithStatement& node) { return true; }
+bool TypeChecker::visit(const ast::WithStatement& node) { 
+    //TODO: check if the variables are capable of context creation and add them to the environment
+    checkBody(node.body());
+    return true; 
+}
 
 bool TypeChecker::visit(const ast::VirtualStatement& node) { return true; }
 
@@ -418,7 +452,26 @@ bool TypeChecker::visit(const ast::CastStatement& node) {
 
 bool TypeChecker::visit(const ast::DefaultArg& node) { return true; }
 
-bool TypeChecker::visit(const ast::TernaryIf& node) { return true; }
+bool TypeChecker::visit(const ast::TernaryIf& node) { 
+    node.if_value()->accept(*this);
+    TypePtr ifType = m_result;
+    check(node.if_condition(), *TypeProducer::boolean());
+    check(node.else_value(), *ifType);
+    m_result=ifType;
+    return true; 
+}
 
-bool TypeChecker::visit(const ast::TryExcept& node) { return true; }
+bool TypeChecker::visit(const ast::TryExcept& node) { 
+    checkBody(node.body());
+    if(node.else_body()->type()!=ast::KAstNoLiteral){
+        checkBody(node.else_body());
+    }
+    auto except_clauses = node.except_clauses();
+    for(auto except_clause : except_clauses){
+        //TODO: Check if the exception is a subclass of the exception in the except block
+        //TODO:Also add the alias of exception to the environment
+        checkBody(except_clause.second);
+    }
+    return true; 
+}
 }
