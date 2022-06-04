@@ -10,13 +10,25 @@
 LEXER::LEXER(std::string input, std::string filename){
     m_input = input;
     m_filename = filename;
-    m_statments=split_ln(input);
     if(m_input.size()>0){
+        m_statments=split_ln(input);
         m_curr_item=m_input[0];
         m_curr_line=m_statments[0];
         lex();
+        complete_it();
     }
-    complete_it();
+    else {
+        m_result.push_back(Token{
+            m_loc,
+            m_curr_line,
+            "<tk_eof>",
+            m_curr_index,
+            m_curr_index+1,
+            m_line,
+            tk_eof,
+            m_tab_count
+        });
+    }
 }
 
 void LEXER::add_unknown(){
