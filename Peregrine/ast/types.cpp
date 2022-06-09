@@ -86,6 +86,10 @@ TypePtr IntType::prefixOperatorResult(Token op) const {
     }
 }
 
+TypePtr IntType::postfixOperatorResult(Token op) const{
+    return TypeProducer::integer();
+}
+
 TypePtr IntType::infixOperatorResult(Token op, const TypePtr type) const {
     switch (type->category()) {
         case TypeCategory::Integer:
@@ -102,7 +106,12 @@ TypePtr IntType::infixOperatorResult(Token op, const TypePtr type) const {
     if (TokenUtils::isComparisonToken(op))
         return TypeProducer::boolean();
 
-    // TODO: handle bitwise operations
+    if (TokenUtils::isBitwiseToken(op)){
+        if(type->category()==TypeCategory::Integer)
+            return type;
+        else
+            return nullptr;
+    }
     return nullptr;
 }
 
@@ -228,6 +237,10 @@ TypePtr DecimalType::prefixOperatorResult(Token op) const {
     }
 }
 
+TypePtr DecimalType::postfixOperatorResult(Token op) const{
+    return TypeProducer::decimal();
+}
+
 TypePtr DecimalType::infixOperatorResult(Token op, const TypePtr type) const {
     switch (type->category()) {
         case TypeCategory::Integer:
@@ -293,6 +306,10 @@ TypePtr StringType::prefixOperatorResult(Token op) const {
     //      return TypeProducer::pointer(std::make_shared<IntType>(*this));
     //  }
 
+    return nullptr;
+}
+
+TypePtr StringType::postfixOperatorResult(Token op) const{
     return nullptr;
 }
 
@@ -401,9 +418,25 @@ TypePtr PointerType::prefixOperatorResult(Token op) const {
             return nullptr;
     }
 }
-
+TypePtr PointerType::postfixOperatorResult(Token op) const{
+    return TypeProducer::pointer(m_baseType);
+}
 // TODO: allow pointer arithmetic as normal binary operations?
 TypePtr PointerType::infixOperatorResult(Token op, const TypePtr type) const {
+    switch (type->category()) {
+        case TypeCategory::Integer:
+            break;
+
+        default:
+            return nullptr;
+    }
+
+    if (op.tkType==tk_plus || op.tkType==tk_minus)
+        return TypeProducer::pointer(m_baseType);
+
+    if (TokenUtils::isComparisonToken(op))
+        return TypeProducer::boolean();
+
     return nullptr;
 }
 
@@ -630,6 +663,10 @@ TypePtr TypeProducer::voidT() { return m_void; }
 
 TypePtr TypeProducer::list(TypePtr elemType, std::string size) {
     return std::make_shared<ListType>(elemType, size);
+}
+
+TypePtr TypeProducer::function(std::vector<TypePtr> parameterTypes, TypePtr returnType){
+    return std::make_shared<FunctionType>(parameterTypes, returnType);
 }
 
 TypePtr TypeProducer::pointer(TypePtr baseType) {

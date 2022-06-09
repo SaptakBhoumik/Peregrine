@@ -23,7 +23,8 @@ class TypeChecker : public ast::AstVisitor {
     void add_error(Token tok, std::string_view msg);
     EnvPtr createEnv(EnvPtr parent = nullptr);
     std::string identifierName(ast::AstNodePtr identifier);
-    void checkBody(ast::AstNodePtr body);
+    void checkBody(ast::AstNodePtr body,
+                   std::vector<std::pair<TypePtr,ast::AstNodePtr>> add_var={});
 
     void check(ast::AstNodePtr expr, const Type& expectedType);
 

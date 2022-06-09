@@ -473,7 +473,7 @@ types::TypePtr VariableStatement::processedType() const {
 
 void VariableStatement::setProcessedType(types::TypePtr processedType,bool defined_before) {
     m_processedType = processedType;
-    if(!defined_before){
+    if(!defined_before&&m_processedType!=NULL){
         m_type=m_processedType->getTypeAst();
     }
 }
@@ -518,6 +518,9 @@ types::TypePtr ConstDeclaration::processedType() const {
 
 void ConstDeclaration::setProcessedType(types::TypePtr processedType) {
     m_processedType = processedType;
+    if(m_processedType!=NULL){
+        m_type=m_processedType->getTypeAst();
+    }
 }
 
 Token ConstDeclaration::token() const { return m_token; }

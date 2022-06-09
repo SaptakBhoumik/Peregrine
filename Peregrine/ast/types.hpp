@@ -54,6 +54,10 @@ class Type {
     // e.g. -34 -> Integer
     virtual TypePtr prefixOperatorResult(Token op) const { return nullptr; }
 
+    // returns the type obtained after applying the given operator to this type
+    // e.g. 34++ -> Integer
+    virtual TypePtr postfixOperatorResult(Token op) const { return nullptr; }
+
     // returns the type obtained after applying the given operator to both types
     // e.g. false == false -> Bool
     virtual TypePtr infixOperatorResult(Token op, const TypePtr type) const {
@@ -85,6 +89,7 @@ class IntType : public Type {
     std::string stringify() const;
 
     TypePtr prefixOperatorResult(Token op) const;
+    TypePtr postfixOperatorResult(Token op) const;
     TypePtr infixOperatorResult(Token op, const TypePtr type) const;
 
     bool operator==(const Type& type) const;
@@ -110,6 +115,7 @@ class DecimalType : public Type {
     bool isFloat() const;
 
     TypePtr prefixOperatorResult(Token op) const;
+    TypePtr postfixOperatorResult(Token op) const;
     TypePtr infixOperatorResult(Token op, const TypePtr type) const;
 
     bool operator==(const Type& type) const;
@@ -129,6 +135,7 @@ class StringType : public Type {
     std::string stringify() const;
 
     TypePtr prefixOperatorResult(Token op) const;
+    TypePtr postfixOperatorResult(Token op) const;
     TypePtr infixOperatorResult(Token op, const TypePtr type) const;
 };
 
@@ -157,6 +164,7 @@ class PointerType : public Type {
     std::string stringify() const;
 
     TypePtr prefixOperatorResult(Token op) const;
+    TypePtr postfixOperatorResult(Token op) const;
     TypePtr infixOperatorResult(Token op, const TypePtr type) const;
 };
 
@@ -239,6 +247,7 @@ class TypeProducer {
         DecimalType::DecimalSize decimalSize = DecimalType::DecimalSize::Float64);
     static TypePtr string();
     static TypePtr boolean();
+    static TypePtr function(std::vector<TypePtr> parameterTypes, TypePtr returnType);
     static TypePtr voidT();
 
     static TypePtr list(TypePtr elemType, std::string size);

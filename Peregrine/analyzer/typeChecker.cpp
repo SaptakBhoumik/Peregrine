@@ -34,9 +34,15 @@ EnvPtr TypeChecker::createEnv(EnvPtr parent) {
     return std::make_shared<SymbolTable<TypePtr>>(parent);
 }
 
-void TypeChecker::checkBody(ast::AstNodePtr body) {
+void TypeChecker::checkBody(ast::AstNodePtr body,
+                            std::vector<std::pair<TypePtr,ast::AstNodePtr>> add_var) {
     EnvPtr previousEnv = m_env;
     m_env = createEnv();
+    if(add_var.size()!=0) {
+        for(auto& var : add_var) {
+            m_env->set(var.second,var.first);
+        }
+    }
     body->accept(*this);
     m_env = previousEnv;
 }
@@ -179,8 +185,9 @@ bool TypeChecker::visit(const ast::IfStatement& node) {
         checkBody(elif.second);
     }
 
-    if (node.elseBody()->type() != ast::KAstNoLiteral)
+    if (node.elseBody()->type() != ast::KAstNoLiteral){
         checkBody(node.elseBody());
+    }
     return true;
 }
 
@@ -191,11 +198,21 @@ bool TypeChecker::visit(const ast::AssertStatement& node) {
 
 bool TypeChecker::visit(const ast::StaticStatement& node) { return true; }
 
-bool TypeChecker::visit(const ast::ExportStatement& node) { return true; }
+bool TypeChecker::visit(const ast::ExportStatement& node) { 
+    node.body()->accept(*this); 
+    return true; 
+}
 
-bool TypeChecker::visit(const ast::InlineStatement& node) { return true; }
+bool TypeChecker::visit(const ast::InlineStatement& node) {
+    node.body()->accept(*this); 
+    return true; 
+}
 
-bool TypeChecker::visit(const ast::RaiseStatement& node) { return true; }
+bool TypeChecker::visit(const ast::RaiseStatement& node) { 
+    //TODO: Check if the exception is a subclass of the exception in the except block
+    node.value()->accept(*this);
+    return true; 
+}
 
 bool TypeChecker::visit(const ast::WhileStatement& node) {
     check(node.condition(), *TypeProducer::boolean());
@@ -312,7 +329,19 @@ bool TypeChecker::visit(const ast::PrefixExpression& node) {
     return true;
 }
 
-bool TypeChecker::visit(const ast::PostfixExpression& node) { return true; }
+bool TypeChecker::visit(const ast::PostfixExpression& node) { 
+    node.left()->accept(*this);
+    TypePtr result = m_result->postfixOperatorResult(node.postfix());
+
+    if (!result) {
+        add_error(node.token(), "operator " + node.postfix().keyword +
+                                " can not be used with type " +
+                                m_result->stringify());
+    }
+
+    m_result = result;
+    return true; 
+}
 
 bool TypeChecker::visit(const ast::FunctionCall& node) {
     node.name()->accept(*this);
@@ -387,7 +416,18 @@ bool TypeChecker::visit(const ast::ListTypeExpr& node) {
     return true;
 }
 
-bool TypeChecker::visit(const ast::FunctionTypeExpr& node) { return true; }
+bool TypeChecker::visit(const ast::FunctionTypeExpr& node) {
+    std::vector<TypePtr> parameterTypes;
+    auto args=node.argTypes();
+    for (auto& param : args) {
+        param->accept(*this);
+        parameterTypes.push_back(m_result);
+    } 
+    node.returnTypes()->accept(*this);
+    auto returnType = m_result;
+    m_result = TypeProducer::function(parameterTypes, returnType);
+    return true; 
+}
 
 bool TypeChecker::visit(const ast::PointerTypeExpr& node) {
     node.baseType()->accept(*this);
@@ -469,8 +509,20 @@ bool TypeChecker::visit(const ast::TryExcept& node) {
     auto except_clauses = node.except_clauses();
     for(auto except_clause : except_clauses){
         //TODO: Check if the exception is a subclass of the exception in the except block
-        //TODO:Also add the alias of exception to the environment
-        checkBody(except_clause.second);
+        auto exception=except_clause.first.first;
+        std::vector<std::pair<TypePtr,ast::AstNodePtr>> add_var={};
+        if(exception.size()>0){
+            exception[0]->accept(*this);
+            auto type=m_result;
+            for(size_t i=1;i<exception.size();i++){
+                check(exception[i],*type);
+            }
+            if(except_clause.first.second->type()!=ast::KAstNoLiteral){
+                std::pair<TypePtr,ast::AstNodePtr> var=std::make_pair(type,except_clause.first.second);
+                add_var.push_back(var);
+            }
+        }
+        checkBody(except_clause.second,add_var);
     }
     return true; 
 }

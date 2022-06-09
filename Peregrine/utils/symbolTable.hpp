@@ -4,6 +4,7 @@
 #include "ast/ast.hpp"
 
 #include <iostream>
+#include <assert.h>
 #include <map>
 #include <memory>
 #include <algorithm>
@@ -40,6 +41,12 @@ class SymbolTable {
         m_symbols[name] = value;
         get(name);
         return true;
+    }
+
+    bool set(ast::AstNodePtr name, T value) {
+        assert(name->type() == ast::KAstIdentifier);
+        auto identifier=std::dynamic_pointer_cast<ast::IdentifierExpression>(name);
+        return set(identifier->value(), value);
     }
 
     bool reassign(std::string name, T value) {
