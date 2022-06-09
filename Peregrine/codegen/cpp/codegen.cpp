@@ -37,7 +37,7 @@ std::string global_name(std::string name)
         else if(c=='-'){
             res+="$$$";
         }
-        else if(c==' '){
+        else if(c==' '||c==':'){
             res+="$$$$$$$";
         }
         else{
