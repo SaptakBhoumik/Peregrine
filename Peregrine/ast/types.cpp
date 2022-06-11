@@ -151,6 +151,10 @@ ast::AstNodePtr IntType::getTypeAst() const {
     return std::make_shared<ast::TypeExpression>((Token){}, res);
 }
 
+ast::AstNodePtr IntType::defaultValue() const {
+    return std::make_shared<ast::IntegerLiteral>((Token){.keyword="0",.tkType=tk_integer}, "0");
+}
+
 DecimalType::DecimalType(DecimalSize decimalSize) {
     m_decimalSize = decimalSize;
 }
@@ -167,7 +171,8 @@ bool DecimalType::isConvertibleTo(const Type& type) const {
 
     if (!isFloat() && typeDecimal.isFloat())
         return false;
-
+    if(m_decimalSize>typeDecimal.size())
+        return false;
     return true;
 }
 
@@ -269,7 +274,9 @@ bool DecimalType::operator==(const Type& type) const {
 
     return false;
 }
-
+ast::AstNodePtr DecimalType::defaultValue() const {
+    return std::make_shared<ast::DecimalLiteral>((Token){.keyword="0",.tkType=tk_decimal}, "0");
+}
 TypeCategory StringType::category() const { return TypeCategory::String; }
 
 bool StringType::isConvertibleTo(const Type& type) const {
@@ -332,7 +339,9 @@ TypePtr StringType::infixOperatorResult(Token op, const TypePtr type) const {
 ast::AstNodePtr StringType::getTypeAst() const {
     return std::make_shared<ast::TypeExpression>((Token){}, "str");
 }
-
+ast::AstNodePtr StringType::defaultValue() const {
+    return std::make_shared<ast::StringLiteral>((Token){.keyword="\"\"",.tkType=tk_string}, "\"\"",false);
+}
 TypeCategory BoolType::category() const { return TypeCategory::Bool; }
 
 bool BoolType::isConvertibleTo(const Type& type) const {
@@ -363,6 +372,10 @@ std::string BoolType::stringify() const { return "bool"; }
 
 ast::AstNodePtr BoolType::getTypeAst() const {
     return std::make_shared<ast::TypeExpression>((Token){}, "bool");
+}
+
+ast::AstNodePtr BoolType::defaultValue() const {
+    return std::make_shared<ast::BoolLiteral>((Token){.keyword="False",.tkType=tk_false}, "False");
 }
 
 PointerType::PointerType(TypePtr baseType) { m_baseType = baseType; }
@@ -444,6 +457,10 @@ ast::AstNodePtr PointerType::getTypeAst() const {
     return std::make_shared<ast::PointerTypeExpr>((Token){}, m_baseType->getTypeAst());
 }
 
+ast::AstNodePtr PointerType::defaultValue() const {
+    return std::make_shared<ast::NoneLiteral>((Token){.keyword="None",.tkType=tk_none});
+}
+
 TypeCategory VoidType::category() const { return TypeCategory::Void; }
 
 bool VoidType::isConvertibleTo(const Type& type) const { return false; }
@@ -455,7 +472,9 @@ std::string VoidType::stringify() const { return "void"; }
 ast::AstNodePtr VoidType::getTypeAst() const {
     return std::make_shared<ast::TypeExpression>((Token){}, "void");
 }
-
+ast::AstNodePtr VoidType::defaultValue() const {
+    return std::make_shared<ast::NoLiteral>();
+}
 ListType::ListType(TypePtr elemType, std::string size) {
     m_elemType = elemType;
     m_size = size;
@@ -524,7 +543,9 @@ ast::AstNodePtr ListType::getTypeAst() const {
     }
     return std::make_shared<ast::ListTypeExpr>((Token){}, m_elemType->getTypeAst(),size);
 }
-
+ast::AstNodePtr ListType::defaultValue() const {
+    return std::make_shared<ast::ListLiteral>((Token){});
+}
 UserDefinedType::UserDefinedType(TypePtr baseType) { m_baseType = baseType; }
 
 TypeCategory UserDefinedType::category() const {
@@ -540,7 +561,9 @@ bool UserDefinedType::isConvertibleTo(const Type& type) const {
 bool UserDefinedType::isCastableTo(const Type& type) const {
     return m_baseType->isCastableTo(type);
 }
-
+ast::AstNodePtr UserDefinedType::defaultValue() const {
+    return m_baseType->defaultValue();
+}
 // TODO
 std::string UserDefinedType::stringify() const { return m_baseType->stringify(); }
 
@@ -592,7 +615,8 @@ bool FunctionType::isConvertibleTo(const Type& type) const {
 
 // TODO
 bool FunctionType::isCastableTo(const Type& type) const { return false; }
-
+// TODO
+ast::AstNodePtr FunctionType::defaultValue() const {return std::make_shared<ast::NoLiteral>();}
 std::string FunctionType::stringify() const { return "function"; }
 
 ast::AstNodePtr FunctionType::getTypeAst() const {

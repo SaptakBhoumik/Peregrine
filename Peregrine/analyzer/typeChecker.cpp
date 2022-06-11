@@ -138,9 +138,11 @@ bool TypeChecker::visit(const ast::VariableStatement& node) {
         node.value()->accept(*this);
         nonConstNode.setProcessedType(m_result,defined_before);
         varType = m_result;
-    } else {
-        check(node.value(), *varType);
-        nonConstNode.setProcessedType(varType,defined_before);
+    } else{
+        if(node.value()->type()!=ast::KAstNoLiteral){
+            check(node.value(), *varType);
+        }
+        nonConstNode.setProcessedType(varType,true);
     }
 
     //TODO:Check if it is an identifier
@@ -159,11 +161,12 @@ bool TypeChecker::visit(const ast::ConstDeclaration& node) {
         node.value()->accept(*this);
         nonConstNode.setProcessedType(m_result);
         constType = m_result;
-    } else {
+    } else{
         check(node.value(), *constType);
-        nonConstNode.setProcessedType(constType);
+        nonConstNode.setProcessedType(NULL);
     }
 
+    //TODO:Check if it is an identifier
     m_env->set(identifierName(node.name()), constType);
     return true;
 }

@@ -337,7 +337,7 @@ class ListLiteral : public AstNode {
     std::vector<AstNodePtr> m_elements;
 
   public:
-    ListLiteral(Token tok, std::vector<AstNodePtr> elements);
+    ListLiteral(Token tok, std::vector<AstNodePtr> elements={});
 
     std::vector<AstNodePtr> elements() const;
 

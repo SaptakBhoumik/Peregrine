@@ -472,9 +472,12 @@ types::TypePtr VariableStatement::processedType() const {
 }
 
 void VariableStatement::setProcessedType(types::TypePtr processedType,bool defined_before) {
-    m_processedType = processedType;
+    m_processedType = processedType;            
     if(!defined_before&&m_processedType!=NULL){
         m_type=m_processedType->getTypeAst();
+    }
+    if (m_value->type()==KAstNoLiteral&&m_processedType!=NULL) {
+        m_value=m_processedType->defaultValue();
     }
 }
 
@@ -517,8 +520,8 @@ types::TypePtr ConstDeclaration::processedType() const {
 }
 
 void ConstDeclaration::setProcessedType(types::TypePtr processedType) {
-    m_processedType = processedType;
     if(m_processedType!=NULL){
+        m_processedType = processedType;
         m_type=m_processedType->getTypeAst();
     }
 }
@@ -530,13 +533,13 @@ AstKind ConstDeclaration::type() const { return KAstConstDecl; }
 std::string ConstDeclaration::stringify() const {
     std::string res = "const ";
 
-    if (m_type->type() != KAstNoLiteral) {
-        res += m_type->stringify();
-        res += " ";
-    }
 
     res += m_name->stringify();
 
+    if (m_type->type() != KAstNoLiteral) {
+        res += ":";
+        res += m_type->stringify();
+    }
     res += " = ";
     res += m_value->stringify();
 
