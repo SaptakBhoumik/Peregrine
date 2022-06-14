@@ -1,4 +1,0 @@
-An example of for loop
-
-for variable in iterable:
-    ...
