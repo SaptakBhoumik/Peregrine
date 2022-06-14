@@ -18,7 +18,19 @@ TypeChecker::TypeChecker(ast::AstNodePtr ast) {
         exit(1);
     }
 }
-
+bool TypeChecker::defined(ast::AstNodePtr name){
+    bool defined_before=true;
+    
+    {
+        if(name->type()==ast::KAstIdentifier){
+            auto identifierType = m_env->get(identifierName(name));
+            if (identifierType==std::nullopt) {
+                defined_before=false;
+            }
+        }
+    }
+    return defined_before;
+}
 void TypeChecker::add_error(Token tok, std::string_view msg) {
     PEError err = {
         {tok.line, tok.start, tok.location, m_filename, tok.statement},
@@ -47,17 +59,20 @@ void TypeChecker::checkBody(ast::AstNodePtr body,
     m_env = previousEnv;
 }
 
-void TypeChecker::check(ast::AstNodePtr expr, const Type& expectedType) {
+void TypeChecker::check(ast::AstNodePtr expr, const TypePtr expTypePtr) {
+    if(expTypePtr==NULL){
+        return;
+    }
     expr->accept(*this);
     if(m_result==NULL){
         return;
     }
     const Type& exprType = *m_result;
 
-    if (exprType != expectedType) {
-        if (!exprType.isConvertibleTo(expectedType) &&
-            !expectedType.isConvertibleTo(exprType)) {
-            add_error(expr->token(), "expected type " + expectedType.stringify() +
+    if (exprType != *expTypePtr) {
+        if (!exprType.isConvertibleTo(*expTypePtr) &&
+            !expTypePtr->isConvertibleTo(exprType)) {
+            add_error(expr->token(), "expected type " + expTypePtr->stringify() +
                                      ", got " + exprType.stringify() +
                                      " instead");
         }
@@ -89,7 +104,7 @@ bool TypeChecker::visit(const ast::FunctionDefinition& node) {
         if (param.p_default->type() != ast::KAstNoLiteral) {
             if (param.p_type->type() != ast::KAstNoLiteral) {
                 param.p_type->accept(*this);
-                check(param.p_default, *m_result);
+                check(param.p_default, m_result);
             }
 
             param.p_default->accept(*this);
@@ -118,20 +133,12 @@ bool TypeChecker::visit(const ast::FunctionDefinition& node) {
 }
 
 bool TypeChecker::visit(const ast::VariableStatement& node) {
+    //TODO:check if redefination
     auto& nonConstNode = const_cast<ast::VariableStatement&>(node);
 
     node.varType()->accept(*this);
     TypePtr varType = m_result;
-    bool defined_before=true;
-    
-    {
-        if(node.name()->type()==ast::KAstIdentifier){
-            auto identifierType = m_env->get(identifierName(node.name()));
-            if (identifierType==std::nullopt) {
-                defined_before=false;
-            }
-        }
-    }
+    bool defined_before=defined(node.name());
 
     if (varType->category() == TypeCategory::Void) {
         // inferring the type of the variable
@@ -140,17 +147,21 @@ bool TypeChecker::visit(const ast::VariableStatement& node) {
         varType = m_result;
     } else{
         if(node.value()->type()!=ast::KAstNoLiteral){
-            check(node.value(), *varType);
+            check(node.value(), varType);
         }
         nonConstNode.setProcessedType(varType,true);
     }
-
-    //TODO:Check if it is an identifier
-    m_env->set(identifierName(node.name()), varType);
+    if(node.name()->type()==ast::KAstIdentifier){
+        m_env->set(identifierName(node.name()), varType);
+    }
+    else{
+        //TODO:implement it
+    }
     return true;
 }
 
 bool TypeChecker::visit(const ast::ConstDeclaration& node) {
+    //TODO:check if redefination
     auto& nonConstNode = const_cast<ast::ConstDeclaration&>(node);
 
     node.constType()->accept(*this);
@@ -162,11 +173,10 @@ bool TypeChecker::visit(const ast::ConstDeclaration& node) {
         nonConstNode.setProcessedType(m_result);
         constType = m_result;
     } else{
-        check(node.value(), *constType);
+        check(node.value(), constType);
         nonConstNode.setProcessedType(NULL);
     }
 
-    //TODO:Check if it is an identifier
     m_env->set(identifierName(node.name()), constType);
     return true;
 }
@@ -180,11 +190,11 @@ bool TypeChecker::visit(const ast::TypeDefinition& node) {
 }
 
 bool TypeChecker::visit(const ast::IfStatement& node) {
-    check(node.condition(), *TypeProducer::boolean());
+    check(node.condition(), TypeProducer::boolean());
     checkBody(node.ifBody());
 
     for (auto& elif : node.elifs()) {
-        check(elif.first, *TypeProducer::boolean());
+        check(elif.first, TypeProducer::boolean());
         checkBody(elif.second);
     }
 
@@ -195,7 +205,7 @@ bool TypeChecker::visit(const ast::IfStatement& node) {
 }
 
 bool TypeChecker::visit(const ast::AssertStatement& node) { 
-    check(node.condition(), *TypeProducer::boolean());
+    check(node.condition(), TypeProducer::boolean());
     return true; 
 }
 
@@ -218,7 +228,7 @@ bool TypeChecker::visit(const ast::RaiseStatement& node) {
 }
 
 bool TypeChecker::visit(const ast::WhileStatement& node) {
-    check(node.condition(), *TypeProducer::boolean());
+    check(node.condition(), TypeProducer::boolean());
     checkBody(node.body());
     return true;
 }
@@ -251,7 +261,7 @@ bool TypeChecker::visit(const ast::MatchStatement& node) {
                 break;
             }
             else if(case_exp[i]->type()!=ast::KAstNoLiteral){
-                check(case_exp[i],*types[i]);
+                check(case_exp[i],types[i]);
             }
         }
     }
@@ -270,7 +280,7 @@ bool TypeChecker::visit(const ast::ReturnStatement& node) {
 
     node.returnValue()->accept(*this);
 
-    check(node.returnValue(), *m_currentFunction->returnType());
+    check(node.returnValue(), m_currentFunction->returnType());
     return true;
 }
 
@@ -288,7 +298,7 @@ bool TypeChecker::visit(const ast::ListLiteral& node) {
     TypePtr listType = m_result;
 
     for (auto& elem : node.elements()) {
-        check(elem, *listType);
+        check(elem, listType);
     }
     m_result = TypeProducer::list(listType, std::to_string(node.elements().size()));
     return true;
@@ -359,7 +369,7 @@ bool TypeChecker::visit(const ast::FunctionCall& node) {
                                 identifierName(node.name()));
 
     for (size_t i = 0; i < node.arguments().size(); i++) {
-        check(node.arguments()[i], *functionType->parameterTypes()[i]);
+        check(node.arguments()[i], functionType->parameterTypes()[i]);
     }
 
     m_result = functionType->returnType();
@@ -405,7 +415,7 @@ bool TypeChecker::visit(const ast::ListTypeExpr& node) {
     node.elemType()->accept(*this);
     auto listType = m_result;
     if(node.size()->type()!=ast::KAstNoLiteral){
-        check(node.size(), *TypeProducer::integer());
+        check(node.size(), TypeProducer::integer());
     }
     std::string size="";
     if(node.size()->type()==ast::KAstNoLiteral){
@@ -498,8 +508,8 @@ bool TypeChecker::visit(const ast::DefaultArg& node) { return true; }
 bool TypeChecker::visit(const ast::TernaryIf& node) { 
     node.if_value()->accept(*this);
     TypePtr ifType = m_result;
-    check(node.if_condition(), *TypeProducer::boolean());
-    check(node.else_value(), *ifType);
+    check(node.if_condition(), TypeProducer::boolean());
+    check(node.else_value(), ifType);
     m_result=ifType;
     return true; 
 }
@@ -518,7 +528,7 @@ bool TypeChecker::visit(const ast::TryExcept& node) {
             exception[0]->accept(*this);
             auto type=m_result;
             for(size_t i=1;i<exception.size();i++){
-                check(exception[i],*type);
+                check(exception[i],type);
             }
             if(except_clause.first.second->type()!=ast::KAstNoLiteral){
                 std::pair<TypePtr,ast::AstNodePtr> var=std::make_pair(type,except_clause.first.second);
@@ -527,6 +537,55 @@ bool TypeChecker::visit(const ast::TryExcept& node) {
         }
         checkBody(except_clause.second,add_var);
     }
+    return true; 
+}
+bool TypeChecker::visit(const ast::MultipleAssign& node){
+    auto name=node.names();
+    auto value=node.values(); 
+    //type and if it is defined before
+    std::vector<std::pair<TypePtr,bool>> value_type;
+    for(auto& val : value){
+        val->accept(*this);
+        value_type.push_back(std::make_pair(m_result,true));
+    }
+    if(value_type.size()>1){
+        //this is not a list or function returning multiple stuff
+        for(size_t i=0;i<name.size();i++){
+            if(name[i]->type()==ast::KAstIdentifier){
+                if(defined(name[i])){
+                    check(name[i],value_type[i].first);
+                }
+                else{
+                    value_type[i].second=false;
+                    m_env->set(identifierName(name[i]), value_type[i].first);
+                }
+            }
+        }
+    }
+    else{
+        auto type=value_type[0].first;
+        value_type.clear();
+        if(type->category()==List){
+            //TODO:add dictionary here
+            auto elem_type=std::dynamic_pointer_cast<ListType>(type)->elemType();
+            for(size_t i=0;i<name.size();i++){
+                value_type.push_back(std::make_pair(elem_type,true));
+                if(name[i]->type()==ast::KAstIdentifier){
+                    if(defined(name[i])){
+                        check(name[i],elem_type);
+                    }
+                    else{
+                        value_type[i].second=false;
+                        m_env->set(identifierName(name[i]), elem_type);
+                    }
+                }
+            }
+        }
+        //TODO: add function returning multiple stuff
+    }
+    auto& nonConstNode = const_cast<ast::MultipleAssign&>(node);
+    nonConstNode.setProcessedType(value_type);
+
     return true; 
 }
 }

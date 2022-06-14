@@ -647,6 +647,14 @@ bool Validator::visit(const MultipleAssign& node){
     for(auto& x:node.names()){
         x->accept(*this);
     }
+    if(node.values().size()!=1&&node.values().size()!=node.names().size()){
+        if(node.values().size()>node.names().size()){
+            add_error(node.token(), "SyntaxError: Too many values in multiple assignment");
+        }
+        else{
+            add_error(node.token(), "SyntaxError: Too few values in multiple assignment");
+        }
+    }
     return true;
 }
 bool Validator::visit(const AugAssign& node){

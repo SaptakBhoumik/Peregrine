@@ -1487,12 +1487,29 @@ MultipleAssign::MultipleAssign(std::vector<AstNodePtr> names,std::vector<AstNode
 std::vector<AstNodePtr> MultipleAssign::names() const{return m_names;}
 std::vector<AstNodePtr> MultipleAssign::values() const{return m_values;}
 AstKind MultipleAssign::type() const{return KAstMultipleAssign;}
+std::vector<std::pair<types::TypePtr,bool>> MultipleAssign::processed_types() const{return m_processed_types;}
+void MultipleAssign::setProcessedType(std::vector<std::pair<types::TypePtr,bool>> processed_types){
+    m_processed_types=processed_types;
+}
 std::string MultipleAssign::stringify() const{
     std::string res="((";
-    for (size_t i=0;i<m_names.size();++i){
-        res+=m_names[i]->stringify();
-        if(i<m_names.size()-1){
-            res+=",";
+    if(m_processed_types.size()>0){
+        for (size_t i=0;i<m_names.size();++i){
+            res+=m_names[i]->stringify();
+            if(!m_processed_types[i].second){
+                res+=":"+m_processed_types[i].first->getTypeAst()->stringify();
+            }
+            if(i<m_names.size()-1){
+                res+=",";
+            }
+        }
+    }
+    else{
+        for (size_t i=0;i<m_names.size();++i){
+            res+=m_names[i]->stringify();
+            if(i<m_names.size()-1){
+                res+=",";
+            }
         }
     }
     res+=")=(";

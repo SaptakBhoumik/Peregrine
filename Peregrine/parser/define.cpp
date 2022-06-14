@@ -106,12 +106,17 @@ AstNodePtr Parser::parseMultipleAssign(AstNodePtr left){
     expect(tk_assign,"Expected = but got "+next().keyword+" instead","","","");
     advance();
     values.push_back(parseExpression());
-    advance();
+    if(next().tkType==tk_comma){
+            advance();
+        }
     while (m_currentToken.tkType==tk_comma){
         advance();
         values.push_back(parseExpression());
         if(next().tkType==tk_comma){
             advance();
+        }
+        else if(next().tkType==tk_new_line){
+            break;
         }
     }
     return std::make_shared<MultipleAssign>(names,values);

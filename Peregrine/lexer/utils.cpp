@@ -45,6 +45,13 @@ bool LEXER::is_int(const std::string s)
         s.end(), [](unsigned char c) { return !std::isdigit(c); }) == s.end();
 }
 
+bool LEXER::is_hex(const std::string s)
+{
+  return !s.empty()&&(s.compare(0, 2, "0x") == 0||s.compare(0, 2, "0X") == 0)
+      && s.size() > 2
+      && s.find_first_not_of("0123456789abcdefABCDEF", 2) == std::string::npos;
+}
+
 char LEXER::next(){
     if((m_curr_index+1)<m_input.size()){
         return m_input[m_curr_index+1];

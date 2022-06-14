@@ -1099,8 +1099,11 @@ class SumType : public AstNode {
 class MultipleAssign : public AstNode {
     std::vector<AstNodePtr> m_names;
     std::vector<AstNodePtr> m_values;
+    std::vector<std::pair<types::TypePtr,bool>> m_processed_types;
   public:
     MultipleAssign(std::vector<AstNodePtr> names,std::vector<AstNodePtr> values);
+    void setProcessedType(std::vector<std::pair<types::TypePtr,bool>> types);
+    std::vector<std::pair<types::TypePtr,bool>> processed_types() const;
     std::vector<AstNodePtr> names() const;
     std::vector<AstNodePtr> values() const;
     Token token() const;

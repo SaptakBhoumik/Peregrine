@@ -32,6 +32,7 @@ class LEXER{
     bool advance();
     std::vector<std::string> split_ln(std::string code);
     bool is_int(const std::string s);
+    bool is_hex(const std::string s);
     
 
     void lex_string();

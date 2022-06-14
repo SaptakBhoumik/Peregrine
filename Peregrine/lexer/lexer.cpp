@@ -87,7 +87,7 @@ void LEXER::add_unknown(){
         type = key_map[m_keyword];
     }
     else if(m_keyword!=""){
-        if(is_int(m_keyword)){
+        if(is_int(m_keyword)||is_hex(m_keyword)){
             type=tk_integer;
         }
         else if(std::regex_match(m_keyword,std::regex(R"(^^\s*[-+]?((\d+(\.\d+)?)|(\d+\.)|(\.\d+))(e[-+]?\d+)?\s*$)"))){
