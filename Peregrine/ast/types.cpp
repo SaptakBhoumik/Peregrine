@@ -1,3 +1,4 @@
+//TODO: handle user defined types like `type name=int` properly
 #include "types.hpp"
 #include "lexer/tokens.hpp"
 #include "ast.hpp"
@@ -643,6 +644,144 @@ bool FunctionType::operator==(const Type& type) const {
     return true;
 }
 
+MultipleReturnType::MultipleReturnType(std::vector<TypePtr> returnTypes) {
+    m_returnTypes = returnTypes;
+}
+
+ast::AstNodePtr MultipleReturnType::getTypeAst() const{
+    std::vector<ast::AstNodePtr> params;
+    for (auto& paramType : m_returnTypes)
+        params.push_back(paramType->getTypeAst());
+    return std::make_shared<ast::TypeTuple>(params);
+}
+
+TypeCategory MultipleReturnType::category() const{
+    return TypeCategory::MultipleReturn;
+}
+
+bool MultipleReturnType::isConvertibleTo(const Type& type) const{
+    if(type.category()==TypeCategory::MultipleReturn){
+        auto& multipleType=dynamic_cast<const MultipleReturnType&>(type);
+        if(m_returnTypes.size()!=multipleType.returnTypes().size())
+            return false;
+        for(size_t i=0;i<m_returnTypes.size();i++){
+            if(!m_returnTypes[i]->isConvertibleTo(*multipleType.returnTypes()[i]))
+                return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+bool MultipleReturnType::isCastableTo(const Type& type) const{
+    return false;
+}
+
+ast::AstNodePtr MultipleReturnType::defaultValue() const{
+    //Should never be used
+    return NULL;
+}
+std::string MultipleReturnType::stringify() const{
+    std::string ret="(";
+    for(size_t i=0;i<m_returnTypes.size();i++){
+        ret+=m_returnTypes[i]->stringify();
+        if(i<m_returnTypes.size()-1)
+            ret+=",";
+    }
+    ret+=")";
+    return ret;
+}
+
+std::vector<TypePtr> MultipleReturnType::returnTypes() const{
+    return m_returnTypes;
+}
+
+bool MultipleReturnType::operator==(const Type& type) const{
+    if(type.category()==TypeCategory::MultipleReturn){
+        auto& multipleType=dynamic_cast<const MultipleReturnType&>(type);
+        if(m_returnTypes.size()!=multipleType.returnTypes().size())
+            return false;
+        for(size_t i=0;i<m_returnTypes.size();i++){
+            if(*m_returnTypes[i]!=*multipleType.returnTypes()[i])
+                return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+EnumType::EnumType(std::string name,std::vector<std::string> items,std::string curr_value){
+    m_name=name;
+    m_items=items;
+    m_curr_value=curr_value;
+}
+
+ast::AstNodePtr EnumType::getTypeAst() const{
+    return std::make_shared<ast::TypeExpression>((Token){},m_name.c_str());
+}
+
+TypeCategory EnumType::category() const{
+    return TypeCategory::Enum;
+}
+
+bool EnumType::isConvertibleTo(const Type& type) const{
+    return false;
+}
+
+bool EnumType::isCastableTo(const Type& type) const{
+    if (type.category() == TypeCategory::UserDefined) {
+        auto& userDefinedType = dynamic_cast<const UserDefinedType&>(type);
+        return isCastableTo(*userDefinedType.baseType());
+    }
+    switch(type.category()){
+        case TypeCategory::Integer:
+            return true;
+        case TypeCategory::Decimal:
+            return true;
+        case TypeCategory::Bool:
+            return true;
+        case TypeCategory::Enum:
+            return true;
+        case TypeCategory::Pointer:
+            return true;
+        default:
+            return false;
+    }
+    return false;
+}
+
+ast::AstNodePtr EnumType::defaultValue() const{
+    auto owner=std::make_shared<ast::IdentifierExpression>((Token){},m_name.c_str());
+    auto reference=std::make_shared<ast::IdentifierExpression>((Token){},m_items[0].c_str());
+    return std::make_shared<ast::DotExpression>((Token){},owner,reference);
+}
+
+std::string EnumType::stringify() const{
+    std::string res=m_name;
+    if(m_curr_value!="")
+        res+="."+m_curr_value;
+    return res;
+}
+
+std::vector<std::string> EnumType::getItem() const{
+    return m_items;
+}
+std::string EnumType::getName() const{
+    return m_name;
+}
+std::string EnumType::getCurrValue() const{
+    return m_curr_value;
+}
+
+bool EnumType::operator==(const Type& type) const{
+    if(type.category()==TypeCategory::Enum){
+        auto& enumType=dynamic_cast<const EnumType&>(type);
+        return m_name==enumType.getName();
+    }
+    return false;
+}
+
+
 std::array<TypePtr, 8> TypeProducer::m_integer = {
     std::make_shared<IntType>(IntType::IntSizes::Int8),
     std::make_shared<IntType>(IntType::IntSizes::Int16),
@@ -696,7 +835,12 @@ TypePtr TypeProducer::function(std::vector<TypePtr> parameterTypes, TypePtr retu
 TypePtr TypeProducer::pointer(TypePtr baseType) {
     return std::make_shared<PointerType>(baseType);
 }
-
+TypePtr TypeProducer::multipleReturn(std::vector<TypePtr> returnTypes){
+    return std::make_shared<MultipleReturnType>(returnTypes);
+}
+TypePtr TypeProducer::enumT(std::string name,std::vector<std::string> items,std::string curr_value){
+    return std::make_shared<EnumType>(name,items,curr_value);
+}
 std::map<std::string, TypePtr> identifierToTypeMap = {
     {"i8", TypeProducer::integer(IntType::IntSizes::Int8)},
     {"i16", TypeProducer::integer(IntType::IntSizes::Int16)},

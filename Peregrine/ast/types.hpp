@@ -26,7 +26,9 @@ enum TypeCategory {
     UserDefined,
     Function,
     Class,
-    Void
+    MultipleReturn,
+    Enum,
+    Void,
 };
 
 class Type;
@@ -243,6 +245,44 @@ class FunctionType : public Type {
     bool operator==(const Type& type) const;
 };
 
+class MultipleReturnType : public Type {
+  public:
+    MultipleReturnType(std::vector<TypePtr> returnTypes);
+        
+    ast::AstNodePtr getTypeAst() const;
+    TypeCategory category() const;
+    bool isConvertibleTo(const Type& type) const;
+    bool isCastableTo(const Type& type) const;
+    ast::AstNodePtr defaultValue() const;
+    std::string stringify() const;
+    std::vector<TypePtr> returnTypes() const;
+
+    bool operator==(const Type& type) const;
+    private:
+    std::vector<TypePtr> m_returnTypes;
+};
+
+class EnumType : public Type {
+  public:
+    EnumType(std::string name,std::vector<std::string> items,std::string curr_value="");
+        
+    ast::AstNodePtr getTypeAst() const;
+    TypeCategory category() const;
+    bool isConvertibleTo(const Type& type) const;
+    bool isCastableTo(const Type& type) const;
+    ast::AstNodePtr defaultValue() const;
+    std::string stringify() const;
+    std::vector<std::string> getItem() const;
+    std::string getName() const;
+    std::string getCurrValue() const;
+
+    bool operator==(const Type& type) const;
+    private:
+    std::vector<std::string> m_items;
+    std::string m_curr_value;
+    std::string m_name;
+};
+
 class TypeProducer {
     static std::array<TypePtr, 8> m_integer;
     static std::array<TypePtr, 3> m_decimal;
@@ -261,9 +301,10 @@ class TypeProducer {
     static TypePtr boolean();
     static TypePtr function(std::vector<TypePtr> parameterTypes, TypePtr returnType);
     static TypePtr voidT();
-
+    static TypePtr multipleReturn(std::vector<TypePtr> returnTypes);
     static TypePtr list(TypePtr elemType, std::string size);
     static TypePtr pointer(TypePtr baseType);
+    static TypePtr enumT(std::string name,std::vector<std::string> items,std::string curr_value="");
 };
 
 extern std::map<std::string, TypePtr> identifierToTypeMap;

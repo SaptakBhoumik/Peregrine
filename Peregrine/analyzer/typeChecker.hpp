@@ -22,7 +22,7 @@ class TypeChecker : public ast::AstVisitor {
     std::vector<PEError> m_errors;
     void add_error(Token tok, std::string_view msg);
     bool defined(ast::AstNodePtr name);
-    EnvPtr createEnv(EnvPtr parent = nullptr);
+    EnvPtr createEnv(EnvPtr parent);
     std::string identifierName(ast::AstNodePtr identifier);
     void checkBody(ast::AstNodePtr body,
                    std::vector<std::pair<TypePtr,ast::AstNodePtr>> add_var={});
@@ -77,6 +77,8 @@ class TypeChecker : public ast::AstVisitor {
     bool visit(const ast::TernaryIf& node);
     bool visit(const ast::TryExcept& node);
     bool visit(const ast::MultipleAssign& node);
+    bool visit(const ast::ExpressionTuple& node);
+    bool visit(const ast::TypeTuple& node);
 
     std::string m_filename;
     TypePtr m_result;
@@ -84,6 +86,8 @@ class TypeChecker : public ast::AstVisitor {
 
     // the function whose body is being currently checked
     std::shared_ptr<FunctionType> m_currentFunction;
+    std::map<std::string, TypePtr> m_enumMap;//TODO:Nested enum
+    TypePtr m_returnType=NULL;//current return type
 };
 }
 #endif

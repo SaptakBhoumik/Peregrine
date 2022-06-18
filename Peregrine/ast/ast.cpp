@@ -671,6 +671,10 @@ std::vector<parameter> FunctionDefinition::parameters() const {
 }
 std::string FunctionDefinition::comment() const { return m_comment; }
 
+void FunctionDefinition::setType(types::TypePtr type){
+    m_returnType=type->getTypeAst();
+}
+
 AstNodePtr FunctionDefinition::body() const { return m_body; }
 
 Token FunctionDefinition::token() const { return m_token; }

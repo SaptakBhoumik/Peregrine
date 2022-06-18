@@ -7,7 +7,7 @@ cpp_src = [
 
 include = include_directories('Peregrine/')
 
-add_project_arguments('-std=c++17', language: 'cpp')
+add_project_arguments('-std=c++20', language: 'cpp')
 
 build_tests = get_option('build_tests')
 

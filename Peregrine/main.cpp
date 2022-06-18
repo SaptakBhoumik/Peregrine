@@ -25,10 +25,10 @@ void compile(cli::state s){
         auto lex=LEXER(buf.str(), "test");
         std::vector<Token> tokens = lex.result(); 
 
-        for (auto& token : tokens) {
-            std::cout << "Keyword= " << token.keyword
-                      << " Type= " << token.tkType <<" Line= "<<token.line<<" Loc="<<token.location<<"\n";
-        }
+        // for (auto& token : tokens) {
+        //     std::cout << "Keyword= " << token.keyword
+        //               << " Type= " << token.tkType <<" Line= "<<token.line<<" Loc="<<token.location<<"\n";
+        // }
         Parser::Parser parser(tokens, "test");
         ast::AstNodePtr program = parser.parse();
         std::cout << program->stringify() << "\n";

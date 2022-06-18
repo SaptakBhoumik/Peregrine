@@ -637,6 +637,7 @@ class FunctionDefinition : public AstNode {
     AstKind type() const;
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
+    void setType(types::TypePtr type);
 };
 
 class ReturnStatement : public AstNode {
