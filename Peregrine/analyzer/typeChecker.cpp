@@ -425,8 +425,9 @@ bool TypeChecker::visit(const ast::DotExpression& node) {
     if(node.owner()->type()==ast::KAstIdentifier&&node.referenced()->type()==ast::KAstIdentifier){
         auto name=identifierName(node.owner());
         auto ref=identifierName(node.referenced());
-        if(m_enumMap.contains(name)){
-            auto type=m_enumMap[name];
+        auto enum_map=m_env->getEnumMap();
+        if(enum_map.contains(name)){
+            auto type=enum_map[name];
             auto _enum=std::dynamic_pointer_cast<types::EnumType>(type);
             auto items=_enum->getItem();
             if(std::count(items.begin(),items.end(),ref)){
@@ -458,8 +459,9 @@ bool TypeChecker::visit(const ast::IdentifierExpression& node) {
 }
 
 bool TypeChecker::visit(const ast::TypeExpression& node) {
-    if(m_enumMap.contains(node.value())){
-        m_result=m_enumMap[node.value()];
+    auto enum_map = m_env->getEnumMap();
+    if(enum_map.contains(node.value())){
+        m_result=enum_map[node.value()];
     }
     else if (!identifierToTypeMap.count(node.value())) {
         auto type = m_env->get(node.value());
@@ -580,11 +582,12 @@ bool TypeChecker::visit(const ast::EnumLiteral& node) {
             values.push_back(itemName);
         }
     }
-    if(m_enumMap.contains(name)){
+    auto enum_map= m_env->getEnumMap();
+    if(enum_map.contains(name)){
         add_error(node.token(), "Redefination of enum: " + name);
     }
     else{
-        m_enumMap[name] = types::TypeProducer::enumT(name, values);
+        m_env->add_enum(name,types::TypeProducer::enumT(name, values));
     }
     return true; 
 }

@@ -29,6 +29,7 @@ enum TypeCategory {
     MultipleReturn,
     Enum,
     Void,
+    Union
 };
 
 class Type;
@@ -280,6 +281,24 @@ class EnumType : public Type {
     private:
     std::vector<std::string> m_items;
     std::string m_curr_value;
+    std::string m_name;
+};
+
+class UnionTypeDef : public Type {
+  public:
+    UnionTypeDef(std::string name,std::map<std::string,TypePtr> items);
+        
+    ast::AstNodePtr getTypeAst() const;
+    TypeCategory category() const;
+    bool isConvertibleTo(const Type& type) const;
+    bool isCastableTo(const Type& type) const;
+    std::string stringify() const;
+    std::map<std::string,TypePtr> getItem() const;
+    std::string getName() const;
+
+    bool operator==(const Type& type) const;
+    private:
+    std::map<std::string,TypePtr> m_items;
     std::string m_name;
 };
 

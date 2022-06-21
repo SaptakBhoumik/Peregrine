@@ -15,10 +15,14 @@ template<typename T>
 class SymbolTable {
     std::map<std::string, T> m_symbols;
     std::shared_ptr<SymbolTable<T>> m_parent;
+    std::map<std::string, T> m_enumMap;
 
   public:
     SymbolTable(std::shared_ptr<SymbolTable> parent) {
         m_parent = parent;
+        if(m_parent!=nullptr){
+            m_enumMap = parent->getEnumMap();
+        }
     }
 
     std::optional<T> get(std::string name) {
@@ -31,6 +35,14 @@ class SymbolTable {
         }
         
         return m_symbols[name];
+    }
+
+    std::map<std::string, T> getEnumMap(){
+        return m_enumMap;
+    }
+
+    void add_enum(std::string key,T value){
+        m_enumMap[key]=value;
     }
 
     bool set(std::string name, T value) {

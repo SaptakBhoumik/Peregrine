@@ -86,7 +86,6 @@ class TypeChecker : public ast::AstVisitor {
 
     // the function whose body is being currently checked
     std::shared_ptr<FunctionType> m_currentFunction;
-    std::map<std::string, TypePtr> m_enumMap;//TODO:Nested enum
     TypePtr m_returnType=NULL;//current return type
 };
 }

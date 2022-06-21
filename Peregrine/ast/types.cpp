@@ -1,4 +1,6 @@
 //TODO: handle user defined types like `type name=int` properly
+//int==user_defined_type
+//should be checked properly
 #include "types.hpp"
 #include "lexer/tokens.hpp"
 #include "ast.hpp"
@@ -400,7 +402,7 @@ bool PointerType::isCastableTo(const Type& type) const {
     switch (type.category()) {
         case TypeCategory::UserDefined:
         case TypeCategory::Integer:
-        case TypeCategory::Pointer:
+        case TypeCategory::Pointer://TODO:Check if it inherits from the same basetype
             break;
 
         default:
@@ -776,11 +778,77 @@ std::string EnumType::getCurrValue() const{
 bool EnumType::operator==(const Type& type) const{
     if(type.category()==TypeCategory::Enum){
         auto& enumType=dynamic_cast<const EnumType&>(type);
-        return m_name==enumType.getName();
+        auto item=enumType.getItem();
+        if(m_name==enumType.getName()&&item.size()==m_items.size()){
+            for(size_t i=0; i<m_items.size();++i){
+                if(m_items[i]!=item[i]){
+                    return false;
+                }
+            }
+            return true;
+        }
     }
     return false;
 }
 
+UnionTypeDef::UnionTypeDef(std::string name,std::map<std::string,TypePtr> items){
+    m_name=name;
+    m_items=items;
+}
+
+ast::AstNodePtr UnionTypeDef::getTypeAst() const{
+    return std::make_shared<ast::TypeExpression>((Token){},m_name.c_str());
+}
+
+TypeCategory UnionTypeDef::category() const{
+    return TypeCategory::Union;
+}
+
+bool UnionTypeDef::isConvertibleTo(const Type& type) const{
+    return false;
+}
+
+bool UnionTypeDef::isCastableTo(const Type& type) const{
+    switch(type.category()){
+        case TypeCategory::Pointer:
+            return true;
+        default:
+            return false;
+    }
+}
+
+std::string UnionTypeDef::stringify() const{
+    return m_name;
+}
+
+std::map<std::string,TypePtr> UnionTypeDef::getItem() const{
+    return m_items;
+}
+
+std::string UnionTypeDef::getName() const{
+    return m_name;
+}
+
+bool UnionTypeDef::operator==(const Type& type) const{
+    if(type.category() == TypeCategory::Union){
+        auto& unionType=dynamic_cast<const UnionTypeDef&>(type);
+        auto items=unionType.getItem();
+        if(m_name==unionType.getName()&&items.size()==m_items.size()){
+            for(auto& item : items){
+                if(m_items.contains(item.first)){
+                    auto pos = m_items.find(item.first);
+                    if(pos->second!=item.second){
+                        return false;
+                    }
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+    }
+    return false;
+}
 
 std::array<TypePtr, 8> TypeProducer::m_integer = {
     std::make_shared<IntType>(IntType::IntSizes::Int8),
