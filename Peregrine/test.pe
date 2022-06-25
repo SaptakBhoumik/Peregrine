@@ -1,7 +1,15 @@
 enum test:
     a,b,c
+union union_test1:
+    a:int 
+    b:int
+union union_test:
+    a:int 
+    b:union_test1
 def may():
-    return 1,test.a
+    c:union_test
+    c1:union_test1
+    c.b.a=4
+    return c.b.a,test.a,c
 def main():
-    a=5
-    a,b=may()
+    a,b,u=may()

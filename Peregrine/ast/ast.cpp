@@ -1527,6 +1527,12 @@ std::string MultipleAssign::stringify() const{
     return res;
 }
 Token MultipleAssign::token() const{return m_names[0]->token();}
+MultipleAssign::MultiAssignType MultipleAssign::get_assign_type() const{
+    return m_assign_type;
+}
+void MultipleAssign::set_assign_type(MultipleAssign::MultiAssignType type){
+    m_assign_type = type;
+}
 AugAssign::AugAssign(Token tok, AstNodePtr name, AstNodePtr value){
     m_token=tok;
     m_name=name;

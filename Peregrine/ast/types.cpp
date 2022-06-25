@@ -850,6 +850,10 @@ bool UnionTypeDef::operator==(const Type& type) const{
     return false;
 }
 
+ast::AstNodePtr UnionTypeDef::defaultValue() const{
+    return std::make_shared<ast::NoLiteral>();
+}
+
 std::array<TypePtr, 8> TypeProducer::m_integer = {
     std::make_shared<IntType>(IntType::IntSizes::Int8),
     std::make_shared<IntType>(IntType::IntSizes::Int16),
@@ -908,6 +912,9 @@ TypePtr TypeProducer::multipleReturn(std::vector<TypePtr> returnTypes){
 }
 TypePtr TypeProducer::enumT(std::string name,std::vector<std::string> items,std::string curr_value){
     return std::make_shared<EnumType>(name,items,curr_value);
+}
+TypePtr TypeProducer::unionT(std::string name,std::map<std::string,TypePtr> items){
+    return std::make_shared<UnionTypeDef>(name,items);
 }
 std::map<std::string, TypePtr> identifierToTypeMap = {
     {"i8", TypeProducer::integer(IntType::IntSizes::Int8)},

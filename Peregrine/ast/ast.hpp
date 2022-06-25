@@ -1098,10 +1098,13 @@ class SumType : public AstNode {
 };
 //multiple assign 
 class MultipleAssign : public AstNode {
-    std::vector<AstNodePtr> m_names;
-    std::vector<AstNodePtr> m_values;
-    std::vector<std::pair<types::TypePtr,bool>> m_processed_types;
+    
   public:
+    enum MultiAssignType{
+        Normal,
+        MultipleReturn,
+        ListType
+    };
     MultipleAssign(std::vector<AstNodePtr> names,std::vector<AstNodePtr> values);
     void setProcessedType(std::vector<std::pair<types::TypePtr,bool>> types);
     std::vector<std::pair<types::TypePtr,bool>> processed_types() const;
@@ -1111,6 +1114,13 @@ class MultipleAssign : public AstNode {
     AstKind type() const;
     std::string stringify() const;
     void accept(AstVisitor& visitor) const;
+    MultiAssignType get_assign_type() const;
+    void set_assign_type(MultiAssignType type);
+    private:
+        std::vector<AstNodePtr> m_names;
+        std::vector<AstNodePtr> m_values;
+        std::vector<std::pair<types::TypePtr,bool>> m_processed_types;
+        MultiAssignType m_assign_type=Normal;
 };
 class AugAssign : public AstNode {
     Token m_token;

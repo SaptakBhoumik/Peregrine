@@ -16,12 +16,14 @@ class SymbolTable {
     std::map<std::string, T> m_symbols;
     std::shared_ptr<SymbolTable<T>> m_parent;
     std::map<std::string, T> m_enumMap;
+    std::map<std::string, T> m_unionMap;
 
   public:
     SymbolTable(std::shared_ptr<SymbolTable> parent) {
         m_parent = parent;
         if(m_parent!=nullptr){
             m_enumMap = parent->getEnumMap();
+            m_unionMap = parent->getUnionMap();
         }
     }
 
@@ -43,6 +45,14 @@ class SymbolTable {
 
     void add_enum(std::string key,T value){
         m_enumMap[key]=value;
+    }
+
+    std::map<std::string, T> getUnionMap(){
+        return m_unionMap;
+    }
+
+    void add_union(std::string key,T value){
+        m_unionMap[key]=value;
     }
 
     bool set(std::string name, T value) {

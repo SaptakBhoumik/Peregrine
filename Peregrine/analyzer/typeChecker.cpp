@@ -1,3 +1,5 @@
+//TODO: Add support for variable shadowing of the same name/type in different scopes
+
 #include "typeChecker.hpp"
 #include "ast/ast.hpp"
 #include "ast/types.hpp"
@@ -144,43 +146,42 @@ bool TypeChecker::visit(const ast::FunctionDefinition& node) {
 bool TypeChecker::visit(const ast::VariableStatement& node) {
     //TODO:check if redefination
     auto& nonConstNode = const_cast<ast::VariableStatement&>(node);
-
-    node.varType()->accept(*this);
-    TypePtr varType = m_result;
-    bool defined_before=defined(node.name());
-
-    if (varType->category() == TypeCategory::Void) {
-        // inferring the type of the variable
-        node.value()->accept(*this);
-        if(m_result->category()==MultipleReturn){
-            add_error(node.token(), "Too few variables on the left hand side");
-            return true;
-        }
-        else if(m_result->category()==Void){
-            add_error(node.token(), "You cant declare a variable of type void");
-            return true;
-        }
-        nonConstNode.setProcessedType(m_result,defined_before);
-        varType = m_result;
-    } else{
-        if(node.value()->type()!=ast::KAstNoLiteral){
-            check(node.value(), varType);
-        }
-        if(m_result->category()==MultipleReturn){
-            add_error(node.token(), "Too few variables on the left hand side");
-            return true;
-        }
-        else if(m_result->category()==Void){
-            add_error(node.token(), "You cant declare a variable of type void");
-            return true;
-        }
-        nonConstNode.setProcessedType(varType,true);
-    }
     if(node.name()->type()==ast::KAstIdentifier){
+        node.varType()->accept(*this);
+        TypePtr varType = m_result;
+        bool defined_before=defined(node.name());
+        if (varType->category() == TypeCategory::Void) {
+            // inferring the type of the variable
+            node.value()->accept(*this);
+            if(m_result->category()==MultipleReturn){
+                add_error(node.token(), "Too few variables on the left hand side");
+                return true;
+            }
+            else if(m_result->category()==Void){
+                add_error(node.token(), "You cant declare a variable of type void");
+                return true;
+            }
+            nonConstNode.setProcessedType(m_result,defined_before);
+            varType = m_result;
+        } else{
+            if(node.value()->type()!=ast::KAstNoLiteral){
+                check(node.value(), varType);
+            }
+            if(m_result->category()==MultipleReturn){
+                add_error(node.token(), "Too few variables on the left hand side");
+                return true;
+            }
+            else if(m_result->category()==Void){
+                add_error(node.token(), "You cant declare a variable of type void");
+                return true;
+            }
+            nonConstNode.setProcessedType(varType,true);
+        }
         m_env->set(identifierName(node.name()), varType);
     }
     else{
-        //TODO:implement it
+        node.name()->accept(*this);
+        check(node.value(), m_result);
     }
     return true;
 }
@@ -437,6 +438,34 @@ bool TypeChecker::visit(const ast::DotExpression& node) {
                 add_error(node.token(),ref+" is not a member of "+name);
                 m_result=NULL;
             }
+            return true; 
+        }
+    }
+    node.owner()->accept(*this);
+    auto type=m_result;
+    if(type==NULL){
+        return true;
+    }
+    switch(type->category()){
+        case TypeCategory::Union:{
+            auto union_type=std::dynamic_pointer_cast<types::UnionTypeDef>(type);
+            auto items=union_type->getItem();
+            m_result=NULL;
+            if(node.referenced()->type()!=ast::KAstIdentifier){
+                add_error(node.token(),"Union member must be an identifier");
+            }
+            else if(items.contains(identifierName(node.referenced()))){
+                m_result=items[identifierName(node.referenced())];
+            }
+            else{
+                add_error(node.token(),identifierName(node.referenced())+" is not a member of "+type->stringify());
+            }
+            break;            
+        }
+        default:{
+            add_error(node.token(),"can not access member of "+type->stringify());
+            m_result=NULL;
+            return true;
         }
     }
     return true; 
@@ -460,8 +489,12 @@ bool TypeChecker::visit(const ast::IdentifierExpression& node) {
 
 bool TypeChecker::visit(const ast::TypeExpression& node) {
     auto enum_map = m_env->getEnumMap();
+    auto union_map = m_env->getUnionMap();
     if(enum_map.contains(node.value())){
         m_result=enum_map[node.value()];
+    }
+    else if(union_map.contains(node.value())){
+        m_result=union_map[node.value()];
     }
     else if (!identifierToTypeMap.count(node.value())) {
         auto type = m_env->get(node.value());
@@ -474,8 +507,9 @@ bool TypeChecker::visit(const ast::TypeExpression& node) {
         m_result = type.value();
         return true;
     }
-
-    m_result = identifierToTypeMap[node.value()];
+    else{
+        m_result = identifierToTypeMap[node.value()];
+    }
     return true;
 }
 
@@ -568,7 +602,28 @@ bool TypeChecker::visit(const ast::NoneLiteral& node) {
     return true;
 }
 
-bool TypeChecker::visit(const ast::UnionLiteral& node) { return true; }
+bool TypeChecker::visit(const ast::UnionLiteral& node) { 
+    auto name =identifierName(node.name());
+    std::map<std::string, TypePtr> item_map;
+    for (auto item : node.elements()) {
+        item.first->accept(*this);
+        auto item_name=identifierName(item.second);
+        if(item_map.contains(item_name)){
+            add_error(item.second->token(),item_name+" is already defined as an union member");
+        }
+        else{
+            item_map[item_name]=m_result;
+        }
+    }
+    auto union_map= m_env->getUnionMap();
+    if(union_map.contains(name)){
+        add_error(node.token(), "Redefination of union: " + name);
+    }
+    else{
+        m_env->add_union(name,types::TypeProducer::unionT(name, item_map));
+    }
+    return true; 
+}
 
 bool TypeChecker::visit(const ast::EnumLiteral& node) {
     auto name=identifierName(node.name());
@@ -651,7 +706,8 @@ bool TypeChecker::visit(const ast::TryExcept& node) {
 }
 bool TypeChecker::visit(const ast::MultipleAssign& node){
     auto name=node.names();
-    auto value=node.values(); 
+    auto value=node.values();
+    auto assign_type=ast::MultipleAssign::MultiAssignType::Normal;
     //type and if it is defined before
     std::vector<std::pair<TypePtr,bool>> value_type;
     for(auto& val : value){
@@ -690,6 +746,7 @@ bool TypeChecker::visit(const ast::MultipleAssign& node){
                     }
                 }
             }
+            assign_type=ast::MultipleAssign::MultiAssignType::ListType;
         }
         else if(type->category()==MultipleReturn){
             auto ret_type=std::dynamic_pointer_cast<MultipleReturnType>(type);
@@ -714,6 +771,7 @@ bool TypeChecker::visit(const ast::MultipleAssign& node){
                     }
                 }
             }
+            assign_type=ast::MultipleAssign::MultiAssignType::MultipleReturn;
         }
         else{
             add_error(node.token(), "To many variables on the left hand side");
@@ -721,7 +779,7 @@ bool TypeChecker::visit(const ast::MultipleAssign& node){
     }
     auto& nonConstNode = const_cast<ast::MultipleAssign&>(node);
     nonConstNode.setProcessedType(value_type);
-
+    nonConstNode.set_assign_type(assign_type);
     return true; 
 }
 }

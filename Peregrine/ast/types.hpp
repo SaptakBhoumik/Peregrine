@@ -295,6 +295,7 @@ class UnionTypeDef : public Type {
     std::string stringify() const;
     std::map<std::string,TypePtr> getItem() const;
     std::string getName() const;
+    ast::AstNodePtr defaultValue() const;
 
     bool operator==(const Type& type) const;
     private:
@@ -324,6 +325,7 @@ class TypeProducer {
     static TypePtr list(TypePtr elemType, std::string size);
     static TypePtr pointer(TypePtr baseType);
     static TypePtr enumT(std::string name,std::vector<std::string> items,std::string curr_value="");
+    static TypePtr unionT(std::string name,std::map<std::string,TypePtr> items);
 };
 
 extern std::map<std::string, TypePtr> identifierToTypeMap;
