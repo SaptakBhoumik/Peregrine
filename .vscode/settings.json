@@ -94,5 +94,7 @@
         "stack": "cpp",
         "*.ipp": "cpp"
     },
-    "mesonbuild.configureOnOpen": true
+    "mesonbuild.configureOnOpen": true,
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
 }
