@@ -782,4 +782,26 @@ bool TypeChecker::visit(const ast::MultipleAssign& node){
     nonConstNode.set_assign_type(assign_type);
     return true; 
 }
+bool TypeChecker::visit(const ast::LambdaDefinition& node){
+    auto params=node.parameters();
+    auto body=node.body();
+    std::vector<TypePtr> param_type;
+    EnvPtr oldEnv = m_env;
+    m_env = createEnv(oldEnv);
+    for(auto& param : params){
+        param.p_type->accept(*this);
+        param_type.push_back(m_result);
+        m_env->set(identifierName(param.p_name), m_result);
+    }
+    body->accept(*this);
+    auto return_type=m_result;
+    if (return_type!=NULL){
+        auto& nonconstnode = const_cast<ast::LambdaDefinition&>(node);
+        nonconstnode.set_return_type(return_type->getTypeAst());
+    }
+    m_env=oldEnv;
+    auto functionType =std::make_shared<FunctionType>(param_type, return_type);
+    m_result=functionType;
+    return true;
+}
 }

@@ -45,7 +45,6 @@ class TypeChecker : public ast::AstVisitor {
     bool visit(const ast::ForStatement& node);
     bool visit(const ast::MatchStatement& node);
     bool visit(const ast::ScopeStatement& node);
-    // bool visit(const ast::CppStatement& node);
     bool visit(const ast::ReturnStatement& node);
     bool visit(const ast::DecoratorStatement& node);
     bool visit(const ast::ListLiteral& node);
@@ -79,6 +78,7 @@ class TypeChecker : public ast::AstVisitor {
     bool visit(const ast::MultipleAssign& node);
     bool visit(const ast::ExpressionTuple& node);
     bool visit(const ast::TypeTuple& node);
+    bool visit(const ast::LambdaDefinition& node);
 
     std::string m_filename;
     TypePtr m_result;

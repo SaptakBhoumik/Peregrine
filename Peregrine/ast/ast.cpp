@@ -1847,6 +1847,12 @@ Token LambdaDefinition::token() const{
 AstKind LambdaDefinition::type() const{
     return KAstLambda;
 }
+void LambdaDefinition::set_return_type(AstNodePtr return_type){
+    m_returnType=return_type;
+}
+AstNodePtr LambdaDefinition::return_type() const{
+    return m_returnType;
+}
 std::string LambdaDefinition::stringify() const{
     std::string res="def(";
     if (!m_parameters.empty()) {
@@ -1859,34 +1865,17 @@ std::string LambdaDefinition::stringify() const{
             if(param.is_const){
                 res += "const ";
             }
-            if(param.p_paramType==VarKwarg){
-                res += param.p_type->stringify();
-                res += param.p_name->stringify();
-            }
-            else if(param.p_paramType==VarArg){
-                res += param.p_type->stringify();
-                res += param.p_name->stringify();
-            }
-            else if(param.p_paramType==Ellipses){
-                res += param.p_type->stringify();
-                if(param.p_name->type()!=KAstNoLiteral){
-                    res += param.p_name->stringify();
-                }
-            }
-            else{
-                res += param.p_name->stringify();
-                if (param.p_type->type()!=KAstNoLiteral){
-                    res += ":";
-                    res += param.p_type->stringify();
-                }
-                if (param.p_default->type()!=ast::KAstNoLiteral){
-                    res+="=";
-                    res+=param.p_default->stringify();
-                }
-            }
+            
+            res += param.p_name->stringify();
+            res += ":";
+            res += param.p_type->stringify();
         }
     }
-    res+="):"+m_body->stringify();
+    res+=")";
+    if(m_returnType!=nullptr){
+        res+="->"+m_returnType->stringify();
+    }
+    res+=":"+m_body->stringify();
     return res;
 }
 GenericCall::GenericCall(Token tok,std::vector<AstNodePtr> generic_types,AstNodePtr identifier){

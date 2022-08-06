@@ -386,13 +386,16 @@ AstNodePtr Parser::parseCast() {
 }
 AstNodePtr Parser::parseLambda(){
     //parses lambda expression
-    //def (arg1,arg2:type):value_to_return
+    //def (arg2:type):value_to_return
     auto tok=m_currentToken;
     expect(tk_l_paren,"Expected a ( but got "+next().keyword+" instead");
     std::vector<parameter> parameters;
 
     advance();
     while (m_currentToken.tkType != tk_r_paren) {
+        //parseParameter() function also parses the default parameter and allows args without type which is not
+        //allowed in lambda expressions.We will parse the parameters as normal and then check if they are valid
+        //or else we will throw an error.This is done in the ast validator.
         parameters.push_back(parseParameter());
         if (m_currentToken.tkType == tk_comma) {
             advance();

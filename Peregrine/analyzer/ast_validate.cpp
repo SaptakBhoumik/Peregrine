@@ -916,7 +916,19 @@ bool Validator::visit(const TernaryFor& node){
 
 bool Validator::visit(const LambdaDefinition& node){
     node.body()->accept(*this);
-    validate_parameters(node.parameters());
+    auto param=node.parameters();
+    for(auto& x:param){
+        if(x.p_default->type()!=KAstNoLiteral){
+            add_error(x.p_name->token(), "SyntaxError: Lambda parameters cannot have default values");
+        }
+        if(x.p_paramType!=Normal){
+            add_error(x.p_name->token(), "SyntaxError: Lambda parameters cannot have ellipses,kwargs or varargs");
+        }
+        if(x.p_type->type()==KAstNoLiteral){
+            add_error(x.p_name->token(), "SyntaxError: Must specify the type of a lambda parameter");
+        }
+    }
+    validate_parameters(param);
     return true;
 }
 

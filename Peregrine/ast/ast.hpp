@@ -1291,12 +1291,15 @@ class LambdaDefinition : public AstNode {
     Token m_tok;
     std::vector<parameter> m_parameters;
     AstNodePtr m_body;
+    AstNodePtr m_returnType=nullptr;
 
   public:
     LambdaDefinition(Token tok,std::vector<parameter> parameters, AstNodePtr body);
 
     std::vector<parameter> parameters() const;
+    void set_return_type(AstNodePtr return_type);
     AstNodePtr body() const;
+    AstNodePtr return_type() const;
     Token token() const;
     AstKind type() const;
     std::string stringify() const;

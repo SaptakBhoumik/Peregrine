@@ -11,5 +11,8 @@ def may():
     c1:union_test1
     c.b.a=4
     return c.b.a,test.a,c
+def june(a:int)->int:
+    return a
 def main():
+    j=def (x:int):june(x)
     a,b,u=may()
