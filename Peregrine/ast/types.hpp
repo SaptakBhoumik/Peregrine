@@ -228,14 +228,16 @@ class UserDefinedType : public Type {
 };
 
 class FunctionType : public Type {
+    bool m_is_user_defined_method=false;
     std::vector<TypePtr> m_parameterTypes;
     TypePtr m_returnType;
 
   public:
-    FunctionType(std::vector<TypePtr> parameterTypes, TypePtr returnType);
+    FunctionType(std::vector<TypePtr> parameterTypes, TypePtr returnType,bool is_user_defined_method=false);
 
     ast::AstNodePtr getTypeAst() const;
     TypeCategory category() const;
+    bool isMethod() const;
     const std::vector<TypePtr>& parameterTypes() const;
     TypePtr returnType() const;
     bool isConvertibleTo(const Type& type) const;

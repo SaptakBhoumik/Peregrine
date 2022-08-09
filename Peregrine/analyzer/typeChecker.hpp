@@ -32,6 +32,7 @@ class TypeChecker : public ast::AstVisitor {
     bool visit(const ast::ClassDefinition& node);
     bool visit(const ast::ImportStatement& node);
     bool visit(const ast::FunctionDefinition& node);
+    bool visit(const ast::MethodDefinition& node);
     bool visit(const ast::VariableStatement& node);
     bool visit(const ast::ConstDeclaration& node);
     bool visit(const ast::TypeDefinition& node);
@@ -79,6 +80,8 @@ class TypeChecker : public ast::AstVisitor {
     bool visit(const ast::ExpressionTuple& node);
     bool visit(const ast::TypeTuple& node);
     bool visit(const ast::LambdaDefinition& node);
+    bool visit(const ast::ExternStatement& node);
+    bool visit(const ast::ExternFuncDef& node);
 
     std::string m_filename;
     TypePtr m_result;
@@ -87,6 +90,7 @@ class TypeChecker : public ast::AstVisitor {
     // the function whose body is being currently checked
     std::shared_ptr<FunctionType> m_currentFunction;
     TypePtr m_returnType=NULL;//current return type
+    std::map<std::string,std::vector<std::string>> extern_libs;//the c libs that are imported
 };
 }
 #endif

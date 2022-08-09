@@ -143,6 +143,59 @@ bool TypeChecker::visit(const ast::FunctionDefinition& node) {
     return true;
 }
 
+bool TypeChecker::visit(const ast::MethodDefinition& node) {
+    EnvPtr oldEnv = m_env;
+    m_env = createEnv(oldEnv);
+
+    std::vector<TypePtr> parameterTypes;
+    parameterTypes.reserve(node.parameters().size()+1);
+    auto reciever = node.reciever();
+    if(reciever.p_type->type()!=ast::KAstNoLiteral){
+        reciever.p_type->accept(*this);
+        parameterTypes.push_back(m_result);
+        m_env->set(identifierName(reciever.p_name), m_result);
+    }
+    for (auto& param : node.parameters()) {
+        if (param.p_default->type() != ast::KAstNoLiteral) {
+            if (param.p_type->type() != ast::KAstNoLiteral) {
+                param.p_type->accept(*this);
+                check(param.p_default, m_result);
+            }
+
+            param.p_default->accept(*this);
+            parameterTypes.push_back(m_result);
+            m_env->set(identifierName(param.p_name), m_result);
+            continue;
+        }
+
+        param.p_type->accept(*this);
+        parameterTypes.push_back(m_result);
+        m_env->set(identifierName(param.p_name), m_result);
+    }
+    node.returnType()->accept(*this);
+    auto returnType=m_result;
+    auto methodType =
+        std::make_shared<FunctionType>(parameterTypes, returnType,true);
+
+    auto oldFunction = m_currentFunction;
+    auto oldReturnType = m_returnType;
+    m_returnType = NULL;
+    m_currentFunction = methodType;
+    node.body()->accept(*this);
+    if(m_returnType!=NULL){
+        auto& nonconstnode = const_cast<ast::MethodDefinition&>(node);
+        nonconstnode.setType(m_returnType);
+        methodType =std::make_shared<FunctionType>(parameterTypes, m_returnType,true);
+    }
+    m_returnType = oldReturnType;
+    m_currentFunction = oldFunction;
+
+    m_env = oldEnv;
+
+    m_env->set(identifierName(node.name()), methodType);
+    return true;
+}
+
 bool TypeChecker::visit(const ast::VariableStatement& node) {
     //TODO:check if redefination
     auto& nonConstNode = const_cast<ast::VariableStatement&>(node);
@@ -160,6 +213,13 @@ bool TypeChecker::visit(const ast::VariableStatement& node) {
             else if(m_result->category()==Void){
                 add_error(node.token(), "You cant declare a variable of type void");
                 return true;
+            }
+            else if(m_result->category()==Function){
+                auto cast=std::dynamic_pointer_cast<FunctionType>(m_result);
+                if(cast->isMethod()){
+                    add_error(node.token(), "You cant declare a variable of type `method`");
+                    return true;
+                }
             }
             nonConstNode.setProcessedType(m_result,defined_before);
             varType = m_result;
@@ -203,6 +263,13 @@ bool TypeChecker::visit(const ast::ConstDeclaration& node) {
         else if(m_result->category()==Void){
             add_error(node.token(), "You cant declare a constant of type void");
             return true;
+        }
+        else if(m_result->category()==Function){
+            auto cast=std::dynamic_pointer_cast<FunctionType>(m_result);
+            if(cast->isMethod()){
+                add_error(node.token(), "You cant declare a variable of type `method`");
+                return true;
+            }
         }
         nonConstNode.setProcessedType(m_result);
         constType = m_result;
@@ -802,6 +869,30 @@ bool TypeChecker::visit(const ast::LambdaDefinition& node){
     m_env=oldEnv;
     auto functionType =std::make_shared<FunctionType>(param_type, return_type);
     m_result=functionType;
+    return true;
+}
+bool TypeChecker::visit(const ast::ExternStatement& node){
+    //TODO:prevent extern name with same variabel
+    extern_libs[node.name()]=node.libs();
+    return true;
+}
+bool TypeChecker::visit(const ast::ExternFuncDef& node) {
+    //TODO:complete it
+    if(!extern_libs.contains(node.owner())){
+        add_error(node.token(), "Library "+node.owner()+" not found");
+        return true;
+    }
+    auto name = node.name();
+    auto params = node.parameters();
+    std::vector<TypePtr> param_type;
+    for (auto& param : params) {
+        param->accept(*this);
+        param_type.push_back(m_result);
+    }
+    node.returnType()->accept(*this);
+    auto return_type = m_result;
+    auto functionType = std::make_shared<FunctionType>(param_type, return_type);
+    // m_env->extern_set(name, functionType);
     return true;
 }
 }

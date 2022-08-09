@@ -581,12 +581,19 @@ ast::AstNodePtr UserDefinedType::getTypeAst() const {
 }
 
 FunctionType::FunctionType(std::vector<TypePtr> parameterTypes,
-                           TypePtr returnType) {
+                           TypePtr returnType,bool is_user_defined_method) {
     m_parameterTypes = parameterTypes;
     m_returnType = returnType;
+    m_is_user_defined_method=is_user_defined_method;
 }
 
-TypeCategory FunctionType::category() const { return TypeCategory::Function; }
+TypeCategory FunctionType::category() const {
+    return TypeCategory::Function; 
+}
+
+bool FunctionType::isMethod() const{
+    return m_is_user_defined_method;
+}
 
 const std::vector<TypePtr>& FunctionType::parameterTypes() const {
     return m_parameterTypes;

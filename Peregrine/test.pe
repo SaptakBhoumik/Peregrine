@@ -13,6 +13,11 @@ def may():
     return c.b.a,test.a,c
 def june(a:int)->int:
     return a
+def (x:int)f():
+    return x
+extern x=import("c")
 def main():
+    m=may
+    #l=f Should be an error
     j=def (x:int):june(x)
-    a,b,u=may()
+    a,b,c=m()

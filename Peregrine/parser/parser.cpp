@@ -458,8 +458,8 @@ AstNodePtr Parser::parseExtern(){
     auto name=m_currentToken.keyword;
     std::vector<std::string> libs;
     expect(tk_assign,"Expected = but got "+next().keyword+" instead","","","");
-    expect(tk_import,"Expected = but got "+next().keyword+" instead","","","");
-    expect(tk_l_paren,"Expected = but got "+next().keyword+" instead","","","");
+    expect(tk_import,"Expected `import` but got "+next().keyword+" instead","","","");
+    expect(tk_l_paren,"Expected `(` but got "+next().keyword+" instead","","","");
     while(m_currentToken.tkType!=tk_r_paren){
         expect(tk_string,"Expected string but got "+next().keyword+" instead","","","");
         libs.push_back(m_currentToken.keyword);

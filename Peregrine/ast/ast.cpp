@@ -1585,6 +1585,10 @@ Token MethodDefinition::token() const { return m_token; }
 
 AstKind MethodDefinition::type() const { return KAstMethodDef; }
 
+void MethodDefinition::setType(types::TypePtr type){
+    m_returnType=type->getTypeAst();
+}
+
 std::string MethodDefinition::stringify() const {
     std::string res = "def (";
     if(m_reciever.is_const){
