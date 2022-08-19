@@ -27,7 +27,8 @@ class TypeChecker : public ast::AstVisitor {
     void checkBody(ast::AstNodePtr body,
                    std::vector<std::pair<TypePtr,ast::AstNodePtr>> add_var={});
 
-    void check(ast::AstNodePtr expr, const TypePtr expectedType);
+    void check(ast::AstNodePtr expr, const TypePtr expTypePtr);
+    void check(const TypePtr exprType, const TypePtr expTypePtr, Token tok={});
 
     bool visit(const ast::ClassDefinition& node);
     bool visit(const ast::ImportStatement& node);

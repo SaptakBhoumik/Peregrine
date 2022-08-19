@@ -413,7 +413,21 @@ bool Validator::visit(const ReturnStatement& node){
 bool Validator::visit(const ContinueStatement& node){return true;}
 bool Validator::visit(const BreakStatement& node){return true;}
 bool Validator::visit(const DecoratorStatement& node){
-    node.body()->accept(*this);
+    switch (node.body()->type()){
+        case KAstMethodDef:{
+            add_error(node.body()->token(),"Error: Method that is modifying a type can't be decorated",
+                                            "Define a regular function instead");
+            break;
+        }
+        case KAstExternFuncDef:{
+            add_error(node.body()->token(),"Error: Defination of external function can't be decorated from peregrine",
+                                            "Use the library directly in that language");
+            break;
+        }
+        default:{
+            node.body()->accept(*this);
+        }
+    }
     auto x=node.decoratorItem();
     for (auto& y:x){
         y->accept(*this);

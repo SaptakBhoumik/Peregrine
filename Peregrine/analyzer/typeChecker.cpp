@@ -83,6 +83,22 @@ void TypeChecker::check(ast::AstNodePtr expr, const TypePtr expTypePtr) {
     }
 }
 
+void TypeChecker::check(const TypePtr exprType, const TypePtr expTypePtr,Token tok) {
+    if(expTypePtr==NULL||exprType==NULL){
+        return;
+    }
+    if (*exprType != *expTypePtr) {
+        if (!exprType->isConvertibleTo(*expTypePtr) &&
+            !expTypePtr->isConvertibleTo(*exprType)) {
+            add_error(tok, "expected type " + expTypePtr->stringify() +
+                                     ", got " + exprType->getTypeAst()->stringify() +
+                                     " instead");
+        }
+
+        // TODO: convert one type to another
+    }
+}
+
 std::string TypeChecker::identifierName(ast::AstNodePtr identifier) {
     assert(identifier->type() == ast::KAstIdentifier);
 
@@ -206,7 +222,10 @@ bool TypeChecker::visit(const ast::VariableStatement& node) {
         if (varType->category() == TypeCategory::Void) {
             // inferring the type of the variable
             node.value()->accept(*this);
-            if(m_result->category()==MultipleReturn){
+            if(m_result==NULL){
+                return true;
+            }
+            else if(m_result->category()==MultipleReturn){
                 add_error(node.token(), "Too few variables on the left hand side");
                 return true;
             }
@@ -397,7 +416,90 @@ bool TypeChecker::visit(const ast::ReturnStatement& node) {
     return true;
 }
 
-bool TypeChecker::visit(const ast::DecoratorStatement& node) { return true; }
+bool TypeChecker::visit(const ast::DecoratorStatement& node) {
+    auto function=std::dynamic_pointer_cast<ast::FunctionDefinition>(node.body());
+    {
+        EnvPtr oldEnv = m_env;
+        m_env = createEnv(oldEnv);
+
+        std::vector<TypePtr> parameterTypes;
+        parameterTypes.reserve(function->parameters().size());
+
+        for (auto& param : function->parameters()) {
+            if (param.p_default->type() != ast::KAstNoLiteral) {
+                if (param.p_type->type() != ast::KAstNoLiteral) {
+                    param.p_type->accept(*this);
+                    check(param.p_default, m_result);
+                }
+
+                param.p_default->accept(*this);
+                parameterTypes.push_back(m_result);
+                m_env->set(identifierName(param.p_name), m_result);
+                continue;
+            }
+
+            param.p_type->accept(*this);
+            parameterTypes.push_back(m_result);
+            m_env->set(identifierName(param.p_name), m_result);
+        }
+        function->returnType()->accept(*this);
+        auto returnType=m_result;
+        auto functionType =
+            std::make_shared<FunctionType>(parameterTypes, returnType);
+
+        auto oldFunction = m_currentFunction;
+        auto oldReturnType = m_returnType;
+        m_returnType = NULL;
+        m_currentFunction = functionType;
+        function->body()->accept(*this);
+        if(m_returnType!=NULL){
+            auto& nonconstnode = const_cast<ast::FunctionDefinition&>(*function);
+            nonconstnode.setType(m_returnType);
+            functionType =std::make_shared<FunctionType>(parameterTypes, m_returnType);
+        }
+        m_returnType = oldReturnType;
+        m_currentFunction = oldFunction;
+
+        m_env = oldEnv;
+        m_result = functionType;
+    }
+    auto function_type=m_result;
+    std::vector<TypePtr> args;
+    auto decorators=node.decoratorItem();
+    for(size_t i=0;i<decorators.size();i++){
+        args.clear();
+        args.push_back(m_result);
+        auto decorator=decorators[decorators.size()-i-1];
+        //TODO: Dot expression and arrow expression
+        if(decorator->type()==ast::KAstFunctionCall){
+            auto call=std::dynamic_pointer_cast<ast::FunctionCall>(decorator);
+            for(auto& arg:call->arguments()){
+                arg->accept(*this);
+                args.push_back(m_result);
+            }
+            decorator=call->name();
+        }
+        decorator->accept(*this);
+        if (m_result->category() != TypeCategory::Function){
+            add_error(node.token(), identifierName(decorator) + " is not a function");
+            return true;
+        }
+        auto decoratorType = std::dynamic_pointer_cast<FunctionType>(m_result);
+        if (decoratorType->parameterTypes().size() != args.size()){
+            add_error(node.token(), "invalid number of arguments passed to " +
+                                    identifierName(decorator));
+            return true;
+        }
+        for (size_t i = 0; i < args.size(); i++) {
+            auto paramType = decoratorType->parameterTypes()[i];
+            auto argType = args[i];
+            check(argType, paramType);
+        }
+        m_result = decoratorType->returnType();
+    }
+    m_env->set(identifierName(function->name()), m_result);
+    return true; 
+}
 
 bool TypeChecker::visit(const ast::ListLiteral& node) {
     //TODO: If the variable is empty do something for the variable
@@ -872,7 +974,7 @@ bool TypeChecker::visit(const ast::LambdaDefinition& node){
     return true;
 }
 bool TypeChecker::visit(const ast::ExternStatement& node){
-    //TODO:prevent extern name with same variabel
+    //TODO:prevent extern name with same variable
     extern_libs[node.name()]=node.libs();
     return true;
 }

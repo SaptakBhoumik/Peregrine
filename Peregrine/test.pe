@@ -16,8 +16,17 @@ def june(a:int)->int:
 def (x:int)f():
     return x
 extern x=import("c")
+def testing(f:def(int)->int):
+    return f(4)
+def testing1(x:int,h:int):
+    return x*h
+@testing1(0)
+@testing
+def testing2(x:int):
+    return x*x
 def main():
     m=may
-    #l=f Should be an error
+    #l=f #Should be an error
     j=def (x:int):june(x)
     a,b,c=m()
+    n=testing2
