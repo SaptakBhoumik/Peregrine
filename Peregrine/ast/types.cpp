@@ -464,6 +464,42 @@ ast::AstNodePtr PointerType::defaultValue() const {
     return std::make_shared<ast::NoneLiteral>((Token){.keyword="None",.tkType=tk_none});
 }
 
+ReferenceType::ReferenceType(TypePtr baseType) { m_baseType = baseType; }
+
+TypeCategory ReferenceType::category() const { return TypeCategory::Reference; }
+
+TypePtr ReferenceType::baseType() const { return m_baseType; }
+
+bool ReferenceType::isConvertibleTo(const Type& type) const {
+    return m_baseType->isConvertibleTo(type);
+}
+
+bool ReferenceType::isCastableTo(const Type& type) const {
+    return m_baseType->isCastableTo(type);
+}
+
+std::string ReferenceType::stringify() const {
+    return "&" + m_baseType->stringify();
+}
+
+TypePtr ReferenceType::prefixOperatorResult(Token op) const {
+    return m_baseType->prefixOperatorResult(op);
+}
+TypePtr ReferenceType::postfixOperatorResult(Token op) const{
+    return m_baseType->postfixOperatorResult(op);
+}
+TypePtr ReferenceType::infixOperatorResult(Token op, const TypePtr type) const {
+    return m_baseType->infixOperatorResult(op, type);
+}
+
+ast::AstNodePtr ReferenceType::getTypeAst() const {
+    return std::make_shared<ast::RefTypeExpr>((Token){}, m_baseType->getTypeAst());
+}
+
+ast::AstNodePtr ReferenceType::defaultValue() const {
+    return NULL;
+}
+
 TypeCategory VoidType::category() const { return TypeCategory::Void; }
 
 bool VoidType::isConvertibleTo(const Type& type) const { return false; }

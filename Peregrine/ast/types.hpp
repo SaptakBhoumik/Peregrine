@@ -21,6 +21,7 @@ enum TypeCategory {
     String,
     Bool,
     Pointer,
+    Reference,
     List,
     Dict,
     UserDefined,
@@ -165,6 +166,25 @@ class PointerType : public Type {
 
   public:
     PointerType(TypePtr baseType);
+
+    ast::AstNodePtr getTypeAst() const;
+    TypeCategory category() const;
+    TypePtr baseType() const;
+    bool isConvertibleTo(const Type& type) const;
+    bool isCastableTo(const Type& type) const;
+    std::string stringify() const;
+    ast::AstNodePtr defaultValue() const;
+
+    TypePtr prefixOperatorResult(Token op) const;
+    TypePtr postfixOperatorResult(Token op) const;
+    TypePtr infixOperatorResult(Token op, const TypePtr type) const;
+};
+
+class ReferenceType : public Type {
+    TypePtr m_baseType;
+
+  public:
+    ReferenceType(TypePtr baseType);
 
     ast::AstNodePtr getTypeAst() const;
     TypeCategory category() const;

@@ -1,10 +1,10 @@
 enum test:
     a,b,c
 union union_test1:
-    a:int 
+    a:int
     b:int
 union union_test:
-    a:int 
+    a:int
     b:union_test1
 def may():
     c:union_test
