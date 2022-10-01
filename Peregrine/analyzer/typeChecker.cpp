@@ -110,11 +110,10 @@ bool TypeChecker::visit(const ast::ClassDefinition& node) { return true; }
 
 bool TypeChecker::visit(const ast::ImportStatement& node) { return true; }
 
-// TODO: default args
+// TODO: default args and check if a the same function or a variable with same name is defined before
 bool TypeChecker::visit(const ast::FunctionDefinition& node) {
     EnvPtr oldEnv = m_env;
     m_env = createEnv(oldEnv);
-
     std::vector<TypePtr> parameterTypes;
     parameterTypes.reserve(node.parameters().size());
 
@@ -127,13 +126,23 @@ bool TypeChecker::visit(const ast::FunctionDefinition& node) {
 
             param.p_default->accept(*this);
             parameterTypes.push_back(m_result);
-            m_env->set(identifierName(param.p_name), m_result);
+            if(extern_libs.contains(identifierName(param.p_name))){
+                add_error(node.token(),"Cant define a function parameter using a predefined name");
+            }
+            else{
+                m_env->set(identifierName(param.p_name), m_result);
+            }
             continue;
         }
 
         param.p_type->accept(*this);
         parameterTypes.push_back(m_result);
-        m_env->set(identifierName(param.p_name), m_result);
+        if(extern_libs.contains(identifierName(param.p_name))){
+            add_error(node.token(),"Cant define a function parameter using a predefined name");
+        }
+        else{
+            m_env->set(identifierName(param.p_name), m_result);
+        }
     }
     node.returnType()->accept(*this);
     auto returnType=m_result;
@@ -154,11 +163,15 @@ bool TypeChecker::visit(const ast::FunctionDefinition& node) {
     m_currentFunction = oldFunction;
 
     m_env = oldEnv;
-
-    m_env->set(identifierName(node.name()), functionType);
+    if(extern_libs.contains(identifierName(node.name()))){
+        add_error(node.token(),"Cant define a function using a predefined name");
+    }   
+    else{
+        m_env->set(identifierName(node.name()), functionType);
+    }
     return true;
 }
-
+//TODO: default args and check if a the same function or a variable with same name is defined before
 bool TypeChecker::visit(const ast::MethodDefinition& node) {
     EnvPtr oldEnv = m_env;
     m_env = createEnv(oldEnv);
@@ -169,7 +182,12 @@ bool TypeChecker::visit(const ast::MethodDefinition& node) {
     if(reciever.p_type->type()!=ast::KAstNoLiteral){
         reciever.p_type->accept(*this);
         parameterTypes.push_back(m_result);
-        m_env->set(identifierName(reciever.p_name), m_result);
+        if(extern_libs.contains(identifierName(reciever.p_name))){
+            add_error(node.token(),"Cant define a method parameter using a predefined name");
+        }
+        else{
+            m_env->set(identifierName(reciever.p_name), m_result);
+        }
     }
     for (auto& param : node.parameters()) {
         if (param.p_default->type() != ast::KAstNoLiteral) {
@@ -180,13 +198,23 @@ bool TypeChecker::visit(const ast::MethodDefinition& node) {
 
             param.p_default->accept(*this);
             parameterTypes.push_back(m_result);
-            m_env->set(identifierName(param.p_name), m_result);
+            if(extern_libs.contains(identifierName(param.p_name))){
+                add_error(node.token(),"Cant define a method parameter using a predefined name");
+            }
+            else{
+                m_env->set(identifierName(param.p_name), m_result);
+            }
             continue;
         }
 
         param.p_type->accept(*this);
         parameterTypes.push_back(m_result);
-        m_env->set(identifierName(param.p_name), m_result);
+        if(extern_libs.contains(identifierName(param.p_name))){
+            add_error(node.token(),"Cant define a method parameter using a predefined name");
+        }
+        else{
+            m_env->set(identifierName(param.p_name), m_result);
+        }
     }
     node.returnType()->accept(*this);
     auto returnType=m_result;
@@ -208,17 +236,22 @@ bool TypeChecker::visit(const ast::MethodDefinition& node) {
 
     m_env = oldEnv;
 
-    m_env->set(identifierName(node.name()), methodType);
+    if(extern_libs.contains(identifierName(node.name()))){
+        add_error(node.token(),"Cant define a method using a predefined name");
+    }   
+    else{
+        m_env->set(identifierName(node.name()), methodType);
+    }
     return true;
 }
 
 bool TypeChecker::visit(const ast::VariableStatement& node) {
-    //TODO:check if redefination
     auto& nonConstNode = const_cast<ast::VariableStatement&>(node);
     if(node.name()->type()==ast::KAstIdentifier){
         node.varType()->accept(*this);
         TypePtr varType = m_result;
         bool defined_before=defined(node.name());
+        auto name =identifierName(node.name());
         if (varType->category() == TypeCategory::Void) {
             // inferring the type of the variable
             node.value()->accept(*this);
@@ -255,8 +288,12 @@ bool TypeChecker::visit(const ast::VariableStatement& node) {
                 return true;
             }
             nonConstNode.setProcessedType(varType,true);
+            if((m_env->contains(name,true)||extern_libs.contains(name))){
+                add_error(node.token(), "Declaration of a variable using a previously defined name is not allowed.Use a diffrent name");
+            }
         }
-        m_env->set(identifierName(node.name()), varType);
+        m_env->set(name, varType);
+
     }
     else{
         node.name()->accept(*this);
@@ -266,12 +303,11 @@ bool TypeChecker::visit(const ast::VariableStatement& node) {
 }
 
 bool TypeChecker::visit(const ast::ConstDeclaration& node) {
-    //TODO:check if redefination
     auto& nonConstNode = const_cast<ast::ConstDeclaration&>(node);
 
     node.constType()->accept(*this);
     TypePtr constType = m_result;
-
+    
     if (constType->category() == TypeCategory::Void) {
         // inferring the type of the constant
         node.value()->accept(*this);
@@ -304,16 +340,26 @@ bool TypeChecker::visit(const ast::ConstDeclaration& node) {
         }
         nonConstNode.setProcessedType(NULL);
     }
-
-    m_env->set(identifierName(node.name()), constType);
+    auto name =identifierName(node.name());
+    if(m_env->contains(name,true)||extern_libs.contains(name)){
+        add_error(node.token(), "Declaration of a constant using a previously defined name is not allowed.Use a diffrent name");
+    }
+    else{
+        m_env->set(name, constType);
+    }
     return true;
 }
 
 bool TypeChecker::visit(const ast::TypeDefinition& node) {
     node.baseType()->accept(*this);
     TypePtr userDefinedType = std::make_shared<UserDefinedType>(m_result);
-
-    m_env->set(identifierName(node.name()), userDefinedType);
+    auto name=identifierName(node.name());
+    if(extern_libs.contains(name)||m_env->contains(name,true)){
+        add_error(node.token(), "Declaration of a type using a previously defined name is not allowed");
+    }
+    else{
+        m_env->set(name, userDefinedType);
+    }
     return true;
 }
 
@@ -415,7 +461,7 @@ bool TypeChecker::visit(const ast::ReturnStatement& node) {
     }
     return true;
 }
-
+//TODO:default args and check if a the same function or a variable with same name is defined before
 bool TypeChecker::visit(const ast::DecoratorStatement& node) {
     auto function=std::dynamic_pointer_cast<ast::FunctionDefinition>(node.body());
     {
@@ -434,13 +480,23 @@ bool TypeChecker::visit(const ast::DecoratorStatement& node) {
 
                 param.p_default->accept(*this);
                 parameterTypes.push_back(m_result);
-                m_env->set(identifierName(param.p_name), m_result);
+                if(extern_libs.contains(identifierName(param.p_name))){
+                    add_error(node.body()->token(),"Cant define a function parameter using a predefined name");
+                }
+                else{
+                    m_env->set(identifierName(param.p_name), m_result);
+                }
                 continue;
             }
 
             param.p_type->accept(*this);
             parameterTypes.push_back(m_result);
-            m_env->set(identifierName(param.p_name), m_result);
+            if(extern_libs.contains(identifierName(param.p_name))){
+                add_error(node.body()->token(),"Cant define a function parameter using a predefined name");
+            }
+            else{
+                m_env->set(identifierName(param.p_name), m_result);
+            }
         }
         function->returnType()->accept(*this);
         auto returnType=m_result;
@@ -480,6 +536,10 @@ bool TypeChecker::visit(const ast::DecoratorStatement& node) {
             decorator=call->name();
         }
         decorator->accept(*this);
+        if(m_result==nullptr){
+            //Undefined decorator. Error is raised in the visit(ast::FunctionCall) function
+            return true;
+        }
         if (m_result->category() != TypeCategory::Function){
             add_error(node.token(), identifierName(decorator) + " is not a function");
             return true;
@@ -497,7 +557,12 @@ bool TypeChecker::visit(const ast::DecoratorStatement& node) {
         }
         m_result = decoratorType->returnType();
     }
-    m_env->set(identifierName(function->name()), m_result);
+    if(extern_libs.contains(identifierName(function->name()))){
+        add_error(node.token(),"Cant define a function using a predefined name");
+    }   
+    else{
+        m_env->set(identifierName(function->name()), m_result);
+    }
     return true; 
 }
 
@@ -573,18 +638,23 @@ bool TypeChecker::visit(const ast::PostfixExpression& node) {
 
 bool TypeChecker::visit(const ast::FunctionCall& node) {
     node.name()->accept(*this);
-
+    if(m_result==NULL){
+        add_error(node.token(),"Undefined function "+identifierName(node.name()));
+        return true;
+    }
     if (m_result->category() != TypeCategory::Function)
         add_error(node.token(), identifierName(node.name()) + " is not a function");
 
     auto functionType = std::dynamic_pointer_cast<FunctionType>(m_result);
 
-    if (functionType->parameterTypes().size() != node.arguments().size())
+    if (functionType->parameterTypes().size() != node.arguments().size()){
         add_error(node.token(), "invalid number of arguments passed to " +
                                 identifierName(node.name()));
-
-    for (size_t i = 0; i < node.arguments().size(); i++) {
-        check(node.arguments()[i], functionType->parameterTypes()[i]);
+    }
+    else{
+        for (size_t i = 0; i < node.arguments().size(); i++) {
+            check(node.arguments()[i], functionType->parameterTypes()[i]);
+        }
     }
 
     m_result = functionType->returnType();
@@ -592,22 +662,73 @@ bool TypeChecker::visit(const ast::FunctionCall& node) {
 }
 
 bool TypeChecker::visit(const ast::DotExpression& node) {
-    if(node.owner()->type()==ast::KAstIdentifier&&node.referenced()->type()==ast::KAstIdentifier){
+    if(node.owner()->type()==ast::KAstIdentifier){
         auto name=identifierName(node.owner());
-        auto ref=identifierName(node.referenced());
-        auto enum_map=m_env->getEnumMap();
-        if(enum_map.contains(name)){
-            auto type=enum_map[name];
-            auto _enum=std::dynamic_pointer_cast<types::EnumType>(type);
-            auto items=_enum->getItem();
-            if(std::count(items.begin(),items.end(),ref)){
-                m_result=type;
+        if(extern_libs.contains(name)){
+            auto extern_map=m_env->getExternMap();
+            if(extern_map.contains(name)){
+                auto lib=extern_map[name];
+                if(node.referenced()->type()==ast::KAstIdentifier){
+                    auto ref=identifierName(node.referenced());
+                    if(lib.contains(ref)){
+                        m_result= lib[ref];
+                    }
+                    else{
+                        add_error(node.token(),"Undefined member "+ref);
+                    }
+                }
+                else if(node.referenced()->type()==ast::KAstFunctionCall){
+                    auto func=std::dynamic_pointer_cast<ast::FunctionCall>(node.referenced());
+                    auto ref=identifierName(func->name());
+                    if(lib.contains(ref)){
+                        m_result= lib[ref];
+                        if(m_result->category()==Function){
+                            auto func_type=std::dynamic_pointer_cast<FunctionType>(m_result);
+                            if (func_type->parameterTypes().size() != func->arguments().size()){
+                                add_error(func->token(), "invalid number of arguments passed to " +
+                                                        identifierName(func->name()));
+                            }
+                            else{
+                                for (size_t i = 0; i < func->arguments().size(); i++) {
+                                    check(func->arguments()[i], func_type->parameterTypes()[i]);
+                                }
+                            }
+                            m_result=func_type->returnType();
+                        }
+                        else{
+                            add_error(node.token(),ref+" is not a callable function");
+                        }
+                    }
+                    else{
+                        add_error(node.token(),"Undefined member "+ref);
+                    }
+                }
+                else{
+                    assert(false&&"This should have never happened.Create an issue at https://github.com/peregrine-lang/Peregrine/issues");
+                }
             }
             else{
-                add_error(node.token(),ref+" is not a member of "+name);
-                m_result=NULL;
+                //Show error
+                add_error(node.token(),"External library '"+name+"' has no defined member");
             }
-            return true; 
+            return true;
+        }
+        else if(node.referenced()->type()==ast::KAstIdentifier){
+            auto ref=identifierName(node.referenced());
+            auto enum_map=m_env->getEnumMap();
+            if(enum_map.contains(name)){
+                auto type=enum_map[name];
+                auto _enum=std::dynamic_pointer_cast<types::EnumType>(type);
+                auto items=_enum->getItem();
+                if(std::count(items.begin(),items.end(),ref)){
+                    m_result=type;
+                }
+                else{
+                    add_error(node.token(),ref+" is not a member of "+name);
+                    m_result=NULL;
+                }
+                return true; 
+            }
         }
     }
     node.owner()->accept(*this);
@@ -632,7 +753,7 @@ bool TypeChecker::visit(const ast::DotExpression& node) {
             break;            
         }
         default:{
-            add_error(node.token(),"can not access member of "+type->stringify());
+            add_error(node.token(),"No member named "+identifierName(node.referenced()) +" can be found");
             m_result=NULL;
             return true;
         }
@@ -672,8 +793,9 @@ bool TypeChecker::visit(const ast::TypeExpression& node) {
             add_error(node.token(),
                   node.value() + " is not a type"); // return or not return?
         }
-
-        m_result = type.value();
+        else{
+            m_result = type.value();
+        }
         return true;
     }
     else{
@@ -789,7 +911,12 @@ bool TypeChecker::visit(const ast::UnionLiteral& node) {
         add_error(node.token(), "Redefination of union: " + name);
     }
     else{
-        m_env->add_union(name,types::TypeProducer::unionT(name, item_map));
+        if(extern_libs.contains(name)||m_env->contains(name,true)){
+            add_error(node.token(),"Cant define an union type using a predefined name");
+        }
+        else{
+            m_env->add_union(name,types::TypeProducer::unionT(name, item_map));
+        }
     }
     return true; 
 }
@@ -811,7 +938,12 @@ bool TypeChecker::visit(const ast::EnumLiteral& node) {
         add_error(node.token(), "Redefination of enum: " + name);
     }
     else{
-        m_env->add_enum(name,types::TypeProducer::enumT(name, values));
+        if(extern_libs.contains(name)||m_env->contains(name,true)){
+            add_error(node.token(),"Cant define an enum type using a predefined name");
+        }
+        else{
+            m_env->add_enum(name,types::TypeProducer::enumT(name, values));
+        }
     }
     return true; 
 }
@@ -875,6 +1007,11 @@ bool TypeChecker::visit(const ast::TryExcept& node) {
 }
 bool TypeChecker::visit(const ast::MultipleAssign& node){
     auto name=node.names();
+    for(auto& i:name){
+        if((extern_libs.contains(identifierName(i)))){
+            add_error(node.token(), "Declaration of a variable using a previously defined name is not allowed.Use a diffrent name");
+        }
+    }
     auto value=node.values();
     auto assign_type=ast::MultipleAssign::MultiAssignType::Normal;
     //type and if it is defined before
@@ -974,12 +1111,15 @@ bool TypeChecker::visit(const ast::LambdaDefinition& node){
     return true;
 }
 bool TypeChecker::visit(const ast::ExternStatement& node){
-    //TODO:prevent extern name with same variable
-    extern_libs[node.name()]=node.libs();
+    if(m_env->contains(node.name(),false)){
+        add_error(node.token(),"External library can't be defined using previously defined name");
+    }
+    else{
+        extern_libs[node.name()]=node.libs();
+    }
     return true;
 }
 bool TypeChecker::visit(const ast::ExternFuncDef& node) {
-    //TODO:complete it
     if(!extern_libs.contains(node.owner())){
         add_error(node.token(), "Library "+node.owner()+" not found");
         return true;
@@ -994,7 +1134,7 @@ bool TypeChecker::visit(const ast::ExternFuncDef& node) {
     node.returnType()->accept(*this);
     auto return_type = m_result;
     auto functionType = std::make_shared<FunctionType>(param_type, return_type);
-    // m_env->extern_set(name, functionType);
+    m_env->extern_set(node.owner(),identifierName(name), functionType);
     return true;
 }
 }

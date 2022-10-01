@@ -14,6 +14,7 @@ namespace Utils{
 template<typename T>
 class SymbolTable {
     std::map<std::string, T> m_symbols;
+    std::map<std::string, std::map<std::string, T>> m_externMap;
     std::shared_ptr<SymbolTable<T>> m_parent;
     std::map<std::string, T> m_enumMap;
     std::map<std::string, T> m_unionMap;
@@ -24,11 +25,12 @@ class SymbolTable {
         if(m_parent!=nullptr){
             m_enumMap = parent->getEnumMap();
             m_unionMap = parent->getUnionMap();
+            m_externMap = parent->getExternMap();
         }
     }
 
     std::optional<T> get(std::string name) {
-        if (m_symbols.find(name) == m_symbols.end()) {
+        if (!m_symbols.contains(name)) {
             if (!m_parent) {
                 return std::nullopt; // the symbol was not found
             }
@@ -38,7 +40,19 @@ class SymbolTable {
         
         return m_symbols[name];
     }
-
+    bool contains(std::string name,bool in_this_scope){
+        if (m_symbols.find(name) != m_symbols.end()) {
+            return true;
+        }
+        else if (!in_this_scope){
+            if(m_parent){
+                if(m_parent->m_symbols.contains(name)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     std::map<std::string, T> getEnumMap(){
         return m_enumMap;
     }
@@ -55,10 +69,16 @@ class SymbolTable {
         m_unionMap[key]=value;
     }
 
+    void extern_set(std::string lib,std::string name, T value) {
+        m_externMap[lib][name]=value;
+    }
+    std::map<std::string, std::map<std::string, T>> getExternMap(){
+        return m_externMap;
+    }
     bool set(std::string name, T value) {
-        if (get(name)) {
-            return false; // the symbol has been defined already
-        }
+        // if (get(name)) {
+        //     return false; // the symbol has been defined already
+        // }
 
         m_symbols[name] = value;
         get(name);
@@ -69,19 +89,6 @@ class SymbolTable {
         assert(name->type() == ast::KAstIdentifier);
         auto identifier=std::dynamic_pointer_cast<ast::IdentifierExpression>(name);
         return set(identifier->value(), value);
-    }
-
-    bool reassign(std::string name, T value) {
-        if (m_symbols.find(name) == m_symbols.end()) {
-            if (!m_parent) {
-                return false; // the symbol was not found
-            }
-
-            return m_parent->reassign(name, value);
-        }
-
-        m_symbols[name] = value;
-        return true;
     }
 
     std::shared_ptr<SymbolTable<T>> parent() {

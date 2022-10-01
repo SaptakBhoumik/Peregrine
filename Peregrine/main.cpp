@@ -31,7 +31,7 @@ void compile(cli::state s){
         // }
         Parser::Parser parser(tokens, "test");
         ast::AstNodePtr program = parser.parse();
-        std::cout << program->stringify() << "\n";
+        // std::cout << program->stringify() << "\n";
         TypeCheck::TypeChecker typeChecker(program);
         // astValidator::Validator val(program,"test");
         std::cout <<"Typed Ast:- \n"<<program->stringify() << "\n";

@@ -695,8 +695,11 @@ MultipleReturnType::MultipleReturnType(std::vector<TypePtr> returnTypes) {
 
 ast::AstNodePtr MultipleReturnType::getTypeAst() const{
     std::vector<ast::AstNodePtr> params;
-    for (auto& paramType : m_returnTypes)
-        params.push_back(paramType->getTypeAst());
+    for (auto& paramType : m_returnTypes){
+        if(paramType!=nullptr){
+            params.push_back(paramType->getTypeAst());
+        }
+    }
     return std::make_shared<ast::TypeTuple>(params);
 }
 
