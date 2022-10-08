@@ -4,7 +4,14 @@ The compiler was expecting something like a ' or " or } or ) or ]
 
 Take the following example:-
 
-def main():
-    a='bad code
+    Code:
+    def main():
+        a='bad code
 
-As you can see that here the ' is missing at the end. This is the reason of the error. Same goes for dictionary, list, Cppcode elc
+    Error:
+    Missing ' at eof. A symbol if started has to have a closing parameter. The same condition applies to dictionary,list,Cppcode etc.
+    
+    Correction:
+    def main():
+        a='bad code'
+
