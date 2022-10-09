@@ -1,5 +1,5 @@
 <p align='center'>
-   <img id="banner" src="./graphics/banner.png" style="width: 65%; align: center;"/>
+   <a href="https://peregrine-lang.github.io"><img id="banner" src="./graphics/banner.png" style="width: 65%; align: center;"/></a>
    <br/>
    <i>A Blazing-Fast Language for the Blazing-Fast world.</i>
    <br/><br/>

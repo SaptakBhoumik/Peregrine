@@ -900,6 +900,154 @@ ast::AstNodePtr UnionTypeDef::defaultValue() const{
     return std::make_shared<ast::NoLiteral>();
 }
 
+
+ExternUnionTypeDef::ExternUnionTypeDef(std::string lib,std::string name,std::map<std::string,TypePtr> items){
+    m_name=name;
+    m_items=items;
+    m_lib=lib;
+}
+
+ast::AstNodePtr ExternUnionTypeDef::getTypeAst() const{
+    auto lib = std::make_shared<ast::IdentifierExpression>(Token{},m_lib);
+    auto type=std::make_shared<ast::TypeExpression>(Token{},m_name);
+    return std::make_shared<ast::DotExpression>(Token{},lib,type);
+}
+
+TypeCategory ExternUnionTypeDef::category() const{
+    return TypeCategory::ExternUnion;
+}
+
+bool ExternUnionTypeDef::isConvertibleTo(const Type& type) const{
+    return false;
+}
+
+bool ExternUnionTypeDef::isCastableTo(const Type& type) const{
+    switch(type.category()){
+        case TypeCategory::Pointer:
+            return true;
+        default:
+            return false;
+    }
+}
+
+std::string ExternUnionTypeDef::stringify() const{
+    return m_lib+"."+m_name;
+}
+
+std::map<std::string,TypePtr> ExternUnionTypeDef::getItem() const{
+    return m_items;
+}
+
+std::string ExternUnionTypeDef::getName() const{
+    return m_name;
+}
+
+std::string ExternUnionTypeDef::getLibName() const{
+    return m_lib;
+}
+
+bool ExternUnionTypeDef::operator==(const Type& type) const{
+    if(type.category() == TypeCategory::ExternUnion){
+        auto& unionType=dynamic_cast<const ExternUnionTypeDef&>(type);
+        auto items=unionType.getItem();
+        if(m_lib!=unionType.getLibName()){
+            return false;
+        }
+        else if(m_name==unionType.getName()&&items.size()==m_items.size()){
+            for(auto& item : items){
+                if(m_items.contains(item.first)){
+                    auto pos = m_items.find(item.first);
+                    if(pos->second!=item.second){
+                        return false;
+                    }
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+ast::AstNodePtr ExternUnionTypeDef::defaultValue() const{
+    return std::make_shared<ast::NoLiteral>();
+}
+
+
+ExternStructTypeDef::ExternStructTypeDef(std::string lib,std::string name,std::map<std::string,TypePtr> items){
+    m_name=name;
+    m_items=items;
+    m_lib=lib;
+}
+
+ast::AstNodePtr ExternStructTypeDef::getTypeAst() const{
+    auto lib = std::make_shared<ast::IdentifierExpression>(Token{},m_lib);
+    auto type=std::make_shared<ast::TypeExpression>(Token{},m_name);
+    return std::make_shared<ast::DotExpression>(Token{},lib,type);
+}
+
+TypeCategory ExternStructTypeDef::category() const{
+    return TypeCategory::ExternStruct;
+}
+
+bool ExternStructTypeDef::isConvertibleTo(const Type& type) const{
+    return false;
+}
+
+bool ExternStructTypeDef::isCastableTo(const Type& type) const{
+    switch(type.category()){
+        case TypeCategory::Pointer:
+            return true;
+        default:
+            return false;
+    }
+}
+
+std::string ExternStructTypeDef::stringify() const{
+    return m_lib+"."+m_name;
+}
+
+std::map<std::string,TypePtr> ExternStructTypeDef::getItem() const{
+    return m_items;
+}
+
+std::string ExternStructTypeDef::getName() const{
+    return m_name;
+}
+
+std::string ExternStructTypeDef::getLibName() const{
+    return m_lib;
+}
+
+bool ExternStructTypeDef::operator==(const Type& type) const{
+    if(type.category() == TypeCategory::ExternStruct){
+        auto& structType=dynamic_cast<const ExternStructTypeDef&>(type);
+        auto items=structType.getItem();
+        if(m_lib!=structType.getLibName()){
+            return false;
+        }
+        else if(m_name==structType.getName()&&items.size()==m_items.size()){
+            for(auto& item : items){
+                if(m_items.contains(item.first)){
+                    auto pos = m_items.find(item.first);
+                    if(pos->second!=item.second){
+                        return false;
+                    }
+                }
+                else{
+                    return false;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+ast::AstNodePtr ExternStructTypeDef::defaultValue() const{
+    return std::make_shared<ast::NoLiteral>();
+}
+
 std::array<TypePtr, 8> TypeProducer::m_integer = {
     std::make_shared<IntType>(IntType::IntSizes::Int8),
     std::make_shared<IntType>(IntType::IntSizes::Int16),

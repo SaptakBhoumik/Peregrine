@@ -91,11 +91,6 @@ AstNodePtr Parser::parseDict() {
 }
 
 AstNodePtr Parser::parseIdentifier() {
-    //identifier name
-    if (m_currentToken.tkType!=tk_identifier){
-        error(m_currentToken,
-              "Expected identifier but got " + m_currentToken.keyword + " instead");
-    }
     return std::make_shared<IdentifierExpression>(m_currentToken,
                                                   m_currentToken.keyword);
 }

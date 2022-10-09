@@ -30,7 +30,9 @@ enum TypeCategory {
     MultipleReturn,
     Enum,
     Void,
-    Union
+    Union,
+    ExternUnion,
+    ExternStruct,
 };
 
 class Type;
@@ -76,6 +78,50 @@ class Type {
     }
 
     bool operator!=(const Type& type) const { return !operator==(type); }
+};
+
+
+class ExternUnionTypeDef : public Type {
+  public:
+    ExternUnionTypeDef(std::string lib,std::string name,std::map<std::string,TypePtr> items);
+        
+    ast::AstNodePtr getTypeAst() const;
+    TypeCategory category() const;
+    bool isConvertibleTo(const Type& type) const;
+    bool isCastableTo(const Type& type) const;
+    std::string stringify() const;
+    std::map<std::string,TypePtr> getItem() const;
+    std::string getName() const;
+    std::string getLibName() const;
+    ast::AstNodePtr defaultValue() const;
+
+    bool operator==(const Type& type) const;
+    private:
+    std::map<std::string,TypePtr> m_items;
+    std::string m_name;
+    std::string m_lib;
+};
+
+
+class ExternStructTypeDef : public Type {
+  public:
+    ExternStructTypeDef(std::string lib,std::string name,std::map<std::string,TypePtr> items);
+        
+    ast::AstNodePtr getTypeAst() const;
+    TypeCategory category() const;
+    bool isConvertibleTo(const Type& type) const;
+    bool isCastableTo(const Type& type) const;
+    std::string stringify() const;
+    std::map<std::string,TypePtr> getItem() const;
+    std::string getName() const;
+    std::string getLibName() const;
+    ast::AstNodePtr defaultValue() const;
+
+    bool operator==(const Type& type) const;
+    private:
+    std::map<std::string,TypePtr> m_items;
+    std::string m_name;
+    std::string m_lib;
 };
 
 class IntType : public Type {
