@@ -1,5 +1,12 @@
-A virtual function can be declared inside a class only. Here is an example:-
+Error #4: Virtual function cannot be declared outside the class.
 
-class name:
-    virtual __init__(self):
-        ...
+A virtual function can only be declared inside a class.
+
+Example:
+    class <name>:
+        virtual __init__(self):
+            [Your code here]
+            
+In the above example:
+1. Text written between <> is changeable as per requirement.
+2. Code goes between [].
