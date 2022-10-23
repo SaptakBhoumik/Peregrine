@@ -1,9 +1,15 @@
-To define a class use the following syntax
+Error #2: Syntax error in the class definition
 
-class name:
-    "Your code here"
+To define a class, use the following syntax:
 
-To define a class with multiple inheritance use the following syntax
+    class <name>:
+        [Your code here]
 
-class name(object1,object2):
-    "Your code here"
+To define a class with multiple inheritance, use the following syntax:
+
+    class <name>(<object1>,<object2>):
+        [Your code here]
+    
+In the above samples:
+1. Text written between <> is changeable as per requirement.
+2. Code goes between [].
