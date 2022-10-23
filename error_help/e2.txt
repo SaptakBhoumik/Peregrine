@@ -1,5 +1,6 @@
 Error #2: Syntax error in the class definition
 
+Example:
 To define a class, use the following syntax:
 
     class <name>:
@@ -10,6 +11,6 @@ To define a class with multiple inheritance, use the following syntax:
     class <name>(<object1>,<object2>):
         [Your code here]
     
-In the above samples:
+In the above examples:
 1. Text written between <> is changeable as per requirement.
 2. Code goes between [].
