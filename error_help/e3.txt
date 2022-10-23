@@ -1,14 +1,24 @@
-A class can only contain variable or methods or nested class/union or enum
+Error #3: Class contains something other than variables, methods, nested class/union or enum.
 
-Example:-
-class iterate_test:
-    variable:int=0
-    class nested_class:
-        ...
-    enum nested_enum:
-        a,b,c
-    union nested_union:
-        x:int
-        y:float
-    def __init__(self,c):
-        ...
+A class can only contain variable or methods or nested class/union or enum.
+
+Example:
+    class iterate_test:
+        int <variable_name> = 0;
+    
+        class <nested_class>:
+            [Your code here]
+        
+        enum <nested_enum>:
+            a,b,c
+        
+        union <nested_union>:
+            x:int
+            y:float
+        
+        def __init__(self,c):
+            [Your code here]
+            
+In the above example:
+1. Text written between <> is changeable as per requirement.
+2. Code goes between [].
