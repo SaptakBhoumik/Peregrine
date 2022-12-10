@@ -92,9 +92,13 @@
         "locale": "cpp",
         "queue": "cpp",
         "stack": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "__memory": "cpp",
+        "*.inc": "cpp"
     },
     "mesonbuild.configureOnOpen": true,
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
+    "editor.tabCompletion": "on",
+    "diffEditor.codeLens": true,
 }
