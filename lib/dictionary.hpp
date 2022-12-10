@@ -1,5 +1,5 @@
-#ifndef __PEREGRINE__STR__
-#define __PEREGRINE__STR__
+#ifndef __PEREGRINE__DICT__
+#define __PEREGRINE__DICT__
 //TODO: Use peregrine exception instead of c++ throw
 #include "list.hpp"
 namespace Peregrine{
