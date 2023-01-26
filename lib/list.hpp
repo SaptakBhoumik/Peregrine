@@ -34,11 +34,17 @@ class list{
         this->m_capacity=other.m_capacity;
     }
     ~list(){
-        delete[] m_data;
+        if(m_data!=nullptr){
+            delete [] m_data;
+            m_data=nullptr;
+        }
     }
     list<T>& operator=(const list<T>& other){
         if(this!=&other){
-            delete[] m_data;
+            if(m_data!=nullptr){
+                delete[] m_data;
+                m_data=nullptr;
+            }
             m_data=new T[other.m_size];
             this->m_size=other.m_size;
             this->m_capacity=other.m_capacity;
@@ -50,14 +56,20 @@ class list{
     }
     list<T>& operator=(list<T>&& other){
         if(this!=&other){
-            delete[] m_data;
+            if(m_data!=nullptr){
+                delete[] m_data;
+                m_data=nullptr;
+            }
             m_data=new T[other.m_size];
             this->m_size=other.m_size;
             this->m_capacity=other.m_capacity;
             for(size_t i=0;i<m_size;i++){
                 m_data[i]=other.m_data[i];
             }
-            delete[] other.m_data;
+            if(m_data!=nullptr){
+                delete[] other.m_data;
+                other.m_data=nullptr;
+            }
         }
         return *this;
     }
@@ -106,7 +118,10 @@ class list{
             for(size_t i=0;i<m_size;i++){
                 new_data[i]=m_data[i];
             }
-            delete[] m_data;
+            if(m_data!=nullptr){
+                delete[] m_data;
+                m_data=nullptr;
+            }
             m_data=new_data;
         }
         for (size_t i = 0; i < other.m_size; i++)
@@ -128,7 +143,10 @@ class list{
             for(size_t i=0;i<m_size;i++){
                 new_data[i]=m_data[i];
             }
-            delete[] m_data;
+            if(m_data!=nullptr){
+                delete[] m_data;
+                m_data=nullptr;
+            }
             m_data=new_data;
         }
         m_size++;
