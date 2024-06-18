@@ -15,6 +15,7 @@
    <br/>
    <h1>The Peregrine Programming Language</h1>
 </p>
+NOTE:-It has been discontinued. Please use mojo
 
 Peregrine is a Compiled, Systems Programming Language, currently under development.
 
